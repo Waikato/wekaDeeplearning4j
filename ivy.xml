@@ -18,6 +18,9 @@
     <dependency org="org.deeplearning4j" name="deeplearning4j-core" rev="${dependency.deeplearning4j.version}" />
     <dependency org="org.nd4j" name="nd4j-jblas" rev="${dependency.nd4j.version}" />
 
+    <dependency org="com.twelvemonkeys.imageio" name="imageio-core" rev="3.2.1" />
+    <dependency org="com.twelvemonkeys.imageio" name="imageio-jpeg" rev="3.2.1" />
+    <dependency org="com.twelvemonkeys.common" name="common" rev="3.2.1"/>
 
     <dependency org="junit" name="junit" rev="4.5" conf="test->default" />
     </dependencies>
