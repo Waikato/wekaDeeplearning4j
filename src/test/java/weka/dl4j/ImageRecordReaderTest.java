@@ -14,6 +14,8 @@ import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.datasets.vectorizer.ImageVectorizer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.util.ArrayUtil;
 import org.nd4j.linalg.util.FeatureUtil;
 
 public class ImageRecordReaderTest {
@@ -33,12 +35,15 @@ public class ImageRecordReaderTest {
 		System.out.println( labeledPath + "/" + labels.get(0) );
 		
 		ImageLoader loader = new ImageLoader(28, 28);
-		INDArray imgMatrix = loader.asMatrix( new File(labeledPath) );
-		INDArray label = FeatureUtil.toOutcomeVector(0, 10);
+		int[][] imgMatrix = loader.fromFile( new File(labeledPath + "/" + labels.get(10)) );
+
+		double[][] imgFloat = ArrayUtil.toDouble(imgMatrix);
+		INDArray imgFloat2 = Nd4j.create(imgFloat);
 		
-		DataSet d = new DataSet(imgMatrix, label);
+		System.out.println(imgFloat2.columns());
+		System.out.println(imgFloat2.rows());
 		
-		System.out.println(d);
+		
 	}
 
 }
