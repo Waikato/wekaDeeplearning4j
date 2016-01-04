@@ -3,10 +3,10 @@
 # 
 
 # Package name (required)
-PackageName=wekaDeeplearning4j
+PackageName=ChrisDL4J
 
 # Version (required)
-Version=1.0.0
+Version=0.0.1
 
 #Date
 Date=2015-03-25
@@ -31,10 +31,12 @@ Description=Provides several wrapper classifiers for the deeplearning4j neural n
 Changes=
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://prdownloads.sourceforge.net/weka/wekaDeeplearning4j1.0.0.zip?download
+#PackageURL=http://prdownloads.sourceforge.net/weka/wekaDeeplearning4j1.0.0.zip?download
+PackageURL=http://localhost/
 
 # URL for further information
-URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4j
+#URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4j
+URL=http://localhost/
 
 # Enhances various other packages ?
 # Enhances=packageName1,packageName2,...

@@ -2,7 +2,7 @@ package weka.dl4j.layers;
 
 public class Constants {
 	
-	public static final String LAYER = "l";
+	public static final String LAYER = "layer";
 	public static final String NUM_UNITS = "num_units";
 	public static final String WEIGHT_INIT = "weight_init";
 	public static final String ACTIVATION = "activation";

@@ -34,107 +34,110 @@ import weka.filters.unsupervised.attribute.Standardize;
 
 /**
  * Chris Beckham's DL4J classifier.
+ * 
  * @author cjb60
  */
 public class ChrisDL4JClassifier extends RandomizableClassifier {
-	
+
 	private ReplaceMissingValues m_replaceMissing = null;
 	private Filter m_normalize = null;
 	private boolean m_standardizeInsteadOfNormalize = true;
 	private NominalToBinary m_nominalToBinary = null;
 	private ZeroR m_zeroR = new ZeroR();
-	
+
 	private MultiLayerNetwork m_model = null;
 
 	private static final long serialVersionUID = -6363244115597574265L;
-	
-	private Layer[] m_layers = new Layer[] { };
-	
+
+	private Layer[] m_layers = new Layer[] {};
+
 	public void setLayers(Layer[] layers) {
 		m_layers = layers;
 	}
-	
-	@OptionMetadata(description = "Layers", displayName = "layers", displayOrder=1)
+
+	@OptionMetadata(description = "Layers", displayName = "layers", displayOrder = 1)
 	public Layer[] getLayers() {
 		return m_layers;
 	}
-	
+
 	private int m_numIterations = 100;
-	
+
 	public void setNumIterations(int numIterations) {
 		m_numIterations = numIterations;
 	}
-	
+
 	public int getNumIterations() {
 		return m_numIterations;
 	}
-	
+
+	/*
 	private GradientNormalization m_gradientNorm = GradientNormalization.None;
-	
+
 	public GradientNormalization getGradientNorm() {
 		return m_gradientNorm;
 	}
-	
+
 	public void setGradientNorm(GradientNormalization gradientNorm) {
 		m_gradientNorm = gradientNorm;
 	}
-	
+	*/
+
 	private OptimizationAlgorithm m_optimAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
-	
+
 	public OptimizationAlgorithm getOptimizationAlgorithm() {
 		return m_optimAlgorithm;
 	}
-	
+
 	public void setOptimizationAlgorithm(OptimizationAlgorithm optimAlgorithm) {
 		m_optimAlgorithm = optimAlgorithm;
 	}
-	
+
 	private double m_learningRate = 0.01;
-	
+
 	public double getLearningRate() {
 		return m_learningRate;
 	}
-	
+
 	public void setLearningRate(double learningRate) {
 		m_learningRate = learningRate;
 	}
-	
+
 	private double m_momentum = 0.9;
-	
+
 	public double getMomentum() {
 		return m_momentum;
 	}
-	
+
 	public void setMomentum(double momentum) {
 		m_momentum = momentum;
 	}
-	
+
 	private LossFunction m_lossFunction = LossFunction.MCXENT;
-	
+
 	public LossFunction getLossFunction() {
 		return m_lossFunction;
 	}
-	
+
 	public void setLossFunction(LossFunction lossFunction) {
 		m_lossFunction = lossFunction;
 	}
-	
+
 	public Updater m_updater = Updater.NESTEROVS;
-	
+
 	public Updater getUpdater() {
 		return m_updater;
 	}
-	
+
 	public void setUpdater(Updater updater) {
 		m_updater = updater;
 	}
 
 	public void validate() throws Exception {
-		if(m_layers.length == 0) {
+		if (m_layers.length == 0) {
 			throw new Exception("No layers have been added!");
 		}
 	}
-	
+
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		// validate
@@ -167,40 +170,41 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 		DataSet dataset = Utils.instancesToDataSet(data);
 		// construct the mlp configuration
 		ListBuilder ip = new NeuralNetConfiguration.Builder()
-			.seed( getSeed() )
-			.iterations( getNumIterations() )
-			.learningRate( getLearningRate() )
-			.gradientNormalization( getGradientNorm() )
-			.optimizationAlgo( getOptimizationAlgorithm() )
-			.updater( getUpdater() )
-			.list( m_layers.length+1 );
-		
-		for(int x = 0; x < m_layers.length; x++) {
-			if(x == 0) {
-				ip = ip.layer(x, m_layers[x].getLayer(x, data.numAttributes()-1));
+				.seed(getSeed())
+				.iterations(getNumIterations())
+				.learningRate(getLearningRate())
+				//.gradientNormalization(getGradientNorm())
+				.optimizationAlgo(getOptimizationAlgorithm())
+				.updater(getUpdater()).list(m_layers.length + 1);
+		for (int x = 0; x < m_layers.length; x++) {
+			if (x == 0) {
+				ip = ip.layer(x,
+						m_layers[x].getLayer(x, data.numAttributes() - 1));
 			} else {
-				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x-1];
-				ip = ip.layer( x, m_layers[x].getLayer(x, prevLayer.getNumUnits()) );
+				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
+				ip = ip.layer(x,
+						m_layers[x].getLayer(x, prevLayer.getNumUnits()));
 			}
 		}
 
 		// TODO: make output layer selectable
-		
-		weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[ m_layers.length - 1 ];
-		ip = ip.layer(m_layers.length, new OutputLayer.Builder( getLossFunction() )
-        	.weightInit(WeightInit.XAVIER)
-        	.activation("softmax")
-        	.nIn( prevLayer.getNumUnits() ).nOut( data.numClasses() )
-        	.build());
+
+		weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[m_layers.length - 1];
+		ip = ip.layer(
+				m_layers.length,
+				new OutputLayer.Builder(getLossFunction())
+				.weightInit(WeightInit.XAVIER).activation("softmax")
+				.nIn(prevLayer.getNumUnits()).nOut(data.numClasses())
+				.build());
 		ip = ip.backprop(true);
 		MultiLayerConfiguration conf = ip.build();
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
-        // train
+		// train
 		m_model.fit(dataset);
 	}
-	
+
 	public double[] distributionForInstance(Instance inst) throws Exception {
 		if (m_zeroR != null) {
 			return m_zeroR.distributionForInstance(inst);
@@ -220,7 +224,7 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 		weka.core.Utils.normalize(preds);
 		return preds;
 	}
-	
+
 	public static String getSpec(Object obj) {
 		String result;
 		if (obj == null) {
@@ -229,69 +233,93 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 			result = obj.getClass().getName();
 			if (obj instanceof OptionHandler) {
 				result += " "
-		          + weka.core.Utils.joinOptions(((OptionHandler) obj).getOptions());
+						+ weka.core.Utils.joinOptions(((OptionHandler) obj)
+								.getOptions());
 			}
-		}		
+		}
 		return result;
 	}
-	
-	public static Object specToObject(String str, Class<?> classType) throws Exception {	
+
+	public static Object specToObject(String str, Class<?> classType)
+			throws Exception {
 		String[] options = weka.core.Utils.splitOptions(str);
 		String base = options[0];
 		options[0] = "";
 		return weka.core.Utils.forName(classType, base, options);
 	}
-	
+
 	@Override
 	public String[] getOptions() {
-	    Vector<String> result = new Vector<String>();
-	    String[] options = super.getOptions();
-	    for (int i = 0; i < options.length; i++) {
-	      result.add(options[i]);
-	    }
-	    // layers
-	    for (int i = 0; i < getLayers().length; i++) {
-	      result.add("-" + Constants.LAYER);
-	      result.add( getSpec(getLayers()[i]) );
-	    }
-	    // num iterations
-	    result.add("-" + Constants.NUM_ITERATIONS);
-	    result.add( "" + getNumIterations() );
-	    // gradient norm
-	    result.add("-" + Constants.GRADIENT_NORM);
-	    result.add( "" + getGradientNorm().name() );
-	    // optimization algorithm
-	    result.add("-" + Constants.OPTIMIZATION_ALGORITHM);
-	    result.add( "" + getOptimizationAlgorithm().name());
-	    // learning rate
-	    result.add("-" + Constants.LEARNING_RATE);
-	    result.add( "" + getLearningRate() );
-	    // momentum
-	    result.add("-" + Constants.MOMENTUM);
-	    result.add( "" + getMomentum() );   
-	    // loss function
-	    result.add("-" + Constants.LOSS_FUNCTION);
-	    result.add( "" + getLossFunction().name() );
-	    // updater
-	    result.add("-" + Constants.UPDATER);
-	    result.add( "" + getUpdater().name() );	    
-	    
-	    return result.toArray(new String[result.size()]);
+		Vector<String> result = new Vector<String>();
+		String[] options = super.getOptions();
+		for (int i = 0; i < options.length; i++) {
+			result.add(options[i]);
+		}
+		// layers
+		for (int i = 0; i < getLayers().length; i++) {
+			result.add("-" + Constants.LAYER);
+			result.add(getSpec(getLayers()[i]));
+		}
+		// num iterations
+		result.add("-" + Constants.NUM_ITERATIONS);
+		result.add("" + getNumIterations());
+		// gradient norm
+		//result.add("-" + Constants.GRADIENT_NORM);
+		//result.add("" + getGradientNorm().name());
+		// optimization algorithm
+		result.add("-" + Constants.OPTIMIZATION_ALGORITHM);
+		result.add("" + getOptimizationAlgorithm().name());
+		// learning rate
+		result.add("-" + Constants.LEARNING_RATE);
+		result.add("" + getLearningRate());
+		// momentum
+		result.add("-" + Constants.MOMENTUM);
+		result.add("" + getMomentum());
+		// loss function
+		result.add("-" + Constants.LOSS_FUNCTION);
+		result.add("" + getLossFunction().name());
+		// updater
+		result.add("-" + Constants.UPDATER);
+		result.add("" + getUpdater().name());
+
+		return result.toArray(new String[result.size()]);
 	}
-	
+
 	@Override
 	public void setOptions(String[] options) throws Exception {
 		super.setOptions(options);
 		// layers
-		Vector<Layer> layers = new Vector<Layer>();
+		Vector<weka.dl4j.layers.Layer> layers = new Vector<weka.dl4j.layers.Layer>();
 		String tmpStr = null;
-		while ((tmpStr = weka.core.Utils.getOption(Constants.LAYER, options)).length() != 0) {
-			layers.add( (Layer) specToObject(tmpStr, Layer.class) );
+		while ((tmpStr = weka.core.Utils.getOption(Constants.LAYER, options))
+				.length() != 0) {
+			layers.add((weka.dl4j.layers.Layer) specToObject(tmpStr, weka.dl4j.layers.Layer.class));
 		}
 		if (layers.size() == 0) {
 			layers.add(new weka.dl4j.layers.DenseLayer());
 		}
-		setLayers( layers.toArray(new Layer[layers.size()]) );
+		setLayers(layers.toArray(new weka.dl4j.layers.Layer[layers.size()]));
+		// num iterations
+		String tmp = weka.core.Utils.getOption(Constants.NUM_ITERATIONS, options);
+		if(!tmp.equals("")) setNumIterations( Integer.parseInt(tmp) );
+		// gradient norm
+		//
+		//
+		// optimization algorithm
+		tmp = weka.core.Utils.getOption(Constants.OPTIMIZATION_ALGORITHM, options);
+		if(!tmp.equals("")) setOptimizationAlgorithm( OptimizationAlgorithm.valueOf(tmp) );
+		// learning rate
+		tmp = weka.core.Utils.getOption(Constants.LEARNING_RATE, options);
+		if(!tmp.equals("")) setLearningRate( Double.parseDouble(tmp) );
+		// momentum
+		tmp = weka.core.Utils.getOption(Constants.MOMENTUM, options);
+		if(!tmp.equals("")) setMomentum( Double.parseDouble(tmp) );
+		// loss function
+		tmp = weka.core.Utils.getOption(Constants.LOSS_FUNCTION, options);
+		if(!tmp.equals("")) setLossFunction( LossFunction.valueOf(tmp) );
+		// updater
+		tmp = weka.core.Utils.getOption(Constants.UPDATER, options);
+		if(!tmp.equals("")) setUpdater( Updater.valueOf(tmp) );
 	}
 
 }
