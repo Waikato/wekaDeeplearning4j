@@ -1,5 +1,6 @@
 package weka.classifiers.functions;
 
+import java.io.File;
 import java.util.Random;
 import java.util.Vector;
 
@@ -20,11 +21,13 @@ import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
+import weka.core.Environment;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.layers.Constants;
+import weka.dl4j.layers.FileIterationListener;
 import weka.dl4j.layers.Layer;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -48,6 +51,16 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 	private MultiLayerNetwork m_model = null;
 
 	private static final long serialVersionUID = -6363244115597574265L;
+	
+	protected String m_debugFile = System.getProperty("user.dir");
+	
+	public String getDebugFile() {
+		return m_debugFile;
+	}
+
+	public void setDebugFile(String debugFile) {
+		m_debugFile = debugFile;
+	}
 
 	private Layer[] m_layers = new Layer[] {};
 
@@ -58,6 +71,16 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 	@OptionMetadata(description = "Layers", displayName = "layers", displayOrder = 1)
 	public Layer[] getLayers() {
 		return m_layers;
+	}
+	
+	private int m_trainBatchSize = 1;
+	
+	public void setTrainBatchSize(int trainBatchSize) {
+		m_trainBatchSize = trainBatchSize;
+	}
+	
+	public int getTrainBatchSize() {
+		return m_trainBatchSize;
 	}
 
 	private int m_numIterations = 100;
@@ -112,16 +135,6 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 		m_momentum = momentum;
 	}
 
-	private LossFunction m_lossFunction = LossFunction.MCXENT;
-
-	public LossFunction getLossFunction() {
-		return m_lossFunction;
-	}
-
-	public void setLossFunction(LossFunction lossFunction) {
-		m_lossFunction = lossFunction;
-	}
-
 	public Updater m_updater = Updater.NESTEROVS;
 
 	public Updater getUpdater() {
@@ -135,6 +148,9 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 	public void validate() throws Exception {
 		if (m_layers.length == 0) {
 			throw new Exception("No layers have been added!");
+		}
+		if( ! (m_layers[ m_layers.length-1 ] instanceof weka.dl4j.layers.OutputLayer) ) {
+			throw new Exception("Last layer in network must be an output layer!");
 		}
 	}
 
@@ -173,34 +189,39 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 				.seed(getSeed())
 				.iterations(getNumIterations())
 				.learningRate(getLearningRate())
+				.momentum(getMomentum())
 				//.gradientNormalization(getGradientNorm())
 				.optimizationAlgo(getOptimizationAlgorithm())
-				.updater(getUpdater()).list(m_layers.length + 1);
+				.updater(getUpdater())
+				.batchSize( getTrainBatchSize() )
+				.list(m_layers.length);
 		for (int x = 0; x < m_layers.length; x++) {
 			if (x == 0) {
-				ip = ip.layer(x,
-						m_layers[x].getLayer(x, data.numAttributes() - 1));
-			} else {
+				// input layer
+				m_layers[x].setNumIncoming(data.numAttributes()-1);
+				ip = ip.layer(x, m_layers[x].getLayer() );
+			} else if ( x == m_layers.length-1 ) {
+				// output layer
 				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
-				ip = ip.layer(x,
-						m_layers[x].getLayer(x, prevLayer.getNumUnits()));
+				m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+				m_layers[x].setNumOutgoing(data.numClasses());
+				ip = ip.layer(x, m_layers[x].getLayer() );
+			} else {
+				// intermediate layer
+				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
+				m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+				ip = ip.layer(x, m_layers[x].getLayer());
 			}
 		}
-
-		// TODO: make output layer selectable
-
-		weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[m_layers.length - 1];
-		ip = ip.layer(
-				m_layers.length,
-				new OutputLayer.Builder(getLossFunction())
-				.weightInit(WeightInit.XAVIER).activation("softmax")
-				.nIn(prevLayer.getNumUnits()).nOut(data.numClasses())
-				.build());
-		ip = ip.backprop(true);
+		ip = ip.pretrain(false).backprop(true);
 		MultiLayerConfiguration conf = ip.build();
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
+		// if the debug file doesn't point to a directory, set up the listener
+		if( ! new File(getDebugFile()).isDirectory() ) {
+			m_model.setListeners(new FileIterationListener(getDebugFile()));
+		}
 		// train
 		m_model.fit(dataset);
 	}
@@ -276,11 +297,19 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 		result.add("-" + Constants.MOMENTUM);
 		result.add("" + getMomentum());
 		// loss function
-		result.add("-" + Constants.LOSS_FUNCTION);
-		result.add("" + getLossFunction().name());
+		//result.add("-" + Constants.LOSS_FUNCTION);
+		//result.add("" + getLossFunction().name());
 		// updater
 		result.add("-" + Constants.UPDATER);
 		result.add("" + getUpdater().name());
+		// train batch size
+		result.add("-" + Constants.TRAIN_BATCH_SIZE);
+		result.add("" + getTrainBatchSize());
+		// debug file
+		if( ! new File(getDebugFile()).isDirectory() ) {
+			result.add("-" + Constants.DEBUG_FILE);
+			result.add( getDebugFile() );
+		}
 
 		return result.toArray(new String[result.size()]);
 	}
@@ -315,11 +344,25 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 		tmp = weka.core.Utils.getOption(Constants.MOMENTUM, options);
 		if(!tmp.equals("")) setMomentum( Double.parseDouble(tmp) );
 		// loss function
-		tmp = weka.core.Utils.getOption(Constants.LOSS_FUNCTION, options);
-		if(!tmp.equals("")) setLossFunction( LossFunction.valueOf(tmp) );
+		//tmp = weka.core.Utils.getOption(Constants.LOSS_FUNCTION, options);
+		//if(!tmp.equals("")) setLossFunction( LossFunction.valueOf(tmp) );
 		// updater
 		tmp = weka.core.Utils.getOption(Constants.UPDATER, options);
 		if(!tmp.equals("")) setUpdater( Updater.valueOf(tmp) );
+		// train batch size
+		tmp = weka.core.Utils.getOption(Constants.TRAIN_BATCH_SIZE, options);
+		if(!tmp.equals("")) setTrainBatchSize( Integer.parseInt(tmp) );
+		// debug file
+		tmp = weka.core.Utils.getOption(Constants.DEBUG_FILE, options);
+		if(!tmp.equals("")) setDebugFile(tmp);
+	}
+	
+	@Override
+	public String toString() {
+		if(m_model != null) {
+			return m_model.conf().toYaml();
+		}
+		return null;
 	}
 
 }

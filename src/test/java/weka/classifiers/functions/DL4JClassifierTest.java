@@ -13,7 +13,12 @@ public class DL4JClassifierTest {
 		
 		ChrisDL4JClassifier cls = new ChrisDL4JClassifier();
 		cls.setLayers(new weka.dl4j.layers.Layer[] {
-				new weka.dl4j.layers.DenseLayer(), new weka.dl4j.layers.DenseLayer() } );
+				new weka.dl4j.layers.DenseLayer(),
+				new weka.dl4j.layers.DenseLayer(),
+				new weka.dl4j.layers.OutputLayer() 
+		});
+		cls.setTrainBatchSize(1);
+		cls.setDebugFile("/tmp/debug.txt");
 		cls.buildClassifier(data);
 		
 		cls.distributionsForInstances(data);

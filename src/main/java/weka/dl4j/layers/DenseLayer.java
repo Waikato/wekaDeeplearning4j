@@ -6,11 +6,11 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import weka.core.Option;
 import weka.core.Utils;
 
-public class DenseLayer implements Layer {
+public class DenseLayer extends Layer {
 
-	private static final long serialVersionUID = -6905917800811990400L;
+	protected static final long serialVersionUID = -6905917800811990400L;
 	
-	private String m_activation = "tanh";
+	protected String m_activation = "tanh";
 	
 	public String getActivation() {
 		return m_activation;
@@ -20,7 +20,7 @@ public class DenseLayer implements Layer {
 		m_activation = activation;
 	}
 	
-	private int m_numUnits = 1;
+	protected int m_numUnits = 1;
 	
 	public int getNumUnits() {
 		return m_numUnits;
@@ -30,7 +30,7 @@ public class DenseLayer implements Layer {
 		m_numUnits = numUnits;
 	}
 	
-	private double m_dropoutP = 0.0;
+	protected double m_dropoutP = 0.0;
 	
 	public double getDropoutP() {
 		return m_dropoutP;
@@ -40,7 +40,7 @@ public class DenseLayer implements Layer {
 		m_dropoutP = dropoutP;
 	}
 	
-	private double m_l1 = 0.0;
+	protected double m_l1 = 0.0;
 	
 	public double getL1() {
 		return m_l1;
@@ -50,7 +50,7 @@ public class DenseLayer implements Layer {
 		m_l1 = l1;
 	}
 	
-	private double m_l2 = 0.0;
+	protected double m_l2 = 0.0;
 	
 	public double getL2() {
 		return m_l2;
@@ -61,9 +61,9 @@ public class DenseLayer implements Layer {
 	}
 	
 	@Override
-	public org.deeplearning4j.nn.conf.layers.Layer getLayer(int layerNumber, int numInputs) {	
+	public org.deeplearning4j.nn.conf.layers.Layer getLayer() {	
 		org.deeplearning4j.nn.conf.layers.DenseLayer layer = new org.deeplearning4j.nn.conf.layers.DenseLayer.Builder()
-			.nIn(numInputs)
+			.nIn(m_numIncoming)
 			.nOut( getNumUnits() )
 			.activation( getActivation() )
 			.weightInit( getWeightInit() )
@@ -74,7 +74,7 @@ public class DenseLayer implements Layer {
 		return layer;
 	}
 	
-	private WeightInit m_weightInit = WeightInit.XAVIER;
+	protected WeightInit m_weightInit = WeightInit.XAVIER;
 	
 	public WeightInit getWeightInit() {
 		return m_weightInit;
