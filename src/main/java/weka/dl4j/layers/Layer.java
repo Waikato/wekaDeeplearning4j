@@ -1,8 +1,10 @@
 package weka.dl4j.layers;
 
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
+import java.io.Serializable;
 
-public interface Layer {
+import weka.core.OptionHandler;
+
+public interface Layer extends Serializable, OptionHandler {
 	
 	public org.deeplearning4j.nn.conf.layers.Layer getLayer(int layerNumber, int numInputs);
 

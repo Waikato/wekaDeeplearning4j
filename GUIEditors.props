@@ -1,0 +1,2 @@
+weka.dl4j.layers.Layer=weka.gui.GenericObjectEditor
+weka.dl4j.layers.Layer[]=weka.gui.GenericArrayEditor
