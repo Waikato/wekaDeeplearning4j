@@ -5,18 +5,20 @@ import java.util.Vector;
 import org.deeplearning4j.nn.weights.WeightInit;
 import weka.core.Option;
 import weka.core.Utils;
+import weka.dl4j.Activation;
+import weka.dl4j.Constants;
 
 public class DenseLayer extends Layer {
 
 	protected static final long serialVersionUID = -6905917800811990400L;
 	
-	protected String m_activation = "tanh";
+	protected Activation m_activation = Activation.RELU;
 	
-	public String getActivation() {
+	public Activation getActivation() {
 		return m_activation;
 	}
 	
-	public void setActivation(String activation) {
+	public void setActivation(Activation activation) {
 		m_activation = activation;
 	}
 	
@@ -65,7 +67,7 @@ public class DenseLayer extends Layer {
 		org.deeplearning4j.nn.conf.layers.DenseLayer layer = new org.deeplearning4j.nn.conf.layers.DenseLayer.Builder()
 			.nIn(m_numIncoming)
 			.nOut( getNumUnits() )
-			.activation( getActivation() )
+			.activation( getActivation().name().toLowerCase() )
 			.weightInit( getWeightInit() )
 			.dropOut( getDropoutP() )
 			.l1( getL1() )
@@ -96,7 +98,7 @@ public class DenseLayer extends Layer {
 		if(!tmp.equals("")) setNumUnits( Integer.parseInt(tmp) );
 		// activation
 		tmp = Utils.getOption(Constants.ACTIVATION, options);
-		if(!tmp.equals("")) setActivation(tmp);
+		if(!tmp.equals("")) setActivation( Activation.valueOf(tmp.toUpperCase()) );
 		// weight init
 		tmp = Utils.getOption(Constants.WEIGHT_INIT, options);
 		setWeightInit( WeightInit.valueOf(tmp) );
@@ -119,7 +121,7 @@ public class DenseLayer extends Layer {
 		result.add( "" + getNumUnits() );
 		// activation
 		result.add( "-" + Constants.ACTIVATION);
-		result.add( "" + getActivation() );
+		result.add( "" + getActivation().name().toLowerCase() );
 		// weight init
 		result.add("-" + Constants.WEIGHT_INIT);
 		result.add( "" + getWeightInit().name() );

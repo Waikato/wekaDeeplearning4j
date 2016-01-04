@@ -1,4 +1,4 @@
-package weka.dl4j.layers;
+package weka.dl4j;
 
 public class Constants {
 	

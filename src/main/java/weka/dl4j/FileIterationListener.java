@@ -1,4 +1,4 @@
-package weka.dl4j.layers;
+package weka.dl4j;
 
 import java.io.File;
 import java.io.FileWriter;

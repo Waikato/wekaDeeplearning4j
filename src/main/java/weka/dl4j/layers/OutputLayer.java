@@ -1,7 +1,8 @@
 package weka.dl4j.layers;
 
 import java.util.Vector;
-
+import weka.dl4j.Constants;
+import weka.dl4j.Activation;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 public class OutputLayer extends DenseLayer {
@@ -10,7 +11,7 @@ public class OutputLayer extends DenseLayer {
 	
 	public OutputLayer() {
 		super();
-		m_activation = "softmax";
+		m_activation = Activation.SOFTMAX;
 	}
 	
 	private LossFunction m_lossFunction = LossFunction.MCXENT;
@@ -28,7 +29,7 @@ public class OutputLayer extends DenseLayer {
 		org.deeplearning4j.nn.conf.layers.OutputLayer layer = new org.deeplearning4j.nn.conf.layers.OutputLayer.Builder()
 			.nIn(m_numIncoming)
 			.nOut(m_numOutgoing)
-			.activation( getActivation() )
+			.activation( getActivation().name().toLowerCase() )
 			.weightInit( getWeightInit() )
 			.dropOut( getDropoutP() )
 			.l1( getL1() )
