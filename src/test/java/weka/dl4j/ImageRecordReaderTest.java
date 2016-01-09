@@ -5,18 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.canova.api.records.reader.RecordReader;
 import org.canova.api.split.FileSplit;
-import org.canova.image.loader.ImageLoader;
 import org.canova.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
-import org.deeplearning4j.datasets.vectorizer.ImageVectorizer;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.util.ArrayUtil;
-import org.nd4j.linalg.util.FeatureUtil;
+
+
+
 
 public class ImageRecordReaderTest {
 	
@@ -24,7 +20,7 @@ public class ImageRecordReaderTest {
 		
 		int numClasses = 10;
 		
-		String labeledPath = "/Users/cjb60/github/wekaDeeplearning4j/mnist-data/0/";
+		String labeledPath = "/Users/cjb60/github/wekaDeeplearning4j/mnist-data/";
 		
 		List<String> labels = new ArrayList<>();
 		for(File f : new File(labeledPath).listFiles()) {
@@ -32,16 +28,37 @@ public class ImageRecordReaderTest {
 			labels.add(filename);
 		}
 		
-		System.out.println( labeledPath + "/" + labels.get(0) );
+		/*
 		
-		ImageLoader loader = new ImageLoader(28, 28);
-		int[][] imgMatrix = loader.fromFile( new File(labeledPath + "/" + labels.get(10)) );
-
-		double[][] imgFloat = ArrayUtil.toDouble(imgMatrix);
-		INDArray imgFloat2 = Nd4j.create(imgFloat);
+		ArrayList<DataSet> imgs = new ArrayList<DataSet>();
+		for(int x = 0; x < labels.size(); x++) {
+			System.out.println("iter: " + x);
+			ImageLoader loader = new ImageLoader(28, 28);
+			// load the image as an int matrix
+			int[][] imgMatrix = loader.fromFile( new File(labeledPath + "/" + labels.get(x)) );
+			// convert to double matrix
+			double[][] imgFloat = ArrayUtil.toDouble(imgMatrix);
+			// convert to indarray
+			INDArray imgFloat2 = Nd4j.create(imgFloat);
+			//System.out.println(imgFloat2.columns());
+			//System.out.println(imgFloat2.rows());
+			DataSet d = new DataSet(imgFloat2, FeatureUtil.toOutcomeVector(1, numClasses));
+			imgs.add(d);
+		}
 		
-		System.out.println(imgFloat2.columns());
-		System.out.println(imgFloat2.rows());
+		System.out.println(imgs.size());
+		
+		*/
+		
+		System.out.println(labels);
+		
+		ImageRecordReader reader = new ImageRecordReader(28, 28, true, labels);
+		reader.initialize(new FileSplit(new File(labeledPath)));
+		
+		DataSetIterator iter = new RecordReaderDataSetIterator(reader, 784, labels.size());
+		DataSet d = iter.next();
+		
+		System.out.println(d.get(0));
 		
 		
 	}

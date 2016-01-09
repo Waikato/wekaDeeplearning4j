@@ -186,7 +186,7 @@ public class ChrisDL4JClassifier extends RandomizableClassifier {
 				//.gradientNormalization(getGradientNorm())
 				.optimizationAlgo(getOptimizationAlgorithm())
 				.updater(getUpdater())
-				.batchSize( getTrainBatchSize() )
+				//.batchSize( getTrainBatchSize() )
 				.list(m_layers.length);
 		for (int x = 0; x < m_layers.length; x++) {
 			if (x == 0) {
