@@ -1,4 +1,4 @@
-<project name="weka-package" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="weka-package" default="compile" basedir=".">
 <!-- 
   ===========================================================================
    Ant build file for a weka package
@@ -9,7 +9,7 @@
   ===========================================================================
 -->
 
-<import file="build-res/subfloor.xml"/>
+  <!-- <import file="build-res/subfloor.xml"/> -->
 
   <!-- set global properties for this build -->
   <property name="src" value="src/main/java"/>
@@ -51,7 +51,8 @@
   </target>
 
   <!-- Compile the java code from ${src}/weka into ${build}/classes -->
-  <target name="compile" depends="init_compile,resolve" 
+  <!-- resolve was previously in depends -->
+  <target name="compile" depends="init_compile"
    description="Compile package and deposit class files in build/classes">
     <javac srcdir="${src}" 
       fork="yes" memoryMaximumSize="${javac_max_memory}"
