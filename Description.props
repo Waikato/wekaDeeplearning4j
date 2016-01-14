@@ -3,7 +3,7 @@
 # 
 
 # Package name (required)
-PackageName=ChrisDL4J
+PackageName=wekaDl4j
 
 # Version (required)
 Version=0.0.1
@@ -17,7 +17,7 @@ Title=Weka wrappers for deeplearning4j
 Category=Classification
 
 # Author (required)
-Author=Mark Hall
+Author=Christopher Beckham
 
 # Maintainer (required)
 Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
