@@ -33,7 +33,7 @@ import weka.filters.unsupervised.attribute.Standardize;
  * 
  * @author cjb60
  */
-public class ChrisDL4JClassifier extends RandomizableClassifier {
+public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	private ReplaceMissingValues m_replaceMissing = null;
 	private Filter m_normalize = null;
