@@ -1,6 +1,6 @@
 #!/bin/bash
 
-java -Xmx5g -cp ../build/classes/:$WEKA_HOME/weka.jar:/Users/cjb60/github/weka-fresh/build/testcases/:../lib/* weka.Run \
+java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      .Dl4jMlpClassifier \
      -S 0 \
      -layer "weka.dl4j.layers.DenseLayer -units 10 -activation tanh -init XAVIER" \
