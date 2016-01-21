@@ -222,7 +222,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// train
 		MultipleEpochsIterator iter = new MultipleEpochsIterator(
 				getNumIterations()-1, 
-				new ShufflingDataSetIterator(dataset, getTrainBatchSize()));
+				new ShufflingDataSetIterator(dataset, getTrainBatchSize(), getSeed()));
 		m_model.fit(iter);
 	}
 
