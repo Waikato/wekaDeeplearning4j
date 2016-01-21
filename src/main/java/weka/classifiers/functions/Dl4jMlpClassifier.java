@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Random;
 import java.util.Vector;
 
+import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -12,6 +13,7 @@ import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
@@ -21,6 +23,7 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.Constants;
 import weka.dl4j.FileIterationListener;
+import weka.dl4j.ShufflingDataSetIterator;
 import weka.dl4j.layers.Layer;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -180,7 +183,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// construct the mlp configuration
 		ListBuilder ip = new NeuralNetConfiguration.Builder()
 				.seed(getSeed())
-				.iterations(getNumIterations())
+				.iterations(1)
 				.learningRate(getLearningRate())
 				.momentum(getMomentum())
 				//.gradientNormalization(getGradientNorm())
@@ -211,12 +214,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
+		int numMiniBatches = (int) Math.ceil( ((double)dataset.numExamples()) / ((double)getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
 		if( ! new File(getDebugFile()).isDirectory() ) {
-			m_model.setListeners(new FileIterationListener(getDebugFile()));
+			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
 		// train
-		m_model.fit(dataset);
+		MultipleEpochsIterator iter = new MultipleEpochsIterator(
+				getNumIterations()-1, 
+				new ShufflingDataSetIterator(dataset, getTrainBatchSize()));
+		m_model.fit(iter);
 	}
 
 	public double[] distributionForInstance(Instance inst) throws Exception {

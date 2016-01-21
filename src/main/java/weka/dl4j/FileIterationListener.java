@@ -3,6 +3,7 @@ package weka.dl4j;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.optimize.api.IterationListener;
@@ -13,13 +14,17 @@ public class FileIterationListener implements IterationListener {
 	
 	protected transient PrintWriter m_pw = null;
 	
-	public FileIterationListener(String filename) throws Exception {
+	private int m_numMiniBatches = 0;
+	private ArrayList<Double> lossesPerEpoch = new ArrayList<Double>();
+	
+	public FileIterationListener(String filename, int numMiniBatches) throws Exception {
 		super();
 		File f = new File(filename);
 		if(f.exists()) f.delete();
 		System.err.println("Creating debug file at: " + filename);
+		m_numMiniBatches = numMiniBatches;
 		m_pw = new PrintWriter(new FileWriter(filename, false));
-		m_pw.write("epoch,loss\n");
+		m_pw.write("loss\n");
 	}
 
 	@Override
@@ -31,10 +36,20 @@ public class FileIterationListener implements IterationListener {
 	}
 
 	@Override
-	public void iterationDone(Model model, int epoch) {
-		System.err.println(epoch);
-		m_pw.write( (epoch+1) + "," + model.score() + "\n");
-		m_pw.flush();
+	public void iterationDone(Model model, int epoch) {	
+		lossesPerEpoch.add( model.score() );
+		if(lossesPerEpoch.size() == m_numMiniBatches) {
+			// calculate mean
+			double mean = 0;
+			for(double val : lossesPerEpoch) {
+				mean += val;
+			}
+			mean = mean / lossesPerEpoch.size();
+			m_pw.write(mean + "\n");
+			m_pw.flush();
+			lossesPerEpoch.clear();
+		}
+		//System.err.println(epoch);
 	}	
 
 }
