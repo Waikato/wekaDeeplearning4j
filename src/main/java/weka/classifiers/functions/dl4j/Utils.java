@@ -21,7 +21,7 @@ public class Utils {
   public static DataSet instancesToDataSet(Instances insts) {
     INDArray data = Nd4j.ones(insts.numInstances(), insts.numAttributes() - 1);
     double[][] outcomes =
-      new double[insts.numInstances()][insts.classAttribute().numValues()];
+      new double[insts.numInstances()][(insts.classAttribute().numValues() == 0) ? 1 : insts.classAttribute().numValues() ];
 
     for (int i = 0; i < insts.numInstances(); i++) {
       double[] independent = new double[insts.numAttributes() - 1];
@@ -31,7 +31,11 @@ public class Utils {
         if (j != insts.classIndex()) {
           independent[index++] = current.value(j);
         } else {
-          outcomes[i][(int) current.classValue()] = 1;
+          // if classification
+          if(insts.numClasses() > 1)
+        	  outcomes[i][(int) current.classValue()] = 1;
+          else
+        	  outcomes[i][0] = current.classValue();
         }
       }
       data.putRow(i, Nd4j.create(independent));
