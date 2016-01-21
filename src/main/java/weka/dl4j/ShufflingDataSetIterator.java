@@ -1,9 +1,12 @@
 package weka.dl4j;
 
 import java.util.List;
+import java.util.Random;
+
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class ShufflingDataSetIterator implements DataSetIterator {
 	
@@ -12,12 +15,12 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	private DataSet m_data = null;
 	private int m_batchSize = 0;
 	private int m_counter = 0;
-	//private Random m_random = null;
+	private Random m_random = null;
 	
-	public ShufflingDataSetIterator(DataSet data, int batchSize) {
+	public ShufflingDataSetIterator(DataSet data, int batchSize, int seed) {
 		m_data = data;
 		m_batchSize = batchSize;
-		//m_random = new Random(seed);
+		m_random = new Random(seed);
 	}
 
 	@Override
@@ -58,7 +61,10 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	@Override
 	public void reset() {
 		m_counter = 0;
-		m_data.shuffle();
+		//m_data.shuffle();
+		long next = m_random.nextLong();
+        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
+        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
 	}
 
 	@Override
