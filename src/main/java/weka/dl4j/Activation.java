@@ -4,5 +4,6 @@ public enum Activation {
 	SIGMOID,
 	TANH,
 	RELU,
-	SOFTMAX
+	SOFTMAX,
+	IDENTITY
 }

@@ -48,8 +48,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	private static final long serialVersionUID = -6363244115597574265L;
 	
-	protected String m_debugFile = System.getProperty("user.dir");
+	public String globalInfo() {
+		return "Create MLPs with DL4J";
+	}
 	
+	protected String m_debugFile = "";
+	
+	@OptionMetadata(description = "File to write training statistics to", displayName = "debugFile", displayOrder = 1)
 	public String getDebugFile() {
 		return m_debugFile;
 	}
@@ -75,6 +80,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		m_trainBatchSize = trainBatchSize;
 	}
 	
+	@OptionMetadata(description = "Batch size for SGD", displayName = "trainBatchSize", displayOrder = 1)
 	public int getTrainBatchSize() {
 		return m_trainBatchSize;
 	}
@@ -85,6 +91,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		m_numIterations = numIterations;
 	}
 
+	@OptionMetadata(description = "Number of iterations/epochs", displayName = "numIterations", displayOrder = 1)
 	public int getNumIterations() {
 		return m_numIterations;
 	}
@@ -103,6 +110,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	private OptimizationAlgorithm m_optimAlgorithm = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 
+	@OptionMetadata(description = "Optimisation algorithm", displayName = "optimizationAlgorithm", displayOrder = 1)
 	public OptimizationAlgorithm getOptimizationAlgorithm() {
 		return m_optimAlgorithm;
 	}
@@ -113,6 +121,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	private double m_learningRate = 0.01;
 
+	@OptionMetadata(description = "Learning rate", displayName = "learningRate", displayOrder = 1)
 	public double getLearningRate() {
 		return m_learningRate;
 	}
@@ -123,6 +132,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	private double m_momentum = 0.9;
 
+	@OptionMetadata(description = "Momentum", displayName = "momentum", displayOrder = 1)
 	public double getMomentum() {
 		return m_momentum;
 	}
@@ -133,6 +143,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	public Updater m_updater = Updater.NESTEROVS;
 
+	@OptionMetadata(description = "Gradient descent update algorithm to use", displayName = "updater", displayOrder = 1)
 	public Updater getUpdater() {
 		return m_updater;
 	}
@@ -177,7 +188,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		m_nominalToBinary = new NominalToBinary();
 		m_nominalToBinary.setInputFormat(data);
 		data = Filter.useFilter(data, m_nominalToBinary);
-		data.randomize(new Random(123));
+		data.randomize(new Random(getSeed()));
 		// convert the dataset
 		DataSet dataset = Utils.instancesToDataSet(data);
 		// construct the mlp configuration
@@ -216,7 +227,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		m_model.init();
 		int numMiniBatches = (int) Math.ceil( ((double)dataset.numExamples()) / ((double)getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
-		if( ! new File(getDebugFile()).isDirectory() ) {
+		if( !getDebugFile().equals("") ) {
 			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
 		// train
@@ -242,7 +253,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		for (int i = 0; i < preds.length; i++) {
 			preds[i] = predicted.getDouble(i);
 		}
-		weka.core.Utils.normalize(preds);
+		// only normalise if we're dealing with classification
+		if( preds.length > 1) {
+			weka.core.Utils.normalize(preds);
+		}
 		return preds;
 	}
 
