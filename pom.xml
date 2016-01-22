@@ -40,6 +40,13 @@
     <dependencies>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-tests </artifactId>
+            <version>3.7.13</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/test-lib/weka-tests.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
             <artifactId>weka-dev </artifactId>
             <version>3.7.13</version>
         </dependency>
