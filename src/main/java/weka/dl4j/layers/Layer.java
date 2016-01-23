@@ -15,6 +15,8 @@ public abstract class Layer implements Serializable, OptionHandler {
 	/**
 	 * Set the number of units coming into this layer. This seems
 	 * to be a weird technicality that DL4J requires to be addressed.
+	 * For convolution layers, this is the number of feature maps
+	 * (i.e. the number of input channels).
 	 * @param numIncoming
 	 */
 	public void setNumIncoming(int numIncoming) {
