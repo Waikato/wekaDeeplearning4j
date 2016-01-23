@@ -32,7 +32,7 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 	private int m_numIterations = 10;
 
 	public void setNumIterations(int numIterations) {
-		m_numIterations = numIterations; // yes, weird technicality
+		m_numIterations = numIterations;
 	}
 
 	@OptionMetadata(description = "Number of iterations/epochs", displayName = "numIterations", displayOrder = 1)
