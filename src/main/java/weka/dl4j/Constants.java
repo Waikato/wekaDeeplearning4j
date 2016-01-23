@@ -18,4 +18,13 @@ public class Constants {
 	public static final String MOMENTUM = "momentum";
 	public static final String DEBUG_FILE = "debug";
 	public static final String TRAIN_BATCH_SIZE = "bs";
+	
+	public static final String STRIDE_X = "stride_x";
+	public static final String STRIDE_Y = "stride_y";
+	public static final String NUM_FILTERS = "num_filters";
+	public static final String FILTER_SIZE_X = "filter_size_x";
+	public static final String FILTER_SIZE_Y = "filter_size_y";
+	
+	public static final String DATASET_ITERATOR = "iterator";
+	
 }

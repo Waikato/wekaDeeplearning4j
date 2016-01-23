@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Random;
 import java.util.Vector;
 
-import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -23,7 +22,8 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.Constants;
 import weka.dl4j.FileIterationListener;
-import weka.dl4j.ShufflingDataSetIterator;
+import weka.dl4j.iterators.AbstractDataSetIterator;
+import weka.dl4j.iterators.DefaultDataSetIterator;
 import weka.dl4j.layers.Layer;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -72,28 +72,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 	@OptionMetadata(description = "Layers", displayName = "layers", displayOrder = 1)
 	public Layer[] getLayers() {
 		return m_layers;
-	}
-	
-	private int m_trainBatchSize = 1;
-	
-	public void setTrainBatchSize(int trainBatchSize) {
-		m_trainBatchSize = trainBatchSize;
-	}
-	
-	@OptionMetadata(description = "Batch size for SGD", displayName = "trainBatchSize", displayOrder = 1)
-	public int getTrainBatchSize() {
-		return m_trainBatchSize;
-	}
-
-	private int m_numIterations = 100;
-
-	public void setNumIterations(int numIterations) {
-		m_numIterations = numIterations;
-	}
-
-	@OptionMetadata(description = "Number of iterations/epochs", displayName = "numIterations", displayOrder = 1)
-	public int getNumIterations() {
-		return m_numIterations;
 	}
 
 	/*
@@ -150,6 +128,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 
 	public void setUpdater(Updater updater) {
 		m_updater = updater;
+	}
+	
+	private AbstractDataSetIterator m_iterator = new DefaultDataSetIterator();
+	
+	public AbstractDataSetIterator getDataSetIterator() {
+		return m_iterator;
+	}
+	
+	public void setDataSetIterator(AbstractDataSetIterator iterator) {
+		m_iterator = iterator;
 	}
 
 	public void validate() throws Exception {
@@ -225,16 +213,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
-		int numMiniBatches = (int) Math.ceil( ((double)dataset.numExamples()) / ((double)getTrainBatchSize()) );
+		int numMiniBatches = (int) Math.ceil( ((double)dataset.numExamples()) / ((double)getDataSetIterator().getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
 		if( !getDebugFile().equals("") ) {
 			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
 		// train
-		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations()-1, 
-				new ShufflingDataSetIterator(dataset, getTrainBatchSize(), getSeed()));
-		m_model.fit(iter);
+		m_model.fit( getDataSetIterator().getIterator(dataset, getSeed()) );
 	}
 
 	public double[] distributionForInstance(Instance inst) throws Exception {
@@ -295,9 +280,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 			result.add("-" + Constants.LAYER);
 			result.add(getSpec(getLayers()[i]));
 		}
-		// num iterations
-		result.add("-" + Constants.NUM_ITERATIONS);
-		result.add("" + getNumIterations());
+		result.add("-" + Constants.DATASET_ITERATOR);
+		result.add("" + getSpec(getDataSetIterator()));
 		// gradient norm
 		//result.add("-" + Constants.GRADIENT_NORM);
 		//result.add("" + getGradientNorm().name());
@@ -316,9 +300,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// updater
 		result.add("-" + Constants.UPDATER);
 		result.add("" + getUpdater().name());
-		// train batch size
-		result.add("-" + Constants.TRAIN_BATCH_SIZE);
-		result.add("" + getTrainBatchSize());
 		// debug file
 		if( ! new File(getDebugFile()).isDirectory() ) {
 			result.add("-" + Constants.DEBUG_FILE);
@@ -342,9 +323,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 			layers.add(new weka.dl4j.layers.DenseLayer());
 		}
 		setLayers(layers.toArray(new weka.dl4j.layers.Layer[layers.size()]));
-		// num iterations
-		String tmp = weka.core.Utils.getOption(Constants.NUM_ITERATIONS, options);
-		if(!tmp.equals("")) setNumIterations( Integer.parseInt(tmp) );
+		
+		String tmp = weka.core.Utils.getOption(Constants.DATASET_ITERATOR, options);
+		if(!tmp.equals("")) setDataSetIterator( 
+				(AbstractDataSetIterator) specToObject(tmp, weka.dl4j.iterators.AbstractDataSetIterator.class));
+
 		// gradient norm
 		//
 		//
@@ -363,9 +346,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// updater
 		tmp = weka.core.Utils.getOption(Constants.UPDATER, options);
 		if(!tmp.equals("")) setUpdater( Updater.valueOf(tmp) );
-		// train batch size
-		tmp = weka.core.Utils.getOption(Constants.TRAIN_BATCH_SIZE, options);
-		if(!tmp.equals("")) setTrainBatchSize( Integer.parseInt(tmp) );
 		// debug file
 		tmp = weka.core.Utils.getOption(Constants.DEBUG_FILE, options);
 		if(!tmp.equals("")) setDebugFile(tmp);
