@@ -9,7 +9,7 @@
     <description>Examples of training different data sets</description>
     <properties>
         <nd4j.version>0.4-rc3.8</nd4j.version>
-        <dl4j.version>	0.4-rc3.8</dl4j.version>
+        <dl4j.version>0.4-rc3.8</dl4j.version>
         <canova.version>0.0.0.14</canova.version>
         <jackson.version>2.5.1</jackson.version>
     </properties>
@@ -40,14 +40,14 @@
     <dependencies>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-tests </artifactId>
+            <artifactId>weka-dev</artifactId>
             <version>3.7.13</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/test-lib/weka-tests.jar</systemPath>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-dev </artifactId>
+            <artifactId>weka-dev</artifactId>
             <version>3.7.13</version>
         </dependency>
         <dependency>

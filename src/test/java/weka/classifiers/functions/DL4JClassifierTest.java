@@ -106,23 +106,5 @@ public class DL4JClassifierTest {
 		List<String> lines = Files.readAllLines(new File(tmpFile).toPath());
 		assertEquals(lines.size(), numIters+1);
 	}
-	
-	@Ignore
-	public void convTest() throws Exception {
-		
-		Instances data = loadIris();
-		
-		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
-		cls.setLayers(new weka.dl4j.layers.Layer[] {
-				new weka.dl4j.layers.Conv1DLayer(),
-				new weka.dl4j.layers.OutputLayer() 
-		});
-		//cls.setTrainBatchSize(1);
-		cls.setDebugFile("/tmp/debug.txt");
-		cls.buildClassifier(data);
-		
-		cls.distributionsForInstances(data);				
-		
-	}
 
 }
