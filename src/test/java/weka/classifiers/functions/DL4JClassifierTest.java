@@ -62,8 +62,8 @@ public class DL4JClassifierTest {
 		int numIters = 10;
 		Instances data = loadIris();
 		Dl4jMlpClassifier cls = getMlp();
-		cls.setTrainBatchSize(50);
-		cls.setNumIterations(numIters);
+		cls.getDataSetIterator().setTrainBatchSize(50);
+		cls.getDataSetIterator().setNumIterations(numIters);
 		String tmpFile = System.getProperty("java.io.tmpdir") + File.separator + "irisTest.txt";
 		System.err.println("irisTest() tmp file: " + tmpFile);
 		cls.setDebugFile(tmpFile);
@@ -94,8 +94,8 @@ public class DL4JClassifierTest {
 		outputLayer.setActivation(Activation.IDENTITY);
 		outputLayer.setLossFunction(LossFunction.MSE);
 		cls.setLayers(new weka.dl4j.layers.Layer[] { hiddenLayer, outputLayer });
-		cls.setTrainBatchSize(50);
-		cls.setNumIterations(numIters);
+		cls.getDataSetIterator().setTrainBatchSize(50);
+		cls.getDataSetIterator().setNumIterations(numIters);
 		String tmpFile = System.getProperty("java.io.tmpdir") + File.separator + "diabetesTest.txt";
 		System.err.println("diabetesTest() tmp file: " + tmpFile);
 		cls.setDebugFile(tmpFile);
@@ -117,7 +117,7 @@ public class DL4JClassifierTest {
 				new weka.dl4j.layers.Conv1DLayer(),
 				new weka.dl4j.layers.OutputLayer() 
 		});
-		cls.setTrainBatchSize(1);
+		//cls.setTrainBatchSize(1);
 		cls.setDebugFile("/tmp/debug.txt");
 		cls.buildClassifier(data);
 		

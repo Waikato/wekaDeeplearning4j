@@ -1,2 +1,5 @@
 weka.dl4j.layers.Layer =\
  weka.dl4j.layers
+
+weka.dl4j.iterators.AbstractDataSetIterator =\
+ weka.dl4j.iterators
