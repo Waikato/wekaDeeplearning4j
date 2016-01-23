@@ -16,7 +16,7 @@ public class Dl4jMlpClassifierAbstractTest extends AbstractClassifierTest {
 	public Classifier getClassifier() {
 		Dl4jMlpClassifier mlp = new Dl4jMlpClassifier();
 		mlp.setLayers(new Layer[] { new DenseLayer(), new OutputLayer() } );
-		mlp.setNumIterations(1);
+		mlp.getDataSetIterator().setNumIterations(1);
 		return mlp;
 	}
 
