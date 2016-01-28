@@ -168,6 +168,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		data = Filter.useFilter(data, m_replaceMissing);
 		if (m_standardizeInsteadOfNormalize) {
 			m_normalize = new Standardize();
+			// we want to also normalize the class
+			m_normalize.setOptions(new String[] { "-unset-class-temporarily" } );
 		} else {
 			m_normalize = new Normalize();
 		}
@@ -176,9 +178,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		m_nominalToBinary = new NominalToBinary();
 		m_nominalToBinary.setInputFormat(data);
 		data = Filter.useFilter(data, m_nominalToBinary);
-		data.randomize(new Random(getSeed()));
-		// convert the dataset
-		DataSet dataset = Utils.instancesToDataSet(data);
+		//data.randomize(new Random(getSeed()));
 		// construct the mlp configuration
 		ListBuilder ip = new NeuralNetConfiguration.Builder()
 				.seed(getSeed())
@@ -191,18 +191,24 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 				//.batchSize( getTrainBatchSize() )
 				.list(m_layers.length);
 		for (int x = 0; x < m_layers.length; x++) {
-			if (x == 0) {
-				// input layer
+			// output layer
+			if ( x == m_layers.length-1 ) {
+				// if this is the only layer (i.e. a perceptron)
+				if( x == 0) {
+					m_layers[x].setNumIncoming(data.numAttributes()-1);
+					m_layers[x].setNumOutgoing(data.numClasses());
+				} else { // otherwise
+					weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
+					m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+					m_layers[x].setNumOutgoing(data.numClasses());
+				}
+				ip = ip.layer(x, m_layers[x].getLayer() );
+			} else if (x == 0) {
+				// hidden layer straight after the input layer
 				m_layers[x].setNumIncoming(data.numAttributes()-1);
 				ip = ip.layer(x, m_layers[x].getLayer() );
-			} else if ( x == m_layers.length-1 ) {
-				// output layer
-				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
-				m_layers[x].setNumIncoming(prevLayer.getNumUnits());
-				m_layers[x].setNumOutgoing(data.numClasses());
-				ip = ip.layer(x, m_layers[x].getLayer() );
 			} else {
-				// intermediate layer
+				// intermediate hidden layer
 				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
 				m_layers[x].setNumIncoming(prevLayer.getNumUnits());
 				ip = ip.layer(x, m_layers[x].getLayer());
@@ -213,13 +219,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
-		int numMiniBatches = (int) Math.ceil( ((double)dataset.numExamples()) / ((double)getDataSetIterator().getTrainBatchSize()) );
+		int numMiniBatches = (int) Math.ceil( ((double)data.numInstances()) / ((double)getDataSetIterator().getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
 		if( !getDebugFile().equals("") ) {
 			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
 		// train
-		m_model.fit( getDataSetIterator().getIterator(dataset, getSeed()) );
+		m_model.fit( getDataSetIterator().getIterator(data, getSeed()) );
 	}
 
 	public double[] distributionForInstance(Instance inst) throws Exception {

@@ -13,6 +13,7 @@ import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
@@ -20,9 +21,27 @@ import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.dl4j.Activation;
+import weka.dl4j.iterators.ImageDataSetIterator;
+import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 
 public class DL4JClassifierTest {
+	
+	@Test
+	public void testFish() throws Exception {
+		DataSource ds = new DataSource("datasets-numeric/fishcatch.arff");
+		Instances data = ds.getDataSet();
+		data.setClassIndex(data.numAttributes()-1);
+		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		OutputLayer out = new weka.dl4j.layers.OutputLayer();
+		out.setLossFunction(LossFunction.MSE);
+		cls.setLayers(new weka.dl4j.layers.Layer[] { out } );
+		cls.setDebugFile("/tmp/debug.txt");
+		cls.setLearningRate(0.01);
+		cls.getDataSetIterator().setNumIterations(100);
+		cls.getDataSetIterator().setTrainBatchSize(1000);
+		cls.buildClassifier(data);
+	}
 	
 	public Instances loadIris() throws Exception {
 		DataSource ds = new DataSource("datasets/iris.arff");
@@ -38,6 +57,13 @@ public class DL4JClassifierTest {
 		return data;
 	}
 	
+	public Instances getMnistMeta() throws Exception {
+		DataSource ds = new DataSource("datasets/mnist.meta.arff");
+		Instances data = ds.getDataSet();
+		data.setClassIndex( data.numAttributes() - 1 );
+		return data;
+	}
+	
 	public Dl4jMlpClassifier getMlp() {
 		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
 		cls.setLayers(new weka.dl4j.layers.Layer[] {
@@ -46,6 +72,21 @@ public class DL4JClassifierTest {
 				new weka.dl4j.layers.OutputLayer() 
 		});
 		return cls;
+	}
+	
+	/**
+	 * Test a no-hidden-layer neural net (i.e. a perceptron)
+	 * on the numeric diabetes dataset
+	 * @throws Exception
+	 */
+	@Test
+	public void testPerceptron() throws Exception {
+		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		cls.setLayers(new weka.dl4j.layers.Layer[] {
+				new weka.dl4j.layers.OutputLayer() 
+		});		
+		Instances data = loadDiabetes();
+		cls.buildClassifier(data);
 	}
 	
 	/**
@@ -105,6 +146,73 @@ public class DL4JClassifierTest {
 		//	System.out.println(Arrays.toString(dist[x]));
 		List<String> lines = Files.readAllLines(new File(tmpFile).toPath());
 		assertEquals(lines.size(), numIters+1);
+	}
+	
+	public int findOne(INDArray arr) {
+		for(int x = 0; x < arr.columns(); x++) {
+			if( arr.getFloat(x) == 1.0 ) {
+				return x;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * Test the image dataset iterator with a very
+	 * minimal MNIST example (10 images, and 1 image
+	 * per class), with 10 iterations and a mini-batch
+	 * size of 3. We expect to get 100 images back,
+	 * with each class containing 10 images.
+	 * @throws Exception
+	 */
+	@Test
+	public void testImageLoading() throws Exception {
+		/*
+		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		Instances data = getMnistMeta();
+		
+		ImageDataSetIterator imgIter = new ImageDataSetIterator();
+		imgIter.setImagesLocation(new File("mnist-data").getAbsolutePath());
+		imgIter.setHeight(28);
+		imgIter.setWidth(28);
+		imgIter.setNumChannels(1);
+		imgIter.setNumIterations(10);
+		imgIter.setTrainBatchSize(128);
+		cls.setDataSetIterator(imgIter);
+		weka.dl4j.layers.DenseLayer hiddenLayer = new weka.dl4j.layers.DenseLayer();
+		hiddenLayer.setNumUnits(10);
+		hiddenLayer.setActivation(Activation.RELU);
+		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
+		outputLayer.setActivation(Activation.SOFTMAX);
+		cls.setLayers( new Layer[] { hiddenLayer, outputLayer } );
+		
+		cls.buildClassifier(data);
+		*/
+		DataSource ds = new DataSource("datasets/mnist.meta.minimal.arff");
+		Instances data = ds.getDataSet();
+		data.setClassIndex(data.numAttributes()-1);
+		ImageDataSetIterator imgIter = new ImageDataSetIterator();
+		imgIter.setHeight(28);
+		imgIter.setWidth(28);
+		imgIter.setNumChannels(1);
+		imgIter.setNumIterations(10);
+		imgIter.setTrainBatchSize(3);
+		imgIter.setNumIterations(10);
+		imgIter.setImagesLocation(new File("datasets/mnist-minimal").getAbsolutePath());
+		DataSetIterator iter = imgIter.getIterator(data, 0);
+		int[] classCounts = new int[10];
+		while(iter.hasNext()) {
+			DataSet batch = iter.next();
+			INDArray classes = batch.getLabels();
+			for(int i = 0; i < classes.rows(); i++) {
+				INDArray row = classes.getRow(i);
+				classCounts[ findOne(row) ] += 1;
+			}
+		}
+		for(int x = 0; x < classCounts.length; x++) {
+			assertEquals(classCounts[x], 10);
+		}
+		
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.Vector;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
 
+import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -16,7 +17,7 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 	
 	private static final long serialVersionUID = 7440584973810993954L;
 
-	public abstract DataSetIterator getIterator(DataSet dataset, int seed);
+	public abstract DataSetIterator getIterator(Instances data, int seed) throws Exception;
 	
 	private int m_trainBatchSize = 1;
 	
