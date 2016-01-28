@@ -27,4 +27,9 @@ public class Constants {
 	
 	public static final String DATASET_ITERATOR = "iterator";
 	
+	public static final String NUM_CHANNELS = "channels";
+	public static final String WIDTH = "width";
+	public static final String HEIGHT = "height";
+	public static final String IMAGES_LOCATION = "location";
+	
 }
