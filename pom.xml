@@ -7,14 +7,15 @@
 
     <name>DeepLearning4j Examples</name>
     <description>Examples of training different data sets</description>
+
     <properties>
         <nd4j.version>0.4-rc3.8</nd4j.version>
         <dl4j.version>0.4-rc3.8</dl4j.version>
         <canova.version>0.0.0.14</canova.version>
         <jackson.version>2.5.1</jackson.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
-
 
     <distributionManagement>
         <snapshotRepository>
@@ -28,6 +29,7 @@
             <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -166,6 +168,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
