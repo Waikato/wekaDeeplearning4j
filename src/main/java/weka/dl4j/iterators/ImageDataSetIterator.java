@@ -4,18 +4,11 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
-import org.canova.api.split.FileSplit;
-import org.canova.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
-import org.deeplearning4j.util.InputSplit;
-import org.nd4j.linalg.dataset.DataSet;
-
 import weka.core.Instances;
 import weka.dl4j.Constants;
 import weka.dl4j.SpecifiableFolderSplit;
@@ -70,6 +63,11 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 		if(! new File(getImagesLocation()).isDirectory()) {
 			throw new Exception("Directory not valid: " + getImagesLocation());
 		}
+	}
+	
+	@Override
+	public int getNumAttributes(Instances data) {
+		return getNumChannels() * getHeight() * getWidth();
 	}
 
 	@Override
