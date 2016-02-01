@@ -17,6 +17,14 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 	
 	private static final long serialVersionUID = 7440584973810993954L;
 
+	/**
+	 * Get the number of input attributes for this iterator.
+	 * @param data
+	 * @return
+	 * @throws Exception
+	 */
+	public abstract int getNumAttributes(Instances data) throws Exception;
+	
 	public abstract DataSetIterator getIterator(Instances data, int seed) throws Exception;
 	
 	private int m_trainBatchSize = 1;

@@ -167,27 +167,6 @@ public class DL4JClassifierTest {
 	 */
 	@Test
 	public void testImageLoading() throws Exception {
-		/*
-		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
-		Instances data = getMnistMeta();
-		
-		ImageDataSetIterator imgIter = new ImageDataSetIterator();
-		imgIter.setImagesLocation(new File("mnist-data").getAbsolutePath());
-		imgIter.setHeight(28);
-		imgIter.setWidth(28);
-		imgIter.setNumChannels(1);
-		imgIter.setNumIterations(10);
-		imgIter.setTrainBatchSize(128);
-		cls.setDataSetIterator(imgIter);
-		weka.dl4j.layers.DenseLayer hiddenLayer = new weka.dl4j.layers.DenseLayer();
-		hiddenLayer.setNumUnits(10);
-		hiddenLayer.setActivation(Activation.RELU);
-		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
-		outputLayer.setActivation(Activation.SOFTMAX);
-		cls.setLayers( new Layer[] { hiddenLayer, outputLayer } );
-		
-		cls.buildClassifier(data);
-		*/
 		DataSource ds = new DataSource("datasets/mnist.meta.minimal.arff");
 		Instances data = ds.getDataSet();
 		data.setClassIndex(data.numAttributes()-1);
@@ -213,6 +192,54 @@ public class DL4JClassifierTest {
 			assertEquals(classCounts[x], 10);
 		}
 		
+	}
+	
+	@Test
+	public void testMinimalMnistDenseNet() throws Exception {
+		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		DataSource ds = new DataSource("datasets/mnist.meta.minimal.arff");
+		Instances data = ds.getDataSet();
+		data.setClassIndex( data.numAttributes() - 1 );
+		ImageDataSetIterator imgIter = new ImageDataSetIterator();
+		imgIter.setImagesLocation(new File("datasets/mnist-minimal").getAbsolutePath());
+		imgIter.setHeight(28);
+		imgIter.setWidth(28);
+		imgIter.setNumChannels(1);
+		imgIter.setNumIterations(10);
+		imgIter.setTrainBatchSize(128);
+		cls.setDataSetIterator(imgIter);
+		weka.dl4j.layers.DenseLayer hiddenLayer = new weka.dl4j.layers.DenseLayer();
+		//hiddenLayer.setNumIncoming(1*28*28);
+		hiddenLayer.setNumUnits(10);
+		hiddenLayer.setActivation(Activation.RELU);
+		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
+		outputLayer.setActivation(Activation.SOFTMAX);
+		cls.setLayers( new Layer[] { hiddenLayer, outputLayer } );		
+		cls.buildClassifier(data);
+	}
+	
+	@Test
+	public void testMinimalMnistConvNet() throws Exception {
+		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		DataSource ds = new DataSource("datasets/mnist.meta.minimal.arff");
+		Instances data = ds.getDataSet();
+		data.setClassIndex( data.numAttributes() - 1 );
+		ImageDataSetIterator imgIter = new ImageDataSetIterator();
+		imgIter.setImagesLocation(new File("datasets/mnist-minimal").getAbsolutePath());
+		imgIter.setHeight(28);
+		imgIter.setWidth(28);
+		imgIter.setNumChannels(1);
+		imgIter.setNumIterations(10);
+		imgIter.setTrainBatchSize(128);
+		cls.setDataSetIterator(imgIter);
+		weka.dl4j.layers.Conv2DLayer convLayer = new weka.dl4j.layers.Conv2DLayer();
+		convLayer.setNumFilters(10);
+		convLayer.setFilterSizeX(5);
+		convLayer.setFilterSizeY(5);	
+		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
+		outputLayer.setActivation(Activation.SOFTMAX);
+		cls.setLayers( new Layer[] { convLayer, outputLayer } );		
+		cls.buildClassifier(data);
 	}
 
 }

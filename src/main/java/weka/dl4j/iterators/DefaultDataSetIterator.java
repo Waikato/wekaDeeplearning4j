@@ -11,6 +11,11 @@ import weka.dl4j.ShufflingDataSetIterator;
 public class DefaultDataSetIterator extends AbstractDataSetIterator {
 
 	private static final long serialVersionUID = 1316260988724548474L;
+	
+	@Override
+	public int getNumAttributes(Instances data) {
+		return data.numAttributes()-1;
+	}
 
 	@Override
 	public DataSetIterator getIterator(Instances data, int seed) {

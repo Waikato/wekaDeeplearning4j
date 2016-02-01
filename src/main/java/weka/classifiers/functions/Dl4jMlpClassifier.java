@@ -9,6 +9,7 @@ import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.conf.Updater;
+import org.deeplearning4j.nn.conf.layers.setup.ConvolutionLayerSetup;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -24,6 +25,9 @@ import weka.dl4j.Constants;
 import weka.dl4j.FileIterationListener;
 import weka.dl4j.iterators.AbstractDataSetIterator;
 import weka.dl4j.iterators.DefaultDataSetIterator;
+import weka.dl4j.iterators.ImageDataSetIterator;
+import weka.dl4j.layers.Conv2DLayer;
+import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
@@ -148,6 +152,25 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 			throw new Exception("Last layer in network must be an output layer!");
 		}
 	}
+	
+	/**
+	 * Get the current number of units (where "units" are
+	 * feature maps for conv nets and the # of hidden units
+	 * for dense layers) for a particular layer.
+	 * @param layer
+	 * @return
+	 */
+	public int getNumUnitsOrFeatureMaps(Layer layer) {
+		if(layer instanceof DenseLayer) {
+			DenseLayer tmp = (DenseLayer) layer;
+			return tmp.getNumUnits();
+		}
+		if(layer instanceof Conv2DLayer) {
+			Conv2DLayer tmp = (Conv2DLayer) layer;
+			return tmp.getNumFilters();
+		}
+		return -1;
+	}
 
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
@@ -190,31 +213,41 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 				.updater(getUpdater())
 				//.batchSize( getTrainBatchSize() )
 				.list(m_layers.length);
+		int numInputAttributes = getDataSetIterator().getNumAttributes(data);
 		for (int x = 0; x < m_layers.length; x++) {
 			// output layer
 			if ( x == m_layers.length-1 ) {
 				// if this is the only layer (i.e. a perceptron)
 				if( x == 0) {
-					m_layers[x].setNumIncoming(data.numAttributes()-1);
+					m_layers[x].setNumIncoming(numInputAttributes);
 					m_layers[x].setNumOutgoing(data.numClasses());
 				} else { // otherwise
-					weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
-					m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+					//weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
+					//m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+					m_layers[x].setNumIncoming( getNumUnitsOrFeatureMaps(m_layers[x-1]) );
 					m_layers[x].setNumOutgoing(data.numClasses());
 				}
 				ip = ip.layer(x, m_layers[x].getLayer() );
 			} else if (x == 0) {
 				// hidden layer straight after the input layer
-				m_layers[x].setNumIncoming(data.numAttributes()-1);
+				m_layers[x].setNumIncoming(numInputAttributes);
 				ip = ip.layer(x, m_layers[x].getLayer() );
 			} else {
 				// intermediate hidden layer
-				weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
-				m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+				//weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
+				//m_layers[x].setNumIncoming(prevLayer.getNumUnits());
+				m_layers[x].setNumIncoming( getNumUnitsOrFeatureMaps(m_layers[x-1]) );
 				ip = ip.layer(x, m_layers[x].getLayer());
 			}
 		}
 		ip = ip.pretrain(false).backprop(true);
+		
+		// if a conv network
+		if( m_layers[0] instanceof Conv2DLayer ) {
+			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
+			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
+		}
+		
 		MultiLayerConfiguration conf = ip.build();
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
