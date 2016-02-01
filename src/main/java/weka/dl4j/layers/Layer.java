@@ -10,6 +10,9 @@ public abstract class Layer implements Serializable, OptionHandler {
 
 	public abstract org.deeplearning4j.nn.conf.layers.Layer getLayer();
 	
+	protected int m_numUnits = 1;
+	
+	
 	protected int m_numIncoming = 0;
 	
 	/**
