@@ -22,6 +22,12 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 		m_batchSize = batchSize;
 		m_random = new Random(seed);
 	}
+	
+	public ShufflingDataSetIterator(DataSet data, int batchSize) {
+		m_data = data;
+		m_batchSize = batchSize;
+		m_random = null;
+	}
 
 	@Override
 	public boolean hasNext() {
@@ -62,9 +68,11 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	public void reset() {
 		m_counter = 0;
 		//m_data.shuffle();
-		long next = m_random.nextLong();
-        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
-        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
+		if(m_random != null) {
+			long next = m_random.nextLong();
+	        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
+	        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
+		}
 	}
 
 	@Override
