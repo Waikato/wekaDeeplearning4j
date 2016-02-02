@@ -16,6 +16,12 @@ public class DefaultDataSetIterator extends AbstractDataSetIterator {
 	public int getNumAttributes(Instances data) {
 		return data.numAttributes()-1;
 	}
+	
+	@Override
+	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
+		DataSet dataset = Utils.instancesToDataSet(data);
+		return new ShufflingDataSetIterator(dataset, testBatchSize);
+	}
 
 	@Override
 	public DataSetIterator getIterator(Instances data, int seed) {

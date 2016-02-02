@@ -69,6 +69,11 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 	public int getNumAttributes(Instances data) {
 		return getNumChannels() * getHeight() * getWidth();
 	}
+	
+	@Override
+	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
+		return null;
+	}
 
 	@Override
 	public DataSetIterator getIterator(Instances data, int seed) throws Exception {
