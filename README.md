@@ -1,4 +1,7 @@
 # wekaDeeplearning4j
+
+**Warning: this project is in very early stages and may change a lot.**
+
 DL4J wrapper for WEKA. Original code written by Mark Hall. This package currently introduces a new classifier,
 `Dl4jMlpClassifier`, which allows arbitrary-depth MLPs to be built with a degree of flexibility (e.g. type of weight initialisation,
 loss function, gradient descent algorithm, etc.).
