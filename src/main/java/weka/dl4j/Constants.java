@@ -32,4 +32,8 @@ public class Constants {
 	public static final String HEIGHT = "height";
 	public static final String IMAGES_LOCATION = "location";
 	
+	public static final String POOL_SIZE_X = "pool_size_x";
+	public static final String POOL_SIZE_Y = "pool_size_y";
+	public static final String POOL_TYPE = "pool_type";
+	
 }
