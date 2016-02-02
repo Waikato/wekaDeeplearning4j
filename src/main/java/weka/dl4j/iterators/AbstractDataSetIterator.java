@@ -27,6 +27,8 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 	
 	public abstract DataSetIterator getIterator(Instances data, int seed) throws Exception;
 	
+	public abstract DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) throws Exception;
+	
 	private int m_trainBatchSize = 1;
 	
 	public void setTrainBatchSize(int trainBatchSize) {

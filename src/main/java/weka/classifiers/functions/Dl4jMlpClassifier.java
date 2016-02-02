@@ -1,9 +1,12 @@
 package weka.classifiers.functions;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -257,6 +260,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		if( !getDebugFile().equals("") ) {
 			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
+		
+		// if debug mode is set, print the shape of the outputs
+		// of the network
+		if( getDebug() ) {
+			DataSetIterator tmpIter = getDataSetIterator().getIterator(data, getSeed());
+	        while(tmpIter.hasNext()) {
+	        	DataSet d = tmpIter.next();
+    	        m_model.initialize(d);
+    	        List<INDArray> activations = m_model.feedForward();
+    	        for(int i = 0; i < activations.size(); i++) {
+    	        	System.out.format("output shape of layer %d is %s\n", (i+1), Arrays.toString(activations.get(i).shape()));
+    	        }
+	        	break;
+	        }
+		}	
+		
 		// train
 		m_model.fit( getDataSetIterator().getIterator(data, getSeed()) );
 	}
@@ -271,7 +290,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier {
 		inst = m_normalize.output();
 		m_nominalToBinary.input(inst);
 		inst = m_nominalToBinary.output();
-		INDArray predicted = m_model.output(Utils.instanceToINDArray(inst));
+		
+		// TODO: implement distributionforinstances instead
+		Instances insts = new Instances( inst.dataset() );
+		insts.add(inst);
+		DataSetIterator iter = getDataSetIterator().getTestIterator( insts, getSeed(), Integer.parseInt(getBatchSize()) );
+		//while(iter.hasNext()) {
+		INDArray testMatrix = iter.next().getFeatureMatrix();	
+		//}
+		
+		INDArray predicted = m_model.output(testMatrix);
+		
+		//INDArray predicted = m_model.output(Utils.instanceToINDArray(inst));
 		predicted = predicted.getRow(0);
 		double[] preds = new double[inst.numClasses()];
 		for (int i = 0; i < preds.length; i++) {

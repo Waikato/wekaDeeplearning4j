@@ -221,6 +221,7 @@ public class DL4JClassifierTest {
 	@Test
 	public void testMinimalMnistConvNet() throws Exception {
 		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
+		cls.setDebug(true); // want to see the network output shapes
 		DataSource ds = new DataSource("datasets/mnist.meta.minimal.arff");
 		Instances data = ds.getDataSet();
 		data.setClassIndex( data.numAttributes() - 1 );
@@ -235,10 +236,15 @@ public class DL4JClassifierTest {
 		weka.dl4j.layers.Conv2DLayer convLayer = new weka.dl4j.layers.Conv2DLayer();
 		convLayer.setNumFilters(10);
 		convLayer.setFilterSizeX(5);
-		convLayer.setFilterSizeY(5);	
+		convLayer.setFilterSizeY(5);
+		weka.dl4j.layers.Pool2DLayer poolLayer = new weka.dl4j.layers.Pool2DLayer();
+		poolLayer.setPoolSizeX(2);
+		poolLayer.setPoolSizeY(2);
+		poolLayer.setStrideX(2);
+		poolLayer.setStrideY(2);
 		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
 		outputLayer.setActivation(Activation.SOFTMAX);
-		cls.setLayers( new Layer[] { convLayer, outputLayer } );		
+		cls.setLayers( new Layer[] { convLayer, poolLayer, outputLayer } );		
 		cls.buildClassifier(data);
 	}
 
