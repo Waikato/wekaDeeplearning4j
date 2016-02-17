@@ -216,6 +216,7 @@ public class DL4JClassifierTest {
 		outputLayer.setActivation(Activation.SOFTMAX);
 		cls.setLayers( new Layer[] { hiddenLayer, outputLayer } );		
 		cls.buildClassifier(data);
+		cls.distributionsForInstances(data);
 	}
 	
 	@Test

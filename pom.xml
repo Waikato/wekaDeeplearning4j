@@ -47,6 +47,13 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <!-- <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-dev</artifactId>
+            <version>3.7.14</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/weka.jar</systemPath>
+        </dependency> -->
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
             <artifactId>weka-dev</artifactId>
@@ -170,8 +177,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
