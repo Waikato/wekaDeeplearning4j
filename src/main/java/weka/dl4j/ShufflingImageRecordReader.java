@@ -13,6 +13,16 @@ public class ShufflingImageRecordReader extends ImageRecordReader {
     public ShufflingImageRecordReader(int width, int height, int channels, boolean appendLabel, List<String> labels) {
         super(width, height, channels, appendLabel, labels);
     }
+    
+    private boolean m_dontShuffle = false;
+    
+    public boolean getDontShuffle() {
+    	return m_dontShuffle;
+    }
+    
+    public void setDontShuffle(boolean dontShuffle) {
+    	m_dontShuffle = dontShuffle;
+    }
 	
 	/**
 	 * This is a bit hacky but is necessary if we want to do proper SGD (i.e. shuffling per epoch)
@@ -20,6 +30,10 @@ public class ShufflingImageRecordReader extends ImageRecordReader {
 	 */
 	@Override
 	public void reset() {
+		
+		if(m_dontShuffle) {
+			return;
+		}
 		
 		// HACKY
 		
