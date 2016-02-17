@@ -59,9 +59,12 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 		m_numChannels = numChannels;
 	}
 	
-	public void validate() throws Exception {
-		if(! new File(getImagesLocation()).isDirectory()) {
+	public void validate(Instances data) throws Exception {
+		if( ! new File(getImagesLocation()).isDirectory() ) {
 			throw new Exception("Directory not valid: " + getImagesLocation());
+		}
+		if( ! ( data.attribute(0).isString() && data.classIndex() == 1) ) {
+			throw new Exception("An ARFF is required with a string attribute and a class attribute");
 		}
 	}
 	
@@ -70,24 +73,16 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 		return getNumChannels() * getHeight() * getWidth();
 	}
 	
-	@Override
-	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
-		return null;
-	}
-
-	@Override
-	public DataSetIterator getIterator(Instances data, int seed) throws Exception {
-		validate();
+	private ShufflingImageRecordReader getImageRecordReader(Instances data) throws Exception {
         URI[] locations = new URI[ data.numInstances() ];
         int len = 0;
         ArrayList<String> labels = new ArrayList<String>();
         Enumeration<Object> it = data.attribute(1).enumerateValues();
-        //data.attribute(1).
         while(it.hasMoreElements()) {
         	labels.add((String)it.nextElement());
         }
         for(int x = 0; x < data.numInstances(); x++) {
-        	String location = data.attribute(0).value(x);
+        	String location = data.attribute(0).value( (int) data.get(x).value(0) );
         	File f = new File( getImagesLocation() + File.separator + 
         			labels.get((int)data.get(x).classValue()) + File.separator + location );
         	locations[x] = f.toURI();
@@ -98,14 +93,31 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         SpecifiableFolderSplit fs = new SpecifiableFolderSplit();
         fs.setFiles(locations);
         fs.setLength(len);
-        
         reader.initialize(fs); 
+        return reader;
+	}
+	
+	@Override
+	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) throws Exception {
+		validate(data);
+        ShufflingImageRecordReader reader = getImageRecordReader(data);
+        // we don't want to shuffle, nor do we want to do multiple epochs
+        reader.setDontShuffle(true); // TODO: "hacky"
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
-        		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), labels.size());
+        		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
+        tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
+		return tmpIter;
+	}
+
+	@Override
+	public DataSetIterator getIterator(Instances data, int seed) throws Exception {
+		validate(data);      
+        ShufflingImageRecordReader reader = getImageRecordReader(data);
+        DataSetIterator tmpIter = new RecordReaderDataSetIterator(
+        		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
 		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations()-1, tmpIter);
-		
+				getNumIterations()-1, tmpIter);		
 		return iter;
 	}
 	
