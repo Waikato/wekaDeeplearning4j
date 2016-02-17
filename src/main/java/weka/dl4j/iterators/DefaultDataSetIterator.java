@@ -20,6 +20,7 @@ public class DefaultDataSetIterator extends AbstractDataSetIterator {
 	@Override
 	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
 		DataSet dataset = Utils.instancesToDataSet(data);
+		// when this constructor is called, m_random = null so this doesn't actually shuffle
 		return new ShufflingDataSetIterator(dataset, testBatchSize);
 	}
 

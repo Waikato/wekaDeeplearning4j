@@ -20,6 +20,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
+import weka.core.BatchPredictor;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.OptionHandler;
@@ -43,7 +44,7 @@ import weka.filters.unsupervised.attribute.Standardize;
  * 
  * @author cjb60
  */
-public class Dl4jMlpClassifier extends RandomizableClassifier {
+public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPredictor {
 
 	private ReplaceMissingValues m_replaceMissing = null;
 	private Filter m_normalize = null;
