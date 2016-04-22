@@ -9,8 +9,10 @@ import java.util.Vector;
 import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
+
 import weka.core.Instances;
 import weka.dl4j.Constants;
+import weka.dl4j.EasyImageRecordReader;
 import weka.dl4j.SpecifiableFolderSplit;
 import weka.dl4j.ScaleImagePixelsPreProcessor;
 import weka.dl4j.ShufflingImageRecordReader;
@@ -73,7 +75,7 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 		return getNumChannels() * getHeight() * getWidth();
 	}
 	
-	private ShufflingImageRecordReader getImageRecordReader(Instances data) throws Exception {
+	private EasyImageRecordReader getImageRecordReader(Instances data) throws Exception {
         URI[] locations = new URI[ data.numInstances() ];
         int len = 0;
         ArrayList<String> labels = new ArrayList<String>();
@@ -81,15 +83,28 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         while(it.hasMoreElements()) {
         	labels.add((String)it.nextElement());
         }
+        /*
+         * DL4J assumes that your images are separated into different folders,
+         * where each folder is a class. E.g. for MNIST, all the 0 images are in a
+         * folder called 0/, all the 1 images in 1/, etc. At test time, you may get
+         * an instance like so: 
+         * image.png,?
+         * This is why we've had to make a new image record reader and make it
+         * possible that all the images are in one folder, and we specify
+         * the classes for those images explicitly.
+         */
+        ArrayList<File> filenames = new ArrayList<File>();
+        ArrayList<String> classes = new ArrayList<String>();
         for(int x = 0; x < data.numInstances(); x++) {
         	String location = data.attribute(0).value( (int) data.get(x).value(0) );
-        	File f = new File( getImagesLocation() + File.separator + 
-        			labels.get((int)data.get(x).classValue()) + File.separator + location );
+        	filenames.add( new File(getImagesLocation() + File.separator + location) );
+        	classes.add( String.valueOf(data.get(x).classValue() ) );
+        	
+        	File f = new File( getImagesLocation() + File.separator + location );
         	locations[x] = f.toURI();
         	len += f.length();
         }
-        
-        ShufflingImageRecordReader reader = new ShufflingImageRecordReader(getWidth(), getHeight(), getNumChannels(), true, labels);
+        EasyImageRecordReader reader = new EasyImageRecordReader(getWidth(), getHeight(), getNumChannels(), filenames, classes);
         SpecifiableFolderSplit fs = new SpecifiableFolderSplit();
         fs.setFiles(locations);
         fs.setLength(len);
@@ -100,9 +115,9 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 	@Override
 	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) throws Exception {
 		validate(data);
-        ShufflingImageRecordReader reader = getImageRecordReader(data);
+        EasyImageRecordReader reader = getImageRecordReader(data);
         // we don't want to shuffle, nor do we want to do multiple epochs
-        reader.setDontShuffle(true); // TODO: "hacky"
+        //reader.setDontShuffle(true); // TODO: "hacky"
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
         		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
@@ -112,7 +127,7 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 	@Override
 	public DataSetIterator getIterator(Instances data, int seed) throws Exception {
 		validate(data);      
-        ShufflingImageRecordReader reader = getImageRecordReader(data);
+		EasyImageRecordReader reader = getImageRecordReader(data);
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
         		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());

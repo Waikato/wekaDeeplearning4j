@@ -191,7 +191,6 @@ public class DL4JClassifierTest {
 		for(int x = 0; x < classCounts.length; x++) {
 			assertEquals(classCounts[x], 10);
 		}
-		
 	}
 	
 	@Test
@@ -247,6 +246,8 @@ public class DL4JClassifierTest {
 		outputLayer.setActivation(Activation.SOFTMAX);
 		cls.setLayers( new Layer[] { convLayer, poolLayer, outputLayer } );		
 		cls.buildClassifier(data);
+		cls.distributionsForInstances(data);
+		
 	}
 
 }
