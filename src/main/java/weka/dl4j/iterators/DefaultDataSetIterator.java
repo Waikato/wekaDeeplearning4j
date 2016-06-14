@@ -21,15 +21,16 @@ public class DefaultDataSetIterator extends AbstractDataSetIterator {
 	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
 		DataSet dataset = Utils.instancesToDataSet(data);
 		// when this constructor is called, m_random = null so this doesn't actually shuffle
+		
 		return new ShufflingDataSetIterator(dataset, testBatchSize);
 	}
 
 	@Override
-	public DataSetIterator getIterator(Instances data, int seed) {
+	public DataSetIterator getTrainIterator(Instances data, int seed) {
 		// convert the dataset
 		DataSet dataset = Utils.instancesToDataSet(data);
 		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations()-1, 
+				getNumIterations(), 
 				new ShufflingDataSetIterator(dataset, getTrainBatchSize(), seed));
 		return iter;
 	}

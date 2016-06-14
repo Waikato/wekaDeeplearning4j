@@ -78,21 +78,6 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 	private EasyImageRecordReader getImageRecordReader(Instances data) throws Exception {
         URI[] locations = new URI[ data.numInstances() ];
         int len = 0;
-        ArrayList<String> labels = new ArrayList<String>();
-        Enumeration<Object> it = data.attribute(1).enumerateValues();
-        while(it.hasMoreElements()) {
-        	labels.add((String)it.nextElement());
-        }
-        /*
-         * DL4J assumes that your images are separated into different folders,
-         * where each folder is a class. E.g. for MNIST, all the 0 images are in a
-         * folder called 0/, all the 1 images in 1/, etc. At test time, you may get
-         * an instance like so: 
-         * image.png,?
-         * This is why we've had to make a new image record reader and make it
-         * possible that all the images are in one folder, and we specify
-         * the classes for those images explicitly.
-         */
         ArrayList<File> filenames = new ArrayList<File>();
         ArrayList<String> classes = new ArrayList<String>();
         for(int x = 0; x < data.numInstances(); x++) {
@@ -101,7 +86,6 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         	classes.add( String.valueOf(data.get(x).classValue() ) );
         	
         	File f = new File( getImagesLocation() + File.separator + location );
-        	locations[x] = f.toURI();
         	len += f.length();
         }
         EasyImageRecordReader reader = new EasyImageRecordReader(getWidth(), getHeight(), getNumChannels(), filenames, classes);
@@ -119,20 +103,20 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         // we don't want to shuffle, nor do we want to do multiple epochs
         //reader.setDontShuffle(true); // TODO: "hacky"
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
-        		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
+        		reader, getTrainBatchSize(), -1, data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
 		return tmpIter;
 	}
 
 	@Override
-	public DataSetIterator getIterator(Instances data, int seed) throws Exception {
+	public DataSetIterator getTrainIterator(Instances data, int seed) throws Exception {
 		validate(data);      
 		EasyImageRecordReader reader = getImageRecordReader(data);
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
-        		reader, getTrainBatchSize(), getNumChannels()*getWidth()*getHeight(), data.numClasses());
+        		reader, getTrainBatchSize(), -1, data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
 		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations()-1, tmpIter);		
+				getNumIterations(), tmpIter);		
 		return iter;
 	}
 	

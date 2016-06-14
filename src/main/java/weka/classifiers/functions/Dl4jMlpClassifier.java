@@ -33,6 +33,7 @@ import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.Conv2DLayer;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
+import weka.dl4j.layers.Pool2DLayer;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -164,14 +165,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	 * @param layer
 	 * @return
 	 */
-	public int getNumUnitsOrFeatureMaps(Layer layer) {
+	public int getNumUnits(Layer layer) {
 		if(layer instanceof DenseLayer) {
 			DenseLayer tmp = (DenseLayer) layer;
 			return tmp.getNumUnits();
-		}
-		if(layer instanceof Conv2DLayer) {
-			Conv2DLayer tmp = (Conv2DLayer) layer;
-			return tmp.getNumFilters();
 		}
 		return -1;
 	}
@@ -218,36 +215,37 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 				//.batchSize( getTrainBatchSize() )
 				.list(m_layers.length);
 		int numInputAttributes = getDataSetIterator().getNumAttributes(data);
+		
+
+		
 		for (int x = 0; x < m_layers.length; x++) {
 			// output layer
 			if ( x == m_layers.length-1 ) {
 				// if this is the only layer (i.e. a perceptron)
 				if( x == 0) {
-					m_layers[x].setNumIncoming(numInputAttributes);
+					if( !(m_layers[x] instanceof Conv2DLayer )) m_layers[x].setNumIncoming(numInputAttributes);
 					m_layers[x].setNumOutgoing(data.numClasses());
 				} else { // otherwise
 					//weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
 					//m_layers[x].setNumIncoming(prevLayer.getNumUnits());
-					m_layers[x].setNumIncoming( getNumUnitsOrFeatureMaps(m_layers[x-1]) );
+					if( !(m_layers[x] instanceof Conv2DLayer )) m_layers[x].setNumIncoming( getNumUnits(m_layers[x-1]) );
 					m_layers[x].setNumOutgoing(data.numClasses());
+					//if(getDebug()) System.err.format("layer %d has prev incoming: %d\n", x, nIn);
 				}
 				ip = ip.layer(x, m_layers[x].getLayer() );
+			// if this is the first layer
 			} else if (x == 0) {
-				// hidden layer straight after the input layer
-				m_layers[x].setNumIncoming(numInputAttributes);
+				if( !(m_layers[x] instanceof Conv2DLayer )) m_layers[x].setNumIncoming(numInputAttributes);
 				ip = ip.layer(x, m_layers[x].getLayer() );
 			} else {
-				// intermediate hidden layer
-				//weka.dl4j.layers.DenseLayer prevLayer = (weka.dl4j.layers.DenseLayer) m_layers[x - 1];
-				//m_layers[x].setNumIncoming(prevLayer.getNumUnits());
-				m_layers[x].setNumIncoming( getNumUnitsOrFeatureMaps(m_layers[x-1]) );
-				ip = ip.layer(x, m_layers[x].getLayer());
+				if( !(m_layers[x] instanceof Conv2DLayer )) m_layers[x].setNumIncoming( getNumUnits(m_layers[x-1]) );
+				ip = ip.layer(x, m_layers[x].getLayer() );
 			}
 		}
 		ip = ip.pretrain(false).backprop(true);
 		
 		// if a conv network
-		if( m_layers[0] instanceof Conv2DLayer ) {
+		if( getDataSetIterator() instanceof ImageDataSetIterator ) {
 			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
 			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
 		}
@@ -256,6 +254,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
+		//System.out.println(conf);
 		int numMiniBatches = (int) Math.ceil( ((double)data.numInstances()) / ((double)getDataSetIterator().getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
 		if( !getDebugFile().equals("") ) {
@@ -265,7 +264,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		// if debug mode is set, print the shape of the outputs
 		// of the network
 		if( getDebug() ) {
-			DataSetIterator tmpIter = getDataSetIterator().getIterator(data, getSeed());
+			DataSetIterator tmpIter = getDataSetIterator().getTrainIterator(data, getSeed());
 	        while(tmpIter.hasNext()) {
 	        	DataSet d = tmpIter.next();
     	        m_model.initialize(d);
@@ -273,12 +272,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
     	        for(int i = 0; i < activations.size(); i++) {
     	        	System.out.format("output shape of layer %d is %s\n", (i+1), Arrays.toString(activations.get(i).shape()));
     	        }
+    	        System.out.format("number of params: %d\n", m_model.numParams() );
 	        	break;
 	        }
 		}	
 		
 		// train
-		m_model.fit( getDataSetIterator().getIterator(data, getSeed()) );
+		m_model.fit( getDataSetIterator().getTrainIterator(data, getSeed()) );
 	}
 
 	public double[] distributionForInstance(Instance inst) throws Exception {
