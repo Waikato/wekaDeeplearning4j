@@ -1,8 +1,13 @@
 package weka.dl4j;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -66,7 +71,14 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
                 return next();
             try {
                 BufferedImage bimg = ImageIO.read(image);
-                INDArray row = imageLoader.asRowVector(bimg);
+                
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                ImageIO.write(bimg, "png", os);
+                InputStream is = new ByteArrayInputStream(os.toByteArray());
+                
+                //INDArray row = imageLoader.asRowVector(bimg);
+                INDArray row = imageLoader.asRowVector(is);
+                
                 ret = RecordConverter.toRecord(row);
                 if(classLabel != "?")
                     ret.add(new DoubleWritable(Double.parseDouble(classLabel)));
@@ -100,6 +112,13 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
     @Override
     public void reset() {
         initialize(null);
-    }  
+    }
+
+	@Override
+	public Collection<Writable> record(URI uri, DataInputStream dataInputStream)
+			throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}  
 
 }
