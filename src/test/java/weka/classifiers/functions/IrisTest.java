@@ -34,23 +34,35 @@ public class IrisTest {
 		
 		DataSet dataset = Utils.instancesToDataSet(data);
 		
-		/*
+		// we expect 3 minibatches per epoch (since iris has 150 instances),
+		// but since we're doing 10 epochs, we expect 3 * 10 = 30 minibatches
+		// in total
 		MultipleEpochsIterator iter = new MultipleEpochsIterator(
 				10, 
 				new ShufflingDataSetIterator(dataset, 50, 0));
 		iter.reset();
+		int numMinibatches = 0;
 		while(iter.hasNext()) {
-			System.out.println("stuff");
+			numMinibatches += 1;
 			iter.next();
 		}
-		*/
 		
-		DataSetIterator iter = new ShufflingDataSetIterator(dataset, 50, 0);
-		iter.reset();
-		while(iter.hasNext()) {
-			System.out.println("stuff");
-			iter.next();
+		// SHOULD BE EQUAL TO 30, BUT IS EQUAL TO 28
+		System.out.println("number of minibatches: " + numMinibatches);
+		
+		
+		// we expect 3 mini-batches per epoch (since iris has 150 instances)
+		DataSetIterator iter2 = new ShufflingDataSetIterator(dataset, 50, 0);
+		iter2.reset();
+		numMinibatches = 0;
+		while(iter2.hasNext()) {
+			numMinibatches += 1;
+			iter2.next();
 		}
+		
+		// SHOULD BE EQUAL TO 3
+		System.out.println("number of minibatches: " + numMinibatches);
+		
 		
 	}
 
