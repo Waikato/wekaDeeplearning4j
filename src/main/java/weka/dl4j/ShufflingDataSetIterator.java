@@ -32,6 +32,7 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	@Override
 	public boolean hasNext() {
 		if( m_counter * m_batchSize >= m_data.numExamples() ) {
+			//System.out.println("hasnext" + (m_counter * m_batchSize ));
 			return false;
 		}
 		return true;
@@ -41,11 +42,13 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	public DataSet next() {
 		DataSet thisBatch = (DataSet) m_data.getRange(m_counter*m_batchSize, (m_counter+1)*m_batchSize);
 		m_counter++;
+		//System.out.println("counter = " + m_counter);
 		return thisBatch;
 	}
 
 	@Override
 	public DataSet next(int num) {
+		System.out.println("test");
 		return (DataSet) m_data.getRange(num*m_batchSize, (num+1)*m_batchSize);
 	}
 
@@ -67,12 +70,13 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	@Override
 	public void reset() {
 		m_counter = 0;
+		//System.out.println("counter = 0");
 		//m_data.shuffle();
-		if(m_random != null) {
-			long next = m_random.nextLong();
-	        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
-	        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
-		}
+		//if(m_random != null) {
+		//	long next = m_random.nextLong();
+	    //    Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
+	    //    Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
+		//}
 	}
 
 	@Override

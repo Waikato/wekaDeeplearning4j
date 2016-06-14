@@ -39,8 +39,8 @@ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
 This trains a one-hidden-layer MLP with 10 units on the Iris dataset. Nesterov momentum is used in conjunction with SGD and the initial
 learning rate and momentum is set to 0.1 and 0.9, respectively. The network is trained for 100 iterations.
 
-## Caveats
+## Design philosophy
 
-* Make sure that the last layer in the network is an output layer. Somewhat confusingly, you can also specify the number 
-of units in this layer -- this has no effect and will internally change itself to the number of classes in the dataset.
-* The training batch size parameter (`-bs`) currently does not work -- full batch gradient descent is always used.
+DL4J is not primarily intended for research purposes -- rather more commercial and convention endeavours -- and so for more research-oriented
+tasks, a library such as Theano should be used in conjunction with the WekaPyScript package which allows WEKA classifiers to be prototyped in
+Python.
