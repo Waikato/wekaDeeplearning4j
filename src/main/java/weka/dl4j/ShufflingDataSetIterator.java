@@ -71,12 +71,12 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	public void reset() {
 		m_counter = 0;
 		//System.out.println("counter = 0");
-		//m_data.shuffle();
-		//if(m_random != null) {
-		//	long next = m_random.nextLong();
-	    //    Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
-	    //    Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
-		//}
+		m_data.shuffle();
+		if(m_random != null) {
+			long next = m_random.nextLong();
+	        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
+	        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
+		}
 	}
 
 	@Override

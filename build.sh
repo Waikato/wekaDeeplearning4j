@@ -8,6 +8,7 @@ fi
 export CLASSPATH=$WEKA_HOME/weka.jar
 
 if [ $1 == "fresh" ]; then
+    rm lib/*
     mvn clean
 fi
 mvn -Dmaven.test.skip=true install
