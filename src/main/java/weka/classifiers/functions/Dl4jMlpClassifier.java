@@ -202,6 +202,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		m_nominalToBinary = new NominalToBinary();
 		m_nominalToBinary.setInputFormat(data);
 		data = Filter.useFilter(data, m_nominalToBinary);
+		
+		//if(getDebug()) {
+		//	System.out.println(data);
+		//}
+		
 		//data.randomize(new Random(getSeed()));
 		// construct the mlp configuration
 		ListBuilder ip = new NeuralNetConfiguration.Builder()
@@ -251,6 +256,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		}
 		
 		MultiLayerConfiguration conf = ip.build();
+		
+		if( getDebug() ) {
+			System.err.println( conf.toJson() );
+		}
+		
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
@@ -275,7 +285,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
     	        System.out.format("number of params: %d\n", m_model.numParams() );
 	        	break;
 	        }
-		}	
+		}
 		
 		// train
 		m_model.fit( getDataSetIterator().getTrainIterator(data, getSeed()) );
