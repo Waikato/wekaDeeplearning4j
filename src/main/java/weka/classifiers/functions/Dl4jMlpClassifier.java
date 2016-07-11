@@ -2,6 +2,7 @@ package weka.classifiers.functions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -23,6 +24,7 @@ import weka.classifiers.rules.ZeroR;
 import weka.core.BatchPredictor;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.Constants;
@@ -62,8 +64,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	}
 	
 	protected String m_debugFile = "";
-	
-	@OptionMetadata(description = "File to write training statistics to", displayName = "debugFile", displayOrder = 1)
+
 	public String getDebugFile() {
 		return m_debugFile;
 	}
@@ -437,6 +438,78 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			return m_model.conf().toYaml();
 		}
 		return null;
+	}
+	
+
+	public Enumeration<Option> listOptions() {
+		Vector<Option> v = new Vector<Option>();
+		// layers
+		v.add(new Option(
+			"\tList of layers that define the MLP/CNN",
+			"-layers",
+			1, 
+			"-layers <layer arguments>"
+		));
+		// dataset iterator
+		v.add(new Option(
+				"\tDataset iterator to use",
+				"-iterator",
+				1, 
+				"-iterator <iterator arguments>"
+		));
+		// optim alg
+		String optNames = "(";
+		for(int i = 0; i < OptimizationAlgorithm.values().length; i++) {
+			optNames += ( OptimizationAlgorithm.values()[i].toString() + " | ");
+		}
+		optNames += ")";
+		v.add(new Option(
+				"\tOptimisation algorithm to use",
+				"-optim",
+				1, 
+				"-optim " + optNames
+		));
+		// learning rate
+		v.add(new Option(
+				"\tLearning rate",
+				"-lr",
+				1, 
+				"-lr <float>"
+		));		
+		// momentum
+		v.add(new Option(
+				"\tMomentum (note: this depends on the updater, e.g. this option has no effect if using plain SGD optimiser)",
+				"-momentum",
+				1, 
+				"-momentum <float>"
+		));
+		// updater
+		optNames = "(";
+		for(int i = 0; i < Updater.values().length; i++) {
+			optNames += ( Updater.values()[i].toString() + " | ");
+		}
+		optNames += ")";		
+		v.add(new Option(
+				"\tType of updater to use",
+				"-updater",
+				1, 
+				"-updater " + optNames
+			));
+		// debug
+		v.add(new Option(
+			"\tDebug file to print training statistics to",
+			"-debug",
+			1, 
+			"-debug <filename>"
+		));
+		
+		
+		return v.elements();
+
+	}
+	
+	public static void main(String[] argv) {
+		runClassifier(new Dl4jMlpClassifier(), argv);
 	}
 
 }
