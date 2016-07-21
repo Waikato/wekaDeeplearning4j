@@ -115,9 +115,10 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         DataSetIterator tmpIter = new RecordReaderDataSetIterator(
         		reader, getTrainBatchSize(), -1, data.numClasses());
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
-		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations(), tmpIter);		
-		return iter;
+		//MultipleEpochsIterator iter = new MultipleEpochsIterator(
+		//		getNumIterations(), tmpIter);		
+		//return iter;
+        return tmpIter;
 	}
 	
 	@Override

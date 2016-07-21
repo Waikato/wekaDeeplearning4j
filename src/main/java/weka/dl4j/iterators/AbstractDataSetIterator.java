@@ -40,17 +40,6 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 		return m_trainBatchSize;
 	}
 	
-	private int m_numIterations = 10;
-
-	public void setNumIterations(int numIterations) {
-		m_numIterations = numIterations;
-	}
-
-	@OptionMetadata(description = "Number of iterations/epochs", displayName = "numIterations", displayOrder = 1)
-	public int getNumIterations() {
-		return m_numIterations;
-	}
-	
 	@Override
 	public Enumeration<Option> listOptions() {
 		return null;
@@ -58,10 +47,8 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 
 	@Override
 	public void setOptions(String[] options) throws Exception {
-		String tmp = weka.core.Utils.getOption(Constants.NUM_ITERATIONS, options);
-		if(!tmp.equals("")) setNumIterations( Integer.parseInt(tmp) );
 		// train batch size
-		tmp = weka.core.Utils.getOption(Constants.TRAIN_BATCH_SIZE, options);
+		String tmp = weka.core.Utils.getOption(Constants.TRAIN_BATCH_SIZE, options);
 		if(!tmp.equals("")) setTrainBatchSize( Integer.parseInt(tmp) );
 	}
 
@@ -75,9 +62,6 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 		// train batch size
 		result.add("-" + Constants.TRAIN_BATCH_SIZE);
 		result.add("" + getTrainBatchSize());
-		// num iterations
-		result.add("-" + Constants.NUM_ITERATIONS);
-		result.add("" + getNumIterations());
 		return result.toArray(new String[result.size()]);
 	}
 

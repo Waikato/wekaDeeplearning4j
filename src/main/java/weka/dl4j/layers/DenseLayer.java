@@ -85,11 +85,7 @@ public class DenseLayer extends Layer {
 	public void setWeightInit(WeightInit weightInit) {
 		m_weightInit = weightInit;
 	}
-	
-	@Override
-	public Enumeration<Option> listOptions() {
-		return null;
-	}
+
 
 	@Override
 	public void setOptions(String[] options) throws Exception {
@@ -135,6 +131,13 @@ public class DenseLayer extends Layer {
 		result.add("-" + Constants.L2);
 		result.add( "" + getL2() );
 	    return result.toArray(new String[result.size()]);
+	}
+	
+	@Override
+	public Enumeration<Option> listOptions() {
+		Vector<Option> v = new Vector<Option>();
+		
+		return v.elements();
 	}
 
 }
