@@ -1,6 +1,7 @@
 package weka.classifiers.functions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -15,8 +16,13 @@ import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.setup.ConvolutionLayerSetup;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
+import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
@@ -48,6 +54,8 @@ import weka.filters.unsupervised.attribute.Standardize;
  * @author cjb60
  */
 public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPredictor {
+	
+	private static final Logger log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
 	private ReplaceMissingValues m_replaceMissing = null;
 	private Filter m_normalize = null;
@@ -71,6 +79,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 
 	public void setDebugFile(String debugFile) {
 		m_debugFile = debugFile;
+	}
+	
+	protected boolean m_vis = false;
+	
+	public boolean getVisualisation() {
+		return m_vis;
+	}
+	
+	public void setVisualisation(boolean b) {
+		m_vis = b;
 	}
 
 	private Layer[] m_layers = new Layer[] {};
@@ -148,6 +166,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	
 	public void setDataSetIterator(AbstractDataSetIterator iterator) {
 		m_iterator = iterator;
+	}
+	
+	private int m_numEpochs = 10;
+	
+	public void setNumEpochs(int numEpochs) {
+		m_numEpochs = numEpochs;
+	}
+	
+	public int getNumEpochs() {
+		return m_numEpochs;
 	}
 
 	public void validate() throws Exception {
@@ -265,12 +293,23 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
+		
+		ArrayList<IterationListener> listeners = new ArrayList<IterationListener>();
+		listeners.add( new ScoreIterationListener( data.numInstances() / getDataSetIterator().getTrainBatchSize() ) );
+		
 		//System.out.println(conf);
 		int numMiniBatches = (int) Math.ceil( ((double)data.numInstances()) / ((double)getDataSetIterator().getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
 		if( !getDebugFile().equals("") ) {
-			m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
+			listeners.add( new FileIterationListener(getDebugFile(), numMiniBatches) );
+			//m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
+		
+		if( getVisualisation() ) {
+			listeners.add( new HistogramIterationListener(1) );
+		}
+		
+		m_model.setListeners(listeners);
 		
 		// if debug mode is set, print the shape of the outputs
 		// of the network
@@ -281,15 +320,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
     	        m_model.initialize(d);
     	        List<INDArray> activations = m_model.feedForward();
     	        for(int i = 0; i < activations.size(); i++) {
-    	        	System.out.format("output shape of layer %d is %s\n", (i+1), Arrays.toString(activations.get(i).shape()));
+    	        	log.info("*** Output shape of layer {} is {} ***", (i+1), Arrays.toString(activations.get(i).shape()) );
     	        }
     	        System.out.format("number of params: %d\n", m_model.numParams() );
 	        	break;
 	        }
 		}
 		
-		// train
-		m_model.fit( getDataSetIterator().getTrainIterator(data, getSeed()) );
+		DataSetIterator iter = getDataSetIterator().getTrainIterator(data, getSeed());
+		for(int i = 0; i < getNumEpochs(); i++) {
+			m_model.fit(iter);
+			log.info("*** Completed epoch {} ***", i+1);		
+			iter.reset();
+		}
 	}
 
 	public double[] distributionForInstance(Instance inst) throws Exception {
@@ -386,6 +429,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			result.add("-" + Constants.DEBUG_FILE);
 			result.add( getDebugFile() );
 		}
+		// vis
+		if( getVisualisation() ) {
+			result.add("-" + Constants.VIS);
+		}
 
 		return result.toArray(new String[result.size()]);
 	}
@@ -430,6 +477,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		// debug file
 		tmp = weka.core.Utils.getOption(Constants.DEBUG_FILE, options);
 		if(!tmp.equals("")) setDebugFile(tmp);
+		// vis
+		tmp = weka.core.Utils.getOption(Constants.VIS, options);
+		if(!tmp.equals("")) setVisualisation(true);
 	}
 	
 	@Override
