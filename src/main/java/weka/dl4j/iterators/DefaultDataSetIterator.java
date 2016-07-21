@@ -29,10 +29,11 @@ public class DefaultDataSetIterator extends AbstractDataSetIterator {
 	public DataSetIterator getTrainIterator(Instances data, int seed) {
 		// convert the dataset
 		DataSet dataset = Utils.instancesToDataSet(data);
-		MultipleEpochsIterator iter = new MultipleEpochsIterator(
-				getNumIterations(), 
-				new ShufflingDataSetIterator(dataset, getTrainBatchSize(), seed));
-		return iter;
+		//MultipleEpochsIterator iter = new MultipleEpochsIterator(
+		//		getNumIterations(), 
+		//		new ShufflingDataSetIterator(dataset, getTrainBatchSize(), seed));
+		//return iter;
+		return new ShufflingDataSetIterator(dataset, getTrainBatchSize(), seed);
 	}
 
 }

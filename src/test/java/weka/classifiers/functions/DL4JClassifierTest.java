@@ -26,7 +26,7 @@ import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 
 public class DL4JClassifierTest {
-	
+
 	@Test
 	public void testFish() throws Exception {
 		DataSource ds = new DataSource("datasets-numeric/fishcatch.arff");
@@ -38,32 +38,32 @@ public class DL4JClassifierTest {
 		cls.setLayers(new weka.dl4j.layers.Layer[] { out } );
 		cls.setDebugFile("/tmp/debug.txt");
 		cls.setLearningRate(0.01);
-		cls.getDataSetIterator().setNumIterations(100);
+		cls.setNumEpochs(100);
 		cls.getDataSetIterator().setTrainBatchSize(1000);
 		cls.buildClassifier(data);
 	}
-	
+
 	public Instances loadIris() throws Exception {
 		DataSource ds = new DataSource("datasets/iris.arff");
 		Instances data = ds.getDataSet();
 		data.setClassIndex( data.numAttributes() - 1 );
 		return data;
 	}
-	
+
 	public Instances loadDiabetes() throws Exception {
 		DataSource ds = new DataSource("datasets/diabetes_numeric.arff");
 		Instances data = ds.getDataSet();
 		data.setClassIndex( data.numAttributes() - 1 );
 		return data;
 	}
-	
+
 	public Instances getMnistMeta() throws Exception {
 		DataSource ds = new DataSource("datasets/mnist.meta.arff");
 		Instances data = ds.getDataSet();
 		data.setClassIndex( data.numAttributes() - 1 );
 		return data;
 	}
-	
+
 	public Dl4jMlpClassifier getMlp() {
 		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
 		cls.setDebug(true);
@@ -74,7 +74,7 @@ public class DL4JClassifierTest {
 		});
 		return cls;
 	}
-	
+
 	/**
 	 * Test a no-hidden-layer neural net (i.e. a perceptron)
 	 * on the numeric diabetes dataset
@@ -89,7 +89,7 @@ public class DL4JClassifierTest {
 		Instances data = loadDiabetes();
 		cls.buildClassifier(data);
 	}
-	
+
 	/**
 	 * Test a simple MLP on the Iris dataset. We're testing
 	 * to see that none of the method calls like buildClassifer
@@ -99,13 +99,13 @@ public class DL4JClassifierTest {
 	 * number of iterations to be 10.
 	 * @throws Exception
 	 */
-	@Ignore
+	@Test
 	public void irisTest() throws Exception {
 		int numEpochs = 10;
 		Instances data = loadIris();
 		Dl4jMlpClassifier cls = getMlp();
 		cls.getDataSetIterator().setTrainBatchSize(50);
-		cls.getDataSetIterator().setNumIterations(numEpochs);
+		cls.setNumEpochs(numEpochs);
 		String tmpFile = System.getProperty("java.io.tmpdir") + File.separator + "irisTest.txt";
 		System.err.println("irisTest() tmp file: " + tmpFile);
 		cls.setDebugFile(tmpFile);
@@ -118,16 +118,16 @@ public class DL4JClassifierTest {
 		}
 		assertEquals(lines.size(), numEpochs+1);
 	}
-	
+
 	@Ignore
 	public void testCSVRecordReader() throws Exception {
 		CSVRecordReader reader = new CSVRecordReader();
 		reader.initialize(new FileSplit(new File("datasets/diabetes.csv")));
 		DataSetIterator iter = new RecordReaderDataSetIterator(reader,null,100,2,1,true);
-        DataSet next = iter.next();
-        System.out.println(next);
+		DataSet next = iter.next();
+		System.out.println(next);
 	}
-	
+
 	@Test
 	public void diabetesTest() throws Exception {
 		int numIters = 10;
@@ -141,7 +141,7 @@ public class DL4JClassifierTest {
 		outputLayer.setLossFunction(LossFunction.MSE);
 		cls.setLayers(new weka.dl4j.layers.Layer[] { hiddenLayer, outputLayer });
 		cls.getDataSetIterator().setTrainBatchSize(50);
-		cls.getDataSetIterator().setNumIterations(numIters);
+		cls.setNumEpochs(numIters);
 		String tmpFile = System.getProperty("java.io.tmpdir") + File.separator + "diabetesTest.txt";
 		System.err.println("diabetesTest() tmp file: " + tmpFile);
 		cls.setDebugFile(tmpFile);
@@ -152,7 +152,7 @@ public class DL4JClassifierTest {
 		List<String> lines = Files.readAllLines(new File(tmpFile).toPath());
 		assertEquals(lines.size(), numIters+1);
 	}
-	
+
 	public int findOne(INDArray arr) {
 		for(int x = 0; x < arr.columns(); x++) {
 			if( arr.getFloat(x) == 1.0 ) {
@@ -161,7 +161,7 @@ public class DL4JClassifierTest {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Test the image dataset iterator with a very
 	 * minimal MNIST example (10 images, and 1 image
@@ -185,27 +185,26 @@ public class DL4JClassifierTest {
 		imgIter.setWidth(28);
 		imgIter.setNumChannels(1);
 		int numEpochs = 10;
-		imgIter.setNumIterations(numEpochs);
 		imgIter.setTrainBatchSize(10);
 		imgIter.setImagesLocation(new File("datasets/mnist-minimal").getAbsolutePath());
 		DataSetIterator iter = imgIter.getTrainIterator(data, 0);
 		int[] classCounts = new int[10];
 		//for(int epoch = 0; epoch < numEpochs; epoch++) {
-			iter.reset();
-			while(iter.hasNext()) {
-				DataSet batch = iter.next();
-				INDArray classes = batch.getLabels();
-				for(int i = 0; i < classes.rows(); i++) {
-					INDArray row = classes.getRow(i);
-					classCounts[ findOne(row) ] += 1;
-				}		
-			}
+		iter.reset();
+		while(iter.hasNext()) {
+			DataSet batch = iter.next();
+			INDArray classes = batch.getLabels();
+			for(int i = 0; i < classes.rows(); i++) {
+				INDArray row = classes.getRow(i);
+				classCounts[ findOne(row) ] += 1;
+			}		
+		}
 		//}
 		for(int x = 0; x < classCounts.length; x++) {
 			assertEquals(classCounts[x], 10);
 		}
 	}
-	
+
 	/**
 	 * TODO: Ignoring this for now. This is a tricky case: the input
 	 * is in the form of images, but we are actually doing a densely
@@ -223,9 +222,9 @@ public class DL4JClassifierTest {
 		imgIter.setHeight(28);
 		imgIter.setWidth(28);
 		imgIter.setNumChannels(1);
-		imgIter.setNumIterations(10);
 		imgIter.setTrainBatchSize(128);
 		cls.setDataSetIterator(imgIter);
+		cls.setNumEpochs(10);
 		weka.dl4j.layers.DenseLayer hiddenLayer = new weka.dl4j.layers.DenseLayer();
 		//hiddenLayer.setNumIncoming(1*28*28);
 		hiddenLayer.setNumUnits(10);
@@ -236,7 +235,7 @@ public class DL4JClassifierTest {
 		cls.buildClassifier(data);
 		cls.distributionsForInstances(data);
 	}
-	
+
 	@Test
 	public void testMinimalMnistConvNet() throws Exception {
 		Dl4jMlpClassifier cls = new Dl4jMlpClassifier();
@@ -249,9 +248,9 @@ public class DL4JClassifierTest {
 		imgIter.setHeight(28);
 		imgIter.setWidth(28);
 		imgIter.setNumChannels(1);
-		imgIter.setNumIterations(10);
 		imgIter.setTrainBatchSize(128);
 		cls.setDataSetIterator(imgIter);
+		cls.setNumEpochs(10);
 		weka.dl4j.layers.Conv2DLayer convLayer = new weka.dl4j.layers.Conv2DLayer();
 		convLayer.setNumFilters(10);
 		convLayer.setFilterSizeX(5);
@@ -261,16 +260,16 @@ public class DL4JClassifierTest {
 		poolLayer.setPoolSizeY(2);
 		poolLayer.setStrideX(2);
 		poolLayer.setStrideY(2);
-		
-		
+
+
 		weka.dl4j.layers.OutputLayer outputLayer = new weka.dl4j.layers.OutputLayer();
 		outputLayer.setActivation(Activation.SOFTMAX);
 		cls.setLayers( new Layer[] { convLayer, poolLayer, outputLayer } );		
 		cls.buildClassifier(data);
 		cls.distributionsForInstances(data);
-		
+
 	}
-	
+
 	/**
 	 * Test that different batch sizes and multiple epochs work
 	 * correctly.
@@ -290,7 +289,7 @@ public class DL4JClassifierTest {
 		int[] batchSizes = new int[] { 1, 2, 10 }; // 2 10		
 		//int numEpochs = 2;
 		for(int batchSize : batchSizes) {
-			imgIter.setNumIterations(1); // TODO: needs to be moved to the classifier
+			//imgIter.setNumIterations(1); // TODO: needs to be moved to the classifier
 			imgIter.setTrainBatchSize(batchSize);
 			DataSetIterator iter = imgIter.getTrainIterator(data, 0);
 			int numBatchesTotal = 0;

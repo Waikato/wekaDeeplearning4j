@@ -18,6 +18,7 @@ public class Constants {
 	public static final String MOMENTUM = "momentum";
 	public static final String DEBUG_FILE = "debug";
 	public static final String TRAIN_BATCH_SIZE = "bs";
+	public static final String VIS = "vis";
 	
 	public static final String STRIDE_X = "stride_x";
 	public static final String STRIDE_Y = "stride_y";

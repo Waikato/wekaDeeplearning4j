@@ -5,8 +5,8 @@
     <artifactId>deeplearning4j-examples</artifactId>
     <version>0.4-rc0-SNAPSHOT</version>
 
-    <name>DeepLearning4j Examples</name>
-    <description>Examples of training different data sets</description>
+    <name>WEKA DL4J PACKAGE</name>
+    <description>Deep learning for WEKA</description>
 
     <properties>
         <nd4j.version>0.4-rc3.9</nd4j.version>
@@ -73,7 +73,6 @@
             <artifactId>deeplearning4j-nlp</artifactId>
             <version>${dl4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-core</artifactId>
@@ -123,7 +122,7 @@
                   <goal>copy-dependencies</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${project.basedir}/lib</outputDirectory>
+                  <outputDirectory>${project.basedir}/lib-full</outputDirectory>
                 </configuration>
               </execution>
             </executions>
