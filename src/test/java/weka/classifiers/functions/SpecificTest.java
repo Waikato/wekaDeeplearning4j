@@ -80,7 +80,7 @@ public class SpecificTest {
 		imgIter.setHeight(28);
 		imgIter.setWidth(28);
 		imgIter.setNumChannels(1);
-		imgIter.setNumIterations(10);
+		//imgIter.setNumIterations(10);
 		imgIter.setTrainBatchSize(128);
 		cls.setDataSetIterator(imgIter);
 		
