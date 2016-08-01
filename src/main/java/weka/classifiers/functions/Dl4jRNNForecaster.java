@@ -259,10 +259,9 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         // can classifier handle the data?
         getCapabilities().testWithFail(data);
         // remove missing data
-        data.remove(0);
-//        m_replaceMissing = new ReplaceMissingValues();
-//        m_replaceMissing.setInputFormat(data);
-//        data = Filter.useFilter(data, m_replaceMissing);
+        m_replaceMissing = new ReplaceMissingValues();
+        m_replaceMissing.setInputFormat(data);
+        data = Filter.useFilter(data, m_replaceMissing);
         if (m_standardizeInsteadOfNormalize) {
             m_normalize = new Standardize();
             // we want to also normalize the class
@@ -282,7 +281,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         	System.err.println(trainingData);
         }
 
-        // construct the mlp configuration
+        // construct the rnn configuration
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
         builder.seed(getSeed());
         builder.biasInit(0);
