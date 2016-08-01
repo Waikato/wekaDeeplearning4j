@@ -24,6 +24,7 @@ public class Constants {
 	public static final String TBPTT_LENGTH = "tbptt_length";
 	public static final String DEBUG_FILE = "debug";
 	public static final String TRAIN_BATCH_SIZE = "bs";
+	public static final String VIS = "vis";
 	public static final String MINI_BATCH_SIZE = "minibs";
 	
 	public static final String STRIDE_X = "stride_x";
