@@ -2,11 +2,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.deeplearning4j</groupId>
-    <artifactId>wekaDeeplearning4j</artifactId>
+    <artifactId>deeplearning4j-examples</artifactId>
     <version>0.4-rc0-SNAPSHOT</version>
 
-    <name>DeepLearning4j Examples</name>
-    <description>Examples of training different data sets</description>
+    <name>WEKA DL4J PACKAGE</name>
+    <description>Deep learning for WEKA</description>
 
     <properties>
         <nd4j.version>0.4-rc3.9</nd4j.version>
@@ -108,31 +108,25 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.12</version>
-          <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>install</phase>
-                <goals>
-                  <goal>copy-dependencies</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.basedir}/lib</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/lib-full</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
