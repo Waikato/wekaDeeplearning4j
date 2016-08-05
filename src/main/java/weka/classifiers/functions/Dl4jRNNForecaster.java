@@ -3,6 +3,7 @@ package weka.classifiers.functions;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.ui.weights.HistogramIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.RandomizableClassifier;
@@ -55,6 +56,17 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
 
     public void setDebugFile(String debugFile) {
         m_debugFile = debugFile;
+    }
+
+    // Allow DL4J metrics visualization to help user in net configuration
+    protected boolean m_vis = false;
+
+    public boolean getVisualisation() {
+        return m_vis;
+    }
+
+    public void setVisualisation(boolean b) {
+        m_vis = b;
     }
 
     // Layers
@@ -329,6 +341,10 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         m_model = new MultiLayerNetwork(conf);
         m_model.init();
 
+        if( getVisualisation() ) {
+            m_model.setListeners(new HistogramIterationListener(1));
+        }
+
         if( getDebug() ) {
             System.err.println( conf.toJson() );
         }
@@ -459,6 +475,10 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
             result.add("-" + Constants.DEBUG_FILE);
             result.add( getDebugFile() );
         }
+        // vis
+        if( getVisualisation() ) {
+            result.add("-" + Constants.VIS);
+        }
 
         return result.toArray(new String[result.size()]);
     }
@@ -516,6 +536,9 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         // debug file
         tmp = weka.core.Utils.getOption(Constants.DEBUG_FILE, options);
         if(!tmp.equals("")) setDebugFile(tmp);
+        // vis
+        tmp = weka.core.Utils.getOption(Constants.VIS, options);
+        if(!tmp.equals("")) setVisualisation(true);
     }
 
     @Override
