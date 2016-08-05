@@ -1,31 +1,16 @@
 package weka.classifiers.functions;
 
-import org.deeplearning4j.datasets.iterator.DataSetIterator;
-import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
-import org.deeplearning4j.nn.conf.layers.GravesLSTM;
-import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
-import org.deeplearning4j.nn.conf.layers.setup.ConvolutionLayerSetup;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.RandomizableClassifier;
-import weka.classifiers.functions.dl4j.*;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
-import weka.core.Utils;
 import weka.dl4j.Constants;
-import weka.dl4j.FileIterationListener;
 import weka.dl4j.iterators.AbstractDataSetIterator;
 import weka.dl4j.iterators.DefaultDataSetIterator;
-import weka.dl4j.iterators.ImageDataSetIterator;
-import weka.dl4j.layers.Conv2DLayer;
-import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.Layer;
 import weka.filters.Filter;
@@ -35,11 +20,8 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import static weka.classifiers.functions.dl4j.Utils.RNNinstancesToDataSet;
@@ -48,7 +30,6 @@ import static weka.classifiers.functions.dl4j.Utils.RNNinstancesToDataSet;
  * Created by pedro on 18-07-2016.
  */
 public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPredictor {
-    public static final int nSamples = 100;
     private ReplaceMissingValues m_replaceMissing = null;
     private Filter m_normalize = null;
     private boolean m_standardizeInsteadOfNormalize = false;
@@ -243,6 +224,18 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         return -1;
     }
 
+    public void clearLSTMState() {
+        m_model.rnnClearPreviousState();
+    }
+
+    public Map<String, INDArray> getLSTMState(int layer) {
+        return m_model.rnnGetPreviousState(layer);
+    }
+
+    public void setLSTMState(int layer, Map<String, INDArray> state) {
+        m_model.rnnSetPreviousState(layer, state);
+    }
+
     @Override
     public void buildClassifier(Instances data) throws Exception {
         // validate
@@ -276,6 +269,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
 //        m_nominalToBinary.setInputFormat(data);
 //        data = Filter.useFilter(data, m_nominalToBinary);
 
+
         DataSet trainingData = RNNinstancesToDataSet(data);
         if(getDebug()) {
         	System.err.println(trainingData);
@@ -303,7 +297,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
             listBuilder.backpropType(BackpropType.TruncatedBPTT).tBPTTForwardLength(tbpttLength).tBPTTBackwardLength(tbpttLength);
         }
         listBuilder = listBuilder.pretrain(false).backprop(true);
-        
+
         int numInputAttributes = getDataSetIterator().getNumAttributes(data);
 
         // set layers
@@ -356,7 +350,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         }
     }
 
-
     public double[] distributionForInstance(Instance inst) throws Exception {
         if (m_zeroR != null) {
             return m_zeroR.distributionForInstance(inst);
@@ -381,13 +374,15 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         // using output() would require us to input to the test matrix all the past instances
         // with rnnTimeStep() we can just input the last instance, as it has stored the state from the last prediction
         // so conceptually all the past data is still always used
-
         predicted = predicted.getRow(0);
         double[] preds = new double[inst.numClasses()];
         for (int i = 0; i < preds.length; i++) {
             preds[i] = predicted.getDouble(i);
         }
-        System.out.println("Predicted: " + predicted);
+        // only normalise if we're dealing with classification
+        if( preds.length > 1) {
+            weka.core.Utils.normalize(preds);
+        }
         return preds;
     }
 

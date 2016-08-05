@@ -19,6 +19,7 @@ fi
 
 # ok, compile all the source code
 mvn -Dmaven.test.skip=true install
+echo "maven done, now ant"
 # clean-up
 ant -f build_package.xml clean
 
