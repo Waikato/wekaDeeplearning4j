@@ -2,4 +2,4 @@ target/
 lib/
 lib-full/
 .idea
-dist
+dist/
