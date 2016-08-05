@@ -1,5 +1,8 @@
 target/
 lib/
 lib-full/
+<<<<<<< HEAD
 .idea
 dist/
+=======
+>>>>>>> c0356e2b0d3dde98c76afa0699834ca824184bd2
