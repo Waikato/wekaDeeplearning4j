@@ -9,20 +9,30 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 
 public class ShufflingDataSetIterator implements DataSetIterator {
-	
+
 	private static final long serialVersionUID = 5571114918884888578L;
-	
+
 	private DataSet m_data = null;
 	private int m_batchSize = 0;
 	private int m_counter = 0;
 	private Random m_random = null;
-	
+
+	@Override
+	public DataSetPreProcessor getPreProcessor() {
+		return null;
+	}
+
+	@Override
+	public boolean resetSupported() {
+		return false;
+	}
+
 	public ShufflingDataSetIterator(DataSet data, int batchSize, int seed) {
 		m_data = data;
 		m_batchSize = batchSize;
 		m_random = new Random(seed);
 	}
-	
+
 	public ShufflingDataSetIterator(DataSet data, int batchSize) {
 		m_data = data;
 		m_batchSize = batchSize;
@@ -97,7 +107,7 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	@Override
 	public void setPreProcessor(DataSetPreProcessor preProcessor) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

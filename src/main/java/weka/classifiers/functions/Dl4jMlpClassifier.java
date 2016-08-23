@@ -37,7 +37,7 @@ import weka.dl4j.Constants;
 import weka.dl4j.FileIterationListener;
 import weka.dl4j.iterators.AbstractDataSetIterator;
 import weka.dl4j.iterators.DefaultDataSetIterator;
-import weka.dl4j.iterators.ImageDataSetIterator;
+//import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.Conv2DLayer;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
@@ -279,10 +279,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		ip = ip.pretrain(false).backprop(true);
 		
 		// if a conv network
-		if( getDataSetIterator() instanceof ImageDataSetIterator ) {
-			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
-			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
-		}
+//		if( getDataSetIterator() instanceof ImageDataSetIterator ) {
+//			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
+//			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
+//		}
 		
 		MultiLayerConfiguration conf = ip.build();
 		
