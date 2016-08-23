@@ -2,12 +2,15 @@ package weka.classifiers.functions;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
+import org.deeplearning4j.nn.conf.layers.GravesLSTM;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.ui.weights.HistogramIterationListener;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
+import weka.classifiers.timeseries.core.StateDependentPredictor;
 import weka.core.*;
 import weka.dl4j.Constants;
 import weka.dl4j.iterators.AbstractDataSetIterator;
@@ -20,17 +23,17 @@ import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 
-import java.io.File;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 import static weka.classifiers.functions.dl4j.Utils.RNNinstancesToDataSet;
 
 /**
- * Created by pedro on 18-07-2016.
+ * Created by pedro on 18-07-2016. Time Series package must be in the classpath!
  */
-public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPredictor {
+public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDependentPredictor {
+    private static final long serialVersionUID = -7363244115597574265L;
+
     private ReplaceMissingValues m_replaceMissing = null;
     private Filter m_normalize = null;
     private boolean m_standardizeInsteadOfNormalize = false;
@@ -39,12 +42,40 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
 
     private MultiLayerNetwork m_model = null;
 
-    private static final long serialVersionUID = -6363244115597574265L;
-
     public String globalInfo() {
         return "Create RNNs with DL4J. This implementation uses Graves' LSTM structure to " +
                 "deal with the vanishing/exploding gradient problem. These networks are indicated for time series " +
                 "datasets and their output layer must be an RNNOutputLayer.";
+    }
+
+    // Serialization
+    public void serializeModel(String path) throws IOException {
+        File file = new File(path);
+        ModelSerializer.writeModel(m_model, file, true);
+    }
+
+    // Serialize model state
+    public void serializeState(String path) throws Exception {
+        File sFile = new File(path);
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(sFile));
+        List<Map<String, INDArray>> states = getPreviousState();
+        oos.writeObject(states);
+        oos.close();
+    }
+
+    // De-serialization
+    public void loadSerializedModel(String path) throws IOException {
+        File sFile = new File(path);
+        m_model = ModelSerializer.restoreMultiLayerNetwork(sFile);
+    }
+
+    // De-serialize model state
+    public void loadSerializedState(String path) throws Exception {
+        File sFile = new File(path);
+        ObjectInputStream is = new ObjectInputStream(new FileInputStream(sFile));
+        Object states = (List<Map<String, INDArray>>) is.readObject();
+        is.close();
+        setPreviousState(states);
     }
 
     // Debug
@@ -236,16 +267,55 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         return -1;
     }
 
-    public void clearLSTMState() {
+    private int getNumLSTMLayers() {
+        int cnt = 0;
+        for (int i = 0; i < getLayers().length; i++) {
+            if (getLayers()[i].getLayer() instanceof GravesLSTM)
+                cnt++;
+        }
+
+        return cnt;
+    }
+
+    private List<Integer> getLSTMindexes() {
+        List<Integer> indexes = new ArrayList<Integer>(getNumLSTMLayers());
+        for (int i = 0; i < m_layers.length; i++) {
+            if (m_layers[i].getLayer() instanceof GravesLSTM)
+                indexes.add(new Integer(i));
+        }
+        return indexes;
+    }
+
+    /*
+      Reset LSTM state
+     */
+    public void clearPreviousState() {
         m_model.rnnClearPreviousState();
     }
 
-    public Map<String, INDArray> getLSTMState(int layer) {
-        return m_model.rnnGetPreviousState(layer);
+    /*
+      Set previous state for each LSTM layer. Object must be a list of maps, one for each LSTM layer
+     */
+    public void setPreviousState(Object previousState){
+        List<Map<String, INDArray>> states = ((List<Map<String,INDArray>>) previousState);
+        int numLayers = getLayers().length;
+        for (int i = 0; i < numLayers; i++) {
+            if (getLayers()[i].getLayer() instanceof GravesLSTM)
+                m_model.rnnSetPreviousState(i, states.get(i));
+        }
     }
 
-    public void setLSTMState(int layer, Map<String, INDArray> state) {
-        m_model.rnnSetPreviousState(layer, state);
+    /*
+      Get previous state of each LSTM layer
+     */
+    public List<Map<String, INDArray>> getPreviousState() {
+        List<Map<String, INDArray>> states = new ArrayList<Map<String, INDArray>>(getNumLSTMLayers());
+        int numLayers = getLayers().length;
+        for (int i = 0; i < numLayers; i ++) {
+            if (getLayers()[i].getLayer() instanceof GravesLSTM)
+                 states.add(m_model.rnnGetPreviousState(i));
+        }
+        return states;
     }
 
     @Override
@@ -357,11 +427,11 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements BatchPr
         }
         // Make net "predict" the known values so it stores the state it's in for making the next prediction
         // using rnnTimeStep. When starting predictions we can pick up from last known output
-        INDArray trainMatrix = trainingData.getFeatureMatrix();
-        INDArray output = m_model.rnnTimeStep(trainMatrix);
+//        INDArray trainMatrix = trainingData.getFeatureMatrix();
+//        INDArray output = m_model.rnnTimeStep(trainMatrix);
 
         if( getDebug() ) {
-            System.out.println("\ntraining data model output: " + output);
+//            System.out.println("\ntraining data model output: " + output);
             System.out.println("\n**************** TRAINING DONE ****************\n");
         }
     }
