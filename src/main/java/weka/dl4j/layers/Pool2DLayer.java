@@ -13,69 +13,69 @@ import weka.dl4j.Activation;
 import weka.dl4j.Constants;
 
 public class Pool2DLayer extends Layer {
-	
+
 	private static final long serialVersionUID = -699034028619492301L;
-	
+
 	private PoolingType m_poolingType = PoolingType.MAX;
-	
+
 	public PoolingType getPoolingType() {
 		return m_poolingType;
 	}
-	
+
 	public void setPoolingType(PoolingType poolingType) {
 		m_poolingType = poolingType;
 	}
-	
+
 	private int m_strideX = 1;
-	
+
 	public int getStrideX() {
 		return m_strideX;
 	}
-	
+
 	public void setStrideX(int strideX) {
 		m_strideX = strideX;
 	}
-	
+
 	private int m_strideY = 1;
-	
+
 	public int getStrideY() {
 		return m_strideY;
 	}
-	
+
 	public void setStrideY(int strideY) {
 		m_strideY = strideY;
 	}
-	
+
 	private int m_poolSizeX = 0;
-	
+
 	public int getPoolSizeX() {
 		return m_poolSizeX;
 	}
-	
+
 	public void setPoolSizeX(int filterSizeX) {
 		m_poolSizeX = filterSizeX;
 	}
-	
+
 	private int m_poolSizeY = 0;
-	
+
 	public int getPoolSizeY() {
 		return m_poolSizeY;
 	}
-	
+
 	public void setPoolSizeY(int poolSizeY) {
 		m_poolSizeY = poolSizeY;
 	}
 
 	@Override
-	public org.deeplearning4j.nn.conf.layers.Layer getLayer() {	
+	public org.deeplearning4j.nn.conf.layers.Layer getLayer() {
 		SubsamplingLayer layer = new SubsamplingLayer.Builder(
-			SubsamplingLayer.PoolingType.MAX, new int[] { getPoolSizeX(), getPoolSizeY() } )
-			.stride( getStrideX(), getStrideY() )
-			.padding(0, 0)
-			.build();
+				SubsamplingLayer.PoolingType.MAX, new int[] { getPoolSizeX(), getPoolSizeY() } )
+				.stride( getStrideX(), getStrideY() )
+				.padding(0, 0)
+				.build();
 		return layer;
 	}
-	
+
 	@Override
 	public Enumeration<Option> listOptions() {
 		return null;
@@ -118,7 +118,7 @@ public class Pool2DLayer extends Layer {
 		// mode
 		result.add( "-" + Constants.POOL_TYPE);
 		result.add( "" + getPoolingType().name().toLowerCase() );
-	    return result.toArray(new String[result.size()]);
+		return result.toArray(new String[result.size()]);
 	}
 
 }

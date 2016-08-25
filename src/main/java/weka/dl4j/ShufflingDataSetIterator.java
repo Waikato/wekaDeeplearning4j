@@ -17,16 +17,6 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 	private int m_counter = 0;
 	private Random m_random = null;
 
-	@Override
-	public DataSetPreProcessor getPreProcessor() {
-		return null;
-	}
-
-	@Override
-	public boolean resetSupported() {
-		return false;
-	}
-
 	public ShufflingDataSetIterator(DataSet data, int batchSize, int seed) {
 		m_data = data;
 		m_batchSize = batchSize;
@@ -84,8 +74,8 @@ public class ShufflingDataSetIterator implements DataSetIterator {
 		m_data.shuffle();
 		if(m_random != null) {
 			long next = m_random.nextLong();
-	        Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
-	        Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
+			Nd4j.shuffle(m_data.getFeatureMatrix(), new Random(next), 1);
+			Nd4j.shuffle(m_data.getLabels(), new Random(next), 1);
 		}
 	}
 

@@ -37,7 +37,7 @@ import weka.dl4j.Constants;
 import weka.dl4j.FileIterationListener;
 import weka.dl4j.iterators.AbstractDataSetIterator;
 import weka.dl4j.iterators.DefaultDataSetIterator;
-//import weka.dl4j.iterators.ImageDataSetIterator;
+import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.Conv2DLayer;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
@@ -50,11 +50,11 @@ import weka.filters.unsupervised.attribute.Standardize;
 
 /**
  * Chris Beckham's DL4J classifier.
- * 
+ *
  * @author cjb60
  */
 public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPredictor {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
 	private ReplaceMissingValues m_replaceMissing = null;
@@ -66,11 +66,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	private MultiLayerNetwork m_model = null;
 
 	private static final long serialVersionUID = -6363244115597574265L;
-	
+
 	public String globalInfo() {
 		return "Create MLPs with DL4J";
 	}
-	
+
 	protected String m_debugFile = "";
 
 	public String getDebugFile() {
@@ -80,13 +80,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	public void setDebugFile(String debugFile) {
 		m_debugFile = debugFile;
 	}
-	
+
 	protected boolean m_vis = false;
-	
+
 	public boolean getVisualisation() {
 		return m_vis;
 	}
-	
+
 	public void setVisualisation(boolean b) {
 		m_vis = b;
 	}
@@ -157,23 +157,23 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 	public void setUpdater(Updater updater) {
 		m_updater = updater;
 	}
-	
+
 	private AbstractDataSetIterator m_iterator = new DefaultDataSetIterator();
-	
+
 	public AbstractDataSetIterator getDataSetIterator() {
 		return m_iterator;
 	}
-	
+
 	public void setDataSetIterator(AbstractDataSetIterator iterator) {
 		m_iterator = iterator;
 	}
-	
+
 	private int m_numEpochs = 10;
-	
+
 	public void setNumEpochs(int numEpochs) {
 		m_numEpochs = numEpochs;
 	}
-	
+
 	public int getNumEpochs() {
 		return m_numEpochs;
 	}
@@ -186,7 +186,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			throw new Exception("Last layer in network must be an output layer!");
 		}
 	}
-	
+
 	/**
 	 * Get the current number of units (where "units" are
 	 * feature maps for conv nets and the # of hidden units
@@ -231,11 +231,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		m_nominalToBinary = new NominalToBinary();
 		m_nominalToBinary.setInputFormat(data);
 		data = Filter.useFilter(data, m_nominalToBinary);
-		
+
 		//if(getDebug()) {
 		//	System.out.println(data);
 		//}
-		
+
 		//data.randomize(new Random(getSeed()));
 		// construct the mlp configuration
 		ListBuilder ip = new NeuralNetConfiguration.Builder()
@@ -249,9 +249,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 				//.batchSize( getTrainBatchSize() )
 				.list(m_layers.length);
 		int numInputAttributes = getDataSetIterator().getNumAttributes(data);
-		
 
-		
+
+
 		for (int x = 0; x < m_layers.length; x++) {
 			// output layer
 			if ( x == m_layers.length-1 ) {
@@ -267,7 +267,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 					//if(getDebug()) System.err.format("layer %d has prev incoming: %d\n", x, nIn);
 				}
 				ip = ip.layer(x, m_layers[x].getLayer() );
-			// if this is the first layer
+				// if this is the first layer
 			} else if (x == 0) {
 				if( !(m_layers[x] instanceof Conv2DLayer )) m_layers[x].setNumIncoming(numInputAttributes);
 				ip = ip.layer(x, m_layers[x].getLayer() );
@@ -277,26 +277,26 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			}
 		}
 		ip = ip.pretrain(false).backprop(true);
-		
+
 		// if a conv network
-//		if( getDataSetIterator() instanceof ImageDataSetIterator ) {
-//			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
-//			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
-//		}
-		
+		if( getDataSetIterator() instanceof ImageDataSetIterator ) {
+			ImageDataSetIterator tmp = (ImageDataSetIterator) getDataSetIterator();
+			new ConvolutionLayerSetup(ip, tmp.getHeight(), tmp.getWidth(), tmp.getNumChannels());
+		}
+
 		MultiLayerConfiguration conf = ip.build();
-		
+
 		if( getDebug() ) {
 			System.err.println( conf.toJson() );
 		}
-		
+
 		// build the network
 		m_model = new MultiLayerNetwork(conf);
 		m_model.init();
-		
+
 		ArrayList<IterationListener> listeners = new ArrayList<IterationListener>();
 		listeners.add( new ScoreIterationListener( data.numInstances() / getDataSetIterator().getTrainBatchSize() ) );
-		
+
 		//System.out.println(conf);
 		int numMiniBatches = (int) Math.ceil( ((double)data.numInstances()) / ((double)getDataSetIterator().getTrainBatchSize()) );
 		// if the debug file doesn't point to a directory, set up the listener
@@ -304,33 +304,33 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			listeners.add( new FileIterationListener(getDebugFile(), numMiniBatches) );
 			//m_model.setListeners(new FileIterationListener(getDebugFile(), numMiniBatches));
 		}
-		
+
 		if( getVisualisation() ) {
 			listeners.add( new HistogramIterationListener(1) );
 		}
-		
+
 		m_model.setListeners(listeners);
-		
+
 		// if debug mode is set, print the shape of the outputs
 		// of the network
 		if( getDebug() ) {
 			DataSetIterator tmpIter = getDataSetIterator().getTrainIterator(data, getSeed());
-	        while(tmpIter.hasNext()) {
-	        	DataSet d = tmpIter.next();
-    	        m_model.initialize(d);
-    	        List<INDArray> activations = m_model.feedForward();
-    	        for(int i = 0; i < activations.size(); i++) {
-    	        	log.info("*** Output shape of layer {} is {} ***", (i+1), Arrays.toString(activations.get(i).shape()) );
-    	        }
-    	        System.out.format("number of params: %d\n", m_model.numParams() );
-	        	break;
-	        }
+			while(tmpIter.hasNext()) {
+				DataSet d = tmpIter.next();
+				m_model.initialize(d);
+				List<INDArray> activations = m_model.feedForward();
+				for(int i = 0; i < activations.size(); i++) {
+					log.info("*** Output shape of layer {} is {} ***", (i+1), Arrays.toString(activations.get(i).shape()) );
+				}
+				System.out.format("number of params: %d\n", m_model.numParams() );
+				break;
+			}
 		}
-		
+
 		DataSetIterator iter = getDataSetIterator().getTrainIterator(data, getSeed());
 		for(int i = 0; i < getNumEpochs(); i++) {
 			m_model.fit(iter);
-			log.info("*** Completed epoch {} ***", i+1);		
+			log.info("*** Completed epoch {} ***", i+1);
 			iter.reset();
 		}
 	}
@@ -345,17 +345,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		inst = m_normalize.output();
 		m_nominalToBinary.input(inst);
 		inst = m_nominalToBinary.output();
-		
+
 		// TODO: implement distributionforinstances instead
 		Instances insts = new Instances( inst.dataset() );
 		insts.add(inst);
 		DataSetIterator iter = getDataSetIterator().getTestIterator( insts, getSeed(), Integer.parseInt(getBatchSize()) );
 		//while(iter.hasNext()) {
-		INDArray testMatrix = iter.next().getFeatureMatrix();	
+		INDArray testMatrix = iter.next().getFeatureMatrix();
 		//}
-		
+
 		INDArray predicted = m_model.output(testMatrix);
-		
+
 		//INDArray predicted = m_model.output(Utils.instanceToINDArray(inst));
 		predicted = predicted.getRow(0);
 		double[] preds = new double[inst.numClasses()];
@@ -378,7 +378,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			if (obj instanceof OptionHandler) {
 				result += " "
 						+ weka.core.Utils.joinOptions(((OptionHandler) obj)
-								.getOptions());
+						.getOptions());
 			}
 		}
 		return result;
@@ -451,9 +451,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 			layers.add(new weka.dl4j.layers.DenseLayer());
 		}
 		setLayers(layers.toArray(new weka.dl4j.layers.Layer[layers.size()]));
-		
+
 		String tmp = weka.core.Utils.getOption(Constants.DATASET_ITERATOR, options);
-		if(!tmp.equals("")) setDataSetIterator( 
+		if(!tmp.equals("")) setDataSetIterator(
 				(AbstractDataSetIterator) specToObject(tmp, weka.dl4j.iterators.AbstractDataSetIterator.class));
 
 		// gradient norm
@@ -481,7 +481,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		tmp = weka.core.Utils.getOption(Constants.VIS, options);
 		if(!tmp.equals("")) setVisualisation(true);
 	}
-	
+
 	@Override
 	public String toString() {
 		if(m_model != null) {
@@ -489,22 +489,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		}
 		return null;
 	}
-	
+
 
 	public Enumeration<Option> listOptions() {
 		Vector<Option> v = new Vector<Option>();
 		// layers
 		v.add(new Option(
-			"\tList of layers that define the MLP/CNN",
-			"-layers",
-			1, 
-			"-layers <layer arguments>"
+				"\tList of layers that define the MLP/CNN",
+				"-layers",
+				1,
+				"-layers <layer arguments>"
 		));
 		// dataset iterator
 		v.add(new Option(
 				"\tDataset iterator to use",
 				"-iterator",
-				1, 
+				1,
 				"-iterator <iterator arguments>"
 		));
 		// optim alg
@@ -516,21 +516,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		v.add(new Option(
 				"\tOptimisation algorithm to use",
 				"-optim",
-				1, 
+				1,
 				"-optim " + optNames
 		));
 		// learning rate
 		v.add(new Option(
 				"\tLearning rate",
 				"-lr",
-				1, 
+				1,
 				"-lr <float>"
-		));		
+		));
 		// momentum
 		v.add(new Option(
 				"\tMomentum (note: this depends on the updater, e.g. this option has no effect if using plain SGD optimiser)",
 				"-momentum",
-				1, 
+				1,
 				"-momentum <float>"
 		));
 		// updater
@@ -538,26 +538,26 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements BatchPr
 		for(int i = 0; i < Updater.values().length; i++) {
 			optNames += ( Updater.values()[i].toString() + " | ");
 		}
-		optNames += ")";		
+		optNames += ")";
 		v.add(new Option(
 				"\tType of updater to use",
 				"-updater",
-				1, 
+				1,
 				"-updater " + optNames
-			));
+		));
 		// debug
 		v.add(new Option(
-			"\tDebug file to print training statistics to",
-			"-debug",
-			1, 
-			"-debug <filename>"
+				"\tDebug file to print training statistics to",
+				"-debug",
+				1,
+				"-debug <filename>"
 		));
-		
-		
+
+
 		return v.elements();
 
 	}
-	
+
 	public static void main(String[] argv) {
 		runClassifier(new Dl4jMlpClassifier(), argv);
 	}

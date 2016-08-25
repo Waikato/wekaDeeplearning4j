@@ -14,7 +14,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.Constants;
 
 public abstract class AbstractDataSetIterator implements OptionHandler, Serializable {
-	
+
 	private static final long serialVersionUID = 7440584973810993954L;
 
 	/**
@@ -24,22 +24,22 @@ public abstract class AbstractDataSetIterator implements OptionHandler, Serializ
 	 * @throws Exception
 	 */
 	public abstract int getNumAttributes(Instances data) throws Exception;
-	
+
 	public abstract DataSetIterator getTrainIterator(Instances data, int seed) throws Exception;
-	
+
 	public abstract DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) throws Exception;
-	
+
 	private int m_trainBatchSize = 1;
-	
+
 	public void setTrainBatchSize(int trainBatchSize) {
 		m_trainBatchSize = trainBatchSize;
 	}
-	
+
 	@OptionMetadata(description = "Batch size for SGD", displayName = "trainBatchSize", displayOrder = 1)
 	public int getTrainBatchSize() {
 		return m_trainBatchSize;
 	}
-	
+
 	@Override
 	public Enumeration<Option> listOptions() {
 		return null;
