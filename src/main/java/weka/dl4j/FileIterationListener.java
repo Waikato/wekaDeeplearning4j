@@ -9,14 +9,14 @@ import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.optimize.api.IterationListener;
 
 public class FileIterationListener implements IterationListener {
-	
+
 	private static final long serialVersionUID = 1948578564961956518L;
-	
+
 	protected transient PrintWriter m_pw = null;
-	
+
 	private int m_numMiniBatches = 0;
 	private ArrayList<Double> lossesPerEpoch = new ArrayList<Double>();
-	
+
 	public FileIterationListener(String filename, int numMiniBatches) throws Exception {
 		super();
 		File f = new File(filename);
@@ -36,7 +36,7 @@ public class FileIterationListener implements IterationListener {
 	}
 
 	@Override
-	public void iterationDone(Model model, int epoch) {	
+	public void iterationDone(Model model, int epoch) {
 		lossesPerEpoch.add( model.score() );
 		if(lossesPerEpoch.size() == m_numMiniBatches) {
 			// calculate mean
@@ -50,6 +50,6 @@ public class FileIterationListener implements IterationListener {
 			lossesPerEpoch.clear();
 		}
 		//System.err.println(epoch);
-	}	
+	}
 
 }
