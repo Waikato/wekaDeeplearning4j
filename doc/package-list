@@ -1,0 +1,5 @@
+weka.classifiers.functions
+weka.classifiers.functions.dl4j
+weka.dl4j
+weka.dl4j.iterators
+weka.dl4j.layers

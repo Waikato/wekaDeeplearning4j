@@ -68,9 +68,9 @@
             <version>3.8.0</version>
         </dependency>
         <dependency>
-            <groupId>pedrofale</groupId>
-            <artifactId>timeSeriesForecasting</artifactId>
-            <version>1.0</version>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>timeseriesForecasting</artifactId>
+            <version>1.0.21-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.deeplearning4j</groupId>

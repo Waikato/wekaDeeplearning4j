@@ -10,6 +10,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
+import weka.classifiers.timeseries.core.BaseModelSerializer;
 import weka.classifiers.timeseries.core.StateDependentPredictor;
 import weka.core.*;
 import weka.dl4j.Constants;
@@ -31,7 +32,7 @@ import static weka.classifiers.functions.dl4j.Utils.RNNinstancesToDataSet;
 /**
  * Created by pedro on 18-07-2016. Time Series package must be in the classpath!
  */
-public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDependentPredictor {
+public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDependentPredictor, BaseModelSerializer {
     private static final long serialVersionUID = -7363244115597574265L;
 
     private ReplaceMissingValues m_replaceMissing = null;
