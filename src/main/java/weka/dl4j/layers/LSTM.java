@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 /**
- * Created by pedro on 18-07-2016.
+ * Created by pedrofale on 18-07-2016.
  */
 public class LSTM extends Layer {
     protected static final long serialVersionUID = -6905917800811990400L;

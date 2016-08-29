@@ -30,18 +30,12 @@ import java.util.*;
 import static weka.classifiers.functions.dl4j.Utils.RNNinstancesToDataSet;
 
 /**
- * Created by pedro on 18-07-2016. Time Series package must be in the classpath!
+ * A classifier suited for forecasting operations using a Recurrent Neural Network with LSTM layers.
+ * Each prediction sets a state that is used on the following prediction.
+ *
+ * Created by pedrofale on 18-07-2016.
  */
 public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDependentPredictor, BaseModelSerializer {
-    private static final long serialVersionUID = -7363244115597574265L;
-
-    private ReplaceMissingValues m_replaceMissing = null;
-    private Filter m_normalize = null;
-    private boolean m_standardizeInsteadOfNormalize = false;
-    private NominalToBinary m_nominalToBinary = null;
-    private ZeroR m_zeroR = new ZeroR();
-
-    private MultiLayerNetwork m_model = null;
 
     public String globalInfo() {
         return "Create RNNs with DL4J. This implementation uses Graves' LSTM structure to " +
@@ -50,6 +44,21 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
     }
 
     // Serialization
+    private static final long serialVersionUID = -7363244115597574265L;
+
+    // Data filtering
+    private ReplaceMissingValues m_replaceMissing = null;
+    private Filter m_normalize = null;
+    private boolean m_standardizeInsteadOfNormalize = false;
+    private NominalToBinary m_nominalToBinary = null;
+
+    // Default classifier
+    private ZeroR m_zeroR = new ZeroR();
+
+    // The recurrent neural network
+    private MultiLayerNetwork m_model = null;
+
+    // Model serialization
     public void serializeModel(String path) throws IOException {
         File file = new File(path);
         ModelSerializer.writeModel(m_model, file, true);
@@ -64,7 +73,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         oos.close();
     }
 
-    // De-serialization
+    // Model de-serialization
     public void loadSerializedModel(String path) throws IOException {
         File sFile = new File(path);
         m_model = ModelSerializer.restoreMultiLayerNetwork(sFile);
@@ -79,7 +88,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         setPreviousState(states);
     }
 
-    // Debug
+    // Debug file
     protected String m_debugFile = "";
 
     public String getDebugFile() {
@@ -90,7 +99,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         m_debugFile = debugFile;
     }
 
-    // Allow DL4J metrics visualization to help user in net configuration
+    // Allow DL4J metrics visualisation to help user in net configuration
     protected boolean m_vis = false;
 
     public boolean getVisualisation() {
@@ -104,13 +113,13 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
     // Layers
     private Layer[] m_layers = new Layer[] {};
 
-    public void setLayers(Layer[] layers) {
-        m_layers = layers;
-    }
-
     @OptionMetadata(description = "Layers", displayName = "layers", displayOrder = 1)
     public Layer[] getLayers() {
         return m_layers;
+    }
+
+    public void setLayers(Layer[] layers) {
+        m_layers = layers;
     }
 
     // Optimization algorithm
@@ -152,20 +161,20 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
     // Number of epochs
     private int m_numEpochs = 1;
 
-    public void setNumEpochs(int numEpochs) { m_numEpochs = numEpochs; }
-
     @OptionMetadata(description = "Number of epochs", displayName = "numEpochs", displayOrder = 1)
     public int getNumEpochs() { return m_numEpochs; }
+
+    public void setNumEpochs(int numEpochs) { m_numEpochs = numEpochs; }
 
     // Number of iterations
     private int m_iterations = 1;
 
-    public void setIterations(int iterations) { m_iterations = iterations; }
-
     @OptionMetadata(description = "Number of iterations", displayName = "iterations", displayOrder = 1)
     public int getIterations() { return m_iterations; }
 
-    // Truncated backpropagation through time
+    public void setIterations(int iterations) { m_iterations = iterations; }
+
+    // Truncated backpropagation through time length
     private int m_tbpttLength = 0;
 
     @OptionMetadata(description = "Truncated Backpropagation Through Time length", displayName = "TBPTTLength", displayOrder = 1)
@@ -187,18 +196,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         m_learningRate = learningRate;
     }
 
-    // Momentum (for Nesterov's updater)
-    private double m_momentum = 0.9;
-
-    @OptionMetadata(description = "Momentum", displayName = "momentum", displayOrder = 1)
-    public double getMomentum() {
-        return m_momentum;
-    }
-
-    public void setMomentum(double momentum) {
-        m_momentum = momentum;
-    }
-
     // Updater
     public Updater m_updater = Updater.NESTEROVS;
 
@@ -211,7 +208,19 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         m_updater = updater;
     }
 
-    // RMS Decay (for RMSPROP updater)
+    // Momentum (for Nesterov's updater)
+    private double m_momentum = 0.9;
+
+    @OptionMetadata(description = "Momentum", displayName = "momentum", displayOrder = 1)
+    public double getMomentum() {
+        return m_momentum;
+    }
+
+    public void setMomentum(double momentum) {
+        m_momentum = momentum;
+    }
+
+    // RMS decay (for RMSPROP updater)
     public double m_rmsDecay = 0.95;
 
     @OptionMetadata(description = "RMS decay for RMSPROP updater", displayName = "rmsDecay", displayOrder = 1)
@@ -223,7 +232,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         m_rmsDecay = rmsdecay;
     }
 
-    // Regularization
+    // Regularization (L1, L2 and droupout)
     protected boolean m_regularization = false;
 
     public boolean getRegularization() { return m_regularization; }
@@ -256,9 +265,10 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
     }
 
     /**
-     * Get the current number of units (nodes).
+     * Get the number of units (nodes) in a LSTM layer.
+     *
      * @param layer
-     * @return
+     * @return -1 if this layer isn't an LSTM layer
      */
     public int getNumUnits(Layer layer) {
         if(layer instanceof LSTM) {
@@ -268,6 +278,11 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         return -1;
     }
 
+    /**
+     * Get the number of LSTM layers
+     *
+     * @return number of LSTM layers
+     */
     private int getNumLSTMLayers() {
         int cnt = 0;
         for (int i = 0; i < getLayers().length; i++) {
@@ -278,6 +293,11 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         return cnt;
     }
 
+    /**
+     * Get the indexes of the LSTM layers of the RNN
+     *
+     * @return a list containing the indexes
+     */
     private List<Integer> getLSTMindexes() {
         List<Integer> indexes = new ArrayList<Integer>(getNumLSTMLayers());
         for (int i = 0; i < m_layers.length; i++) {
@@ -287,15 +307,17 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         return indexes;
     }
 
-    /*
-      Reset LSTM state
+    /**
+     * Reset state of the LSTM layers, as seen by a StateDependentPredictor
      */
     public void clearPreviousState() {
         m_model.rnnClearPreviousState();
     }
 
-    /*
-      Set previous state for each LSTM layer. Object must be a list of maps, one for each LSTM layer
+    /**
+     * Set the previous state of each LSTM layer, as seen by a StateDependentPredictor.
+     *
+     * @param previousState must be a list of maps Map<String,INDArray> for RNNs
      */
     public void setPreviousState(Object previousState){
         List<Map<String, INDArray>> states = ((List<Map<String,INDArray>>) previousState);
@@ -306,8 +328,10 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         }
     }
 
-    /*
-      Get previous state of each LSTM layer
+    /**
+     * Get the previous state of each LSTM layer, as seen by a StateDependentPredictor.
+     *
+     * @return list of state for each layer
      */
     public List<Map<String, INDArray>> getPreviousState() {
         List<Map<String, INDArray>> states = new ArrayList<Map<String, INDArray>>(getNumLSTMLayers());
@@ -319,25 +343,38 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         return states;
     }
 
+    /**
+     * Train the classifier on the training data
+     *
+     * @param data the training data for the classifier
+     * @throws Exception if something goes wrong
+     */
     @Override
     public void buildClassifier(Instances data) throws Exception {
         // validate
         validate();
+
         m_zeroR = null;
+
         // remove instances with missing class
         data = new Instances(data);
         data.deleteWithMissingClass();
+
         // classifier defaults to Zero Rule
         if (data.numInstances() == 0 || data.numAttributes() < 2) {
             m_zeroR.buildClassifier(data);
             return;
         }
+
         // can classifier handle the data?
         getCapabilities().testWithFail(data);
+
         // remove missing data
         m_replaceMissing = new ReplaceMissingValues();
         m_replaceMissing.setInputFormat(data);
         data = Filter.useFilter(data, m_replaceMissing);
+
+        // normalize data
         if (m_standardizeInsteadOfNormalize) {
             m_normalize = new Standardize();
             // we want to also normalize the class
@@ -348,10 +385,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         }
         m_normalize.setInputFormat(data);
         data = Filter.useFilter(data, m_normalize);
-//        m_nominalToBinary = new NominalToBinary();
-//        m_nominalToBinary.setInputFormat(data);
-//        data = Filter.useFilter(data, m_nominalToBinary);
-
 
         DataSet trainingData = RNNinstancesToDataSet(data);
         if(getDebug()) {
@@ -408,6 +441,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         }
 
         MultiLayerConfiguration conf = listBuilder.build();
+
         // build the network
         m_model = new MultiLayerNetwork(conf);
         m_model.init();
@@ -426,22 +460,24 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
                 System.err.println("**** Epoch " + i + " ****");
             m_model.fit(trainingData);
         }
-        // Make net "predict" the known values so it stores the state it's in for making the next prediction
-        // using rnnTimeStep. When starting predictions we can pick up from last known output
-//        INDArray trainMatrix = trainingData.getFeatureMatrix();
-//        INDArray output = m_model.rnnTimeStep(trainMatrix);
 
         if( getDebug() ) {
-//            System.out.println("\ntraining data model output: " + output);
             System.out.println("\n**************** TRAINING DONE ****************\n");
         }
     }
 
+    /**
+     * Make prediction
+     *
+     * @param inst input data to predict on
+     * @throws Exception if something goes wrong
+     */
     public double[] distributionForInstance(Instance inst) throws Exception {
         if (m_zeroR != null) {
             return m_zeroR.distributionForInstance(inst);
         }
-        // Transform the input instance
+
+        // Normalize the input instance
         m_normalize.input(inst);
         inst = m_normalize.output();
 
@@ -461,6 +497,7 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         // using output() would require us to input to the test matrix all the past instances
         // with rnnTimeStep() we can just input the last instance, as it has stored the state from the last prediction
         // so conceptually all the past data is still always used
+
         predicted = predicted.getRow(0);
         double[] preds = new double[inst.numClasses()];
         for (int i = 0; i < preds.length; i++) {
@@ -732,13 +769,10 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
                 "-debug <filename>"
         ));
 
-
         return v.elements();
-
     }
 
     public static void main(String[] argv) {
         runClassifier(new Dl4jMlpClassifier(), argv);
     }
-
 }

@@ -1,5 +1,6 @@
 target/
-lib/
 lib-full/
 .idea/
 dist/
+build/
+doc/
