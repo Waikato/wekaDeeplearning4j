@@ -7,7 +7,7 @@ import weka.dl4j.Constants;
 import java.util.Vector;
 
 /**
- * Created by pedro on 18-07-2016.
+ * Created by pedrofale on 18-07-2016.
  */
 public class RNNOutputLayer extends LSTM {
 
