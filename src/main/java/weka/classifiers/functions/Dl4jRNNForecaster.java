@@ -606,8 +606,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
         }
         setLayers(layers.toArray(new weka.dl4j.layers.Layer[layers.size()]));
 
-        //.batchSize( getTrainBatchSize() )
-
         // optimization algorithm
         String tmp = weka.core.Utils.getOption(Constants.OPTIMIZATION_ALGORITHM, options);
         if(!tmp.equals("")) setOptimizationAlgorithm( OptimizationAlgorithm.valueOf(tmp) );
@@ -773,6 +771,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
     }
 
     public static void main(String[] argv) {
-        runClassifier(new Dl4jMlpClassifier(), argv);
+        runClassifier(new Dl4jRNNForecaster(), argv);
     }
 }
