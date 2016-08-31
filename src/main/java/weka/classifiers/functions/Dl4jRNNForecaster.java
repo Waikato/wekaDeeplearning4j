@@ -486,7 +486,6 @@ public class Dl4jRNNForecaster extends RandomizableClassifier implements StateDe
 
         DataSet testData = RNNinstancesToDataSet(insts);
         INDArray testMatrix = testData.getFeatureMatrix();
-        System.out.println("Test feature matrix: " + testMatrix);
 
         // For RNNs the state of the network is important (namely all the LSTM layers). After training it with the
         // given data, the prediction it makes for the next time step must take all the past into account. Of course
