@@ -36,29 +36,29 @@ import org.nd4j.linalg.api.ndarray.INDArray;
  */
 public class EasyImageRecordReader extends BaseImageRecordReader {
 
-	private static final long serialVersionUID = 3806752391833402426L;
-	
-	private ArrayList<File> m_filenames = null;
-	private ArrayList<String> m_classes = null;
-	
-	private Iterator<String> m_classIterator = null;
-	
-	public EasyImageRecordReader(int width, int height, int channels,
-			ArrayList<File> filenames, ArrayList<String> classes) throws IOException {
-		m_filenames = filenames;
-		m_classes = classes;
-		
-		initialize(null);
-		imageLoader = new ImageLoader(width, height, channels);
-	}
-	
+    private static final long serialVersionUID = 3806752391833402426L;
+
+    private ArrayList<File> m_filenames = null;
+    private ArrayList<String> m_classes = null;
+
+    private Iterator<String> m_classIterator = null;
+
+    public EasyImageRecordReader(int width, int height, int channels,
+                                 ArrayList<File> filenames, ArrayList<String> classes) throws IOException {
+        m_filenames = filenames;
+        m_classes = classes;
+
+        initialize(null);
+        imageLoader = new ImageLoader(width, height, channels);
+    }
+
     @Override
     public void initialize(InputSplit split) {
-    	// TODO: we don't use the split parameter, which is a bit hacky
-		iter = m_filenames.listIterator();
-		m_classIterator = m_classes.listIterator();
+        // TODO: we don't use the split parameter, which is a bit hacky
+        iter = m_filenames.listIterator();
+        m_classIterator = m_classes.listIterator();
     }
-	
+
     @Override
     public Collection<Writable> next() {
         if(iter != null) {
@@ -71,14 +71,14 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
                 return next();
             try {
                 BufferedImage bimg = ImageIO.read(image);
-                
+
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 ImageIO.write(bimg, "png", os);
                 InputStream is = new ByteArrayInputStream(os.toByteArray());
-                
+
                 //INDArray row = imageLoader.asRowVector(bimg);
                 INDArray row = imageLoader.asRowVector(is);
-                
+
                 ret = RecordConverter.toRecord(row);
                 if(classLabel != "?")
                     ret.add(new DoubleWritable(Double.parseDouble(classLabel)));
@@ -108,17 +108,17 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
         }
         throw new IllegalStateException("No more elements");
     }
-    
+
     @Override
     public void reset() {
         initialize(null);
     }
 
-	@Override
-	public Collection<Writable> record(URI uri, DataInputStream dataInputStream)
-			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}  
+    @Override
+    public Collection<Writable> record(URI uri, DataInputStream dataInputStream)
+            throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

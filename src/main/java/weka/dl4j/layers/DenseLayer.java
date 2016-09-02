@@ -11,77 +11,77 @@ import weka.dl4j.Constants;
 public class DenseLayer extends Layer {
 
 	protected static final long serialVersionUID = -6905917800811990400L;
-	
+
 	protected Activation m_activation = Activation.RELU;
-	
+
 	public Activation getActivation() {
 		return m_activation;
 	}
-	
+
 	public void setActivation(Activation activation) {
 		m_activation = activation;
 	}
-	
+
 	protected int m_numUnits = 1;
-	
+
 	public int getNumUnits() {
 		return m_numUnits;
 	}
-	
+
 	public void setNumUnits(int numUnits) {
 		m_numUnits = numUnits;
 	}
-	
+
 	protected double m_dropoutP = 0.0;
-	
+
 	public double getDropoutP() {
 		return m_dropoutP;
 	}
-	
+
 	public void setDropoutP(double dropoutP) {
 		m_dropoutP = dropoutP;
 	}
-	
+
 	protected double m_l1 = 0.0;
-	
+
 	public double getL1() {
 		return m_l1;
 	}
-	
+
 	public void setL1(double l1) {
 		m_l1 = l1;
 	}
-	
+
 	protected double m_l2 = 0.0;
-	
+
 	public double getL2() {
 		return m_l2;
 	}
-	
+
 	public void setL2(double l2) {
 		m_l2 = l2;
 	}
-	
+
 	@Override
-	public org.deeplearning4j.nn.conf.layers.Layer getLayer() {	
+	public org.deeplearning4j.nn.conf.layers.Layer getLayer() {
 		org.deeplearning4j.nn.conf.layers.DenseLayer layer = new org.deeplearning4j.nn.conf.layers.DenseLayer.Builder()
-			.nIn(m_numIncoming)
-			.nOut( getNumUnits() )
-			.activation( getActivation().name().toLowerCase() )
-			.weightInit( getWeightInit() )
-			.dropOut( getDropoutP() )
-			.l1( getL1() )
-			.l2( getL2() )
-			.build();
+				.nIn(m_numIncoming)
+				.nOut( getNumUnits() )
+				.activation( getActivation().name().toLowerCase() )
+				.weightInit( getWeightInit() )
+				.dropOut( getDropoutP() )
+				.l1( getL1() )
+				.l2( getL2() )
+				.build();
 		return layer;
 	}
-	
+
 	protected WeightInit m_weightInit = WeightInit.XAVIER;
-	
+
 	public WeightInit getWeightInit() {
 		return m_weightInit;
 	}
-	
+
 	public void setWeightInit(WeightInit weightInit) {
 		m_weightInit = weightInit;
 	}
@@ -103,7 +103,7 @@ public class DenseLayer extends Layer {
 		if(!tmp.equals("")) setDropoutP( Double.parseDouble(tmp) );
 		// l1
 		tmp = Utils.getOption(Constants.L1, options);
-		if(!tmp.equals("")) setL1( Double.parseDouble(tmp) );		
+		if(!tmp.equals("")) setL1( Double.parseDouble(tmp) );
 		// l2
 		tmp = Utils.getOption(Constants.L2, options);
 		if(!tmp.equals("")) setL2( Double.parseDouble(tmp) );
@@ -130,13 +130,13 @@ public class DenseLayer extends Layer {
 		// l2
 		result.add("-" + Constants.L2);
 		result.add( "" + getL2() );
-	    return result.toArray(new String[result.size()]);
+		return result.toArray(new String[result.size()]);
 	}
-	
+
 	@Override
 	public Enumeration<Option> listOptions() {
 		Vector<Option> v = new Vector<Option>();
-		
+
 		return v.elements();
 	}
 

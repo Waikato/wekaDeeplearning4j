@@ -11,17 +11,17 @@ import weka.dl4j.ShufflingDataSetIterator;
 public class DefaultDataSetIterator extends AbstractDataSetIterator {
 
 	private static final long serialVersionUID = 1316260988724548474L;
-	
+
 	@Override
 	public int getNumAttributes(Instances data) {
 		return data.numAttributes()-1;
 	}
-	
+
 	@Override
 	public DataSetIterator getTestIterator(Instances data, int seed, int testBatchSize) {
 		DataSet dataset = Utils.instancesToDataSet(data);
 		// when this constructor is called, m_random = null so this doesn't actually shuffle
-		
+
 		return new ShufflingDataSetIterator(dataset, testBatchSize);
 	}
 

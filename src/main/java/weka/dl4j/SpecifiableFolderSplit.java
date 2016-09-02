@@ -16,18 +16,18 @@ import org.canova.api.split.FileSplit;
  */
 public class SpecifiableFolderSplit extends FileSplit {
 
-	private static final long serialVersionUID = 462115492403223134L;
-	
+    private static final long serialVersionUID = 462115492403223134L;
+
     public SpecifiableFolderSplit() {
         super(null, null, true, null, false); // true
     }
-    
+
     public void setFiles(URI[] uris) {
-    	locations = uris;
+        locations = uris;
     }
-    
+
     public void setLength(int len) {
-    	length = len;
+        length = len;
     }
-	
+
 }
