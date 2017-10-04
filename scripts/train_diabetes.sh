@@ -10,5 +10,5 @@ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      -updater NESTEROVS \
      -lr 0.01 \
      -momentum 0.9 \
-     -t ../datasets/diabetes_numeric.arff \
+     -t ../datasets/numeric/diabetes_numeric.arff \
      -no-cv

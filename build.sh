@@ -1,55 +1,145 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-install_pack="0"
+install_pack=false
+verbose=false
+clean=false
+out=/dev/null
 
-if [install_pack=="1"]; then
-	if [ -z $WEKA_HOME ]; then
-    		echo "make sure WEKA_HOME env variable is set!"
-   		 exit 1
+### BEGIN parse arguments ###
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -v|--verbose)
+    verbose=true
+    shift # past argument
+    ;;
+    -i|--install-packages)
+    install_pack=true
+    shift # past argument
+    ;;
+    -c|--clean)
+    clean=true
+    shift # past argument
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo "Parameters:"
+echo verbose       = "${verbose}"
+echo install_pack  = "${install_pack}"
+echo clean         = "${clean}"
+echo ""
+### END parse arguments ###
+
+# If verbose redirect to stdout, else /dev/null
+if [[ "$verbose" = true ]]; then
+    out=/dev/stdout
+fi
+
+
+if [[ "$install_pack" = true ]]; then
+	if [[ -z "$WEKA_HOME" ]]; then
+    	echo "WEKA_HOME env variable is not set!"
+    	echo "Exiting now..."
+   		exit 1
+	elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
+	    echo "${WEKA_HOME} does not contain weka.jar!"
+    	echo "Exiting now..."
+   		exit 1
 	fi
 
-	export CLASSPATH=$WEKA_HOME/weka.jar
-	echo "classpath" $CLASSPATH
+	export CLASSPATH=${WEKA_HOME}/weka.jar
+	echo "Classpath: " ${CLASSPATH}
 fi
 
-DL4J_BUILD_EXPERIMENTAL="0"
+arr=( "Core" "CPU" "GPU" )
+echo "Cleaning up lib-full and lib in each module..."
+for sub in "${arr[@]}"
+do
+    dir=wekaDeeplearning4j${sub}
+    if [[ "$clean" = true ]]; then
+        rm ${dir}/lib-full/*
+        rm ${dir}/lib/*
 
-if [ $1 == "fresh" ]; then
-    echo "removing contents in lib-full and lib"
-    rm lib-full/*
-    rm lib/*
-    mvn clean
-fi
+        mvn clean > "$out"
+    fi
+done
 
-# ok, compile all the source code
-mvn -Dmaven.test.skip=true install
-
-echo "maven done, now ant"
-
-# clean-up
-ant -f build_package.xml clean
-
-if [ DL4J_BUILD_EXPERIMENTAL == "1" ]; then
-    # copy only the *necessary* jars from lib-full to lib
-    while read p; do
-      if [ -e lib-full/$p ]; then
-	  cp lib-full/$p lib/$p
-      fi
-      # we'll probably need all the core jars
-      cp lib-full/deeplearning*.jar lib/
-      # ...and apache
-      cp lib-full/commons*.jar lib/
-    done <scripts/find_jars/jars_unique.txt
-else
-    # just copy all the jars :(
-    cp lib-full/*jar lib/
-fi
+echo "Compiling the source code now..."
+mvn -DskipTests=true install >  "$out"
 
 
-# build the package
-ant -f build_package.xml make_package -Dpackage=wekaDl4j
+function build_ant {
+    dir=wekaDeeplearning4j$1
 
-if [install_pack=="1"]; then
-	cd dist
-	java weka.core.WekaPackageManager -install-package wekaDl4j0.0.1.zip
-fi
+    # clean-up
+    ant -f ${dir}/build_package.xml clean > "$out"
+
+    if [[ $1 == "Core" ]]; then
+        # Strip that list down by looking up which jars are unnecessary
+        jars=(
+        "deeplearning"
+        "common"
+        "datavec"
+        "guava"
+        "imageio"
+        "jackson"
+        "jai-imageio"
+        "javassist"
+        "lombok"
+        "nd4j"
+        "opencv"
+        "reflections"
+        "slf4j"
+        )
+
+        for name in "${jars[@]}"
+        do
+            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
+        done
+
+    elif [[ $1 == "CPU" ]]; then
+        jars=(
+        "openblas" #should already be in core?
+        )
+
+        for name in "${jars[@]}"
+        do
+            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
+        done
+    elif [[ $1 == "GPU" ]]; then
+        jars=(
+        "cuda"
+        "nd4j-cuda"
+        )
+
+        for name in "${jars[@]}"
+        do
+            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
+        done
+    fi
+
+    # build the package
+    ant -f ${dir}/build_package.xml make_package -Dpackage=${dir} > "$out"
+
+    if [[ "$install_pack" = true ]]; then
+        echo "Installing ${dir} package..."
+        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${dir}/dist/${dir}.zip
+    fi
+}
+
+
+
+for sub in "${arr[@]}"
+do
+    echo "Starting ant build for" ${sub}
+    build_ant ${sub}
+done

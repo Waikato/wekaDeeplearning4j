@@ -14,6 +14,6 @@ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      -optim STOCHASTIC_GRADIENT_DESCENT \
      -lr 0.01 -momentum 0.9 -updater NESTEROVS -debug /tmp/debug.txt \
      -output-debug-info \
-     -t ../datasets/mnist.meta.arff \
+     -t ../datasets/nominal/mnist.meta.arff \
      -batch-size 100 \
      -no-cv

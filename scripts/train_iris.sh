@@ -10,5 +10,5 @@ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      -updater NESTEROVS \
      -lr 0.1 \
      -momentum 0.9 \
-     -t ../datasets/iris.arff \
+     -t ../datasets/nominal/iris.arff \
      -no-cv

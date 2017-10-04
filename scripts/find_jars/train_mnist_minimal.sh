@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 java -verbose:class -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      .Dl4jMlpClassifier -S 2 \
@@ -13,6 +13,6 @@ java -verbose:class -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      -optim STOCHASTIC_GRADIENT_DESCENT \
      -lr 0.01 -momentum 0.9 -updater NESTEROVS \
      -output-debug-info \
-     -t ../../datasets/mnist.meta.minimal.arff \
+     -t ../../datasets/nominal/mnist.meta.minimal.arff \
      -batch-size 100 \
      -no-cv | grep -v "Loaded java" | grep -v "Loaded sun" | grep -v "Loaded com.sun" | grep -v "jdk.internal" | grep -v "weka.jar" | python extract_jar.py
