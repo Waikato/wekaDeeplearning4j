@@ -1,9 +1,17 @@
 #!/usr/bin/env bash
 
+# Options
 install_pack=false
 verbose=false
 clean=false
 out=/dev/null
+
+# Colors
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Module prefix
+PREFIX=wekaDeeplearning4j
 
 ### BEGIN parse arguments ###
 POSITIONAL=()
@@ -44,44 +52,46 @@ if [[ "$verbose" = true ]]; then
     out=/dev/stdout
 fi
 
-
-if [[ "$install_pack" = true ]]; then
-	if [[ -z "$WEKA_HOME" ]]; then
-    	echo "WEKA_HOME env variable is not set!"
-    	echo "Exiting now..."
-   		exit 1
-	elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
-	    echo "${WEKA_HOME} does not contain weka.jar!"
-    	echo "Exiting now..."
-   		exit 1
-	fi
-
-	export CLASSPATH=${WEKA_HOME}/weka.jar
-	echo "Classpath: " ${CLASSPATH}
+# Check if env var is set and weka.jar could be found
+if [[ -z "$WEKA_HOME" ]]; then
+    echo -e "${RED}WEKA_HOME env variable is not set!" > /dev/stderr
+    echo -e "Exiting now...${NC}" > /dev/stderr
+    exit 1
+elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
+    echo -e "${RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
+    echo -e "Exiting now...${NC}" > /dev/stderr
+    exit 1
 fi
 
-arr=( "Core" "CPU" "GPU" )
-echo "Cleaning up lib-full and lib in each module..."
-for sub in "${arr[@]}"
-do
-    dir=wekaDeeplearning4j${sub}
-    if [[ "$clean" = true ]]; then
+export CLASSPATH=${WEKA_HOME}/weka.jar
+echo "Classpath = " ${CLASSPATH}
+
+# Available modules
+modules=( "Core" "CPU" "GPU" )
+
+# Clean up lib folders and classes
+if [[ "$clean" = true ]]; then
+    echo "Cleaning up lib-full and lib in each module..."
+    for sub in "${modules[@]}"
+    do
+        dir=${PREFIX}${sub}
         rm ${dir}/lib-full/*
         rm ${dir}/lib/*
+        mvn clean > /dev/null # don't clutter with mvn clean output
+    done
+fi
 
-        mvn clean > "$out"
-    fi
-done
-
+# Compile source code with maven
 echo "Compiling the source code now..."
 mvn -DskipTests=true install >  "$out"
 
 
-function build_ant {
-    dir=wekaDeeplearning4j$1
 
-    # clean-up
-    ant -f ${dir}/build_package.xml clean > "$out"
+function build_module {
+    dir=${PREFIX}$1
+
+    # Clean-up
+    ant -f ${dir}/build_package.xml clean > /dev/null # don't clutter with ant clean output
 
     if [[ $1 == "Core" ]]; then
         # Strip that list down by looking up which jars are unnecessary
@@ -100,36 +110,27 @@ function build_ant {
         "reflections"
         "slf4j"
         )
-
-        for name in "${jars[@]}"
-        do
-            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
-        done
-
     elif [[ $1 == "CPU" ]]; then
         jars=(
         "openblas" #should already be in core?
         )
-
-        for name in "${jars[@]}"
-        do
-            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
-        done
     elif [[ $1 == "GPU" ]]; then
         jars=(
         "cuda"
         "nd4j-cuda"
         )
-
-        for name in "${jars[@]}"
-        do
-            cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
-        done
     fi
 
-    # build the package
+    # Copy the libs from lib-full to lib
+    for name in "${jars[@]}"
+    do
+        cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
+    done
+
+    # Build the package
     ant -f ${dir}/build_package.xml make_package -Dpackage=${dir} > "$out"
 
+    # Install package from dist dir
     if [[ "$install_pack" = true ]]; then
         echo "Installing ${dir} package..."
         java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${dir}/dist/${dir}.zip
@@ -138,8 +139,8 @@ function build_ant {
 
 
 
-for sub in "${arr[@]}"
+for mod in "${modules[@]}"
 do
-    echo "Starting ant build for" ${sub}
-    build_ant ${sub}
+    echo "Starting ant build for" ${mod}
+    build_module ${mod}
 done
