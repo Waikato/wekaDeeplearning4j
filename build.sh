@@ -67,7 +67,7 @@ export CLASSPATH=${WEKA_HOME}/weka.jar
 echo "Classpath = " ${CLASSPATH}
 
 # Available modules
-modules=( "Core" "CPU" "GPU" )
+modules=( "Core" "CPU" "GPU" "NLP")
 
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
@@ -120,6 +120,11 @@ function build_module {
         jars=(
         "cuda"
         "nd4j-cuda"
+        )
+    elif [[ $1 == "NLP" ]]; then
+        jars=(
+        "deeplearning4j-nlp"
+        "ark-tweet-nlp"
         )
     fi
 

@@ -18,6 +18,7 @@
         <module>wekaDeeplearning4jCore</module>
         <module>wekaDeeplearning4jCPU</module>
         <module>wekaDeeplearning4jGPU</module>
+        <module>wekaDeeplearning4jNLP</module>
     </modules>
 
     <!--Properties-->
@@ -27,6 +28,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
+
+    <!--Global dependencies-->
+    <dependencies>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-dev</artifactId>
+            <version>3.9.1</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-dev</artifactId>
+            <version>3.9.1</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
