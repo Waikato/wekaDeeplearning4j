@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>wekaDeeplearning4jNLP</artifactId>
+    <version>1.1.7-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>wekaDeeplearning4jNLP</name>
+
+    <!--Reference parent-->
+    <parent>
+        <groupId>nz.ac.waikato.cms.weka</groupId>
+        <artifactId>wekaDeeplearning4j</artifactId>
+        <version>1.17-SNAPSHOT</version>
+    </parent>
+
+
+    <!--NLP specific dependencies-->
+    <dependencies>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-nlp</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/edu.cmu.cs/ark-tweet-nlp -->
+        <dependency>
+            <groupId>edu.cmu.cs</groupId>
+            <artifactId>ark-tweet-nlp</artifactId>
+            <version>0.3.2</version>
+        </dependency>
+    </dependencies>
+
+</project>

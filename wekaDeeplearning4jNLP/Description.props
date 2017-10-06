@@ -1,0 +1,43 @@
+# Description file for WekaDeepLearning4jNLP
+#
+#
+
+# Package name (required)
+PackageName=WekaDeepLearning4jNLP
+
+# Version (required)
+Version=1.0.0
+
+#Date
+Date=2016-09-09
+
+# Title (required)
+Title=Deep Learning models for NLP
+
+Category=Text classification
+
+# Author (required)
+Author=felipebravom <fjb11@students.waikato.ac.nz>
+
+# Maintainer (required)
+Maintainer=felipebravom <fjb11@students.waikato.ac.nz>
+
+# License (required)
+License=GPL 3.0
+
+# Description (required)
+Description= Deep Learning models for NLP.
+
+# Package URL for obtaining the package archive (required)
+PackageURL=https://github.com/felipebravom/WekaDeepLearning4jNLP/releases/download/1.0.0/WekaDeepLearning4jNLP1.0.0.zip
+
+# URL for further information
+URL=https://github.com/felipebravom/WekaDeepLearning4jNLP
+
+# Related to other packages?
+#Related=
+
+# Dependencies
+Depends=weka (>=3.8.1)
+
+

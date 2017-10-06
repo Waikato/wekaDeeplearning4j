@@ -1,0 +1,6 @@
+org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess =\ weka.dl4j.text.tokenization.tokenizer.preprocessor
+
+org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory =\ weka.dl4j.text.tokenization.tokenizerfactory
+
+weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\ weka.dl4j.text.stopwords
+
