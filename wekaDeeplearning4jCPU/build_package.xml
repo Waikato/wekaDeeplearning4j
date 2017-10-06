@@ -1,5 +1,5 @@
 <project name="weka-package" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-<!-- 
+<!--
   ===========================================================================
    Ant build file for a weka package
 
@@ -37,7 +37,7 @@
     <pathelement path="${java.class.path}" />
   </path>
 
-<!-- 
+<!--
  ============================================================================
  Compilation and documentation making stuff
  ============================================================================
@@ -49,17 +49,17 @@
   </target>
 
   <!-- Compile the java code from ${src}/weka into ${build}/classes -->
-  <target name="compile" depends="init_compile" 
+  <target name="compile" depends="init_compile"
    description="Compile package and deposit class files in build/classes">
     <echo message="Nothing to do for compile"/>
   </target>
 
   <!-- Make the javadocs -->
-  <target name="docs" 
-          depends="init_all" 
+  <target name="docs"
+          depends="init_all"
           description="Make javadocs into ./doc">
     <echo message="Nothing to do for docs"/>
-  </target> 
+  </target>
 
 
 <!--
@@ -72,22 +72,22 @@
     <available property="junit.present" classname="junit.framework.TestCase"/>
     <!-- Create the build directory structure used by compile -->
     <mkdir dir="${build}/testcases"/>
-    <!-- make this if it doesn't exist so that the compile_test task doesn't faile for 
+    <!-- make this if it doesn't exist so that the compile_test task doesn't faile for
          stuff that doesn't have test cases -->
     <mkdir dir="${src-test}"/>
   </target>
 
   <!-- compile the testcases -->
-  <target name="compile_tests" depends="init_tests, compile" 
+  <target name="compile_tests" depends="init_tests, compile"
    description="Compile unit tests into build/testcases">
-     <javac srcdir="${src-test}" 
+     <javac srcdir="${src-test}"
        fork="yes" memoryMaximumSize="${javac_max_memory}"
             destdir="${build}/testcases"
             optimize="${optimization}"
             debug="${debug}"
             deprecation="${deprecation}"
             source="1.6" target="1.6">
-       <classpath refid="project.class.path" /> 
+       <classpath refid="project.class.path" />
      </javac>
      <copy todir="${build}/testcases" >
        <fileset dir="${src-test}">
@@ -102,7 +102,7 @@
   <!-- Put everything in ${build}/testcases into the ${package}-tests.jar file -->
   <target name="jar_tests" depends="compile_tests, init_dist"
    description="Creates a jar file with the test cases in ./dist. Run with -Dpackage=[package name]">
-    <jar jarfile="${dist}/${package}-tests.jar" 
+    <jar jarfile="${dist}/${package}-tests.jar"
       basedir="${build}/testcases">
     </jar>
   </target>
@@ -139,16 +139,22 @@
     <copy file="Description.props"
           todir="${dist}/${package}"/>
     <mkdir dir="${dist}/${package}/lib"/>
-    <zip destfile="${dist}/${package}.zip" 
+    <copy todir="${dist}/${package}/lib" >
+      <fileset dir="${lib}">
+        <include name="*.jar"/>
+        <include name="*.zip"/>
+      </fileset>
+    </copy>
+    <zip destfile="${dist}/${package}.zip"
       basedir="${dist}/${package}">
     </zip>
   </target>
 
   <!-- Put all .java, and .props files into ${dist}/${package}-src.jar-->
   <target name="srcjar" depends="init_dist, init_all"
-   description="Create a jar file containing weka source in ./dist. Run with -Dpackage=[package name]">  
+   description="Create a jar file containing weka source in ./dist. Run with -Dpackage=[package name]">
     <!-- jar up the source -->
-    <jar jarfile="${dist}/${package}-src.jar" 
+    <jar jarfile="${dist}/${package}-src.jar"
       basedir=".">
       <include name="*.xml"/>
       <include name="src/**/*.excludes"/>
