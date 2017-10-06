@@ -36,6 +36,14 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
 This trains a one-hidden-layer MLP with 10 units on the Iris dataset. Nesterov momentum is used in conjunction with SGD and the initial
 learning rate and momentum is set to 0.01 and 0.9, respectively. The network is trained for 100 iterations.
 
+## Structure
+
+This package is structured into three different modules/weka-packages:
+
+- Core: Core code and dependencies
+- CPU: CPU specific code and dependencies
+- GPU: GPU specific code and dependencies
+
 ## Design philosophy
 
 DL4J is not primarily intended for research purposes -- rather more commercial and convention endeavours -- and so for more research-oriented
