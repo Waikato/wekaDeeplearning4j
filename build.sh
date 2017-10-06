@@ -109,10 +109,12 @@ function build_module {
         "opencv"
         "reflections"
         "slf4j"
+        "nd4j-native-0"
+        "openblas"
+        "javacpp"
         )
     elif [[ $1 == "CPU" ]]; then
         jars=(
-        "openblas" #should already be in core?
         )
     elif [[ $1 == "GPU" ]]; then
         jars=(
@@ -132,6 +134,8 @@ function build_module {
 
     # Install package from dist dir
     if [[ "$install_pack" = true ]]; then
+        # Remove up old packages
+        # rm -r ${WEKA_HOME}/packages/${dir}
         echo "Installing ${dir} package..."
         java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${dir}/dist/${dir}.zip
     fi
