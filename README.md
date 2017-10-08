@@ -43,7 +43,7 @@ This package is structured into three different modules/weka-packages:
 - Core: Core code and dependencies
 - CPU: CPU specific code and dependencies
 - GPU: GPU specific code and dependencies
-
+- NLP: Package for natural language processing
 ## Design philosophy
 
 DL4J is not primarily intended for research purposes -- rather more commercial and convention endeavours -- and so for more research-oriented
