@@ -7,9 +7,7 @@ import weka.filters.Filter;
 
 import java.io.File;
 /**
- * JUnit tests for the Dl4jMlpClassifier.
- * Tests nominal classes with iris, numerical classes with diabetes and image
- * classification with minimal mnist.
+ * JUnit tests for the Dl4jStringToWord2Vec Filter.
  *
  * @author Steven Lang
  *
