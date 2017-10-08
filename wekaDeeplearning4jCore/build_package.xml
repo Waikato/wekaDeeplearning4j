@@ -188,10 +188,37 @@
     <mkdir dir="${dist}/${package}/lib"/>
     <copy todir="${dist}/${package}/lib" >
        <fileset dir="${lib}">
-         <include name="*.jar"/>
-         <include name="*.zip"/>
+         <!--<include name="*.jar"/>-->
+
+         <!--Includes-->
+         <!--<include name="*.zip"/>-->
+         <include name="deeplearning*.jar"/>
+         <include name="common*.jar"/>
+         <include name="datavec*.jar"/>
+         <include name="guava*.jar"/>
+         <include name="imageio*.jar"/>
+         <include name="jackson*.jar"/>
+         <include name="jai-imageio*.jar"/>
+         <include name="javassist*.jar"/>
+         <include name="lombok*.jar"/>
+         <include name="nd4j*.jar"/>
+         <include name="opencv*.jar"/>
+         <include name="reflections*.jar"/>
+         <include name="slf4j*.jar"/>
+         <include name="nd4j-native-0*.jar"/>
+         <include name="openblas*.jar"/>
+         <include name="javacpp*.jar"/>
+
+         <!--Excludes-->
          <exclude name="weka.jar"/>
        </fileset>
+    </copy>
+
+    <!--Libraries that need to be copied to the package root dir for some reason-->
+    <copy todir="${dist}/${package}" >
+      <fileset dir="${lib}">
+        <include name="deeplearning4j-nn-*.jar"/>
+      </fileset>
     </copy>
 
     <mkdir dir="${dist}/${package}/doc"/>

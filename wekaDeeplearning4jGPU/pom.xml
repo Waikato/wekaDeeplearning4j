@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>wekaDeeplearning4jGPU</artifactId>
-    <version>1.1.7-SNAPSHOT</version>
+    <version>1.17-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>wekaDeeplearning4jGPU</name>
 
@@ -29,4 +29,6 @@
             <version>${nd4j.version}</version>
         </dependency>
     </dependencies>
+
+    
 </project>

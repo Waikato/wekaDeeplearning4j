@@ -21,7 +21,6 @@
             <artifactId>deeplearning4j-nlp</artifactId>
             <version>${dl4j.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/edu.cmu.cs/ark-tweet-nlp -->
         <dependency>
             <groupId>edu.cmu.cs</groupId>
             <artifactId>ark-tweet-nlp</artifactId>

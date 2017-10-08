@@ -1,4 +1,4 @@
-<project name="weka-package" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="weka-package" default="compile" basedir="" xmlns:ivy="antlib:org.apache.ivy.ant">
 <!--
   ===========================================================================
    Ant build file for a weka package
@@ -141,8 +141,11 @@
     <mkdir dir="${dist}/${package}/lib"/>
     <copy todir="${dist}/${package}/lib" >
       <fileset dir="${lib}">
-        <include name="*.jar"/>
-        <include name="*.zip"/>
+
+        <!--Includes-->
+
+        <!--Excludes-->
+        <exclude name="*.jar"/>
       </fileset>
     </copy>
     <zip destfile="${dist}/${package}.zip"
@@ -155,7 +158,7 @@
    description="Create a jar file containing weka source in ./dist. Run with -Dpackage=[package name]">
     <!-- jar up the source -->
     <jar jarfile="${dist}/${package}-src.jar"
-      basedir=".">
+      basedir="">
       <include name="*.xml"/>
       <include name="src/**/*.excludes"/>
       <include name="src/**/*.gif"/>

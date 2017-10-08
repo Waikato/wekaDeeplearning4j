@@ -71,11 +71,10 @@ modules=( "Core" "CPU" "GPU" "NLP")
 
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    echo "Cleaning up lib-full and lib in each module..."
+    echo "Cleaning up lib in each module..."
     for sub in "${modules[@]}"
     do
         dir=${PREFIX}${sub}
-        rm ${dir}/lib-full/*
         rm ${dir}/lib/*
         mvn clean > /dev/null # don't clutter with mvn clean output
     done
@@ -93,54 +92,15 @@ function build_module {
     # Clean-up
     ant -f ${dir}/build_package.xml clean > /dev/null # don't clutter with ant clean output
 
-    if [[ $1 == "Core" ]]; then
-        # Strip that list down by looking up which jars are unnecessary
-        jars=(
-        "deeplearning"
-        "common"
-        "datavec"
-        "guava"
-        "imageio"
-        "jackson"
-        "jai-imageio"
-        "javassist"
-        "lombok"
-        "nd4j"
-        "opencv"
-        "reflections"
-        "slf4j"
-        "nd4j-native-0"
-        "openblas"
-        "javacpp"
-        )
-    elif [[ $1 == "CPU" ]]; then
-        jars=(
-        )
-    elif [[ $1 == "GPU" ]]; then
-        jars=(
-        "cuda"
-        "nd4j-cuda"
-        )
-    elif [[ $1 == "NLP" ]]; then
-        jars=(
-        "deeplearning4j-nlp"
-        "ark-tweet-nlp"
-        )
-    fi
-
-    # Copy the libs from lib-full to lib
-    for name in "${jars[@]}"
-    do
-        cp ${dir}/lib-full/${name}*.jar ${dir}/lib/
-    done
-
     # Build the package
     ant -f ${dir}/build_package.xml make_package -Dpackage=${dir} > "$out"
 
     # Install package from dist dir
     if [[ "$install_pack" = true ]]; then
         # Remove up old packages
-        # rm -r ${WEKA_HOME}/packages/${dir}
+        if [[ "$clean" == true ]]; then
+            rm -r ${WEKA_HOME}/packages/${dir}
+        fi
         echo "Installing ${dir} package..."
         java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${dir}/dist/${dir}.zip
     fi
