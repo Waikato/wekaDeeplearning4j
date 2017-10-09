@@ -7,11 +7,16 @@ clean=false
 out=/dev/null
 
 # Colors
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+RED='\e[0;31m'
+NC='\e[0m' # Reset attributes
+BOLD='\e[1m'
+GREEN='\e[32m'
+
 
 # Module prefix
 PREFIX=wekaDeeplearning4j
+
+ECHO_PREFIX="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
 
 ### BEGIN parse arguments ###
 POSITIONAL=()
@@ -40,10 +45,10 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-echo "Parameters:"
-echo verbose       = "${verbose}"
-echo install_pack  = "${install_pack}"
-echo clean         = "${clean}"
+echo -e ${ECHO_PREFIX}"Parameters:"
+echo -e ${ECHO_PREFIX}verbose       = "${verbose}"
+echo -e ${ECHO_PREFIX}install_pack  = "${install_pack}"
+echo -e ${ECHO_PREFIX}clean         = "${clean}"
 echo ""
 ### END parse arguments ###
 
@@ -54,62 +59,62 @@ fi
 
 # Check if env var is set and weka.jar could be found
 if [[ -z "$WEKA_HOME" ]]; then
-    echo -e "${RED}WEKA_HOME env variable is not set!" > /dev/stderr
-    echo -e "Exiting now...${NC}" > /dev/stderr
+    echo -e "${ECHO_PREFIX}${RED}WEKA_HOME env variable is not set!" > /dev/stderr
+    echo -e "${ECHO_PREFIX}Exiting now...${NC}" > /dev/stderr
     exit 1
 elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
-    echo -e "${RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
-    echo -e "Exiting now...${NC}" > /dev/stderr
+    echo -e "$${ECHO_PREFIX}{RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
+    echo -e "${ECHO_PREFIX}Exiting now...${NC}" > /dev/stderr
     exit 1
 fi
 
 export CLASSPATH=${WEKA_HOME}/weka.jar
-echo "Classpath = " ${CLASSPATH}
+echo -e "${ECHO_PREFIX}Classpath = " ${CLASSPATH}
 
 # Available modules
-modules=( "Core" "CPU" "GPU" "NLP")
+packages=( "Core" "CPU" "GPU" "NLP")
 
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    echo "Cleaning up lib in each module..."
-    for sub in "${modules[@]}"
+    echo -e "${ECHO_PREFIX}Cleaning up lib in each package..."
+    for sub in "${packages[@]}"
     do
-        dir=${PREFIX}${sub}
-        rm ${dir}/lib/*
+        pack=${PREFIX}${sub}
+        rm ${pack}/lib/*
         mvn clean > /dev/null # don't clutter with mvn clean output
     done
 fi
 
 # Compile source code with maven
-echo "Compiling the source code now..."
+echo -e "${ECHO_PREFIX}Pulling dependencies via maven..."
 mvn -DskipTests=true install >  "$out"
 
 
 
-function build_module {
-    dir=${PREFIX}$1
+function build_package {
+    pack=${PREFIX}$1
 
     # Clean-up
-    ant -f ${dir}/build_package.xml clean > /dev/null # don't clutter with ant clean output
+    ant -f ${pack}/build_package.xml clean > /dev/null # don't clutter with ant clean output
 
     # Build the package
-    ant -f ${dir}/build_package.xml make_package -Dpackage=${dir} > "$out"
+    ant -f ${pack}/build_package.xml make_package -Dpackage=${pack} > "$out"
 
     # Install package from dist dir
     if [[ "$install_pack" = true ]]; then
         # Remove up old packages
-        if [[ "$clean" == true ]]; then
-            rm -r ${WEKA_HOME}/packages/${dir}
+        if [[ "$clean" = true ]]; then
+            rm -r ${WEKA_HOME}/packages/${pack}
         fi
-        echo "Installing ${dir} package..."
-        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${dir}/dist/${dir}.zip
+        echo -e "${ECHO_PREFIX}Installing ${pack} package..."
+        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${pack}/dist/${pack}.zip
     fi
 }
 
 
 
-for mod in "${modules[@]}"
+for pack in "${packages[@]}"
 do
-    echo "Starting ant build for" ${mod}
-    build_module ${mod}
+    echo -e "${ECHO_PREFIX}Starting ant build for ${BOLD}"${pack}${NC}
+    build_package ${pack}
 done
