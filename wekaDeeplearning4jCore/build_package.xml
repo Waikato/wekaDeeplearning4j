@@ -210,7 +210,7 @@
          <include name="javacpp*.jar"/>
 
          <!--Excludes-->
-         <exclude name="weka.jar"/>
+         <exclude name="deeplearning4j-nn-*.jar"/>
        </fileset>
     </copy>
 

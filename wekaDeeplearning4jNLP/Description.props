@@ -1,9 +1,9 @@
-# Description file for WekaDeepLearning4jNLP
+# Description file for wekaDeepLearning4jNLP
 #
 #
 
 # Package name (required)
-PackageName=WekaDeepLearning4jNLP
+PackageName=wekaDeeplearning4jNLP
 
 # Version (required)
 Version=1.0.0
@@ -38,6 +38,9 @@ URL=https://github.com/felipebravom/WekaDeepLearning4jNLP
 #Related=
 
 # Dependencies
-Depends=weka (>=3.8.1)
+Depends=weka (>=3.8.1), wekaDeeplearning4jCore (>=1.1.2)
+
+#Inject these dependencies at load time
+InjectDependencies=wekaDeeplearning4jCore
 
 

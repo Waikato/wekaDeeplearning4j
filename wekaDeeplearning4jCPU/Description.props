@@ -43,7 +43,7 @@ URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4jCPU
 #Related=
 
 # Dependencies
-Depends=weka (>=3.9.1-SNAPSHOT), wekaDeeplearning4jCore (>=1.1.2), wekaDeeplearning4jCPULibs (>=1.0.0)
+Depends=weka (>=3.9.1-SNAPSHOT), wekaDeeplearning4jCore (>=1.1.2)
 
 # Package(s) that can't be installed alongside this one (old wekaDeepLearning4j)
 Precludes=wekaDeeplearning4j,wekaDeeplearning4jGPU
