@@ -23,8 +23,8 @@
 
     <!--Properties-->
     <properties>
-        <nd4j.version>0.8.0</nd4j.version>
-        <dl4j.version>0.8.0</dl4j.version>
+        <nd4j.version>0.9.1</nd4j.version>
+        <dl4j.version>0.9.1</dl4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacpp</artifactId>
-            <version>1.3.2</version>
+            <version>1.3.3</version>
         </dependency>
         <dependency>
             <groupId>org.bytedeco.javacpp-presets</groupId>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>23.1-jre</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

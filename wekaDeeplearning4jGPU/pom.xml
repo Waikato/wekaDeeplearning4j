@@ -29,6 +29,4 @@
             <version>${nd4j.version}</version>
         </dependency>
     </dependencies>
-
-    
 </project>

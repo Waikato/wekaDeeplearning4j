@@ -26,6 +26,7 @@
             <artifactId>ark-tweet-nlp</artifactId>
             <version>0.3.2</version>
         </dependency>
+        <!--Old version necessary for ark-tweet-nlp-->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>

@@ -29,7 +29,7 @@ import java.util.*;
 import org.datavec.api.writable.DoubleWritable;
 import org.datavec.api.split.InputSplit;
 import org.datavec.api.writable.Writable;
-import org.datavec.common.RecordConverter;
+import org.datavec.api.util.ndarray.RecordConverter;
 import org.datavec.image.loader.ImageLoader;
 import org.datavec.image.recordreader.BaseImageRecordReader;
 import org.nd4j.linalg.api.ndarray.INDArray;
