@@ -183,7 +183,9 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
         validate(data);
         data.randomize(new Random(seed));
         EasyImageRecordReader reader = getImageRecordReader(data, seed);
-        DataSetIterator tmpIter = new RecordReaderDataSetIterator( reader, batchSize, -1, data.numClasses());
+        final int numPossibleLabels = data.numClasses();
+        final int labelIndex = 1; // Use explicit label index position
+        DataSetIterator tmpIter = new RecordReaderDataSetIterator( reader, batchSize, labelIndex, numPossibleLabels);
         tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
         return tmpIter;
     }

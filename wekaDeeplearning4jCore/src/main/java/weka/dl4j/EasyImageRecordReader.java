@@ -83,7 +83,7 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
         m_random = new Random(seed);
         initialize(null);
 
-        imageLoader = new ImageLoader(width, height, channels);
+        imageLoader = new ImageLoader(height, width, channels);
     }
 
     /**
@@ -119,7 +119,7 @@ public class EasyImageRecordReader extends BaseImageRecordReader {
             try {
                 INDArray row = imageLoader.asRowVector(image);
                 ret = RecordConverter.toRecord(row);
-                if(classLabel != "?")
+                if(!"?".equals(classLabel))
                     ret.add(new DoubleWritable(Double.parseDouble(classLabel)));
             } catch (Exception e) {
                 e.printStackTrace();
