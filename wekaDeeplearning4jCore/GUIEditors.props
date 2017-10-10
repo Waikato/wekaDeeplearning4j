@@ -13,3 +13,5 @@ org.nd4j.linalg.lossfunctions.ILossFunction=weka.gui.GenericObjectEditor
 weka.dl4j.iterators.AbstractDataSetIterator=weka.gui.GenericObjectEditor
 
 org.nd4j.linalg.activations.IActivation=weka.gui.GenericObjectEditor
+
+org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor

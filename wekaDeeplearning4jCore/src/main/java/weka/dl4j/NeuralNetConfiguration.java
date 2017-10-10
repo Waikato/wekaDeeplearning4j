@@ -3,6 +3,7 @@ package weka.dl4j;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.LearningRatePolicy;
 import org.deeplearning4j.nn.conf.stepfunctions.StepFunction;
+import org.nd4j.linalg.learning.config.IUpdater;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -11,6 +12,7 @@ import weka.gui.ProgrammaticProperty;
 import java.io.Serializable;
 
 import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
@@ -20,13 +22,17 @@ import java.util.Enumeration;
  * @version $Revision: 11711 $
  */
 public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNetConfiguration implements Serializable, OptionHandler {
-
+  
+  /**
+   * NeuralNetConfiguration builder
+   */
+  private Builder builder;
+  
   /**
    * Constructor that provides default values for the settings.
    */
   public NeuralNetConfiguration() {
-
-    this.leakyreluAlpha = 0.01D;
+    this.builder = new Builder();
     this.miniBatch = true;
     this.numIterations = 1;
     this.maxNumLineSearchIterations = 5;
@@ -55,15 +61,12 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public void setOptimizationAlgo(OptimizationAlgorithm optimAlgorithm) {
     super.setOptimizationAlgo(optimAlgorithm);
   }
-
-  @OptionMetadata(
-          displayName = "leaky relu alpha",
-          description = "The parameter for the leaky relu (default = 0.1).",
-          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
-          displayOrder = 1)
-  public double getLeakyreluAlpha() { return super.getLeakyreluAlpha(); }
-  public void setLeakyreluAlpha(double a) { super.setLeakyreluAlpha(a); }
-
+  
+  @Override
+  public void setL1ByParam(Map<String, Double> l1ByParam) {
+    super.setL1ByParam(l1ByParam);
+  }
+  
   @OptionMetadata(
           displayName = "learning rate policy",
           description = "The learning rate policy (default = None).",
@@ -143,7 +146,19 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           displayOrder = 11)
   public StepFunction getStepFunction() { return super.getStepFunction(); }
   public void setStepFunction(StepFunction f) { super.setStepFunction(f); }
-
+  
+  @OptionMetadata(
+          displayName = "updater",
+          description = "The updater to use (default = SGD).",
+          commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
+          displayOrder = 12)
+  public IUpdater getIUpdater(){
+    return this.builder.getIUpdater();
+  }
+  public void setIUpdater(IUpdater iUpdater){
+    this.builder.updater(iUpdater);
+  }
+  
   @ProgrammaticProperty
   public int getIterationCount() { return super.getIterationCount(); }
   public void setIterationCount(int n) { super.setIterationCount(n); }
@@ -159,6 +174,19 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   @ProgrammaticProperty
   public boolean isPretrain() { return super.isPretrain(); }
   public void setPretrain(boolean b) { super.setPretrain(b); }
+  
+  
+  public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder
+          implements Serializable{
+    Builder() {
+      super();
+    }
+  
+    public Builder(org.deeplearning4j.nn.conf.NeuralNetConfiguration newConf) {
+      super(newConf);
+    }
+  }
+  
 
   /**
    * Returns an enumeration describing the available options.
