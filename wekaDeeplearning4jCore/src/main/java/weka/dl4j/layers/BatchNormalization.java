@@ -67,16 +67,7 @@ public class BatchNormalization extends org.deeplearning4j.nn.conf.layers.BatchN
 		setActivationFunction(new ActivationIdentity());
 		setWeightInit(WeightInit.XAVIER);
 		setDist(new NormalDistribution());
-		setUpdater(Updater.NESTEROVS);
-		setLearningRate(0.01);
-		setBiasLearningRate(getLearningRate());
-		setMomentum(0.9);
 		setBiasInit(1.0);
-		setAdamMeanDecay(0.9);
-		setAdamVarDecay(0.999);
-		setEpsilon(1e-6);
-		setRmsDecay(0.95);
-		setDecay(0.9);
 		setEps(1e-5);
 		setGamma(1.0);
 		setBeta(0.0);
@@ -223,66 +214,6 @@ public class BatchNormalization extends org.deeplearning4j.nn.conf.layers.BatchN
 	}
 
 	@OptionMetadata(
-					displayName = "learning rate",
-					description = "The learning rate (default = 0.01).",
-					commandLineParamName = "lr", commandLineParamSynopsis = "-lr <double>",
-					displayOrder = 11)
-	public double getLearningRate() {
-		return this.learningRate;
-	}
-	public void setLearningRate(double learningRate) {
-		this.learningRate = learningRate;
-	}
-
-	@OptionMetadata(
-					displayName = "bias learning rate",
-					description = "The bias learning rate (default = 0.01).",
-					commandLineParamName = "blr", commandLineParamSynopsis = "-blr <double>",
-					displayOrder = 12)
-	public double getBiasLearningRate() {
-		return this.biasLearningRate;
-	}
-	public void setBiasLearningRate(double biasLearningRate) {
-		this.biasLearningRate = biasLearningRate;
-	}
-
-	@OptionMetadata(
-					displayName = "learning rate schedule",
-					description = "The learning rate schedule.",
-					commandLineParamName = "lrSchedule", commandLineParamSynopsis = "-lrSchedule <specification>",
-					displayOrder = 13)
-	public Map<Integer, Double> getLearningRateSchedule() {
-		return this.learningRateSchedule;
-	}
-	public void setLearningRateSchedule(Map<Integer, Double> learningRateSchedule) {
-		this.learningRateSchedule = learningRateSchedule;
-	}
-
-	@OptionMetadata(
-					displayName = "momentum",
-					description = "The momentum (default = 0.9).",
-					commandLineParamName = "momentum", commandLineParamSynopsis = "-momentum <double>",
-					displayOrder = 14)
-	public double getMomentum() {
-		return this.momentum;
-	}
-	public void setMomentum(double momentum) {
-		this.momentum = momentum;
-	}
-
-	@OptionMetadata(
-					displayName = "momentum schedule",
-					description = "The momentum schedule.",
-					commandLineParamName = "momentumSchedule", commandLineParamSynopsis = "-momentumSchedule <specification>",
-					displayOrder = 15)
-	public Map<Integer, Double> getMomentumSchedule() {
-		return this.momentumSchedule;
-	}
-	public void setMomentumSchedule(Map<Integer, Double> momentumSchedule) {
-		this.momentumSchedule = momentumSchedule;
-	}
-
-	@OptionMetadata(
 					displayName = "L1",
 					description = "The L1 parameter (default = 0).",
 					commandLineParamName = "L1", commandLineParamSynopsis = "-L1 <double>",
@@ -340,76 +271,6 @@ public class BatchNormalization extends org.deeplearning4j.nn.conf.layers.BatchN
 	}
 	public void setDropOut(double dropOut) {
 		this.dropOut = dropOut;
-	}
-
-	@OptionMetadata(
-					displayName = "updater for stochastic gradient descent",
-					description = "The updater for stochastic gradient descent (default NESTEROVS).",
-					commandLineParamName = "updater", commandLineParamSynopsis = "-updater <speficiation>",
-					displayOrder = 21)
-	public Updater getUpdater() {
-		return this.updater;
-	}
-	public void setUpdater(Updater updater) {
-		this.updater = updater;
-	}
-
-	@OptionMetadata(
-					displayName = "ADADELTA's rho parameter",
-					description = "ADADELTA's rho parameter (default = 0).",
-					commandLineParamName = "rho", commandLineParamSynopsis = "-rho <double>",
-					displayOrder = 22)
-	public double getRho() {
-		return this.rho;
-	}
-	public void setRho(double rho) {
-		this.rho = rho;
-	}
-
-	@OptionMetadata(
-					displayName = "ADADELTA's epsilon parameter",
-					description = "ADADELTA's epsilon parameter (default = 1e-6).",
-					commandLineParamName = "epsilon", commandLineParamSynopsis = "-epsilon <double>",
-					displayOrder = 23)
-	public double getEpsilon() {
-		return this.epsilon;
-	}
-	public void setEpsilon(double epsilon) {
-		this.epsilon = epsilon;
-	}
-
-	@OptionMetadata(
-					displayName = "RMSPROP's RMS decay parameter",
-					description = "RMSPROP's RMS decay parameter (default = 0.95).",
-					commandLineParamName = "rmsDecay", commandLineParamSynopsis = "-rmsDecay <double>",
-					displayOrder = 24)
-	public double getRmsDecay() {
-		return this.rmsDecay;
-	}
-	public void setRmsDecay(double rmsDecay) {
-		this.rmsDecay = rmsDecay;
-	}
-
-	@OptionMetadata(
-					displayName = "ADAM's mean decay parameter",
-					description = "ADAM's mean decay parameter (default 0.9).",
-					commandLineParamName = "adamMeanDecay", commandLineParamSynopsis = "-adamMeanDecay <double>",
-					displayOrder = 25)
-	public double getAdamMeanDecay() { return this.adamMeanDecay; }
-	public void setAdamMeanDecay(double adamMeanDecay) {
-		this.adamMeanDecay = adamMeanDecay;
-	}
-
-	@OptionMetadata(
-					displayName = "ADAMS's var decay parameter",
-					description = "ADAM's var decay parameter (default 0.999).",
-					commandLineParamName = "adamVarDecay", commandLineParamSynopsis = "-adamVarDecay <double>",
-					displayOrder = 26)
-	public double getAdamVarDecay() {
-		return this.adamVarDecay;
-	}
-	public void setAdamVarDecay(double adamVarDecay) {
-		this.adamVarDecay = adamVarDecay;
 	}
 
 	@OptionMetadata(
