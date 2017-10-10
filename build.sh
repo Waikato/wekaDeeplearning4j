@@ -5,6 +5,7 @@ install_pack=false
 verbose=false
 clean=false
 out=/dev/null
+PACK=''
 
 # Colors
 RED='\e[0;31m'
@@ -16,7 +17,7 @@ GREEN='\e[32m'
 # Module prefix
 PREFIX=wekaDeeplearning4j
 
-ECHO_PREFIX="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
+EP="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
 
 ### BEGIN parse arguments ###
 POSITIONAL=()
@@ -33,6 +34,11 @@ case $key in
     install_pack=true
     shift # past argument
     ;;
+    -p|--package)
+    PACK="$2"
+    shift # past argument
+    shift # past value
+    ;;
     -c|--clean)
     clean=true
     shift # past argument
@@ -45,10 +51,11 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-echo -e ${ECHO_PREFIX}"Parameters:"
-echo -e ${ECHO_PREFIX}verbose       = "${verbose}"
-echo -e ${ECHO_PREFIX}install_pack  = "${install_pack}"
-echo -e ${ECHO_PREFIX}clean         = "${clean}"
+echo -e ${EP}"Parameters:"
+echo -e ${EP}verbose       = "${verbose}"
+echo -e ${EP}install_pack  = "${install_pack}"
+echo -e ${EP}clean         = "${clean}"
+echo -e ${EP}package         = "${PACK}"
 echo ""
 ### END parse arguments ###
 
@@ -59,24 +66,30 @@ fi
 
 # Check if env var is set and weka.jar could be found
 if [[ -z "$WEKA_HOME" ]]; then
-    echo -e "${ECHO_PREFIX}${RED}WEKA_HOME env variable is not set!" > /dev/stderr
-    echo -e "${ECHO_PREFIX}Exiting now...${NC}" > /dev/stderr
+    echo -e "${EP}${RED}WEKA_HOME env variable is not set!" > /dev/stderr
+    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
     exit 1
 elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
-    echo -e "$${ECHO_PREFIX}{RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
-    echo -e "${ECHO_PREFIX}Exiting now...${NC}" > /dev/stderr
+    echo -e "${EP}${RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
+    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
     exit 1
 fi
 
 export CLASSPATH=${WEKA_HOME}/weka.jar
-echo -e "${ECHO_PREFIX}Classpath = " ${CLASSPATH}
+echo -e "${EP}Classpath = " ${CLASSPATH}
 
 # Available modules
-packages=( "Core" "CPU" "GPU" "NLP")
-
+if [[ ${PACK} = '' ]]; then
+    packages=( "Core" "CPU" "GPU" "NLP")
+elif [[ ${PACK} = "Core" || ${PACK} = "CPU" || ${PACK} = "GPU" || ${PACK} = "NLP" ]]; then
+    packages=( ${PACK} )
+else
+    echo -e "${EP}${RED}Invalid package. Exiting now...${NC}"
+    exit 1
+fi
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    echo -e "${ECHO_PREFIX}Cleaning up lib in each package..."
+    echo -e "${EP}Cleaning up lib in each package..."
     for sub in "${packages[@]}"
     do
         pack=${PREFIX}${sub}
@@ -86,7 +99,7 @@ if [[ "$clean" = true ]]; then
 fi
 
 # Compile source code with maven
-echo -e "${ECHO_PREFIX}Pulling dependencies via maven..."
+echo -e "${EP}Pulling dependencies via maven..."
 mvn -DskipTests=true install >  "$out"
 
 
@@ -106,7 +119,7 @@ function build_package {
         if [[ "$clean" = true ]]; then
             rm -r ${WEKA_HOME}/packages/${pack}
         fi
-        echo -e "${ECHO_PREFIX}Installing ${pack} package..."
+        echo -e "${EP}Installing ${pack} package..."
         java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${pack}/dist/${pack}.zip
     fi
 }
@@ -115,6 +128,6 @@ function build_package {
 
 for pack in "${packages[@]}"
 do
-    echo -e "${ECHO_PREFIX}Starting ant build for ${BOLD}"${pack}${NC}
+    echo -e "${EP}Starting ant build for ${BOLD}"${pack}${NC}
     build_package ${pack}
 done
