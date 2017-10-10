@@ -211,6 +211,7 @@
 
          <!--Excludes-->
          <exclude name="deeplearning4j-nn-*.jar"/>
+         <exclude name="nd4j-api-*.jar"/>
        </fileset>
     </copy>
 
@@ -218,6 +219,7 @@
     <copy todir="${dist}/${package}" >
       <fileset dir="${lib}">
         <include name="deeplearning4j-nn-*.jar"/>
+        <include name="nd4j-api-*.jar"/>
       </fileset>
     </copy>
 

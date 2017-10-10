@@ -190,7 +190,14 @@
         <include name="commons-lang-*.jar" />
 
         <!--Excludes-->
+        <exclude name="deeplearning4j-nlp-*.jar"/>
+      </fileset>
+    </copy>
 
+    <!--Libraries that need to be copied to the package root dir for some reason-->
+    <copy todir="${dist}/${package}" >
+      <fileset dir="${lib}">
+        <include name="deeplearning4j-nlp-*.jar"/>
       </fileset>
     </copy>
 
