@@ -20,7 +20,6 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.iterators.ConvolutionalInstancesIterator;
 import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
@@ -50,7 +49,6 @@ public class Dl4jMlpTest {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setDebug(true);
         
         // Data
         ConverterUtils.DataSource ds = new ConverterUtils.DataSource(arffPath);
@@ -266,7 +264,7 @@ public class Dl4jMlpTest {
         
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        nnc.setIUpdater(new Sgd());
+        
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, convLayer3, poolLayer3, denseLayer, outputLayer});
