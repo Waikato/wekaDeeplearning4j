@@ -1,12 +1,22 @@
 package weka.classifiers.functions;
 
+import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
+import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.dl4j.NeuralNetConfiguration;
@@ -19,6 +29,8 @@ import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.updater.Sgd;
 
 import java.io.File;
+import java.io.IOException;
+
 /**
  * JUnit tests for the Dl4jMlpClassifier.
  * Tests nominal classes with iris, numerical classes with diabetes and image
@@ -52,7 +64,7 @@ public class Dl4jMlpTest {
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
         final Sgd iUpdater = new Sgd();
-        iUpdater.setLearningRate(0.1);
+        iUpdater.setLearningRate(5);
         nnc.setIUpdater(iUpdater);
         
         clf.setNeuralNetConfiguration(nnc);
@@ -64,12 +76,69 @@ public class Dl4jMlpTest {
         Assert.assertEquals(3, res[0].length);
     }
     
+    /**
+     * Code from dl4j-examples.
+     *
+     * @throws IOException Could not load Mnist dataset
+     */
     @Test
-    public void testDl4jLayers(){
-        org.deeplearning4j.nn.conf.layers.DenseLayer dl = new org.deeplearning4j.nn.conf.layers.DenseLayer.Builder()
-                .learningRate(0.01)
-                .updater(new org.nd4j.linalg.learning.config.Sgd(0.001))
+    public void testDl4jLayers() throws IOException {
+    
+        //number of rows and columns in the input pictures
+        final int numRows = 28;
+        final int numColumns = 28;
+        int outputNum = 10; // number of output classes
+        int batchSize = 128; // batch size for each epoch
+        int rngSeed = 123; // random number seed for reproducibility
+        int numEpochs = 1; // number of epochs to perform
+    
+        //Get the DataSetIterators:
+        DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, rngSeed);
+        DataSetIterator mnistTest = new MnistDataSetIterator(batchSize, false, rngSeed);
+    
+    
+        MultiLayerConfiguration conf = new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
+                .seed(rngSeed) //include a random seed for reproducibility
+                // use stochastic gradient descent as an optimization algorithm
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .iterations(1)
+                .regularization(true).l2(1e-4)
+                .list()
+                .layer(0, new org.deeplearning4j.nn.conf.layers.DenseLayer.Builder() //create the first, input layer with xavier initialization
+                        .nIn(numRows * numColumns)
+                        .nOut(1000)
+                        .activation(Activation.RELU)
+                        .weightInit(WeightInit.XAVIER)
+                        .build())
+                .layer(1, new org.deeplearning4j.nn.conf.layers.OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD) //create hidden layer
+                        .nIn(1000)
+                        .nOut(outputNum)
+                        .activation(Activation.SOFTMAX)
+                        .weightInit(WeightInit.XAVIER)
+                        .build())
+                .pretrain(false).backprop(true) //use backpropagation to adjust weights
                 .build();
+    
+        MultiLayerNetwork model = new MultiLayerNetwork(conf);
+        model.init();
+        //print the score with every 1 iteration
+        model.setListeners(new ScoreIterationListener(1));
+    
+        for( int i=0; i<numEpochs; i++ ){
+            model.fit(mnistTrain);
+        }
+    
+    
+        Evaluation eval = new Evaluation(outputNum); //create an evaluation object with 10 possible classes
+        while(mnistTest.hasNext()){
+            DataSet next = mnistTest.next();
+            INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
+            eval.eval(next.getLabels(), output); //check the prediction against the true class
+        }
+    
+        System.out.println(eval.stats());
+        System.out.println(model.summary());
+        System.out.println(conf.toString());
     }
     
     @Test
