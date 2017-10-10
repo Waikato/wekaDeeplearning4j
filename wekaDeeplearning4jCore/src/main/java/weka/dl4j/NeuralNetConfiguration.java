@@ -24,15 +24,10 @@ import java.util.Map;
 public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNetConfiguration implements Serializable, OptionHandler {
   
   /**
-   * NeuralNetConfiguration builder
-   */
-  private Builder builder;
-  
-  /**
    * Constructor that provides default values for the settings.
    */
   public NeuralNetConfiguration() {
-    this.builder = new Builder();
+    this.leakyreluAlpha = 0.01D;
     this.miniBatch = true;
     this.numIterations = 1;
     this.maxNumLineSearchIterations = 5;
@@ -57,6 +52,14 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public OptimizationAlgorithm getOptimizationAlgo() {
     return super.getOptimizationAlgo();
   }
+  
+  @OptionMetadata(
+          displayName = "leaky relu alpha",
+          description = "The parameter for the leaky relu (default = 0.1).",
+          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
+          displayOrder = 1)
+  public double getLeakyreluAlpha() { return super.getLeakyreluAlpha(); }
+  public void setLeakyreluAlpha(double a) { super.setLeakyreluAlpha(a); }
 
   public void setOptimizationAlgo(OptimizationAlgorithm optimAlgorithm) {
     super.setOptimizationAlgo(optimAlgorithm);
@@ -147,17 +150,6 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public StepFunction getStepFunction() { return super.getStepFunction(); }
   public void setStepFunction(StepFunction f) { super.setStepFunction(f); }
   
-  @OptionMetadata(
-          displayName = "updater",
-          description = "The updater to use (default = SGD).",
-          commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
-          displayOrder = 12)
-  public IUpdater getIUpdater(){
-    return this.builder.getIUpdater();
-  }
-  public void setIUpdater(IUpdater iUpdater){
-    this.builder.updater(iUpdater);
-  }
   
   @ProgrammaticProperty
   public int getIterationCount() { return super.getIterationCount(); }
@@ -174,18 +166,6 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   @ProgrammaticProperty
   public boolean isPretrain() { return super.isPretrain(); }
   public void setPretrain(boolean b) { super.setPretrain(b); }
-  
-  
-  public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder
-          implements Serializable{
-    Builder() {
-      super();
-    }
-  
-    public Builder(org.deeplearning4j.nn.conf.NeuralNetConfiguration newConf) {
-      super(newConf);
-    }
-  }
   
 
   /**
