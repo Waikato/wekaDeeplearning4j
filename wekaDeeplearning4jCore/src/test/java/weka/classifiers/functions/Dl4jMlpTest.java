@@ -61,10 +61,6 @@ public class Dl4jMlpTest {
         
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        final Sgd iUpdater = new Sgd();
-        iUpdater.setLearningRate(5);
-        nnc.setIUpdater(iUpdater);
-        
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{outputLayer});
         clf.buildClassifier(data);
