@@ -11,7 +11,7 @@ loss function, gradient descent algorithm, etc.).
 Not many tests have been written for this classifier yet, so expect it to be quite buggy!
 
 ## Installation
-## Use pre-built zips
+### Use pre-built zips
 The [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) provide pre-built zip files of the packages (Core, CPU, GPU, NLP) that allow easy installation via commandline
 ```bash
 java -cp weka.jar weka.core.WekaPackageManager \
