@@ -23,6 +23,7 @@
     <properties>
         <nd4j.version>0.9.1</nd4j.version>
         <dl4j.version>0.9.1</dl4j.version>
+        <weka.version>3.8.1</weka.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8
         </project.reporting.outputEncoding>
@@ -32,15 +33,15 @@
     <dependencies>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-dev</artifactId>
-            <version>3.9.1</version>
+            <artifactId>weka-stable</artifactId>
+            <version>${weka.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-dev</artifactId>
-            <version>3.9.1</version>
+            <artifactId>weka-stable</artifactId>
+            <version>${weka.version}</version>
         </dependency>
 
 
