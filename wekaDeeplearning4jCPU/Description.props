@@ -6,10 +6,10 @@
 PackageName=wekaDeeplearning4jCPU
 
 # Version (required)
-Version=1.1.3
+Version=1.2.0
 
 #Date
-Date=2017-05-21
+Date=2017-10-21
 
 # Title (required)
 Title=Weka wrappers for Deeplearning4j
@@ -31,10 +31,11 @@ Description=Provides a wrapper classifier for feedforward networks, including co
 Changes=Upgraded to deepLearning4j version 0.8.0. Several bug fixes to do with option handling.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://prdownloads.sourceforge.net/weka/wekaDeeplearning4jCPU1.1.3.zip?download
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jCPU.zip
+
 
 # URL for further information
-URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4jCPU
+URL=https://github.com/Waikato/wekaDeeplearning4j
 
 # Enhances various other packages ?
 # Enhances=packageName1,packageName2,...
@@ -43,7 +44,7 @@ URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4jCPU
 #Related=
 
 # Dependencies
-Depends=weka (>=3.9.1-SNAPSHOT), wekaDeeplearning4jCore (>=1.1.2)
+Depends=weka (>=3.9.1-SNAPSHOT), wekaDeeplearning4jCore (>=1.2.0)
 
 # Package(s) that can't be installed alongside this one (old wekaDeepLearning4j)
 Precludes=wekaDeeplearning4j,wekaDeeplearning4jGPU

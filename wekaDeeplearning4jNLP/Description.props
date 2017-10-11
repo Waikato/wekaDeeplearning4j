@@ -6,10 +6,10 @@
 PackageName=wekaDeeplearning4jNLP
 
 # Version (required)
-Version=1.0.0
+Version=1.2.0
 
 #Date
-Date=2016-09-09
+Date=2017-10-11
 
 # Title (required)
 Title=Deep Learning models for NLP
@@ -29,16 +29,17 @@ License=GPL 3.0
 Description= Deep Learning models for NLP.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/felipebravom/WekaDeepLearning4jNLP/releases/download/1.0.0/WekaDeepLearning4jNLP1.0.0.zip
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jNLP.zip
+
 
 # URL for further information
-URL=https://github.com/felipebravom/WekaDeepLearning4jNLP
+URL=https://github.com/Waikato/wekaDeeplearning4j
 
 # Related to other packages?
 #Related=
 
 # Dependencies
-Depends=weka (>=3.8.1), wekaDeeplearning4jCore (>=1.1.2)
+Depends=weka (>=3.9.1-SNAPSHOT), wekaDeeplearning4jCore (>=1.2.0)
 
 #Inject these dependencies at load time
 InjectDependencies=wekaDeeplearning4jCore

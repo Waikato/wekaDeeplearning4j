@@ -1,15 +1,15 @@
 # Template Description file for a Weka package
 #
-# 
+#
 
 # Package name (required)
 PackageName=wekaDeeplearning4jCore
 
 # Version (required)
-Version=1.1.7
+Version=1.2.0
 
 #Date
-Date=2017-07-13
+Date=2017-10-11
 
 # Title (required)
 Title=Weka wrappers for Deeplearning4j
@@ -31,10 +31,10 @@ Description=Provides a wrapper classifier for feedforward networks, including co
 Changes=Code refactoring and clean-up. More options. Bug fixes: last mini batch was skipped in instance-based dataset iterators; serialization now also works in FilteredClassifier, etc.
 
 # Package URL for obtaining the package archive (required)
-PackageURL=http://prdownloads.sourceforge.net/weka/wekaDeeplearning4jCore1.1.7.zip?download
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jCore.zip
 
 # URL for further information
-URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4jCore
+URL=https://github.com/Waikato/wekaDeeplearning4j
 
 # Enhances various other packages ?
 # Enhances=packageName1,packageName2,...
