@@ -17,7 +17,7 @@ Simply run the `build.sh` script in the core directory. This assumes:
   can get the .jar of the nightly snapshot [here](http://www.cs.waikato.ac.nz/~ml/weka/snapshots/developer-branch.zip).
 
 ```
-Usage: bash.sh
+Usage: build.sh
 
 Optional arguments:
    -v/--verbose            Enable verbose mode

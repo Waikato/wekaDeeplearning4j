@@ -20,7 +20,7 @@ PREFIX=wekaDeeplearning4j
 EP="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
 
 function show_usage {
-    echo -e "Usage: bash.sh"
+    echo -e "Usage: build.sh"
     echo -e ""
     echo -e "Optional arguments:"
     echo -e "   -v/--verbose            Enable verbose mode"
