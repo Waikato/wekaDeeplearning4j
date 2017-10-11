@@ -11,6 +11,16 @@ loss function, gradient descent algorithm, etc.).
 Not many tests have been written for this classifier yet, so expect it to be quite buggy!
 
 ## Installation
+## Use pre-built zips
+The [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) provide pre-built zip files of the packages (Core, CPU, GPU, NLP) that allow easy installation via commandline
+```bash
+java -cp weka.jar weka.core.WekaPackageManager \
+     -install-package package.zip
+```
+
+or via the GUI package manager as described [here](http://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2).
+
+### Build locally
 Simply run the `build.sh` script in the core directory. This assumes:
 * You have Ant and Maven installed.
 * WEKA's `weka.jar` file resides somewhere in your Java classpath. The latest and greatest WEKA installation is highly recommended; you
