@@ -22,21 +22,13 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-import java.util.Map;
 
 import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.distribution.Distribution;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.activations.IActivation;
-import weka.dl4j.distribution.NormalDistribution;
 
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.core.OptionHandler;
 import weka.gui.ProgrammaticProperty;
-import weka.dl4j.activations.ActivationIdentity;
 
 /**
  * A version of DeepLearning4j's SubsamplingLayer that implements WEKA option handling.
