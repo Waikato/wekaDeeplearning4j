@@ -22,3 +22,10 @@ org.nd4j.linalg.activations.IActivation =\
 # Uncomment as soon as DL4J allows IUpdater to set the updater-configuration
 #org.nd4j.linalg.learning.config.IUpdater =\
 # weka.dl4j.updater
+
+org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess =\ weka.dl4j.text.tokenization.tokenizer.preprocessor
+
+org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory =\ weka.dl4j.text.tokenization.tokenizerfactory
+
+weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\ weka.dl4j.text.stopwords
+

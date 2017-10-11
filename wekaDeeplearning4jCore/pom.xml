@@ -4,7 +4,7 @@
     <artifactId>wekaDeeplearning4jCore</artifactId>
     <version>1.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>wekaDeeplearning4jCore</name>
+    <name>wekaDeeplearning4jCore-dev</name>
 
     <!--Reference parent-->
     <parent>
@@ -18,5 +18,6 @@
     <dependencies>
         <!--Core dependencies were put into the parent pom to enable the usage
         of those dependencies for further packages that rely on Core-->
+
     </dependencies>
 </project>

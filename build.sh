@@ -5,7 +5,7 @@ install_pack=false
 verbose=false
 clean=false
 out=/dev/null
-PACK=''
+PACK='all'
 
 # Colors
 RED='\e[0;31m'
@@ -26,7 +26,7 @@ function show_usage {
     echo -e "   -v/--verbose            Enable verbose mode"
     echo -e "   -i/--install-packages   Install selected packages"
     echo -e "   -p/--package            Select specific package (default: all)"
-    echo -e "                           Available: ( Core CPU GPU NLP )"
+    echo -e "                           Available: ( Core CPU GPU )"
     echo -e "   -c/--clean              Clean up build-environment"
     echo -e "   -h/--help               Show this message"
     exit 0
@@ -96,9 +96,9 @@ export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${EP}Classpath = " ${CLASSPATH}
 
 # Available modules
-if [[ ${PACK} = '' ]]; then
-    packages=( "Core" "CPU" "GPU" "NLP")
-elif [[ ${PACK} = "Core" || ${PACK} = "CPU" || ${PACK} = "GPU" || ${PACK} = "NLP" ]]; then
+if [[ ${PACK} = 'all' ]]; then
+    packages=( "Core" "CPU" "GPU")
+elif [[ ${PACK} = "Core" || ${PACK} = "CPU" || ${PACK} = "GPU" ]]; then
     packages=( ${PACK} )
 else
     echo -e "${EP}${RED}Invalid package. Exiting now...${NC}"
@@ -128,16 +128,16 @@ function build_package {
     ant -f ${pack}/build_package.xml clean > /dev/null # don't clutter with ant clean output
 
     # Build the package
-    ant -f ${pack}/build_package.xml make_package -Dpackage=${pack} > "$out"
+    ant -f ${pack}/build_package.xml make_package -Dpackage=${pack}"-dev" > "$out"
 
     # Install package from dist dir
     if [[ "$install_pack" = true ]]; then
         # Remove up old packages
         if [[ "$clean" = true ]]; then
-            rm -r ${WEKA_HOME}/packages/${pack}
+            rm -r ${WEKA_HOME}/packages/${pack}"-dev"
         fi
-        echo -e "${EP}Installing ${pack} package..."
-        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${pack}/dist/${pack}.zip
+        echo -e "${EP}Installing ${pack}-dev package..."
+        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${pack}/dist/${pack}"-dev".zip
     fi
 }
 
@@ -145,6 +145,6 @@ function build_package {
 
 for pack in "${packages[@]}"
 do
-    echo -e "${EP}Starting ant build for ${BOLD}"${pack}${NC}
+    echo -e "${EP}Starting ant build for ${BOLD}"${pack}"-dev"${NC}
     build_package ${pack}
 done

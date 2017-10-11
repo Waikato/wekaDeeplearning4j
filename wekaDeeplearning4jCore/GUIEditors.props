@@ -16,3 +16,10 @@ org.nd4j.linalg.activations.IActivation=weka.gui.GenericObjectEditor
 
 # Uncomment as soon as DL4J allows IUpdater to set the updater-configuration
 #org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor
+
+org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess=weka.gui.GenericObjectEditor
+
+org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory=weka.gui.GenericObjectEditor
+
+
+weka.dl4j.text.stopwords.Dl4jAbstractStopwords=weka.gui.GenericObjectEditor

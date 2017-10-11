@@ -54,10 +54,10 @@ import weka.filters.SimpleBatchFilter;
 
 
 /**
- *  <!-- globalinfo-start --> An abstract attribute filter that calculates word embeddings on a String attribute. 
+ *  <!-- globalinfo-start --> An abstract attribute filter that calculates word embeddings on a String attribute.
  * <!-- globalinfo-end -->
- *  
- * 
+ *
+ *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
  * @version $Revision: 1 $
  */
@@ -115,7 +115,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 
 
 	/** the index of the string attribute to be processed. */
-	protected int m_textIndex=1; 
+	protected int m_textIndex=1;
 
 	/** the minimum frequency of a word to be considered. */
 	protected int m_minWordFrequency=5;
@@ -148,15 +148,15 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	 * @see weka.filters.Filter#getOptions()
 	 */
 	@Override
-	public String[] getOptions() {		
+	public String[] getOptions() {
 		return Option.getOptions(this, this.getClass());
 	}
 
 
 	/**
 	 * Parses the options for this object.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param options
 	 *            the options to use
 	 * @throws Exception
@@ -207,7 +207,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 			// Add one attribute for each embedding dimension
 			for(int i=0;i<this.m_layerSize;i++){
 				att.add(new Attribute(m_embedding_prefix+i));
-			}	
+			}
 
 			att.add(new Attribute("word_id", (ArrayList<String>) null));
 
@@ -228,12 +228,12 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 			if(this.m_action.equals(Action.DOC_VECTOR_ADD)||this.m_action.equals(Action.DOC_VECTOR_AVERAGE))
 				for(int i=0;i<this.m_layerSize;i++){
 					att.add(new Attribute(m_embedding_prefix+i));
-				}	
+				}
 			else if(this.m_action.equals(Action.DOC_VECTOR_CONCAT))
 				for(int i=0;i<this.m_concat_words;i++){
 					for(int j=0;j<this.m_layerSize;j++){
 						att.add(new Attribute(m_embedding_prefix+i+","+j));
-					}			
+					}
 				}
 
 
@@ -253,7 +253,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 
 	/**
 	 * Calculates word embeddings from Weka Instances
-	 * 
+	 *
 	 * @param instances the Weka Instances object
 	 */
 	abstract void initiliazeVectors(Instances instances);
@@ -276,7 +276,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 
 
 		// create Embeddings in the first batch
-		if(!isFirstBatchDone())		{	
+		if(!isFirstBatchDone())		{
 			this.initiliazeVectors(instances);
 		}
 
@@ -321,10 +321,10 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 				int m=0;
 				for(String word:words){
 					if(this.vec.hasWord(word)){
-						int j=0;						
-						for(double embDimVal:this.vec.getWordVector(word)){						
+						int j=0;
+						for(double embDimVal:this.vec.getWordVector(word)){
 							if(this.m_action==Action.DOC_VECTOR_AVERAGE){
-								values[result.attribute(m_embedding_prefix+j).index()] += embDimVal/words.size();	
+								values[result.attribute(m_embedding_prefix+j).index()] += embDimVal/words.size();
 							}
 							else if(this.m_action==Action.DOC_VECTOR_ADD){
 								values[result.attribute(m_embedding_prefix+j).index()] += embDimVal;
@@ -336,7 +336,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 							}
 
 							j++;
-						}					
+						}
 					}
 					m++;
 
@@ -382,7 +382,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 					+ "3) Add embeddings of the input string (DOC_VECTOR_ADD), "
 					+ "4) Concatenate the first *concat_words* embeddings of  the input string (DOC_VECTOR_CONCAT), (default WORD_VECTOR).",
 			commandLineParamName = "action", commandLineParamSynopsis = "-level <speficiation>",
-			displayOrder = 1)	
+			displayOrder = 1)
 	public Action getAction() {
 		return m_action;
 	}
@@ -396,7 +396,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 			description = "Number of words (from left to right) of the tweet whose embeddings will be concatenated."
 					+ "This parameter only applies if action=DOC_VECTOR_CONCAT (default = 15).",
 			commandLineParamName = "concat_words", commandLineParamSynopsis = "-concat_words <int>",
-			displayOrder = 2)		
+			displayOrder = 2)
 	public int getConcat_words() {
 		return m_concat_words;
 	}
@@ -409,7 +409,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "stopWordsHandler",
 			description = "The stopWordsHandler. Dl4j Null means no stop words are used.",
 			commandLineParamName = "stopWordsHandler", commandLineParamSynopsis = "-stopWordsHandler <String>",
-			displayOrder = 3)		
+			displayOrder = 3)
 	public Dl4jAbstractStopwords getStopWordsHandler() {
 		return m_stopWordsHandler;
 	}
@@ -422,7 +422,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "tokenizerFactory",
 			description = "The tokenizer factory to use on the strings. Default: DefaultTokenizer.",
 			commandLineParamName = "tokenizerFactory", commandLineParamSynopsis = "-tokenizerFactory <String>",
-			displayOrder = 4)	
+			displayOrder = 4)
 	public TokenizerFactory getTokenizerFactory() {
 		return m_tokenizerFactory;
 	}
@@ -435,10 +435,10 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "preprocessor",
 			description = "The token Preprocessor for preprocessing the Strings. Default: CommonPreprocessor.",
 			commandLineParamName = "preprocessor", commandLineParamSynopsis = "-preprocessor <String>",
-			displayOrder = 5)	
+			displayOrder = 5)
 	/**
 	 * Gets the action for the selected preprocessor.
-	 * 
+	 *
 	 * @return the current action.
 	 */
 	public TokenPreProcess getPreProcessor() {
@@ -447,9 +447,9 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 
 	/**
 	 * Sets the preprocessor action.
-	 * 
+	 *
 	 * @param value the action type
-	 * 
+	 *
 	 */
 	public void setPreProcessor(TokenPreProcess value) {
 		this.m_preprocessor=value;
@@ -462,15 +462,15 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 			displayOrder = 6)
 	/**
 	 * Get the position of the target string.
-	 * 
+	 *
 	 * @return the index of the target string
-	 */	
+	 */
 	public int getTextIndex() {
 		return m_textIndex;
 	}
 	/**
 	 * Set the attribute's index with the string to process.
-	 * 
+	 *
 	 * @param textIndex the index value name
 	 */
 	public void setTextIndex(int textIndex) {
@@ -506,7 +506,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "iterations",
 			description = "The number of iterations (default = 1).",
 			commandLineParamName = "iterations", commandLineParamSynopsis = "-iterations <int>",
-			displayOrder = 9)	
+			displayOrder = 9)
 	public int getIterations() {
 		return m_iterations;
 	}
@@ -530,10 +530,10 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 
 
 
-	@OptionMetadata(displayName = "epochs", 
+	@OptionMetadata(displayName = "epochs",
 			description = "The number of epochs (iterations over whole training corpus) for training (default = 1).",
 			commandLineParamName = "epochs", commandLineParamSynopsis = "-epochs <int>",
-			displayOrder = 11)		
+			displayOrder = 11)
 	public int getEpochs() {
 		return m_epochs;
 	}
@@ -542,10 +542,10 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	}
 
 
-	@OptionMetadata(displayName = "workers", 
+	@OptionMetadata(displayName = "workers",
 			description = "The maximum number of concurrent threads available for training.",
 			commandLineParamName = "workers", commandLineParamSynopsis = "-workers <int>",
-			displayOrder = 12)		
+			displayOrder = 12)
 	public int getWorkers() {
 		return m_workers;
 	}
@@ -558,7 +558,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "seed",
 			description = "The random number seed to be used. (default = 1).",
 			commandLineParamName = "seed", commandLineParamSynopsis = "-seed <int>",
-			displayOrder = 13)	
+			displayOrder = 13)
 	public int getSeed() {
 		return m_seed;
 	}
@@ -571,7 +571,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
 	@OptionMetadata(displayName = "embedding_prefix",
 			description = "The prefix for each embedding attribute. Default: \"embedding-\".",
 			commandLineParamName = "embedding_prefix", commandLineParamSynopsis = "-embedding_prefix <String>",
-			displayOrder = 14)		
+			displayOrder = 14)
 	public String getEmbedding_prefix() {
 		return m_embedding_prefix;
 	}

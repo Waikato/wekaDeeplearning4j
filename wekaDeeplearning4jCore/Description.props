@@ -3,7 +3,7 @@
 #
 
 # Package name (required)
-PackageName=wekaDeeplearning4jCore
+PackageName=wekaDeeplearning4jCore-dev
 
 # Version (required)
 Version=1.2.0
@@ -31,7 +31,7 @@ Description=Provides a wrapper classifier for feedforward networks, including co
 Changes=Update api to dl4j 0.9.1
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jCore.zip
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jCore-dev.zip
 
 # URL for further information
 URL=https://github.com/Waikato/wekaDeeplearning4j

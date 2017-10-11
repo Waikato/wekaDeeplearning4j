@@ -4,7 +4,7 @@
     <artifactId>wekaDeeplearning4jGPU</artifactId>
     <version>1.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>wekaDeeplearning4jGPU</name>
+    <name>wekaDeeplearning4jGPU-dev</name>
 
     <!--Reference parent-->
     <parent>

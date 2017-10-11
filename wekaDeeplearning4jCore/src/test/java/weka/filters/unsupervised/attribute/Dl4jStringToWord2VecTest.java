@@ -5,7 +5,6 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
 
-import java.io.File;
 /**
  * JUnit tests for the Dl4jStringToWord2Vec Filter.
  *

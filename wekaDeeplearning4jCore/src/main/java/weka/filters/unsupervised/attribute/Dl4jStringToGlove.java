@@ -37,9 +37,9 @@ import weka.dl4j.text.sentenceiterator.WekaInstanceSentenceIterator;
 
 /**
  *  <!-- globalinfo-start --> An attribute filter that calculates word embeddings on a String attribute using the Glove implementation provided by
- *   DeepLearning4j. 
+ *   DeepLearning4j.
  * <!-- globalinfo-end -->
- * 
+ *
  * <!-- technical-bibtex-start -->
  * BibTeX:
  * <pre>
@@ -49,13 +49,13 @@ import weka.dl4j.text.sentenceiterator.WekaInstanceSentenceIterator;
  *  Booktitle                = {EMNLP},
  *  Year                     = {2014}
  * }
- * 
- * 
- * 
+ *
+ *
+ *
  * </pre>
  <!-- technical-bibtex-end -->
- *  
- * 
+ *
+ *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
  * @version $Revision: 1 $
  */
@@ -94,10 +94,10 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	
 	/**
 	 * Returns a string describing this filter.
-	 * 
+	 *
 	 * @return a description of the filter suitable for displaying in the
 	 *         explorer/experimenter gui
-	 */	
+	 */
 	@Override
 	public String globalInfo() {
 		return "Calculates word embeddings on a string attribute using the Glove method.\n"
@@ -135,17 +135,17 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	 * @see weka.filters.Filter#getOptions()
 	 */
 	@Override
-	public String[] getOptions() {	
+	public String[] getOptions() {
 		return Option.getOptionsForHierarchy(this, this.getClass().getSuperclass());
-				
+		
 		//return Option.getOptions(this, this.getClass());
 	}
 
 
 	/**
 	 * Parses the options for this object.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param options
 	 *            the options to use
 	 * @throws Exception
@@ -158,7 +158,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	}
 
 	/* (non-Javadoc)
-	 * @see weka.filters.unsupervised.attribute.Dl4jStringToWordEmbeddings#initiliazeVectors(weka.core.Instances)
+	 * @see Dl4jStringToWordEmbeddings#initiliazeVectors(weka.core.Instances)
 	 */
 	@Override
 	void initiliazeVectors(Instances instances) {
@@ -174,7 +174,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 		// Building model
 		this.vec = new Glove.Builder()
 		.iterate(iter)
-		.tokenizerFactory(this.m_tokenizerFactory)		
+		.tokenizerFactory(this.m_tokenizerFactory)
 		.alpha(this.m_alpha)
 		.learningRate(this.m_learningRate)
 		.epochs(this.m_epochs)
@@ -205,7 +205,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	@OptionMetadata(displayName = "learningRate",
 			description = "The learning rate (default = 0.05).",
 			commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-			displayOrder = 15)	
+			displayOrder = 15)
 	public double getLearningRate() {
 		return m_learningRate;
 	}
@@ -216,7 +216,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	@OptionMetadata(displayName = "minLearningRate",
 			description = "This method defines minimal learning rate value for training (default = 1.0E-4).",
 			commandLineParamName = "minLearningRate", commandLineParamSynopsis = "-minLearningRate <double>",
-			displayOrder = 16)	
+			displayOrder = 16)
 	public double getMinLearningRate() {
 		return m_minLearningRate;
 	}
@@ -225,10 +225,10 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	}
 
 
-	@OptionMetadata(displayName = "symetric", 
+	@OptionMetadata(displayName = "symetric",
 			description = "Parameters specifying, if cooccurrences list should be build into both directions from any current word (default = true).",
 			commandLineParamName = "symetric", commandLineParamSynopsis = "-symetric", commandLineParamIsFlag = true,
-			displayOrder = 17)	
+			displayOrder = 17)
 	public boolean isSymetric() {
 		return m_symetric;
 	}
@@ -237,10 +237,10 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	}
 
 
-	@OptionMetadata(displayName = "shuffle", 
+	@OptionMetadata(displayName = "shuffle",
 			description = "Parameter specifying, if cooccurrences list should be shuffled between training epochs (default = true).",
 			commandLineParamName = "shuffle", commandLineParamSynopsis = "-shuffle", commandLineParamIsFlag = true,
-			displayOrder = 18)		
+			displayOrder = 18)
 	public boolean isShuffle() {
 		return m_shuffle;
 	}
@@ -252,7 +252,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	@OptionMetadata(displayName = "xMax",
 			description = "Parameter specifying cutoff in weighting function (default = 100.0).",
 			commandLineParamName = "xMax", commandLineParamSynopsis = "-xMax <double>",
-			displayOrder = 19)		
+			displayOrder = 19)
 	public double getXMax() {
 		return m_xMax;
 	}
@@ -264,7 +264,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	@OptionMetadata(displayName = "alpha",
 			description = "Parameter in exponent of weighting function (default = 0.75).",
 			commandLineParamName = "alpha", commandLineParamSynopsis = "-alpha <double>",
-			displayOrder = 20)		
+			displayOrder = 20)
 	public double getAlpha() {
 		return m_alpha;
 	}
@@ -272,7 +272,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 		this.m_alpha = m_alpha;
 	}
 	
-	@OptionMetadata(displayName = "useAdaGrad", 
+	@OptionMetadata(displayName = "useAdaGrad",
 			description = "This method defines whether adaptive gradients should be used or not (default = false).",
 			commandLineParamName = "useAdaGrad", commandLineParamSynopsis = "-useAdaGrad", commandLineParamIsFlag = true,
 			displayOrder = 21)
@@ -284,16 +284,16 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 	}
 
 
-	@OptionMetadata(displayName = "batchSize", 
+	@OptionMetadata(displayName = "batchSize",
 			description = "The mini-batch size (default = 1000).",
 			commandLineParamName = "batchSize", commandLineParamSynopsis = "-batchSize <int>",
-			displayOrder = 22)	
+			displayOrder = 22)
 	public int getBatchSize() {
 		return m_batchSize;
 	}
 	public void setBatchSize(int m_batchSize) {
 		this.m_batchSize = m_batchSize;
-	}	
+	}
 
 
 
