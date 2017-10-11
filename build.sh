@@ -19,6 +19,19 @@ PREFIX=wekaDeeplearning4j
 
 EP="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
 
+function show_usage {
+    echo -e "Usage: bash.sh"
+    echo -e ""
+    echo -e "Optional arguments:"
+    echo -e "   -v/--verbose            Enable verbose mode"
+    echo -e "   -i/--install-packages   Install selected packages"
+    echo -e "   -p/--package            Select specific package (default: all)"
+    echo -e "                           Available: ( Core CPU GPU NLP )"
+    echo -e "   -c/--clean              Clean up build-environment"
+    echo -e "   -h/--help               Show this message"
+    exit 0
+}
+
 ### BEGIN parse arguments ###
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -41,6 +54,10 @@ case $key in
     ;;
     -c|--clean)
     clean=true
+    shift # past argument
+    ;;
+    -h|--help)
+    show_usage
     shift # past argument
     ;;
     *)    # unknown option

@@ -16,11 +16,24 @@ Simply run the `build.sh` script in the core directory. This assumes:
 * WEKA's `weka.jar` file resides somewhere in your Java classpath. The latest and greatest WEKA installation is highly recommended; you
   can get the .jar of the nightly snapshot [here](http://www.cs.waikato.ac.nz/~ml/weka/snapshots/developer-branch.zip).
 
+```
+Usage: bash.sh
+
+Optional arguments:
+   -v/--verbose            Enable verbose mode
+   -i/--install-packages   Install selected packages
+   -p/--package            Select specific package (default: all)
+                           Available: ( Core CPU GPU NLP )
+   -c/--clean              Clean up build-environment
+   -h/--help               Show this message
+
+```
+
 ## Usage
 
 An example script is provided that can be run on the Iris dataset in the `scripts` directory.
 
-```
+```bash
 java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
      .Dl4jMlpClassifier -S 1 -iterator "weka.dl4j.iterators.DefaultInstancesIterator -bs 1" \
      -normalization "Standardize training data" \
