@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>wekaDeeplearning4jGPULibs</artifactId>
+    <version>1.2.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>wekaDeeplearning4jGPULibs-dev</name>
+
+    <!--Reference parent-->
+    <parent>
+        <groupId>nz.ac.waikato.cms.weka</groupId>
+        <artifactId>wekaDeeplearning4j</artifactId>
+        <version>1.2.0-SNAPSHOT</version>
+    </parent>
+
+
+    <!--GPU specific dependencies-->
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/cuda -->
+        <dependency>
+            <groupId>org.bytedeco.javacpp-presets</groupId>
+            <artifactId>cuda</artifactId>
+            <version>8.0-6.0-1.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.nd4j/nd4j-cuda-8.0 -->
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-cuda-8.0</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
+    </dependencies>
+</project>

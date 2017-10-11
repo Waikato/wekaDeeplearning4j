@@ -14,19 +14,8 @@
     </parent>
 
 
-    <!--GPU specific dependencies-->
+    <!--GPU specific dependencies must be specified in the GPULibs package-->
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/cuda -->
-        <dependency>
-            <groupId>org.bytedeco.javacpp-presets</groupId>
-            <artifactId>cuda</artifactId>
-            <version>8.0-6.0-1.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.nd4j/nd4j-cuda-8.0 -->
-        <dependency>
-            <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-cuda-8.0</artifactId>
-            <version>${nd4j.version}</version>
-        </dependency>
+
     </dependencies>
 </project>

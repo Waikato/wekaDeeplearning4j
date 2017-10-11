@@ -5,7 +5,7 @@ install_pack=false
 verbose=false
 clean=false
 out=/dev/null
-PACK='all'
+PACK=''
 
 # Colors
 RED='\e[0;31m'
@@ -25,8 +25,8 @@ function show_usage {
     echo -e "Optional arguments:"
     echo -e "   -v/--verbose            Enable verbose mode"
     echo -e "   -i/--install-packages   Install selected packages"
-    echo -e "   -p/--package            Select specific package (default: all)"
-    echo -e "                           Available: ( Core CPU GPU )"
+    echo -e "   -p/--package            Select specific package "
+    echo -e "                           Available: ( CPU GPU )"
     echo -e "   -c/--clean              Clean up build-environment"
     echo -e "   -h/--help               Show this message"
     exit 0
@@ -76,6 +76,12 @@ echo -e ${EP}package         = "${PACK}"
 echo ""
 ### END parse arguments ###
 
+if [[ ${PACK} != 'CPU' && ${PACK} != 'GPU' ]]; then
+    echo -e "${EP}${RED}Selected package must be either CPU or GPU!" > /dev/stderr
+    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
+    exit 1
+fi
+
 # If verbose redirect to stdout, else /dev/null
 if [[ "$verbose" = true ]]; then
     out=/dev/stdout
@@ -96,13 +102,10 @@ export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${EP}Classpath = " ${CLASSPATH}
 
 # Available modules
-if [[ ${PACK} = 'all' ]]; then
-    packages=( "Core" "CPU" "GPU")
-elif [[ ${PACK} = "Core" || ${PACK} = "CPU" || ${PACK} = "GPU" ]]; then
-    packages=( ${PACK} )
+if [[ ${PACK} = 'CPU' ]]; then
+    packages=( "Core" "CPU" "CPULibs")
 else
-    echo -e "${EP}${RED}Invalid package. Exiting now...${NC}"
-    exit 1
+    packages=( "Core" "GPU" "GPULibs")
 fi
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then

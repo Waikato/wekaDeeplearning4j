@@ -47,10 +47,10 @@ URL=https://github.com/Waikato/wekaDeeplearning4j
 MessageToDisplayOnInstallation=This package requires CUDA 8 to be installed. See instructions at http://docs.nvidia.com/cuda/
 
 # Dependencies
-Depends=weka (>=3.8.1), wekaDeeplearning4jCore-dev (>=1.2.0)
+Depends=weka (>=3.8.1), wekaDeeplearning4jCore-dev (>=1.2.0), wekaDeeplearning4jGPULibs-dev (>=1.2.0)
 
 # Package(s) that can't be installed alongside this one (old wekaDeepLearning4j, CPU version)
 Precludes=wekaDeeplearning4j,wekaDeeplearning4jCPU-dev
 
 #Inject these dependencies at load time
-InjectDependencies=wekaDeeplearning4jCore-dev
+InjectDependencies=wekaDeeplearning4jCore-dev:wekaDeeplearning4jGPULibs-dev

@@ -44,10 +44,10 @@ URL=https://github.com/Waikato/wekaDeeplearning4j
 #Related=
 
 # Dependencies
-Depends=weka (>=3.8.1), wekaDeeplearning4jCore-dev (>=1.2.0)
+Depends=weka (>=3.8.1), wekaDeeplearning4jCore-dev (>=1.2.0), wekaDeeplearning4jCPULibs-dev (>=1.2.0)
 
 # Package(s) that can't be installed alongside this one (old wekaDeepLearning4j)
 Precludes=wekaDeeplearning4j,wekaDeeplearning4jGPU-dev
 
 #Inject these dependencies at load time
-InjectDependencies=wekaDeeplearning4jCore-dev
+InjectDependencies=wekaDeeplearning4jCore-dev:wekaDeeplearning4jCPULibs-dev

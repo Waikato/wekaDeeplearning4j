@@ -1,0 +1,49 @@
+# Template Description file for a Weka package
+#
+#
+
+# Package name (required)
+PackageName=wekaDeeplearning4jCPULibs-dev
+
+# Version (required)
+Version=1.2.0
+
+#Date
+Date=2017-10-11
+
+# Title (required)
+Title=CPU native libraries for wekaDeeplearning4j
+
+Category=Classification/Regression
+
+# Author (required)
+Author=Christopher Beckham, Eibe Frank and Mark Hall
+
+# Maintainer (required)
+Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
+
+# License (required)
+License=GPL 3.0
+
+# Description (required)
+Description=Provides the CPU native libraries for the wekaDeeplearning4jCPU package
+
+Changes=Update api to dl4j 0.9.1
+
+# Package URL for obtaining the package archive (required)
+PackageURL=http://prdownloads.sourceforge.net/weka/wekaDeeplearning4jCPULibs1.0.1.zip?download
+
+# URL for further information
+URL=http://weka.sourceforge.net/doc.packages/wekaDeeplearning4jCPULibs
+
+# Enhances various other packages ?
+# Enhances=packageName1,packageName2,...
+
+# Related to other packages?
+#Related=
+
+# Dependencies
+Depends=weka (>=3.8.1)
+
+# Package(s) that can't be installed alongside this one
+Precludes=wekaDeeplearning4jGPULibs-dev
