@@ -202,7 +202,6 @@
          <include name="javassist*.jar"/>
          <include name="lombok*.jar"/>
          <include name="nd4j*.jar"/>
-         <include name="opencv*.jar"/>
          <include name="reflections*.jar"/>
          <include name="slf4j*.jar"/>
          <include name="nd4j-native-0*.jar"/>
