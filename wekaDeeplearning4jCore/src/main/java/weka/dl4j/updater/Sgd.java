@@ -12,9 +12,9 @@ public class Sgd extends org.nd4j.linalg.learning.config.Sgd implements Updater 
     
     @OptionMetadata(
             displayName = "learningrate",
-            description = "The learningrate to use (default = 0.001).",
+            description = "The learningrate to use (default = " + DEFAULT_SGD_LR + ").",
             commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-            displayOrder = 12)
+            displayOrder = 0)
     @Override
     public double getLearningRate() {
         return super.getLearningRate();

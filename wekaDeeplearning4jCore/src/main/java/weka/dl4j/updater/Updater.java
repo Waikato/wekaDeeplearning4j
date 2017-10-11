@@ -15,6 +15,8 @@ import java.util.Enumeration;
  */
 public interface Updater extends OptionHandler{
     
+    
+    
     /**
      * Returns an enumeration describing the available options.
      *
