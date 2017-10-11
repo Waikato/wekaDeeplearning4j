@@ -28,7 +28,7 @@ License=GPL 3.0
 # Description (required)
 Description=Provides a wrapper classifier for feedforward networks, including convolutional networks, trained using the Deeplearning4j library. Do *not* install this package directly, instead install either wekaDeeplearning4jCPU (for CPU-based processing) or wekaDeeplearning4jGPU (for GPU-accelerated processing).
 
-Changes=Code refactoring and clean-up. More options. Bug fixes: last mini batch was skipped in instance-based dataset iterators; serialization now also works in FilteredClassifier, etc.
+Changes=Update api to dl4j 0.9.1
 
 # Package URL for obtaining the package archive (required)
 PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jCore.zip

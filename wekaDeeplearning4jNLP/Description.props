@@ -28,6 +28,8 @@ License=GPL 3.0
 # Description (required)
 Description= Deep Learning models for NLP.
 
+Changes=Update api to dl4j 0.9.1
+
 # Package URL for obtaining the package archive (required)
 PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jNLP.zip
 
