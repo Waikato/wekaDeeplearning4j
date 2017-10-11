@@ -137,3 +137,6 @@ lib-full/
 doc/
 dist/
 wekarefs/
+
+# Allow documentation of Core
+!/wekaDeeplearning4jCore/doc/
