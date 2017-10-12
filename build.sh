@@ -127,7 +127,8 @@ ant -f build_package_${BACKEND}.xml make_package -Dpackage=${PACKAGE_NAME} > "$o
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        rm -r ${WEKA_HOME}/packages/${PACKAGE_NAME}
+        rm -r ${WEKA_HOME}/packages/${PREFIX}"CPU-dev"
+        rm -r ${WEKA_HOME}/packages/${PREFIX}"GPU-dev"
     fi
     echo -e "${EP}Installing ${PACKAGE_NAME} package..."
     java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${PACKAGE_NAME}.zip
