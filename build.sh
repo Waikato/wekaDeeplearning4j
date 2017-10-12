@@ -5,7 +5,7 @@ install_pack=false
 verbose=false
 clean=false
 out=/dev/null
-PACK=''
+BACKEND=''
 
 # Colors
 RED='\e[0;31m'
@@ -17,6 +17,8 @@ GREEN='\e[32m'
 # Module prefix
 PREFIX=wekaDeeplearning4j
 
+cd ${PREFIX}Core
+
 EP="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
 
 function show_usage {
@@ -25,7 +27,7 @@ function show_usage {
     echo -e "Optional arguments:"
     echo -e "   -v/--verbose            Enable verbose mode"
     echo -e "   -i/--install-packages   Install selected packages"
-    echo -e "   -p/--package            Select specific package "
+    echo -e "   -b/--backend            Select specific backend "
     echo -e "                           Available: ( CPU GPU )"
     echo -e "   -c/--clean              Clean up build-environment"
     echo -e "   -h/--help               Show this message"
@@ -48,7 +50,7 @@ case $key in
     shift # past argument
     ;;
     -p|--package)
-    PACK="$2"
+    BACKEND="$2"
     shift # past argument
     shift # past value
     ;;
@@ -72,11 +74,11 @@ echo -e ${EP}"Parameters:"
 echo -e ${EP}verbose       = "${verbose}"
 echo -e ${EP}install_pack  = "${install_pack}"
 echo -e ${EP}clean         = "${clean}"
-echo -e ${EP}package         = "${PACK}"
+echo -e ${EP}package         = "${BACKEND}"
 echo ""
 ### END parse arguments ###
 
-if [[ ${PACK} != 'CPU' && ${PACK} != 'GPU' ]]; then
+if [[ ${BACKEND} != 'CPU' && ${BACKEND} != 'GPU' ]]; then
     echo -e "${EP}${RED}Selected package must be either CPU or GPU!" > /dev/stderr
     echo -e "${EP}Exiting now...${NC}" > /dev/stderr
     exit 1
@@ -101,53 +103,35 @@ fi
 export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${EP}Classpath = " ${CLASSPATH}
 
-# Available modules
-if [[ ${PACK} = 'CPU' ]]; then
-    packages=( "Core" "CPU" "CPULibs")
-else
-    packages=( "Core" "GPU" "GPULibs")
-fi
+BASE=${PREFIX}Core
+PACKAGE_NAME=${PREFIX}${BACKEND}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    echo -e "${EP}Cleaning up lib in each package..."
-    for sub in "${packages[@]}"
-    do
-        pack=${PREFIX}${sub}
-        rm ${pack}/lib/*
-        mvn clean > /dev/null # don't clutter with mvn clean output
-    done
+    rm lib/*
+    mvn clean > /dev/null # don't clutter with mvn clean output
 fi
 
 # Compile source code with maven
 echo -e "${EP}Pulling dependencies via maven..."
 mvn -DskipTests=true install >  "$out"
 
+echo -e "${EP}Starting ant build for ${BOLD}"${BASE}"-dev"${NC}
 
+# Clean-up
+ant -f build_package_${BACKEND}.xml clean > /dev/null # don't clutter with ant clean output
 
-function build_package {
-    pack=${PREFIX}$1
+# Build the package
+ant -f build_package_${BACKEND}.xml make_package -Dpackage=${PACKAGE_NAME} > "$out"
 
-    # Clean-up
-    ant -f ${pack}/build_package.xml clean > /dev/null # don't clutter with ant clean output
-
-    # Build the package
-    ant -f ${pack}/build_package.xml make_package -Dpackage=${pack}"-dev" > "$out"
-
-    # Install package from dist dir
-    if [[ "$install_pack" = true ]]; then
-        # Remove up old packages
-        if [[ "$clean" = true ]]; then
-            rm -r ${WEKA_HOME}/packages/${pack}"-dev"
-        fi
-        echo -e "${EP}Installing ${pack}-dev package..."
-        java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package ${pack}/dist/${pack}"-dev".zip
+# Install package from dist dir
+if [[ "$install_pack" = true ]]; then
+    # Remove up old packages
+    if [[ "$clean" = true ]]; then
+        rm -r ${WEKA_HOME}/packages/${PACKAGE_NAME}
     fi
-}
+    echo -e "${EP}Installing ${PACKAGE_NAME} package..."
+    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${PACKAGE_NAME}.zip
+fi
 
-
-
-for pack in "${packages[@]}"
-do
-    echo -e "${EP}Starting ant build for ${BOLD}"${pack}"-dev"${NC}
-    build_package ${pack}
-done
+# Go back
+cd ..

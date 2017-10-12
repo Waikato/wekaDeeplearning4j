@@ -3,7 +3,7 @@
 #
 
 # Package name (required)
-PackageName=wekaDeeplearning4jCore-dev
+PackageName=wekaDeeplearning4jCPU-dev
 
 # Version (required)
 Version=1.2.0
