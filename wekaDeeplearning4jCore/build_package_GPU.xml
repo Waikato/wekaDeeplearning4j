@@ -213,6 +213,7 @@
         <include name="slf4j*.jar"/>
         <include name="ark-tweet-nlp*.jar" />
         <include name="commons-lang-*.jar" />
+        <include name="javacpp*.jar"/>
 
         <!--GPU specific-->
         <include name="cuda*.jar"/>

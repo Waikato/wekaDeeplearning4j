@@ -210,11 +210,11 @@
         <include name="slf4j*.jar"/>
         <include name="ark-tweet-nlp*.jar" />
         <include name="commons-lang-*.jar" />
+        <include name="javacpp*.jar"/>
 
         <!--CPU specific-->
         <include name="nd4j-native-0*.jar"/>
         <include name="openblas*.jar"/>
-        <include name="javacpp*.jar"/>
 
         <!--Excludes-->
         <exclude name="deeplearning4j-nn-*.jar"/>
