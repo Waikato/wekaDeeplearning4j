@@ -229,6 +229,14 @@
         <include name="deeplearning4j-nn-*.jar"/>
         <include name="deeplearning4j-nlp-*.jar"/>
         <include name="nd4j-api-*.jar"/>
+        <include name="nd4j-api-*.jar"/>
+        <include name="nd4j-base64*.jar"/>
+        <include name="nd4j-buffer*.jar"/>
+        <include name="nd4j-common*.jar"/>
+        <include name="nd4j-context*.jar"/>
+        <include name="nd4j-jackson*.jar"/>
+        <include name="nd4j-native-api*.jar"/>
+        <include name="slf4j-api-*.jar"/>
       </fileset>
     </copy>
 
