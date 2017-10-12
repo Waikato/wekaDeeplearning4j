@@ -45,5 +45,8 @@ URL=https://github.com/Waikato/wekaDeeplearning4j
 # Dependencies
 Depends=weka (>=3.8.1)
 
-# Package(s) that can't be installed alongside this one (old wekaDeepLearning4j)
-Precludes=wekaDeeplearning4j
+
+# Package(s) that can't be installed alongside this one
+# - old wekaDeeplearning4j
+# - CPU version of this package (CPU-dev)
+Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jCPU-dev
