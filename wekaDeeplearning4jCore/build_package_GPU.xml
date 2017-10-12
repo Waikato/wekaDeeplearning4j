@@ -188,12 +188,8 @@
     <mkdir dir="${dist}/${package}/lib"/>
     <copy todir="${dist}/${package}/lib" >
       <fileset dir="${lib}">
-        <!--<include name="*.jar"/>-->
-
         <!--Includes-->
-        <!--<include name="*.zip"/>-->
         <include name="deeplearning*.jar"/>
-        <!--<include name="nd4j-native-0*.jar"/>-->
         <include name="common*.jar"/>
         <include name="datavec*.jar"/>
         <include name="guava*.jar"/>
