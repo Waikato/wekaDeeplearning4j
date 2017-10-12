@@ -21,7 +21,7 @@ java -cp weka.jar weka.core.WekaPackageManager \
 or via the GUI package manager as described [here](http://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2).
 
 ### Build locally
-Simply run the `build.sh` script in the core directory. This assumes:
+Simply run the `build.sh` script. This assumes:
 * You have Ant and Maven installed.
 * WEKA's `weka.jar` file resides somewhere in your Java classpath. The latest and greatest WEKA installation is highly recommended; you
   can get the .jar of the nightly snapshot [here](http://www.cs.waikato.ac.nz/~ml/weka/snapshots/developer-branch.zip).
@@ -67,8 +67,15 @@ This package is structured into three different modules/weka-packages:
 - CPU: CPU specific code and dependencies
 - GPU: GPU specific code and dependencies
 
+## Documentation
+
+The java-doc for the Core module can be found [here](https://waikato.github.io/wekaDeeplearning4j/wekaDeeplearning4jCore/doc/).
+
 ## Design philosophy
 
 DL4J is not primarily intended for research purposes -- rather more commercial and convention endeavours -- and so for more research-oriented
 tasks, a library such as Theano should be used in conjunction with the WekaPyScript package which allows WEKA classifiers to be prototyped in
 Python.
+
+## Misc
+Original code by Mark Hall
