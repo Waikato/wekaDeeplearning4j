@@ -44,3 +44,6 @@ Depends=weka (>=3.8.1)
 # - old wekaDeeplearning4j
 # - CPU version of this package (CPU-dev)
 Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jCPU-dev
+
+
+MessageToDisplayOnInstallation=This package requires CUDA to be installed.
