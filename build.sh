@@ -113,7 +113,7 @@ fi
 
 # Compile source code with maven
 echo -e "${EP}Pulling dependencies via maven..."
-mvn -DskipTests=true install >  "$out"
+mvn -DskipTests=true -P ${BACKEND} install >  "$out"
 
 echo -e "${EP}Starting ant build for ${BOLD}"${BASE}"-dev"${NC}
 
