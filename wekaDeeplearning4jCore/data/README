@@ -1,5 +1,0 @@
-The mnist-minimal data has just enough data to try out a simple convolutional network. However, as there are only 10 images, you will not get sensible results.
-
-A very simple example configuration of a convolutional network for WEKA is given below. You will need to adjust the imagesLocation to give the path to the mnist-minimal folder on your system. The configuration can be pasted into WEKA's GUIs.
-
-weka.classifiers.functions.Dl4jMlpClassifier -S 1 -iterator "weka.dl4j.iterators.ImageDataSetIterator -imagesLocation wekaDeeplearning4j/data/mnist-minimal -bs 1 -numChannels 1  -width 28 -height 28 " -layer "weka.dl4j.layers.ConvolutionLayer -activation \"weka.dl4j.activations.ActivationIdentity\" -lr 0.0001 -blr 0.0001 -nFilters 5 -kernelSizeX 5 -kernelSizeY 5 -paddingX 0 -paddingY 0 -strideX 1 -strideY 1" -layer "weka.dl4j.layers.DenseLayer -nOut 20 -activation \"weka.dl4j.activations.ActivationReLU\" -lr 0.0001 -blr 0.0001" -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax\" -lossFn weka.dl4j.lossfunctions.LossMCXENT -lr 0.0001 -blr 0.0001" -numEpochs 100
