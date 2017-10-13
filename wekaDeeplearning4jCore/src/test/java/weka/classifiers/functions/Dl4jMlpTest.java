@@ -266,7 +266,7 @@ public class Dl4jMlpTest {
      * @return ImageDataSetIterator
      */
     private ImageDataSetIterator loadMnistImageIterator() {
-        final String imagesPath = "../datasets/nominal/mnist-minimal";
+        final String imagesPath = "datasets/nominal/mnist-minimal";
         ImageDataSetIterator imgIter = new ImageDataSetIterator();
         imgIter.setImagesLocation(new File(imagesPath));
         final int height = 28;
@@ -285,7 +285,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadIris() throws Exception {
-        DataSource ds = new DataSource("../datasets/nominal/iris.arff");
+        DataSource ds = new DataSource("datasets/nominal/iris.arff");
         Instances data = ds.getDataSet();
         data.setClassIndex(data.numAttributes() - 1);
         return data;
@@ -297,7 +297,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadDiabetes() throws Exception {
-        DataSource ds = new DataSource("../datasets/numeric/diabetes_numeric.arff");
+        DataSource ds = new DataSource("datasets/numeric/diabetes_numeric.arff");
         Instances data = ds.getDataSet();
         data.setClassIndex(data.numAttributes() - 1);
         return data;
@@ -309,7 +309,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadMnistMinimalMeta() throws Exception {
-        DataSource ds = new DataSource("../datasets/nominal/mnist.meta.minimal.arff");
+        DataSource ds = new DataSource("datasets/nominal/mnist.meta.minimal.arff");
         Instances data = ds.getDataSet();
         data.setClassIndex(data.numAttributes() - 1);
         return data;

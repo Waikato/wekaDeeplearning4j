@@ -9,5 +9,5 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
      -config "weka.dl4j.NeuralNetConfiguration -leakyreluAlpha 0.01 -learningRatePolicy None -lrPolicyDecayRate NaN -lrPolicyPower NaN -lrPolicySteps NaN -maxNumLineSearchIterations 5 -minimize -numIterations 1 -algorithm STOCHASTIC_GRADIENT_DESCENT -stepFunction \"weka.dl4j.stepfunctions.NegativeGradientStepFunction \" -useRegularization" \
      -numEpochs 10 \
      -queueSize 0 \
-     -t ../datasets/numeric/diabetes_numeric.arff \
+     -t ../wekaDeeplearning4jCore/datasets/numeric/diabetes_numeric.arff \
      -no-cv

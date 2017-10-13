@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 java -cp ${WEKA_HOME}/weka.jar weka.Run .Dl4jStringToWord2Vec \
-    -i ../datasets/text/ReutersCorn-train.arff \
+    -i ../wekaDeeplearning4jCore/datasets/text/ReutersCorn-train.arff \
     -batchSize 512 \
     -learningRate 0.025 \
     -minLearningRate 1.0E-4 \
