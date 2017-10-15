@@ -6,6 +6,8 @@ pages:
     - Home: index.md
     - Installation: install.md
 
-    - User Guide:
-        - 'Classifying iris': 'user-guide/classifying-iris.md'
-    - About: about.md
+    - Getting Started: getting-started.md
+    - Examples:
+        - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
+        - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
+    - Troubleshooting: troubleshooting.md

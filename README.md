@@ -1,18 +1,15 @@
 # wekaDeeplearning4j
-
-**Warning: this project is in very early stages and may change a lot.**
-
 DL4J wrapper for WEKA. Original code written by Mark Hall. This package currently introduces a new classifier,
 `Dl4jMlpClassifier`, which allows arbitrary-depth MLPs to be built with a degree of flexibility (e.g. type of weight initialisation,
 loss function, gradient descent algorithm, etc.).
 
-<img src="https://raw.githubusercontent.com/christopher-beckham/wekaDeeplearning4j/master/images/gui.png" alt="img" width="700" />
+The full documentation, giving installation instructions and getting started guides, is available [here](https://waikato.github.io/wekaDeeplearning4j/).
 
-Not many tests have been written for this classifier yet, so expect it to be quite buggy!
+![Weka workbench GUI](docs/img/gui.png)
 
 ## Installation
 ### Use pre-built zips
-The [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) provide pre-built zip files of the packages (Core, CPU, GPU, NLP) that allow easy installation via commandline
+The [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) provide pre-built zip files of the packages that allow easy installation via commandline
 ```bash
 java -cp weka.jar weka.core.WekaPackageManager \
      -install-package package.zip
@@ -32,11 +29,10 @@ Usage: build.sh
 Optional arguments:
    -v/--verbose            Enable verbose mode
    -i/--install-packages   Install selected packages
-   -p/--package            Select specific package (default: all)
-                           Available: ( Core CPU GPU )
+   -b/--backend            Select specific backend 
+                           Available: ( CPU GPU )
    -c/--clean              Clean up build-environment
    -h/--help               Show this message
-
 ```
 
 ## Usage
@@ -59,17 +55,9 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
 This trains a one-hidden-layer MLP with 10 units on the Iris dataset. Nesterov momentum is used in conjunction with SGD and the initial
 learning rate and momentum is set to 0.01 and 0.9, respectively. The network is trained for 100 iterations.
 
-## Structure
-
-This package is structured into three different modules/weka-packages:
-
-- Core: Core code and dependencies
-- CPU: CPU specific code and dependencies
-- GPU: GPU specific code and dependencies
-
 ## Documentation
 
-The java-doc for the Core module can be found [here](https://waikato.github.io/wekaDeeplearning4j/wekaDeeplearning4jCore/doc/).
+The java-doc can be found [here](https://waikato.github.io/wekaDeeplearning4j/doc/).
 
 ## Design philosophy
 
