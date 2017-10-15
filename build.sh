@@ -5,21 +5,21 @@ install_pack=false
 verbose=false
 clean=false
 out=/dev/null
-BACKEND=''
+backend=''
 
 # Colors
-RED='\e[0;31m'
-NC='\e[0m' # Reset attributes
-BOLD='\e[1m'
-GREEN='\e[32m'
+red='\e[0;31m'
+nc='\e[0m' # Reset attributes
+bold='\e[1m'
+green='\e[32m'
 
 
 # Module prefix
-PREFIX=wekaDeeplearning4j
+prefix=wekaDeeplearning4j
 
-cd ${PREFIX}Core
+cd ${prefix}Core
 
-EP="${BOLD}[${GREEN}${PREFIX} build.sh${NC}${BOLD}]${NC}: "
+ep="${bold}[${green}${prefix} build.sh${nc}${bold}]${nc}: "
 
 function show_usage {
     echo -e "Usage: build.sh"
@@ -50,7 +50,7 @@ case $key in
     shift # past argument
     ;;
     -p|--package)
-    BACKEND="$2"
+    backend="$2"
     shift # past argument
     shift # past value
     ;;
@@ -70,17 +70,28 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-echo -e ${EP}"Parameters:"
-echo -e ${EP}verbose       = "${verbose}"
-echo -e ${EP}install_pack  = "${install_pack}"
-echo -e ${EP}clean         = "${clean}"
-echo -e ${EP}package         = "${BACKEND}"
+echo -e ${ep}"Parameters:"
+echo -e ${ep}verbose       = "${verbose}"
+echo -e ${ep}install_pack  = "${install_pack}"
+echo -e ${ep}clean         = "${clean}"
+echo -e ${ep}package         = "${backend}"
 echo ""
 ### END parse arguments ###
 
-if [[ ${BACKEND} != 'CPU' && ${BACKEND} != 'GPU' ]]; then
-    echo -e "${EP}${RED}Selected package must be either CPU or GPU!" > /dev/stderr
-    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
+# Get platform
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=linux;;
+    Darwin*)    machine=macosx;;
+    CYGWIN*)    machine=windows;;
+    MINGW*)     machine=windows;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+
+if [[ ${backend} != 'CPU' && ${backend} != 'GPU' ]]; then
+    echo -e "${ep}${red}Selected package must be either CPU or GPU!" > /dev/stderr
+    echo -e "${ep}Exiting now...${nc}" > /dev/stderr
     exit 1
 fi
 
@@ -91,20 +102,20 @@ fi
 
 # Check if env var is set and weka.jar could be found
 if [[ -z "$WEKA_HOME" ]]; then
-    echo -e "${EP}${RED}WEKA_HOME env variable is not set!" > /dev/stderr
-    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
+    echo -e "${ep}${red}WEKA_HOME env variable is not set!" > /dev/stderr
+    echo -e "${ep}Exiting now...${nc}" > /dev/stderr
     exit 1
 elif [[ ! -e "$WEKA_HOME/weka.jar" ]]; then
-    echo -e "${EP}${RED}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
-    echo -e "${EP}Exiting now...${NC}" > /dev/stderr
+    echo -e "${ep}${red}WEKA_HOME=${WEKA_HOME} does not contain weka.jar!" > /dev/stderr
+    echo -e "${ep}Exiting now...${nc}" > /dev/stderr
     exit 1
 fi
 
 export CLASSPATH=${WEKA_HOME}/weka.jar
-echo -e "${EP}Classpath = " ${CLASSPATH}
+echo -e "${ep}Classpath = " ${CLASSPATH}
 
-BASE=${PREFIX}Core
-PACKAGE_NAME=${PREFIX}${BACKEND}"-dev"
+base=${prefix}Core
+pack_name=${prefix}${backend}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
     rm lib/*
@@ -112,26 +123,26 @@ if [[ "$clean" = true ]]; then
 fi
 
 # Compile source code with maven
-echo -e "${EP}Pulling dependencies via maven..."
-mvn -DskipTests=true -P ${BACKEND} install >  "$out"
+echo -e "${ep}Pulling dependencies via maven..."
+mvn -DskipTests=true -P ${backend} install >  "$out"
 
-echo -e "${EP}Starting ant build for ${BOLD}"${BASE}"-dev"${NC}
+echo -e "${ep}Starting ant build for ${bold}"${base}"-dev"${nc}
 
 # Clean-up
-ant -f build_package_${BACKEND}.xml clean > /dev/null # don't clutter with ant clean output
+ant -f build_package_${backend}.xml clean > /dev/null # don't clutter with ant clean output
 
 # Build the package
-ant -f build_package_${BACKEND}.xml make_package -Dpackage=${PACKAGE_NAME} > "$out"
+ant -f build_package_${backend}.xml make_package -Dpackage=${pack_name} > "$out"
 
 # Install package from dist dir
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        rm -r ${WEKA_HOME}/packages/${PREFIX}"CPU-dev"
-        rm -r ${WEKA_HOME}/packages/${PREFIX}"GPU-dev"
+        rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev"
+        rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev"
     fi
-    echo -e "${EP}Installing ${PACKAGE_NAME} package..."
-    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${PACKAGE_NAME}.zip
+    echo -e "${ep}Installing ${pack_name} package..."
+    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${pack_name}-${machine}-x86_64.zip
 fi
 
 # Go back

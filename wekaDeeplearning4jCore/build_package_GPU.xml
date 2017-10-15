@@ -13,7 +13,7 @@
   <property name="src" value="src/main/java"/>
   <property name="src-test" value="src/test/java"/>
   <property name="lib" value="lib" />
-  <property name="data" value="data" />
+  <property name="data" value="datasets" />
   <property name="build" value="build"/>
   <property name="dist"  value="dist"/>
   <property name="doc"  value="doc"/>
@@ -21,6 +21,9 @@
   <property name="debug" value="on" />
   <property name="project.revision" value="" />
   <property name="package" value="wekaDeeplearning4jGPU-dev"/>
+  <property name="package-linux" value="${package}-linux-x86_64"/>
+  <property name="package-macosx" value="${package}-macosx-x86_64"/>
+  <property name="package-windows" value="${package}-windows-x86_64"/>
 
   <property file="build.properties"
             description="Properties customized for your particular project belong in this file." />
@@ -269,11 +272,50 @@
         <include name="src/**/*.matrix"/>
       </fileset>
     </copy>
-    <zip destfile="${dist}/${package}${project.revision}.zip"
-         basedir="${dist}/${package}">
-    </zip>
-    <copy file="${dist}/${package}/${package}.jar"
-          todir="${dist}"/>
+
+    <!--Build different packages for different platforms-->
+    <copydir src="${dist}/${package}" dest="${dist}/${package-linux}"/>
+    <copydir src="${dist}/${package}" dest="${dist}/${package-macosx}"/>
+    <copydir src="${dist}/${package}" dest="${dist}/${package-windows}"/>
+
+    <!--Remove wrong libraries from platform packages-->
+    <!--Keep linux-x86_64 libs-->
+    <delete>
+      <fileset dir="${dist}/${package-linux}/lib">
+        <include name="*linux*.jar"/>
+        <include name="*windows*.jar"/>
+        <include name="*macosx*.jar"/>
+        <include name="*android*.jar"/>
+        <exclude name="*linux-x86_64.jar"/>
+      </fileset>
+    </delete>
+
+    <!--Keep macosx-x86_64 libs-->
+    <delete>
+      <fileset dir="${dist}/${package-macosx}/lib">
+        <include name="*linux*.jar"/>
+        <include name="*windows*.jar"/>
+        <include name="*macosx*.jar"/>
+        <include name="*android*.jar"/>
+        <exclude name="*macosx-x86_64.jar"/>
+      </fileset>
+    </delete>
+
+    <!--Keep windows-x86_64 libs-->
+    <delete>
+      <fileset dir="${dist}/${package-windows}/lib">
+        <include name="*linux*.jar"/>
+        <include name="*windows*.jar"/>
+        <include name="*macosx*.jar"/>
+        <include name="*android*.jar"/>
+        <exclude name="*windows-x86_64.jar"/>
+      </fileset>
+    </delete>
+
+    <zip destfile="${dist}/${package-linux}${project.revision}.zip" basedir="${dist}/${package-linux}"/>
+    <zip destfile="${dist}/${package-macosx}${project.revision}.zip" basedir="${dist}/${package-macosx}"/>
+    <zip destfile="${dist}/${package-windows}${project.revision}.zip" basedir="${dist}/${package-windows}"/>
+    <copy file="${dist}/${package}/${package}.jar" todir="${dist}"/>
   </target>
 
   <!-- Put all .java, and .props files into ${dist}/${package}-src.jar-->
