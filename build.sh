@@ -13,6 +13,8 @@ nc='\e[0m' # Reset attributes
 bold='\e[1m'
 green='\e[32m'
 
+# Project version
+version="1.2.0"
 
 # Module prefix
 prefix=wekaDeeplearning4j
@@ -115,7 +117,7 @@ export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${ep}Classpath = " ${CLASSPATH}
 
 base=${prefix}Core
-pack_name=${prefix}${backend}"-dev"
+pack_name=${prefix}${backend}-${version}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
     rm lib/*

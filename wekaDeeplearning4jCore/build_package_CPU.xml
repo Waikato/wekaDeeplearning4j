@@ -20,7 +20,8 @@
   <property name="javac_max_memory" value="256m"/>
   <property name="debug" value="on" />
   <property name="project.revision" value="" />
-  <property name="package" value="wekaDeeplearning4jCPU-dev"/>
+  <property name="version" value="1.2.0" />
+  <property name="package" value="wekaDeeplearning4jCPU-${version}-dev"/>
   <property name="package-linux" value="${package}-linux-x86_64"/>
   <property name="package-macosx" value="${package}-macosx-x86_64"/>
   <property name="package-windows" value="${package}-windows-x86_64"/>
@@ -168,8 +169,8 @@
   </target>
 
   <target name="make_package" depends="exejar" description="Make the package zip file. Run with -Dpackage=[package name]">
-    <copydir src="${data}" dest="${dist}/${package}/${data}"/>
     <mkdir dir="${dist}/${package}"/>
+    <copydir src="${data}" dest="${dist}/${package}/${data}"/>
     <copy todir="${dist}/${package}">
       <fileset dir="${dist}">
         <include name="*.jar"/>
