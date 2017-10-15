@@ -143,7 +143,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /** Coefficients used for normalizing the class */
   protected double m_x1 = 1.0;
   protected double m_x0 = 0.0;
-
+  
+  /**
+   * Flag for ScoreIterationListener
+   */
+  private boolean m_enableScoreIterationListener = false;
+  
   /**
    * The main method for running this class.
    *
@@ -533,8 +538,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
 
       ArrayList<IterationListener> listeners = new ArrayList<IterationListener>();
-      listeners.add(new ScoreIterationListener(data.numInstances()
-              / getDataSetIterator().getTrainBatchSize()));
+      if (m_enableScoreIterationListener){
+        listeners.add(new ScoreIterationListener(data.numInstances()
+                / getDataSetIterator().getTrainBatchSize()));
+      }
 
       // if the log file doesn't point to a directory, set up the listener
       if (getLogFile() != null && !getLogFile().isDirectory()) {
@@ -598,7 +605,15 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     m_Data = null;
   }
-
+  
+  /**
+   * Enables the score iteration listener.
+   * @param enabled Flag for score iteration listener
+   */
+  public void enableScoreIterationListener(boolean enabled){
+    m_enableScoreIterationListener = enabled;
+  }
+  
   /**
    * Performs efficient batch prediction
    *

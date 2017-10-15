@@ -1,6 +1,7 @@
 package weka.classifiers.functions;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -9,13 +10,17 @@ import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.*;
+import weka.dl4j.lossfunctions.LossMCXENT;
 
 import java.io.File;
+import java.io.FileReader;
+import java.util.Random;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier.
@@ -73,14 +78,28 @@ public class Dl4jMlpTest {
         Instances data = loadIris();
         data.setClassIndex(data.numAttributes() - 1);
         
+        // Define layers
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
         outputLayer.setWeightInit(WeightInit.XAVIER);
+        outputLayer.setUpdater(Updater.SGD);
+        outputLayer.setLearningRate(0.01);
+        outputLayer.setBiasLearningRate(0.01);
+        outputLayer.setLossFn(new LossMCXENT());
         
+        // Configure neural network
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+        
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{outputLayer});
+        clf.setNumEpochs(10);
+    
+        Evaluation eval = new Evaluation(data);
+        eval.crossValidateModel(clf, data,10, new Random(1));
+    
+        System.out.println(eval.toSummaryString());
+        
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
         
@@ -111,6 +130,7 @@ public class Dl4jMlpTest {
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
         outputLayer.setWeightInit(WeightInit.XAVIER);
+        outputLayer.setLossFn(new LossMCXENT());
         
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
@@ -253,10 +273,16 @@ public class Dl4jMlpTest {
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, convLayer3, poolLayer3, denseLayer, outputLayer});
+    
+        // Evaluate the network
+        Evaluation eval = new Evaluation(data);
+        int numFolds = 3;
+        eval.crossValidateModel(clf, data, numFolds, new Random(1));
+    
+        System.out.println(eval.toSummaryString());
+        
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
-        
-        
         Assert.assertEquals(NUM_INSTANCES_MNIST, res.length);
         Assert.assertEquals(NUM_CLASSES_MNIST, res[0].length);
     }
@@ -285,8 +311,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadIris() throws Exception {
-        DataSource ds = new DataSource("datasets/nominal/iris.arff");
-        Instances data = ds.getDataSet();
+        Instances data = new Instances(new FileReader("datasets/nominal/iris.arff"));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
@@ -297,8 +322,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadDiabetes() throws Exception {
-        DataSource ds = new DataSource("datasets/numeric/diabetes_numeric.arff");
-        Instances data = ds.getDataSet();
+        Instances data = new Instances(new FileReader("datasets/numeric/diabetes_numeric.arff"));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
@@ -309,8 +333,7 @@ public class Dl4jMlpTest {
      * @throws Exception IO error.
      */
     private Instances loadMnistMinimalMeta() throws Exception {
-        DataSource ds = new DataSource("datasets/nominal/mnist.meta.minimal.arff");
-        Instances data = ds.getDataSet();
+        Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
