@@ -131,10 +131,10 @@ mvn -DskipTests=true -P ${backend} install >  "$out"
 echo -e "${ep}Starting ant build for ${bold}"${base}"-dev"${nc}
 
 # Clean-up
-ant -f build_package_${backend}.xml clean > /dev/null # don't clutter with ant clean output
+ant -f build_package.xml clean > /dev/null # don't clutter with ant clean output
 
 # Build the package
-ant -f build_package_${backend}.xml make_package -Dpackage=${pack_name} > "$out"
+ant -f build_package.xml make_package_${backend} > "$out"
 
 # Install package from dist dir
 if [[ "$install_pack" = true ]]; then
