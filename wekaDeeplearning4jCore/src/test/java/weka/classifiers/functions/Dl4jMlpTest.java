@@ -1,10 +1,13 @@
 package weka.classifiers.functions;
 
+import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.zoo.model.LeNet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
@@ -12,14 +15,18 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.*;
+import weka.dl4j.listener.BatchListener;
+import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.filters.Filter;
+import weka.filters.unsupervised.instance.RemovePercentage;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Random;
 
 /**
@@ -93,13 +100,15 @@ public class Dl4jMlpTest {
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{outputLayer});
-        clf.setNumEpochs(10);
-    
+        clf.setNumEpochs(100);
+
+        // Evaluate the network
         Evaluation eval = new Evaluation(data);
-        eval.crossValidateModel(clf, data,10, new Random(1));
-    
+        int numFolds = 10;
+        eval.crossValidateModel(clf, data, numFolds, new Random(1));
+
         System.out.println(eval.toSummaryString());
-        
+
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
         
@@ -301,7 +310,6 @@ public class Dl4jMlpTest {
         imgIter.setHeight(height);
         imgIter.setWidth(width);
         imgIter.setNumChannels(channels);
-        imgIter.setTrainBatchSize(1);
         return imgIter;
     }
     
@@ -427,5 +435,51 @@ public class Dl4jMlpTest {
         
         Assert.assertEquals(NUM_INSTANCES_MNIST, res.length);
         Assert.assertEquals(NUM_CLASSES_MNIST, res[0].length);
+    }
+
+    @Test
+    public void testLeNetZooModel() throws IOException {
+        LeNet model = new LeNet(10, 1, 1);
+        model.setInputShape(new int[][]{new int[]{1, 28, 28}});
+        org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = model.conf();
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        MultiLayerNetwork mln = new MultiLayerNetwork(conf);
+
+        MnistDataSetIterator train = new MnistDataSetIterator(4, 1000, false, true, true, 1);
+        MnistDataSetIterator test = new MnistDataSetIterator(4, 100, false, false, true, 1);
+
+        while (train.hasNext()){
+            DataSet next = train.next();
+            System.out.println("next.numExamples() = " + next.numExamples());
+            mln.fit(next);
+            org.deeplearning4j.eval.Evaluation evaluate = mln.evaluate(test);
+            System.out.println(evaluate.accuracy());
+        }
+    }
+
+    @Test
+    public void testLeNetWrapper() throws Exception {
+        // CLF
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        clf.setSeed(1);
+        clf.setNumEpochs(1);
+
+        // Data
+        Instances data = loadMnistMinimalMeta();
+        data.setClassIndex(data.numAttributes() - 1);
+        ImageDataSetIterator iterator = loadMnistImageIterator();
+        iterator.setTrainBatchSize(16);
+        clf.setDataSetIterator(iterator);
+        clf.setZooModel(new weka.dl4j.zoo.LeNet());
+        clf.setNumEpochs(20);
+        clf.setIterationListener(new BatchListener());
+
+        // Evaluate the network
+        Evaluation eval = new Evaluation(data);
+        int numFolds = 2;
+        eval.crossValidateModel(clf, data, numFolds, new Random(1));
+
+        System.out.println(eval.toSummaryString());
+
     }
 }

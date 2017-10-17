@@ -27,14 +27,13 @@ import java.util.Random;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.optimize.api.IterationListener;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
-import weka.dl4j.FileIterationListener;
+import weka.dl4j.listener.FileIterationListener;
 import weka.dl4j.iterators.AbstractDataSetIterator;
 import weka.dl4j.iterators.ConvolutionalInstancesIterator;
 import weka.dl4j.iterators.DefaultInstancesIterator;
@@ -52,6 +51,10 @@ import weka.dl4j.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.listener.EpochListener;
+import weka.dl4j.listener.IterationListener;
+import weka.dl4j.zoo.EmptyNet;
+import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -91,8 +94,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected ZeroR m_zeroR;
 
+
   /** The actual neural network model. **/
   protected transient MultiLayerNetwork m_model;
+
+  /** The model zoo model. **/
+  protected ZooModel m_zooModel = new EmptyNet();
 
   /** The size of the serialized network model in bytes. **/
   protected long m_modelSize;
@@ -143,11 +150,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /** Coefficients used for normalizing the class */
   protected double m_x1 = 1.0;
   protected double m_x0 = 0.0;
-  
+
+
   /**
-   * Flag for ScoreIterationListener
+   * Iteration listener
    */
-  private boolean m_enableScoreIterationListener = false;
+  private IterationListener m_iterationListener = new EpochListener();
   
   /**
    * The main method for running this class.
@@ -320,6 +328,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
+    if(!(m_zooModel instanceof EmptyNet)){
+      m_log.warn("Custom NeuralNetConfiguration was set while a ZooModel has been set." +
+              "This has no effect.");
+    }
     m_configuration = config;
   }
 
@@ -485,63 +497,87 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
-      // Initialize random number generator for construction of network
-      NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder(m_configuration);
-      builder.setSeed(rand.nextInt());
-
-      // Construct the mlp configuration
-      ListBuilder ip = builder.list(getLayers());
-      int numInputAttributes = getDataSetIterator().getNumAttributes(data);
-
-      // Connect up the layers appropriately
-      for (int x = 0; x < m_layers.length; x++) {
-
-        // Is this the first hidden layer?
-        if (x == 0) {
-          setNumIncoming(m_layers[x], numInputAttributes);
+      // If zoo model was set, use this model as internal MultiLayerNetwork
+      if(!(m_zooModel instanceof EmptyNet)){
+        int channels;
+        int height;
+        int width;
+        if (getDataSetIterator() instanceof ImageDataSetIterator){
+          ImageDataSetIterator it = (ImageDataSetIterator) getDataSetIterator();
+          channels = it.getNumChannels();
+          height = it.getHeight();
+          width = it.getWidth();
         } else {
-          setNumIncoming(m_layers[x], getNumUnits(m_layers[x - 1]));
+          throw new WekaException("Your current configuration is not supported.");
         }
 
-        // Is this the output layer?
-        if (x == m_layers.length - 1) {
-          ((OutputLayer) m_layers[x]).setNOut(data.numClasses());
+        int[] shape = new int[]{channels, height, width};
+        int[][] shapeWrap = new int[][]{shape}; // Necessary from Dl4j
+        try{
+          m_model = m_zooModel.init(data.numClasses(), getSeed(), shapeWrap);
+        }catch (DL4JInvalidConfigException e){
+          throw new WekaException("The provided dataset does not fit the selected model architecture " +
+                  "(input/ouput is set automatically, though convolution and pool might reduce the width and height " +
+                  "below 0 for this input dataset)", e);
         }
-        ip = ip.layer(x, m_layers[x]);
+      } else { // If not, setup network as defined
+        // Initialize random number generator for construction of network
+        NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder(m_configuration);
+        builder.setSeed(rand.nextInt());
+
+        // Construct the mlp configuration
+        ListBuilder ip = builder.list(getLayers());
+        int numInputAttributes = getDataSetIterator().getNumAttributes(data);
+
+        // Connect up the layers appropriately
+        for (int x = 0; x < m_layers.length; x++) {
+
+          // Is this the first hidden layer?
+          if (x == 0) {
+            setNumIncoming(m_layers[x], numInputAttributes);
+          } else {
+            setNumIncoming(m_layers[x], getNumUnits(m_layers[x - 1]));
+          }
+
+          // Is this the output layer?
+          if (x == m_layers.length - 1) {
+            ((OutputLayer) m_layers[x]).setNOut(data.numClasses());
+          }
+          ip = ip.layer(x, m_layers[x]);
+        }
+
+        // If we have a convolutional network
+        if (getDataSetIterator() instanceof ImageDataSetIterator) {
+          ImageDataSetIterator idsi = (ImageDataSetIterator) getDataSetIterator();
+          ip.setInputType(InputType.convolutionalFlat(idsi.getWidth(),
+                  idsi.getHeight(), idsi.getNumChannels()));
+        } else if (getDataSetIterator() instanceof ConvolutionalInstancesIterator) {
+          ConvolutionalInstancesIterator cii = (ConvolutionalInstancesIterator) getDataSetIterator();
+          ip.setInputType(InputType.convolutionalFlat(cii.getWidth(),
+                  cii.getHeight(), cii.getNumChannels()));
+        }
+
+        ip = ip.backprop(true);
+
+        MultiLayerConfiguration conf = ip.build();
+
+        if (getDebug()) {
+          System.err.println(conf.toJson());
+        }
+
+        // build the network
+        m_model = new MultiLayerNetwork(conf);
       }
 
-      // If we have a convolutional network
-      if (getDataSetIterator() instanceof ImageDataSetIterator) {
-        ImageDataSetIterator idsi = (ImageDataSetIterator) getDataSetIterator();
-        ip.setInputType(InputType.convolutionalFlat(idsi.getWidth(),
-                idsi.getHeight(), idsi.getNumChannels()));
-      } else if (getDataSetIterator() instanceof ConvolutionalInstancesIterator) {
-        ConvolutionalInstancesIterator cii = (ConvolutionalInstancesIterator) getDataSetIterator();
-        ip.setInputType(InputType.convolutionalFlat(cii.getWidth(),
-                cii.getHeight(), cii.getNumChannels()));
-      }
-
-      ip = ip.backprop(true);
-
-      MultiLayerConfiguration conf = ip.build();
-
-      if (getDebug()) {
-        System.err.println(conf.toJson());
-      }
-
-      // build the network
-      m_model = new MultiLayerNetwork(conf);
       m_model.init();
 
       if (getDebug()) {
         System.err.println(m_model.conf().toYaml());
       }
 
-      ArrayList<IterationListener> listeners = new ArrayList<IterationListener>();
-      if (m_enableScoreIterationListener){
-        listeners.add(new ScoreIterationListener(data.numInstances()
-                / getDataSetIterator().getTrainBatchSize()));
-      }
+      m_iterationListener.init(getNumEpochs(), getDataSetIterator().getTrainBatchSize(), data.numInstances());
+      ArrayList<org.deeplearning4j.optimize.api.IterationListener> listeners = new ArrayList<org.deeplearning4j.optimize.api.IterationListener>();
+      listeners.add(m_iterationListener);
 
       // if the log file doesn't point to a directory, set up the listener
       if (getLogFile() != null && !getLogFile().isDirectory()) {
@@ -551,7 +587,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         listeners.add(new FileIterationListener(getLogFile().getAbsolutePath(),
                 numMiniBatches));
       }
-
       m_model.setListeners(listeners);
 
       m_Data = data;
@@ -605,15 +640,39 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     m_Data = null;
   }
-  
+
   /**
-   * Enables the score iteration listener.
-   * @param enabled Flag for score iteration listener
+   * Set the modelzoo zooModel
+   *
+   * @param zooModel The predefined zooModel
    */
-  public void enableScoreIterationListener(boolean enabled){
-    m_enableScoreIterationListener = enabled;
+  @OptionMetadata(displayName = "zooModel",
+          description = "The model-architecture to choose from the modelzoo " +
+                  "(default = no model).", commandLineParamName = "zooModel",
+          commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
+  public void setZooModel(ZooModel zooModel){
+    m_zooModel = zooModel;
   }
-  
+
+  /**
+   * Get the modelzoo model
+   * @return The modelzoo model object
+   */
+  public ZooModel getZooModel(){
+    return m_zooModel;
+  }
+
+  @OptionMetadata(displayName = "set the IterationListener",
+          description = "Set the iterationlistener.", commandLineParamName = "iterationListener",
+          commandLineParamSynopsis = "-iterationListener <string>", displayOrder = 12)
+  public void setIterationListener(IterationListener m_iterationListener) {
+    this.m_iterationListener = m_iterationListener;
+  }
+
+  public IterationListener getIterationListener() {
+    return m_iterationListener;
+  }
+
   /**
    * Performs efficient batch prediction
    *
