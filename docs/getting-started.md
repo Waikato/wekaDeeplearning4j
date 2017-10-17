@@ -1,3 +1,4 @@
+# Usage
 If you are new to Weka, you should probably first start reading the [Weka primer](https://weka.wikispaces.com/Primer) as a basic introduction.
 
 As most of Weka, the WekaDeeplearning4j's functionality is accessible in three ways:
@@ -9,7 +10,7 @@ As most of Weka, the WekaDeeplearning4j's functionality is accessible in three w
 All three ways are explained in the following. The main classifier exposed by this package is classed `Dl4jMlpClassifier`.
 Simple examples are given in the for the [Iris dataset](examples/classifying-iris) and the [MNIST dataset](examples/classifying-mnist) in the examples section.
 
-# Commandline Interface
+## Commandline Interface
 A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
 $ java -cp weka.jar weka.Run .Dl4jMlpClassifier -h
@@ -64,7 +65,7 @@ The above setup builds a network with one hidden layer, having 10 output units u
 Another important option is the neural network configuration `-conf` in which you can setup hyperparameters for the network. Available options can be found in the [Java documentation](https://waikato.github.io/wekaDeeplearning4j/doc/weka/dl4j/NeuralNetConfiguration.html) (the field `commandLineParamSynopsis` indicates the commandline parameter name for each available method).
 
 
-# Java
+## Java
 The Java API is a straight forward wrapper for the official DeepLearning4j API. Using the `Dl4jMlPClassifier` your code should usually start with
 ```java
 // Create a new Multi-Layer-Perceptron classifier
@@ -99,5 +100,18 @@ Finally the layers are set with
 clf.setLayers(new Layer[]{denseLayer, outputLayer});
 ```
 
-# GUI
+## GUI
 A tutorial on how to use the GUI is coming soon.
+
+# Model Zoo
+WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
+
+- AlexNet
+- LeNet
+- SimpleCNN
+- VGG16
+- VGG19
+
+This set of models will be extended over the time.
+
+To set a predefined model, e.g. LeNet, from the modelzoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier`.
