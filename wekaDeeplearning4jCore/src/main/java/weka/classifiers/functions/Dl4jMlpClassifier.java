@@ -663,8 +663,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   @OptionMetadata(displayName = "set the IterationListener",
-          description = "Set the iterationlistener.", commandLineParamName = "iterationListener",
-          commandLineParamSynopsis = "-iterationListener <string>", displayOrder = 12)
+          description = "Set the iterationlistener.", commandLineParamName = "iteration-listener",
+          commandLineParamSynopsis = "-iteration-listener <string>", displayOrder = 12)
   public void setIterationListener(IterationListener m_iterationListener) {
     this.m_iterationListener = m_iterationListener;
   }
