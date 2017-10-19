@@ -14,20 +14,23 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.StandardEvaluationMetric;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.iterators.DefaultInstancesIterator;
 import weka.dl4j.iterators.ImageDataSetIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.BatchListener;
-import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
-import weka.filters.Filter;
-import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.util.DatasetLoader;
+import weka.util.TestUtil;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
+
+import static weka.util.TestUtil.splitTrainTest;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier.
@@ -38,38 +41,13 @@ import java.util.Random;
  * @version $Revision : 11711 $
  */
 public class Dl4jMlpTest {
-    
+
     /**
-     * Number of classes in the iris dataset
+     * Number of epochs per test
      */
-    private static final int NUM_CLASSES_IRIS = 3;
-    
-    /**
-     * Number of classes in the mnist dataset
-     */
-    private static final int NUM_CLASSES_MNIST = 10;
-    
-    /**
-     * Number of classes in the diabetes dataset
-     */
-    private static final int NUM_CLASSES_DIABETES = 1;
-    
-    /**
-     * Number of instances in the iris dataset
-     */
-    private static final int NUM_INSTANCES_IRIS = 150;
-    
-    /**
-     * Number of instances in the mnist dataset
-     */
-    private static final int NUM_INSTANCES_MNIST = 10;
-    
-    /**
-     * Number of instances in the diabetes dataset
-     */
-    private static final int NUM_INSTANCES_DIABETES = 43;
-    
-    
+    private static final int NUM_EPOCHS = 10;
+
+
     /**
      * Test single layer iris.
      *
@@ -77,12 +55,13 @@ public class Dl4jMlpTest {
      */
     @Test
     public void testSingleLayerIris() throws Exception {
+
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
         
         // Data
-        Instances data = loadIris();
+        Instances data = DatasetLoader.loadIris();
         data.setClassIndex(data.numAttributes() - 1);
         
         // Define layers
@@ -100,20 +79,15 @@ public class Dl4jMlpTest {
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{outputLayer});
-        clf.setNumEpochs(100);
+        clf.setNumEpochs(NUM_EPOCHS);
+        clf.getDataSetIterator().setTrainBatchSize(5);
 
-        // Evaluate the network
-        Evaluation eval = new Evaluation(data);
-        int numFolds = 10;
-        eval.crossValidateModel(clf, data, numFolds, new Random(1));
+        TestUtil.holdout(clf, data);
 
-        System.out.println(eval.toSummaryString());
-
-        clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
         
-        Assert.assertEquals(NUM_INSTANCES_IRIS, res.length);
-        Assert.assertEquals(NUM_CLASSES_IRIS, res[0].length);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_IRIS, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_IRIS, res[0].length);
     }
     
     /**
@@ -128,7 +102,7 @@ public class Dl4jMlpTest {
         clf.setSeed(1);
         
         // Data
-        Instances data = loadDiabetes();
+        Instances data = DatasetLoader.loadDiabetes();
         data.setClassIndex(data.numAttributes() - 1);
         
         DenseLayer denseLayer = new DenseLayer();
@@ -146,11 +120,13 @@ public class Dl4jMlpTest {
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{outputLayer});
-        clf.buildClassifier(data);
+
+        TestUtil.holdout(clf,data);
+
         final double[][] res = clf.distributionsForInstances(data);
         
-        Assert.assertEquals(NUM_INSTANCES_DIABETES, res.length);
-        Assert.assertEquals(NUM_CLASSES_DIABETES, res[0].length);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_DIABETES, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_DIABETES, res[0].length);
     }
     
     /**
@@ -162,9 +138,9 @@ public class Dl4jMlpTest {
     public void testImageDatasetIteratorMnist() throws Exception {
         
         // Data
-        Instances data = loadMnistMinimalMeta();
+        Instances data = DatasetLoader.loadMiniMnistMeta();
         data.setClassIndex(data.numAttributes() - 1);
-        ImageDataSetIterator imgIter = loadMnistImageIterator();
+        ImageDataSetIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
         
         final int seed = 1;
         for (int batchSize : new int[]{1, 2, 5, 10}) {
@@ -207,12 +183,13 @@ public class Dl4jMlpTest {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setNumEpochs(1);
+        clf.setNumEpochs(NUM_EPOCHS);
+        clf.setDebug(false);
         
         // Data
-        Instances data = loadMnistMinimalMeta();
+        Instances data = DatasetLoader.loadMediumMnistMeta();
         data.setClassIndex(data.numAttributes() - 1);
-        ImageDataSetIterator imgIter = loadMnistImageIterator();
+        ImageDataSetIterator imgIter = DatasetLoader.loadMediumMnistImageIterator();
         clf.setDataSetIterator(imgIter);
         
         ConvolutionLayer convLayer1 = new ConvolutionLayer();
@@ -224,14 +201,14 @@ public class Dl4jMlpTest {
         convLayer1.setWeightInit(WeightInit.XAVIER);
         convLayer1.setNOut(16);
         convLayer1.setLayerName("Conv-layer 1");
-        
+
         SubsamplingLayer poolLayer1 = new SubsamplingLayer();
         poolLayer1.setPoolingType(PoolingType.MAX);
         poolLayer1.setKernelSizeX(2);
         poolLayer1.setKernelSizeY(2);
         poolLayer1.setStrideX(2);
         poolLayer1.setStrideY(2);
-        
+
         ConvolutionLayer convLayer2 = new ConvolutionLayer();
         convLayer2.setKernelSizeX(3);
         convLayer2.setKernelSizeY(3);
@@ -240,14 +217,14 @@ public class Dl4jMlpTest {
         convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
         convLayer2.setWeightInit(WeightInit.XAVIER);
         convLayer2.setNOut(32);
-        
+
         SubsamplingLayer poolLayer2 = new SubsamplingLayer();
         poolLayer2.setPoolingType(PoolingType.MAX);
         poolLayer2.setKernelSizeX(2);
         poolLayer2.setKernelSizeY(2);
         poolLayer2.setStrideX(2);
         poolLayer2.setStrideY(2);
-        
+
         ConvolutionLayer convLayer3 = new ConvolutionLayer();
         convLayer3.setKernelSizeX(3);
         convLayer3.setKernelSizeY(3);
@@ -256,7 +233,7 @@ public class Dl4jMlpTest {
         convLayer3.setActivationFn(Activation.RELU.getActivationFunction());
         convLayer3.setWeightInit(WeightInit.XAVIER);
         convLayer3.setNOut(48);
-        
+
         SubsamplingLayer poolLayer3 = new SubsamplingLayer();
         poolLayer3.setPoolingType(PoolingType.MAX);
         poolLayer3.setKernelSizeX(2);
@@ -270,7 +247,7 @@ public class Dl4jMlpTest {
         denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
         denseLayer.setWeightInit(WeightInit.XAVIER);
         denseLayer.setLayerName("Dense-layer 1");
-        
+
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
         outputLayer.setWeightInit(WeightInit.XAVIER);
@@ -282,167 +259,104 @@ public class Dl4jMlpTest {
         
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, convLayer3, poolLayer3, denseLayer, outputLayer});
-    
-        // Evaluate the network
-        Evaluation eval = new Evaluation(data);
-        int numFolds = 3;
-        eval.crossValidateModel(clf, data, numFolds, new Random(1));
-    
-        System.out.println(eval.toSummaryString());
-        
-        clf.buildClassifier(data);
+
+        TestUtil.holdout(clf, data);
+
         final double[][] res = clf.distributionsForInstances(data);
-        Assert.assertEquals(NUM_INSTANCES_MNIST, res.length);
-        Assert.assertEquals(NUM_CLASSES_MNIST, res[0].length);
-    }
-    
-    /**
-     * Load the mnist minimal dataset with an ImageDataSetIterator
-     * @return ImageDataSetIterator
-     */
-    private ImageDataSetIterator loadMnistImageIterator() {
-        final String imagesPath = "datasets/nominal/mnist-minimal";
-        ImageDataSetIterator imgIter = new ImageDataSetIterator();
-        imgIter.setImagesLocation(new File(imagesPath));
-        final int height = 28;
-        final int width = 28;
-        final int channels = 1;
-        imgIter.setHeight(height);
-        imgIter.setWidth(width);
-        imgIter.setNumChannels(channels);
-        return imgIter;
-    }
-    
-    /**
-     * Load the iris arff file
-     * @return Iris data as Instances
-     * @throws Exception IO error.
-     */
-    private Instances loadIris() throws Exception {
-        Instances data = new Instances(new FileReader("datasets/nominal/iris.arff"));
-        data.setClassIndex(data.numAttributes() - 1);
-        return data;
-    }
-    
-    /**
-     * Load the diabetes arff file
-     * @return Diabetes data as Instances
-     * @throws Exception IO error.
-     */
-    private Instances loadDiabetes() throws Exception {
-        Instances data = new Instances(new FileReader("datasets/numeric/diabetes_numeric.arff"));
-        data.setClassIndex(data.numAttributes() - 1);
-        return data;
-    }
-    
-    /**
-     * Load the mnist minimal meta arff file
-     * @return Mnist minimal meta data as Instances
-     * @throws Exception IO error.
-     */
-    private Instances loadMnistMinimalMeta() throws Exception {
-        Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
-        data.setClassIndex(data.numAttributes() - 1);
-        return data;
-    }
-    
-    /**
-     * Test a no-hidden-layer neural net (i.e. a perceptron)
-     * on the numeric diabetes dataset
-     *
-     * @throws Exception the exception
-     */
-    @Test
-    public void testOutputLayer() throws Exception {
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        OutputLayer out = new OutputLayer();
-        clf.setLayers(new Layer[]{out});
-        Instances data = loadDiabetes();
-        clf.buildClassifier(data);
-        final double[][] res = clf.distributionsForInstances(data);
-        Assert.assertEquals(NUM_INSTANCES_DIABETES, res.length);
-        Assert.assertEquals(NUM_CLASSES_DIABETES, res[0].length);
-    }
-    
-    /**
-     * Test subsampling layer.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testSubsamplingLayer() throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-        
-        // Data
-        Instances data = loadMnistMinimalMeta();
-        data.setClassIndex(data.numAttributes() - 1);
-        final ImageDataSetIterator imgIter = loadMnistImageIterator();
-        clf.setDataSetIterator(imgIter);
-        
-        SubsamplingLayer pool = new SubsamplingLayer();
-        pool.setKernelSizeX(2);
-        pool.setKernelSizeY(2);
-        pool.setPoolingType(PoolingType.MAX);
-        
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
-        
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{pool, outputLayer});
-        clf.buildClassifier(data);
-        final double[][] res = clf.distributionsForInstances(data);
-        
-        Assert.assertEquals(NUM_INSTANCES_MNIST, res.length);
-        Assert.assertEquals(NUM_CLASSES_MNIST, res[0].length);
-    }
-    
-    /**
-     * Test batchnorm layer.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testBatchNormLayer() throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-        
-        // Data
-        Instances data = loadMnistMinimalMeta();
-        data.setClassIndex(data.numAttributes() - 1);
-        final ImageDataSetIterator imgIter = loadMnistImageIterator();
-        clf.setDataSetIterator(imgIter);
-        
-        BatchNormalization bn = new BatchNormalization();
-        
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
-        
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{bn, outputLayer});
-        clf.buildClassifier(data);
-        final double[][] res = clf.distributionsForInstances(data);
-        
-        Assert.assertEquals(NUM_INSTANCES_MNIST, res.length);
-        Assert.assertEquals(NUM_CLASSES_MNIST, res[0].length);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
     }
 
+
+    /**
+     * Test minimal mnist dense net.
+     *
+     * @throws Exception IO error.
+     */
     @Test
+    public void testMinimalMnist() throws Exception {
+        // CLF
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        clf.setSeed(10);
+        clf.setNumEpochs(NUM_EPOCHS);
+
+        // Data
+        Instances data = DatasetLoader.loadMiniMnistMeta();
+        ImageDataSetIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
+        clf.setDataSetIterator(imgIter);
+
+        DenseLayer dl = new DenseLayer();
+        dl.setNOut(128);
+
+        ConvolutionLayer cl = new ConvolutionLayer();
+        cl.setKernelSize(new int[]{3,3});
+        cl.setNOut(16);
+        cl.setWeightInit(WeightInit.XAVIER);
+        cl.setActivationFn(Activation.RELU.getActivationFunction());
+
+        DenseLayer denseLayer = new DenseLayer();
+        denseLayer.setNOut(64);
+
+        OutputLayer outputLayer = new OutputLayer();
+        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+        outputLayer.setWeightInit(WeightInit.XAVIER);
+        outputLayer.setLayerName("Output-layer");
+
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+
+
+        clf.setNeuralNetConfiguration(nnc);
+        clf.setLayers(new Layer[]{cl, dl, denseLayer, outputLayer});
+
+        TestUtil.holdout(clf, data);
+    }
+
+
+    /**
+     * Test minimal mnist dense net.
+     *
+     * @throws Exception IO error.
+     */
+    @Test
+    public void testMinimalMnistArff() throws Exception {
+        // CLF
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        clf.setSeed(1);
+        clf.setNumEpochs(10);
+
+        // Data
+        Instances data = new Instances(new FileReader("/home/slang/datasets/mnist_784_train_minimal.arff"));
+        data.setClassIndex(data.numAttributes() - 1);
+
+        OutputLayer outputLayer = new OutputLayer();
+        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+        outputLayer.setWeightInit(WeightInit.XAVIER);
+        outputLayer.setLayerName("Output-layer");
+        outputLayer.setUpdater(Updater.ADAM);
+        outputLayer.setLossFn(new LossMCXENT());
+
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+
+
+
+        clf.setNeuralNetConfiguration(nnc);
+        clf.setLayers(new Layer[]{outputLayer});
+
+        TestUtil.holdout(clf, data);
+
+    }
+
+
+    
+
+
+//    @Test
     public void testLeNetZooModel() throws IOException {
         LeNet model = new LeNet(10, 1, 1);
         model.setInputShape(new int[][]{new int[]{1, 28, 28}});
         org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = model.conf();
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         MultiLayerNetwork mln = new MultiLayerNetwork(conf);
 
         MnistDataSetIterator train = new MnistDataSetIterator(4, 1000, false, true, true, 1);
@@ -462,24 +376,110 @@ public class Dl4jMlpTest {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setNumEpochs(1);
 
         // Data
-        Instances data = loadMnistMinimalMeta();
+        Instances data = DatasetLoader.loadMiniMnistMeta();
         data.setClassIndex(data.numAttributes() - 1);
-        ImageDataSetIterator iterator = loadMnistImageIterator();
+        ImageDataSetIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
         iterator.setTrainBatchSize(16);
         clf.setDataSetIterator(iterator);
         clf.setZooModel(new weka.dl4j.zoo.LeNet());
-        clf.setNumEpochs(20);
+        clf.setNumEpochs(NUM_EPOCHS);
         clf.setIterationListener(new BatchListener());
 
-        // Evaluate the network
-        Evaluation eval = new Evaluation(data);
-        int numFolds = 2;
-        eval.crossValidateModel(clf, data, numFolds, new Random(1));
+        TestUtil.holdout(clf, data);
+    }
 
-        System.out.println(eval.toSummaryString());
 
+    /**
+     * Test minimal mnist conv net.
+     *
+     * @throws Exception IO error.
+     */
+    @Test
+    public void testMinimalMnistConvNetArff() throws Exception {
+        // CLF
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        clf.setSeed(1);
+        clf.setNumEpochs(NUM_EPOCHS);
+        clf.setDataSetIterator(new DefaultInstancesIterator());
+
+        // Data
+        Instances data = new Instances(new FileReader("/home/slang/datasets/mnist_784_train.arff"));
+        data.setClassIndex(data.numAttributes() - 1);
+
+        ConvolutionLayer convLayer1 = new ConvolutionLayer();
+        convLayer1.setKernelSizeX(3);
+        convLayer1.setKernelSizeY(3);
+        convLayer1.setStrideX(1);
+        convLayer1.setStrideY(1);
+        convLayer1.setActivationFn(Activation.RELU.getActivationFunction());
+        convLayer1.setWeightInit(WeightInit.XAVIER);
+        convLayer1.setNOut(16);
+        convLayer1.setLayerName("Conv-layer 1");
+
+        SubsamplingLayer poolLayer1 = new SubsamplingLayer();
+        poolLayer1.setPoolingType(PoolingType.MAX);
+        poolLayer1.setKernelSizeX(2);
+        poolLayer1.setKernelSizeY(2);
+        poolLayer1.setStrideX(2);
+        poolLayer1.setStrideY(2);
+
+        ConvolutionLayer convLayer2 = new ConvolutionLayer();
+        convLayer2.setKernelSizeX(3);
+        convLayer2.setKernelSizeY(3);
+        convLayer2.setStrideX(1);
+        convLayer2.setStrideY(1);
+        convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+        convLayer2.setWeightInit(WeightInit.XAVIER);
+        convLayer2.setNOut(32);
+
+        SubsamplingLayer poolLayer2 = new SubsamplingLayer();
+        poolLayer2.setPoolingType(PoolingType.MAX);
+        poolLayer2.setKernelSizeX(2);
+        poolLayer2.setKernelSizeY(2);
+        poolLayer2.setStrideX(2);
+        poolLayer2.setStrideY(2);
+
+        ConvolutionLayer convLayer3 = new ConvolutionLayer();
+        convLayer3.setKernelSizeX(3);
+        convLayer3.setKernelSizeY(3);
+        convLayer3.setStrideX(1);
+        convLayer3.setStrideY(1);
+        convLayer3.setActivationFn(Activation.RELU.getActivationFunction());
+        convLayer3.setWeightInit(WeightInit.XAVIER);
+        convLayer3.setNOut(48);
+
+        SubsamplingLayer poolLayer3 = new SubsamplingLayer();
+        poolLayer3.setPoolingType(PoolingType.MAX);
+        poolLayer3.setKernelSizeX(2);
+        poolLayer3.setKernelSizeY(2);
+        poolLayer3.setStrideX(2);
+        poolLayer3.setStrideY(2);
+
+
+        DenseLayer denseLayer = new DenseLayer();
+        denseLayer.setNOut(128);
+        denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+        denseLayer.setWeightInit(WeightInit.XAVIER);
+        denseLayer.setLayerName("Dense-layer 1");
+
+        OutputLayer outputLayer = new OutputLayer();
+        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+        outputLayer.setWeightInit(WeightInit.XAVIER);
+        outputLayer.setLayerName("Output-layer");
+
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+
+
+        clf.setNeuralNetConfiguration(nnc);
+        clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, convLayer3, poolLayer3, denseLayer, outputLayer});
+
+        TestUtil.holdout(clf, data);
+
+        final double[][] res = clf.distributionsForInstances(data);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
     }
 }
