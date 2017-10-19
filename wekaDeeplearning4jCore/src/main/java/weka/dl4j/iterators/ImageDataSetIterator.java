@@ -25,14 +25,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.datavec.api.split.StringSplit;
+import org.datavec.api.split.CollectionInputSplit;
+import org.datavec.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
+import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.Instances;
 import weka.core.OptionMetadata;
-import weka.dl4j.EasyImageRecordReader;
-import weka.dl4j.ScaleImagePixelsPreProcessor;
+import weka.dl4j.ArffPathLabelGenerator;
 
 /**
  * An iterator that loads images.
@@ -147,22 +149,11 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
      * @return the image recorder
      * @throws Exception
      */
-    protected EasyImageRecordReader getImageRecordReader(Instances data, int seed) throws Exception {
-
-        int len = 0;
-        ArrayList<File> filenames = new ArrayList<File>();
-        ArrayList<String> classes = new ArrayList<String>();
-        for(int x = 0; x < data.numInstances(); x++) {
-            String location = data.attribute(0).value( (int) data.get(x).value(0) );
-            filenames.add( new File(getImagesLocation() + File.separator + location) );
-            classes.add( String.valueOf(data.get(x).classValue() ) );
-
-            File f = new File( getImagesLocation() + File.separator + location );
-            len += f.length();
-        }
-        EasyImageRecordReader reader = new EasyImageRecordReader(getWidth(), getHeight(), getNumChannels(), filenames,
-                classes, seed);
-        reader.initialize(new StringSplit("")); // The argument is ignored anyway
+    protected ImageRecordReader getImageRecordReader(Instances data, int seed) throws Exception {
+        ArffPathLabelGenerator labelGenerator = new ArffPathLabelGenerator(data, getImagesLocation().toString());
+        ImageRecordReader reader = new ImageRecordReader(getHeight(), getWidth(), getNumChannels(), labelGenerator);
+        CollectionInputSplit cis = new CollectionInputSplit(labelGenerator.getPathURIs());
+        reader.initialize(cis);
         return reader;
     }
 
@@ -181,12 +172,13 @@ public class ImageDataSetIterator extends AbstractDataSetIterator {
 
         batchSize = Math.min(data.numInstances(), batchSize);
         validate(data);
-        data.randomize(new Random(seed));
-        EasyImageRecordReader reader = getImageRecordReader(data, seed);
+        ImageRecordReader reader = getImageRecordReader(data, seed);
         final int numPossibleLabels = data.numClasses();
         final int labelIndex = 1; // Use explicit label index position
         DataSetIterator tmpIter = new RecordReaderDataSetIterator( reader, batchSize, labelIndex, numPossibleLabels);
-        tmpIter.setPreProcessor(new ScaleImagePixelsPreProcessor());
+        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+        scaler.fit(tmpIter);
+        tmpIter.setPreProcessor(scaler);
         return tmpIter;
     }
 }
