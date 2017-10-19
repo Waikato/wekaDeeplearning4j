@@ -28,6 +28,7 @@ import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -383,7 +384,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @param numInputs the number of inputs
    */
   protected void setNumIncoming(Layer layer, int numInputs) {
-
     if (layer instanceof DenseLayer) {
       ((DenseLayer) layer).setNIn(numInputs);
     } else if (layer instanceof OutputLayer) {
@@ -522,12 +522,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         }
       } else { // If not, setup network as defined
         // Initialize random number generator for construction of network
+        m_configuration.setSeed(getSeed());
         NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder(m_configuration);
         builder.setSeed(rand.nextInt());
+        builder.setTrainingWorkspaceMode(WorkspaceMode.SINGLE);
 
         // Construct the mlp configuration
         ListBuilder ip = builder.list(getLayers());
-        int numInputAttributes = getDataSetIterator().getNumAttributes(data);
+
+        int numInputAttributes;
+        if(getDataSetIterator() instanceof ImageDataSetIterator){
+          ImageDataSetIterator it = (ImageDataSetIterator) getDataSetIterator();
+          numInputAttributes = it.getNumChannels()*it.getHeight() * it.getWidth();
+        } else {
+          numInputAttributes = getDataSetIterator().getNumAttributes(data);
+
+        }
 
         // Connect up the layers appropriately
         for (int x = 0; x < m_layers.length; x++) {
@@ -549,7 +559,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         // If we have a convolutional network
         if (getDataSetIterator() instanceof ImageDataSetIterator) {
           ImageDataSetIterator idsi = (ImageDataSetIterator) getDataSetIterator();
-          ip.setInputType(InputType.convolutionalFlat(idsi.getWidth(),
+          ip.setInputType(InputType.convolutional(idsi.getWidth(),
                   idsi.getHeight(), idsi.getNumChannels()));
         } else if (getDataSetIterator() instanceof ConvolutionalInstancesIterator) {
           ConvolutionalInstancesIterator cii = (ConvolutionalInstancesIterator) getDataSetIterator();
@@ -578,7 +588,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       m_iterationListener.init(getNumEpochs(), getDataSetIterator().getTrainBatchSize(), data.numInstances());
       ArrayList<org.deeplearning4j.optimize.api.IterationListener> listeners = new ArrayList<org.deeplearning4j.optimize.api.IterationListener>();
       listeners.add(m_iterationListener);
-
+//      listeners.add(new EvaluativeListener(getDataSetIterator().getIterator(data,getSeed()),1, InvocationType.EPOCH_END));
       // if the log file doesn't point to a directory, set up the listener
       if (getLogFile() != null && !getLogFile().isDirectory()) {
         int numMiniBatches =
@@ -721,15 +731,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     insts = Filter.useFilter(insts, m_replaceMissing);
     insts = Filter.useFilter(insts, m_nominalToBinary);
     if (m_Filter != null) {
-      insts = m_Filter.useFilter(insts, m_Filter);
+      insts = Filter.useFilter(insts, m_Filter);
     }
 
-    DataSetIterator it = getDataSetIterator().getIterator(insts, getSeed());
+    // Get predictions
+    final DataSetIterator it = getDataSetIterator().getIterator(insts, getSeed());
     INDArray predicted = m_model.output(it, false);
+
+    // Build weka distribution output
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
     for (int i = 0; i < preds.length; i++) {
       for (int j = 0; j < preds[i].length; j++) {
-        preds[i][j] = predicted.getRow(i).getDouble(j);
+        preds[i][j] = predicted.getDouble(i,j);
       }
 
       // only normalise if we're dealing with classification
