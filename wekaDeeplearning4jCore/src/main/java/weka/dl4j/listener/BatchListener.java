@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BatchListener extends IterationListener {
     private static final Logger log = LoggerFactory.getLogger(BatchListener.class);
-    private boolean invoked = false;
     private long iterCount = 0;
     private int currentEpoch = 0;
     private int currentBatch = 0;

@@ -1,8 +1,13 @@
 package weka.dl4j.listener;
 
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.optimize.api.TrainingListener;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A listener that prints the model score every epoch.
@@ -11,33 +16,45 @@ import org.slf4j.LoggerFactory;
  * @author Steven Lang
  * @version $Revision: 1 $
  */
-public class EpochListener extends IterationListener {
+public class EpochListener extends IterationListener implements TrainingListener {
     private static final Logger log = LoggerFactory.getLogger(weka.dl4j.listener.EpochListener.class);
-    private boolean invoked = false;
-    private long iterCount = 0;
     private int currentEpoch = 0;
 
 
-    @Override
-    public boolean invoked() {
-        return invoked;
-    }
+
 
     @Override
-    public void invoke() {
-        this.invoked = true;
+    public void onEpochEnd(Model model) {
+        currentEpoch++;
+        final double score = model.score();
+        log.info("Epoch [" + currentEpoch + "/" + numEpochs + "], Score: " + score);
     }
 
     @Override
     public void iterationDone(Model model, int iteration) {
-        if (numSamples <= 0)
-            numSamples = 1;
-        if (iterCount % numSamples == 0) {
-            invoke();
-            double result = model.score();
-            log.info("Epoch [" + currentEpoch + "/" + numEpochs + "], Score: " + result);
-            currentEpoch += 1;
-        }
-        iterCount++;
+    }
+
+    @Override
+    public void onEpochStart(Model model) {
+    }
+
+    @Override
+    public void onForwardPass(Model model, List<INDArray> activations) {
+
+    }
+
+    @Override
+    public void onForwardPass(Model model, Map<String, INDArray> activations) {
+
+    }
+
+    @Override
+    public void onGradientCalculation(Model model) {
+
+    }
+
+    @Override
+    public void onBackwardPass(Model model) {
+
     }
 }

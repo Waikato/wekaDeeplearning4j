@@ -7,6 +7,7 @@ import java.util.Enumeration;
 
 public abstract class IterationListener implements org.deeplearning4j.optimize.api.IterationListener, OptionHandler{
 
+    protected boolean invoked;
 
     protected int batchSize;
     protected int numEpochs;
@@ -18,7 +19,17 @@ public abstract class IterationListener implements org.deeplearning4j.optimize.a
         this.numEpochs = numEpochs;
         this.batchSize = batchSize;
         this.numSamples = numSamples;
-        this.numBatches = numSamples/batchSize - 1;
+        this.numBatches = numSamples/batchSize;
+    }
+
+    @Override
+    public boolean invoked() {
+        return invoked;
+    }
+
+    @Override
+    public void invoke() {
+        this.invoked = true;
     }
 
     /**
