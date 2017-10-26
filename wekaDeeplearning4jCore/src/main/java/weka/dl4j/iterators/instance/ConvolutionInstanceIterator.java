@@ -23,14 +23,11 @@ package weka.dl4j.iterators.instance;
 
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
-import weka.dl4j.iterators.dataset.ShufflingDataSetIterator;
 
 import java.util.Enumeration;
 
@@ -43,7 +40,7 @@ import java.util.Enumeration;
  * @author Eibe Frank
  * @author Steven Lang
  */
-public class ConvolutionalInstanceIterator extends AbstractInstanceIterator {
+public class ConvolutionInstanceIterator extends DefaultInstanceIterator {
 
     /** The version ID used for serializing objects of this class */
     private static final long serialVersionUID = -3101209034945158130L;
@@ -56,6 +53,7 @@ public class ConvolutionalInstanceIterator extends AbstractInstanceIterator {
 
     /** The desired number of channels */
     protected int m_numChannels = 1;
+
 
     @OptionMetadata(displayName = "size of mini batch",
             description = "The mini batch size to use in the iterator (default = 1).",
@@ -127,14 +125,8 @@ public class ConvolutionalInstanceIterator extends AbstractInstanceIterator {
     public DataSetIterator getIterator(Instances data, int seed, int batchSize) {
         // Convert Instances to DataSet
         DataSet dataset = Utils.instancesToConvDataSet(data, getHeight(), getWidth(), getNumChannels());
-        DefaultDataSetIterator iter = new DefaultDataSetIterator(dataset, batchSize);
 
-        // TODO: outsource image rescaling
-        DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-        scaler.fit(iter);
-        iter.setPreProcessor(scaler);
-
-        return iter;
+        return new DefaultDataSetIterator(dataset, batchSize);
     }
 
     /**

@@ -14,11 +14,11 @@
  */
 
 /*
- *    AbstractDataSetIterator.java
+ *    AbstractInstanceIterator.java
  *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  *
  */
-package weka.dl4j.iterators;
+package weka.dl4j.iterators.instance;
 
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -31,14 +31,13 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 
 /**
- * An abstract iterator wrapper.
+ * An abstract iterator that wraps DataSetIterators around Weka {@link Instances}.
  *
  * @author Christopher Beckham
  * @author Eibe Frank
- *
- * @version $Revision: 11711 $
+ * @author Steven Lang
  */
-public abstract class AbstractDataSetIterator implements OptionHandler, Serializable {
+public abstract class AbstractInstanceIterator implements OptionHandler, Serializable {
 
 	/** The ID used for serialization */
 	private static final long serialVersionUID = 7440584973810993954L;

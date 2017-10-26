@@ -12,7 +12,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+/**
+ * A LabelGenerator based on the file path in the Arff-Meta dataset
+ *
+ * @author Steven Lang
+ */
 
 public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
 

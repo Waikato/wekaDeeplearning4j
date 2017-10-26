@@ -18,13 +18,11 @@
  *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  *
  */
-package weka.dl4j.iterators;
+package weka.dl4j.iterators.dataset;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
@@ -33,30 +31,15 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
  *
  * @author Christopher Beckham
  * @author Eibe Frank
- *
- * @version $Revision: 11711 $
+ * @author Steven Lang
  */
-public class ShufflingDataSetIterator implements DataSetIterator, Serializable {
+public class ShufflingDataSetIterator extends DefaultDataSetIterator {
 
 	/** The ID used to serialize this class */
 	private static final long serialVersionUID = 5571114918884888578L;
 
-	/** The dataset to operate on */
-	protected DataSet m_data = null;
-
-	/** The mini batch size */
-	protected int m_batchSize = 1;
-
-	/** The cursor */
-	protected int m_cursor = 0;
-
 	/** The random number generator used for shuffling the data */
-	protected Random m_random = null;
-
-	/**
-	 * Preprocessor
-	 */
-	protected DataSetPreProcessor preProcessor;
+	protected Random random = null;
 
 	/**
 	 * Constructs a new shuffling iterator.
@@ -66,93 +49,8 @@ public class ShufflingDataSetIterator implements DataSetIterator, Serializable {
 	 * @param seed the seed for the random number generator
 	 */
 	public ShufflingDataSetIterator(DataSet data, int batchSize, int seed) {
-
-		m_data = data;
-		m_batchSize = Math.min(batchSize, data.numExampexles());
-		m_random = new Random(seed);
-	}
-
-	/**
-	 * Whether another batch of data is still available.
-	 *
-	 * @return true if another batch is still available
-	 */
-	@Override
-	public boolean hasNext() { return ( m_cursor + m_batchSize <= m_data.numExamples() ); }
-
-	/**
-	 * Returns the next mini batch of data.
-	 *
-	 * @return the dataset corresponding to the mini batch
-	 */
-	@Override
-	public DataSet next() {
-		// Apply preprocessor
-		if (preProcessor != null) {
-			preProcessor.preProcess(m_data);
-		}
-
-		// Special case: getRange() does not work as expected if there is just a single example
-		if ((m_cursor == 0) && (m_batchSize == 1) && (m_data.numExamples() == 1)) {
-			return m_data;
-		}
-		DataSet thisBatch = (DataSet) m_data.getRange(m_cursor, m_cursor + m_batchSize);
-		m_cursor += m_batchSize;
-		return thisBatch;
-	}
-
-	/**
-	 * Returns a batch of the given size
-	 *
-	 * @param num the size of the batch to return
-	 * @return a mini-batch of the given size
-	 */
-	@Override
-	public DataSet next(int num) {
-
-		// Apply preprocessor
-		if (preProcessor != null)
-			preProcessor.preProcess(m_data);
-
-
-		// Special case: getRange() does not work as expected if there is just a single example
-		if ((m_cursor == 0) && (num == 1) && (m_data.numExamples() == 1)) {
-			return m_data;
-		}
-
-		DataSet thisBatch = (DataSet) m_data.getRange(m_cursor, m_cursor + num);
-		m_cursor += num;
-		return thisBatch;
-	}
-
-	/**
-	 * Returns the total number of examples in the dataset.
-	 *
-	 * @return the total number of examples in the dataset.
-	 */
-	@Override
-	public int totalExamples() {
-		return m_data.numExamples();
-	}
-
-	/**
-	 * Returns the number of input columns.
-	 *
-	 * @return the number of input columns
-	 */
-	@Override
-	public int inputColumns() {
-		return m_data.get(0).getFeatureMatrix().columns();
-	}
-
-	/**
-	 * Returns the total number of labels.
-	 *
-	 * @return the total number of labels
-	 */
-	@Override
-	public int totalOutcomes() {
-		return m_data.get(0).getLabels().columns();
+		super(data, batchSize);
+		random = new Random(seed);
 	}
 
 	/**
@@ -160,94 +58,7 @@ public class ShufflingDataSetIterator implements DataSetIterator, Serializable {
 	 */
 	@Override
 	public void reset() {
-
-		m_cursor = 0;
-		m_data.shuffle(m_random.nextLong());
-	}
-
-	/**
-	 * Whether the iterator can be reset.
-	 *
-	 * @return true
-	 */
-	@Override
-	public boolean resetSupported() {
-		return true;
-	}
-
-	/**
-	 * Whether the iterator can be used asynchronously.
-	 *
-	 * @return false
-	 */
-	@Override
-	public boolean asyncSupported() {
-		return false;
-	}
-
-	/**
-	 * The size of the mini batches.
-	 *
-	 * @return the size of the mini batches
-	 */
-	@Override
-	public int batch() {
-		return m_batchSize;
-	}
-
-	/**
-	 * The cursor given the location in the dataset.
-	 *
-	 * @return cursor
-	 */
-	@Override
-	public int cursor() {
-		return m_cursor;
-	}
-
-	/**
-	 * The number of examples in the dataset.
-	 *
-	 * @return the number of examples
-	 */
-	@Override
-	public int numExamples() {
-		return m_data.numExamples();
-	}
-
-	/**
-	 * Sets the preprocessor.
-	 *
-	 * @param preProcessor
-	 */
-	@Override
-	public void setPreProcessor(DataSetPreProcessor preProcessor) { this.preProcessor = preProcessor; }
-
-	/**
-	 * Gets the preprocessor.
-	 *
-	 * @return preProcessor
-	 */
-	@Override
-	public DataSetPreProcessor getPreProcessor() {
-		return preProcessor;
-	}
-
-	/**
-	 * Gets the labels.
-	 *
-	 * @return the labels
-	 */
-	@Override
-	public List<String> getLabels() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Enables removing of a mini-batch.
-	 */
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException();
+		cursor = 0;
+		data.shuffle(random.nextLong());
 	}
 }

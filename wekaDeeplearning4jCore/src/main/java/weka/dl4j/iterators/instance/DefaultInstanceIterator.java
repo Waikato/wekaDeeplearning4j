@@ -14,7 +14,7 @@
  */
 
 /*
- *    DefaultInstancesIterator.java
+ *    DefaultInstanceIterator.java
  *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -42,7 +42,7 @@ import weka.dl4j.iterators.dataset.ShufflingDataSetIterator;
  * @author Eibe Frank
  * @author Steven Lang
  */
-public class DefaultInstancesIterator extends AbstractInstanceIterator {
+public class DefaultInstanceIterator extends AbstractInstanceIterator {
 
 	/** The ID used to serialize this class */
 	private static final long serialVersionUID = 1316260988724548474L;

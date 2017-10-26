@@ -19,7 +19,7 @@
  *
  */
 
-package weka.dl4j.iterators;
+package weka.dl4j.iterators.instance;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,8 +28,6 @@ import java.io.InvalidObjectException;
 import org.datavec.api.split.CollectionInputSplit;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.datasets.fetchers.BaseDataFetcher;
-import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
@@ -37,16 +35,17 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.Instances;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
+import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 
 /**
  * An iterator that loads images.
  *
  * @author Christopher Beckham
  * @author Eibe Frank
+ * @author Steven Lang
  *
- * @version $Revision: 11711 $
  */
-public class ImageDataSetIterator extends AbstractDataSetIterator {
+public class ImageInstanceIterator extends AbstractInstanceIterator {
 
     /** The version ID used for serializing objects of this class */
     private static final long serialVersionUID = -3701309032945158130L;
