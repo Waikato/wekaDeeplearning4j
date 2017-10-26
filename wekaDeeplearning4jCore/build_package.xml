@@ -236,6 +236,8 @@
         <include name="ark-tweet-nlp*.jar" />
         <include name="commons-lang-*.jar" />
         <include name="javacpp*.jar"/>
+        <include name="javacv*.jar"/>
+        <include name="opencv*.jar"/>
 
         <!--Excludes-->
         <exclude name="deeplearning4j-nn-*.jar"/>
