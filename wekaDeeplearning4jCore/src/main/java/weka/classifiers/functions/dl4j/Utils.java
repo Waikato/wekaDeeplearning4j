@@ -25,8 +25,15 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -34,6 +41,12 @@ import weka.core.Instances;
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
  */
 public class Utils {
+
+
+  /**
+   * Logger instance
+   */
+  private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   /**
    * Converts a set of training instances to a DataSet. Assumes that the
@@ -54,24 +67,52 @@ public class Utils {
       Instance current = insts.instance(i);
       for (int j = 0; j < current.numValues(); j++) {
         int index = current.index(j);
+        double value = current.valueSparse(j);
+
         if (index < insts.classIndex()) {
-          independent[index] = current.valueSparse(j);
+          independent[index] = value;
         } else if (index > insts.classIndex()) {
-          independent[index - 1] = current.valueSparse(j);
-        } else {
-          if (insts.numClasses() > 1) {
-            dependent[(int)current.valueSparse(j)] = 1.0;
-          } else {
-            dependent[0] = current.valueSparse(j);
-          }
+          independent[index - 1] = value;
+          logger.error("This should not happen. Class values may be overwritten.");
         }
       }
-      data.putRow(i, Nd4j.create(independent));
+      // TODO: Fix for multitarget datasets
+      // Set class values
+      if (insts.numClasses() > 1) { // Classification
+        dependent[(int) current.classValue()] = 1.0;
+      } else { // Regression (currently only single class)
+        dependent[0] = current.classValue();
+      }
+
+      INDArray row = Nd4j.create(independent);
+      data.putRow(i, row);
       outcomes.putRow(i, Nd4j.create(dependent));
     }
+    return new DataSet(data, outcomes);
+  }
 
-    DataSet dataSet = new DataSet(data, outcomes);
-    return dataSet;
+  /**
+   * Converts a set of training instances to a DataSet prepared for the convolution operation using the height, width
+   * and number of channels
+   *
+   * @param height image height
+   * @param width image width
+   * @param channels number of image channels
+   * @param insts the instances to convert
+   * @return a DataSet
+   */
+  public static DataSet instancesToConvDataSet(Instances insts, int height, int width, int channels) {
+    DataSet ds = instancesToDataSet(insts);
+    INDArray data = Nd4j.zeros(insts.numInstances(), channels, height, width);
+    ds.getFeatures();
+
+    for (int i = 0; i < insts.numInstances(); i++){
+      INDArray row = ds.getFeatures().getRow(i);
+      row = row.reshape(1, channels, height, width);
+      data.putRow(i, row);
+    }
+
+    return new DataSet(data, ds.getLabels());
   }
 
   /**
