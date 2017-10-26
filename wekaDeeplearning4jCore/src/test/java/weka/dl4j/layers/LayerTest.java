@@ -1,4 +1,4 @@
-package weka.classifiers.functions;
+package weka.dl4j.layers;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.Layer;
@@ -7,6 +7,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
@@ -15,6 +16,7 @@ import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
+import weka.dl4j.listener.EpochListener;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
@@ -79,7 +81,6 @@ public class LayerTest {
         clf.setLayers(new Layer[]{out});
         Instances data = DatasetLoader.loadDiabetes();
 
-        TestUtil.holdout(clf, data);
         final double[][] res = clf.distributionsForInstances(data);
         clf.buildClassifier(data);
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_DIABETES, res.length);
@@ -116,7 +117,10 @@ public class LayerTest {
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{bn, outputLayer});
 
-        TestUtil.holdout(clf, data);
+        clf.buildClassifier(data);
+        double[][] res = clf.distributionsForInstances(data);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
     }
     /**
      * Test batchnorm layer.
@@ -139,7 +143,7 @@ public class LayerTest {
         convLayer.setKernelSize(new int[]{3,3});
         convLayer.setActivationFn(Activation.RELU.getActivationFunction());
         convLayer.setWeightInit(WeightInit.XAVIER);
-        convLayer.setNOut(16);
+        convLayer.setNOut(32);
 
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
@@ -151,6 +155,9 @@ public class LayerTest {
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{convLayer, outputLayer});
 
-        TestUtil.holdout(clf, data);
+        clf.buildClassifier(data);
+        double[][] res = clf.distributionsForInstances(data);
+        Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
+        Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
     }
 }

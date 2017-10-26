@@ -1,13 +1,17 @@
 package weka.util;
 
 import weka.core.Instances;
-import weka.dl4j.iterators.ImageDataSetIterator;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.Remove;
-import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.dl4j.iterators.instance.ImageInstanceIterator;
 
 import java.io.File;
 import java.io.FileReader;
+
+
+/**
+ * Utility class for loading datasets in JUnit tests
+ *
+ * @author Steven Lang
+ */
 
 public class DatasetLoader {
 
@@ -43,30 +47,22 @@ public class DatasetLoader {
 
 
     /**
-     * Load the mnist minimal dataset with an ImageDataSetIterator
+     * Load the mnist minimal dataset with an ImageInstanceIterator
      *
-     * @return ImageDataSetIterator
+     * @return ImageInstanceIterator
      */
-    public static ImageDataSetIterator loadMiniMnistImageIterator() {
+    public static ImageInstanceIterator loadMiniMnistImageIterator() {
         return loadMnistImageIterator("datasets/nominal/mnist-minimal");
     }
 
-    /**
-     * Load the mnist minimal dataset with an ImageDataSetIterator
-     *
-     * @return ImageDataSetIterator
-     */
-    public static ImageDataSetIterator loadMediumMnistImageIterator() {
-        return loadMnistImageIterator("datasets/nominal/mnist-minimal-2101");
-    }
 
     /**
-     * Load the mnist minimal dataset with an ImageDataSetIterator
+     * Load the mnist minimal dataset with an ImageInstanceIterator
      *
-     * @return ImageDataSetIterator
+     * @return ImageInstanceIterator
      */
-    public static ImageDataSetIterator loadMnistImageIterator(String path) {
-        ImageDataSetIterator imgIter = new ImageDataSetIterator();
+    public static ImageInstanceIterator loadMnistImageIterator(String path) {
+        ImageInstanceIterator imgIter = new ImageInstanceIterator();
         imgIter.setImagesLocation(new File(path));
         final int height = 28;
         final int width = 28;
@@ -108,18 +104,19 @@ public class DatasetLoader {
      * @throws Exception IO error.
      */
     public static Instances loadMiniMnistMeta() throws Exception {
-        return loadMetaData("datasets/nominal/mnist.meta.minimal.arff");
+        return loadArff("datasets/nominal/mnist.meta.minimal.arff");
     }
 
     /**
-     * Load the mnist medium meta arff file
+     * Load the mnist minimal arff file
      *
-     * @return Mnist minimal meta data as Instances
+     * @return Mnist minimal arff data as Instances
      * @throws Exception IO error.
      */
-    public static Instances loadMediumMnistMeta() throws Exception {
-        return loadMetaData("datasets/nominal/mnist.meta.minimal.2101.arff");
+    public static Instances loadMiniMnistArff() throws Exception {
+        return loadArff("src/test/resources/nominal/mnist_784_train_minimal.arff");
     }
+
 
     /**
      * Load the mnist minimal meta arff file
@@ -127,11 +124,12 @@ public class DatasetLoader {
      * @return Mnist minimal meta data as Instances
      * @throws Exception IO error.
      */
-    public static Instances loadMetaData(String path) throws Exception {
+    public static Instances loadArff(String path) throws Exception {
         Instances data = new Instances(new FileReader(path));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
+
 
 
 }

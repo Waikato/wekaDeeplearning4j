@@ -9,12 +9,10 @@ import weka.filters.Filter;
  * JUnit tests for the Dl4jStringToWord2Vec Filter.
  *
  * @author Steven Lang
- *
- * @version $Revision: 11711 $
  */
 public class Dl4jStringToWord2VecTest {
     
-    @Test
+//    @Test
     public void testReuters() throws Exception {
         final String arffPath = "datasets/text/ReutersCorn-train.arff";
         ConverterUtils.DataSource ds = new ConverterUtils.DataSource(arffPath);

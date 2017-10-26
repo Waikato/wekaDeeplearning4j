@@ -40,12 +40,12 @@ import java.util.*;
  *
  * @author Steven Lang
  */
-public class Dl4jMlpImageTest {
+public class Dl4jMlpTest {
 
     /**
      * Logger instance
      */
-    private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpImageTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
 
 
     /**
@@ -159,6 +159,7 @@ public class Dl4jMlpImageTest {
 
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
+        clf.addTrainingListener(new EpochListener());
 
         TestUtil.holdout(clf, dataIris);
     }
@@ -364,7 +365,7 @@ public class Dl4jMlpImageTest {
 
         logger.info("Build model....");
 
-        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+        MultiLayerConfiguration conf = new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
                 .seed(rngSeed)
                 .iterations(1)
                 .learningRate(.01)
