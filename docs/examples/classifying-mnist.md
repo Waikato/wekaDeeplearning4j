@@ -11,7 +11,7 @@ The following run creates a Conv>Pool>Conv>Pool>Dense>Out architecture
 $ java -Xmx5g -cp weka.jar weka.Run \
      .Dl4jMlpClassifier \
      -S 1 \
-     -iterator "weka.dl4j.iterators.ImageDataSetIterator -imagesLocation datasets/nominal/mnist-minimal -numChannels 1 -height 28 -width 28" \
+     -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -numChannels 1 -height 28 -width 28 -bs 16" \
      -normalization "Standardize training data" \
      -layer "weka.dl4j.layers.ConvolutionLayer -nFilters 32 -activation weka.dl4j.activations.ActivationReLU -kernelSizeX 3 -kernelSizeY 3 -paddingX 0 -paddingY 0 -strideX 1 -strideY 1 -updater ADAM" \
      -layer "weka.dl4j.layers.SubsamplingLayer -kernelSizeX 2 -kernelSizeY 2 -paddingX 0 -paddingY 0 -poolingType MAX -strideX 1 -strideY 1" \
@@ -21,7 +21,7 @@ $ java -Xmx5g -cp weka.jar weka.Run \
      -layer "weka.dl4j.layers.OutputLayer -activation weka.dl4j.activations.ActivationSoftmax -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
      -numEpochs 10 \
      -t datasets/nominal/mnist.meta.minimal.arff \
-     -no-cv
+     -split-percentage 66
 ```
 
 ## Java
@@ -56,7 +56,7 @@ convLayer1.setKernelSizeX(3);
 convLayer1.setKernelSizeY(3);
 convLayer1.setStrideX(1);
 convLayer1.setStrideY(1);
-convLayer1.setActivationFn(Activation.RELU.getActivationFunction());
+convLayer1.setActivationFn(new ActivationReLU());
 convLayer1.setNOut(32);
 
 // First maxpooling layer, 2x2 filter
@@ -73,7 +73,7 @@ convLayer2.setKernelSizeX(3);
 convLayer2.setKernelSizeY(3);
 convLayer2.setStrideX(1);
 convLayer2.setStrideY(1);
-convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+convLayer2.setActivationFn(new ActivationReLU());
 convLayer2.setNOut(64);
 
 // Second maxpooling layer, 2x2 filter
@@ -87,11 +87,11 @@ poolLayer2.setStrideY(2);
 // Fully connected dense leyer, 128 output units
 DenseLayer denseLayer = new DenseLayer();
 denseLayer.setNOut(128);
-denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+denseLayer.setActivationFn(new ActivationReLU());
 
 // Output layer with softmax activation
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+outputLayer.setActivationFn(new ActivationSoftmax());
 outputLayer.setLossFn(new LossMCXENT());
 
 

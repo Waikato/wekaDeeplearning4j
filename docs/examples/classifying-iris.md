@@ -17,7 +17,7 @@ $ java -cp weka.jar weka.Run \
               -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
        -numEpochs 10 \
        -t datasets/nominal/iris.arff \
-       -no-cv
+       -split-percentage 66
 ```
 
 
@@ -36,7 +36,7 @@ data.setClassIndex(data.numAttributes() - 1);
 
 // Define the output layer
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+outputLayer.setActivationFn(new ActivationSoftmax());
 outputLayer.setUpdater(Updater.SGD);
 outputLayer.setLearningRate(0.01);
 outputLayer.setBiasLearningRate(0.01);
