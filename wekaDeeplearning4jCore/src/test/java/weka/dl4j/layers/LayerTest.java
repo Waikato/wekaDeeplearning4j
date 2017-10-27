@@ -8,17 +8,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.activations.Activation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.BatchNormalization;
-import weka.dl4j.layers.ConvolutionLayer;
-import weka.dl4j.layers.OutputLayer;
-import weka.dl4j.layers.SubsamplingLayer;
-import weka.dl4j.listener.EpochListener;
 import weka.util.DatasetLoader;
-import weka.util.TestUtil;
 
 
 /**
@@ -45,7 +38,7 @@ public class LayerTest {
         Instances data = DatasetLoader.loadMiniMnistMeta();
         data.setClassIndex(data.numAttributes() - 1);
         final ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
-        clf.setDataSetIterator(imgIter);
+        clf.setInstanceIterator(imgIter);
 
         SubsamplingLayer pool = new SubsamplingLayer();
         pool.setKernelSizeX(2);
@@ -61,9 +54,9 @@ public class LayerTest {
 
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{pool, outputLayer});
+
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
-
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
         Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
     }
@@ -81,8 +74,8 @@ public class LayerTest {
         clf.setLayers(new Layer[]{out});
         Instances data = DatasetLoader.loadDiabetes();
 
-        final double[][] res = clf.distributionsForInstances(data);
         clf.buildClassifier(data);
+        final double[][] res = clf.distributionsForInstances(data);
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_DIABETES, res.length);
         Assert.assertEquals(DatasetLoader.NUM_CLASSES_DIABETES, res[0].length);
     }
@@ -103,7 +96,7 @@ public class LayerTest {
         Instances data = DatasetLoader.loadMiniMnistMeta();
         data.setClassIndex(data.numAttributes() - 1);
         final ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
-        clf.setDataSetIterator(imgIter);
+        clf.setInstanceIterator(imgIter);
 
         BatchNormalization bn = new BatchNormalization();
 
@@ -137,7 +130,7 @@ public class LayerTest {
         // Data
         Instances data = DatasetLoader.loadMiniMnistMeta();
         final ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
-        clf.setDataSetIterator(imgIter);
+        clf.setInstanceIterator(imgIter);
 
         ConvolutionLayer convLayer = new ConvolutionLayer();
         convLayer.setKernelSize(new int[]{3,3});

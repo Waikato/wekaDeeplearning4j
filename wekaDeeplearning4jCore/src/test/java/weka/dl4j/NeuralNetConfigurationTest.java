@@ -1,42 +1,20 @@
 package weka.dl4j;
 
-import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.params.BatchNormalizationParamInitializer;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.api.InvocationType;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
 import org.junit.*;
 import org.junit.rules.TestName;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.learning.config.IUpdater;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
-import weka.dl4j.listener.EpochListener;
-import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.util.DatasetLoader;
-import weka.util.TestUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -108,7 +86,7 @@ public class NeuralNetConfigurationTest {
         idiMnist = DatasetLoader.loadMiniMnistImageIterator();
         idiMnist.setTrainBatchSize(DEFAULT_BATCHSIZE);
         startTime = System.currentTimeMillis();
-        clf.setDataSetIterator(idiMnist);
+        clf.setInstanceIterator(idiMnist);
 //        TestUtil.enableUIServer(clf);
     }
 

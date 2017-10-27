@@ -215,7 +215,7 @@ public class Dl4jMlpTest {
      */
     @Test
     public void testMinimalMnistConvNet() throws Exception {
-        clf.setDataSetIterator(idiMnist);
+        clf.setInstanceIterator(idiMnist);
 
         int[] threeByThree = {3, 3};
         int[] twoByTwo = {2, 2};
@@ -309,7 +309,7 @@ public class Dl4jMlpTest {
      */
     @Test
     public void testMinimalMnistDense() throws Exception {
-        clf.setDataSetIterator(idiMnist);
+        clf.setInstanceIterator(idiMnist);
 
         DenseLayer denseLayer = new DenseLayer();
         denseLayer.setNOut(256);

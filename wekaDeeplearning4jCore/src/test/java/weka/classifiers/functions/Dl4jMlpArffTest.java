@@ -101,7 +101,7 @@ public class Dl4jMlpArffTest {
         cii.setHeight(28);
         cii.setWidth(28);
         cii.setTrainBatchSize(DEFAULT_BATCHSIZE);
-        clf.setDataSetIterator(cii);
+        clf.setInstanceIterator(cii);
 
 
         DenseLayer denseLayer = new DenseLayer();
@@ -146,7 +146,7 @@ public class Dl4jMlpArffTest {
         cii.setHeight(28);
         cii.setWidth(28);
         cii.setTrainBatchSize(DEFAULT_BATCHSIZE);
-        clf.setDataSetIterator(cii);
+        clf.setInstanceIterator(cii);
 
         int[] threeByThree = {3, 3};
         int[] twoByTwo = {2, 2};

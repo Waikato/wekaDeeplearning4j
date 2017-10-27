@@ -1,30 +1,21 @@
 package weka.zoo;
 
-import org.deeplearning4j.datasets.mnist.draw.DrawReconstruction;
 import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.Dl4jMlpTest;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
-import weka.dl4j.listener.EpochListener;
 import weka.dl4j.zoo.*;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 
 
 /**
@@ -109,7 +100,7 @@ public class ModelZooTest {
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
         iterator.setTrainBatchSize(16);
 
-        clf.setDataSetIterator(new ResizeImageInstanceIterator(iterator, 80, 80));
+        clf.setInstanceIterator(new ResizeImageInstanceIterator(iterator, 80, 80));
         clf.setZooModel(new LeNet());
         clf.setNumEpochs(10);
         TestUtil.holdout(clf, data);
@@ -149,7 +140,7 @@ public class ModelZooTest {
         data.setClassIndex(data.numAttributes() - 1);
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
         iterator.setTrainBatchSize(16);
-        clf.setDataSetIterator(iterator);
+        clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
         clf.setNumEpochs(10);
         TestUtil.holdout(clf, data);

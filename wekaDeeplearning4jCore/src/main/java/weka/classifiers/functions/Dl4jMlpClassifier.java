@@ -349,7 +349,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return m_iterator;
   }
 
-  public void setDataSetIterator(AbstractInstanceIterator iterator) {
+  public void setInstanceIterator(AbstractInstanceIterator iterator) {
     m_iterator = iterator;
   }
 
@@ -619,7 +619,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 //          // Try to initialize the zoomodel with the new shape
 //          MultiLayerNetwork net = m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
 //          // No exception thrown -> set new datasetiterator
-//          setDataSetIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+//          setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
 //          foundCorrectShape = true;
 //          return net;
 //        } catch (DL4JInvalidConfigException e2) {
@@ -670,20 +670,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // the input type. This is especially problematic in the Weka AbstractTest since no new CLF instance
     // is created on new tests and therefor buildClassifier is called multiple times.
     boolean override = true;
-    if (getInstanceIterator() instanceof ImageInstanceIterator && m_layers[0] instanceof DenseLayer){
+    Layer inputLayer = m_layers[0];
+    if (getInstanceIterator() instanceof ImageInstanceIterator
+            && (inputLayer instanceof DenseLayer || inputLayer instanceof OutputLayer)){
       ImageInstanceIterator iii = ((ImageInstanceIterator)getInstanceIterator());
       int height = iii.getHeight();
       int width = iii.getWidth();
       int channels = iii.getNumChannels();
-      m_layers[0].setNIn(InputType.convolutionalFlat(height, width, channels), override);
-    } else if (getInstanceIterator() instanceof ConvolutionInstanceIterator && m_layers[0] instanceof DenseLayer){
+      inputLayer.setNIn(InputType.convolutionalFlat(height, width, channels), override);
+    } else if (getInstanceIterator() instanceof ConvolutionInstanceIterator && inputLayer instanceof DenseLayer){
       ConvolutionInstanceIterator iii = ((ConvolutionInstanceIterator)getInstanceIterator());
       int height = iii.getHeight();
       int width = iii.getWidth();
       int channels = iii.getNumChannels();
-      m_layers[0].setNIn(InputType.convolutionalFlat(height, width, channels), override);
+      inputLayer.setNIn(InputType.convolutionalFlat(height, width, channels), override);
     } else {
-      m_layers[0].setNIn(InputType.inferInputType(features), override);
+      inputLayer.setNIn(InputType.inferInputType(features), override);
     }
 
     MultiLayerConfiguration conf = list.pretrain(false).backprop(true).build();
