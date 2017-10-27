@@ -34,7 +34,6 @@ import org.nd4j.linalg.activations.IActivation;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.distribution.NormalDistribution;
 import weka.gui.ProgrammaticProperty;
 import weka.dl4j.activations.ActivationIdentity;
@@ -47,7 +46,7 @@ import weka.dl4j.activations.ActivationIdentity;
  *
  * @version $Revision: 11711 $
  */
-public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.ConvolutionLayer implements BaseLayer, OptionHandler, Serializable {
+public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.ConvolutionLayer implements OptionHandler, Serializable {
 
 	/** The ID used to serialize this class. */
 	private static final long serialVersionUID = 6905344091980568487L;
@@ -67,14 +66,29 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 	public ConvolutionLayer() {
 		setLayerName("Convolution layer");
 		setActivationFunction(new ActivationIdentity());
-		setConvolutionMode(ConvolutionMode.Same);
-		setKernelSize(new int[] {3, 3});
+		setLearningRate(Double.NaN);
+		setBiasLearningRate(Double.NaN);
+		setMomentum(Double.NaN);
+		setBiasInit(Double.NaN);
+		setAdamMeanDecay(Double.NaN);
+		setAdamVarDecay(Double.NaN);
+		setEpsilon(Double.NaN);
+		setRmsDecay(Double.NaN);
+		setL1(Double.NaN);
+		setL2(Double.NaN);
+		setRho(Double.NaN);
+		setConvolutionMode(ConvolutionMode.Truncate);
+		setKernelSize(new int[] {5, 5});
 		setStride(new int[] {1, 1});
 		setPadding(new int[] {0, 0});
-		this.cudnnAlgoMode = AlgoMode.PREFER_FASTEST;
-		setDefaults();
+		this.cudnnAlgoMode = ConvolutionLayer.AlgoMode.PREFER_FASTEST;
 	}
 
+	@OptionMetadata(
+					displayName = "layer name",
+					description = "The name of the layer (default = Convolutional Layer).",
+					commandLineParamName = "name", commandLineParamSynopsis = "-name <string>",
+					displayOrder = 0)
 	public String getLayerName() {
 		return this.layerName;
 	}
@@ -205,6 +219,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.padding[1] = padding;
 	}
 
+	@OptionMetadata(
+			displayName = "activation function",
+			description = "The activation function to use (default = Identity).",
+			commandLineParamName = "activation", commandLineParamSynopsis = "-activation <specification>",
+			displayOrder = 10)
 	public IActivation getActivationFunction() { return this.activationFn; }
 	public void setActivationFunction(IActivation activationFn) {
 		this.activationFn = activationFn;
@@ -216,6 +235,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		super.setActivationFn(fn);
 	}
 
+	@OptionMetadata(
+					displayName = "weight initialization method",
+					description = "The method for weight initialization (default = XAVIER).",
+					commandLineParamName = "weightInit", commandLineParamSynopsis = "-weightInit <specification>",
+					displayOrder = 11)
 	public WeightInit getWeightInit() {
 		return this.weightInit;
 	}
@@ -223,6 +247,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.weightInit = weightInit;
 	}
 
+	@OptionMetadata(
+					displayName = "bias initialization",
+					description = "The bias initialization (default = 1.0).",
+					commandLineParamName = "biasInit", commandLineParamSynopsis = "-biasInit <double>",
+					displayOrder = 12)
 	public double getBiasInit() {
 		return this.biasInit;
 	}
@@ -230,6 +259,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.biasInit = biasInit;
 	}
 
+	@OptionMetadata(
+					displayName = "distribution",
+					description = "The distribution (default = NormalDistribution(1e-3, 1)).",
+					commandLineParamName = "dist", commandLineParamSynopsis = "-dist <specification>",
+					displayOrder = 13)
 	public Distribution getDist() {
 		return this.dist;
 	}
@@ -237,6 +271,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.dist = dist;
 	}
 
+	@OptionMetadata(
+					displayName = "learning rate",
+					description = "The learning rate (default = 0.01).",
+					commandLineParamName = "lr", commandLineParamSynopsis = "-lr <double>",
+					displayOrder = 14)
 	public double getLearningRate() {
 		return this.learningRate;
 	}
@@ -244,6 +283,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.learningRate = learningRate;
 	}
 
+	@OptionMetadata(
+					displayName = "bias learning rate",
+					description = "The bias learning rate (default = 0.01).",
+					commandLineParamName = "blr", commandLineParamSynopsis = "-blr <double>",
+					displayOrder = 15)
 	public double getBiasLearningRate() {
 		return this.biasLearningRate;
 	}
@@ -251,6 +295,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.biasLearningRate = biasLearningRate;
 	}
 
+	@OptionMetadata(
+					displayName = "learning rate schedule",
+					description = "The learning rate schedule.",
+					commandLineParamName = "lrSchedule", commandLineParamSynopsis = "-lrSchedule <specification>",
+					displayOrder = 16)
 	public Map<Integer, Double> getLearningRateSchedule() {
 		return this.learningRateSchedule;
 	}
@@ -258,6 +307,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.learningRateSchedule = learningRateSchedule;
 	}
 
+	@OptionMetadata(
+					displayName = "momentum",
+					description = "The momentum (default = 0.9).",
+					commandLineParamName = "momentum", commandLineParamSynopsis = "-momentum <double>",
+					displayOrder = 17)
 	public double getMomentum() {
 		return this.momentum;
 	}
@@ -265,6 +319,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.momentum = momentum;
 	}
 
+	@OptionMetadata(
+					displayName = "momentum schedule",
+					description = "The momentum schedule.",
+					commandLineParamName = "momentumSchedule", commandLineParamSynopsis = "-momentumSchedule <specification>",
+					displayOrder = 18)
 	public Map<Integer, Double> getMomentumSchedule() {
 		return this.momentumSchedule;
 	}
@@ -272,6 +331,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.momentumSchedule = momentumSchedule;
 	}
 
+	@OptionMetadata(
+					displayName = "L1",
+					description = "The L1 parameter (default = 0).",
+					commandLineParamName = "L1", commandLineParamSynopsis = "-L1 <double>",
+					displayOrder = 19)
 	public double getL1() {
 		return this.l1;
 	}
@@ -279,6 +343,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.l1 = l1;
 	}
 
+	@OptionMetadata(
+					displayName = "L2",
+					description = "The L2 parameter (default = 0).",
+					commandLineParamName = "L2", commandLineParamSynopsis = "-L2 <double>",
+					displayOrder = 20)
 	public double getL2() {
 		return this.l2;
 	}
@@ -286,6 +355,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.l2 = l2;
 	}
 
+	@OptionMetadata(
+					displayName = "L1 bias",
+					description = "The L1 bias parameter (default = 0).",
+					commandLineParamName = "l1Bias", commandLineParamSynopsis = "-l1Bias <double>",
+					displayOrder = 21)
 	public double getBiasL1() {
 		return this.l1Bias;
 	}
@@ -293,6 +367,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.l1Bias = biasL1;
 	}
 
+	@OptionMetadata(
+					displayName = "L2 bias",
+					description = "The L2 bias parameter (default = 0).",
+					commandLineParamName = "l2Bias", commandLineParamSynopsis = "-l2Bias <double>",
+					displayOrder = 22)
 	public double getBiasL2() {
 		return this.l2Bias;
 	}
@@ -300,6 +379,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.l2Bias = biasL2;
 	}
 
+	@OptionMetadata(
+					displayName = "dropout parameter",
+					description = "The dropout parameter (default = 0).",
+					commandLineParamName = "dropout", commandLineParamSynopsis = "-dropout <double>",
+					displayOrder = 23)
 	public double getDropOut() {
 		return this.dropOut;
 	}
@@ -307,6 +391,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.dropOut = dropOut;
 	}
 
+	@OptionMetadata(
+					displayName = "updater for stochastic gradient descent",
+					description = "The updater for stochastic gradient descent (default NESTEROVS).",
+					commandLineParamName = "updater", commandLineParamSynopsis = "-updater <speficiation>",
+					displayOrder = 24)
 	public Updater getUpdater() {
 		return this.updater;
 	}
@@ -314,6 +403,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.updater = updater;
 	}
 
+	@OptionMetadata(
+					displayName = "ADADELTA's rho parameter",
+					description = "ADADELTA's rho parameter (default = 0).",
+					commandLineParamName = "rho", commandLineParamSynopsis = "-rho <double>",
+					displayOrder = 25)
 	public double getRho() {
 		return this.rho;
 	}
@@ -321,6 +415,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.rho = rho;
 	}
 
+	@OptionMetadata(
+					displayName = "ADADELTA's epsilon parameter",
+					description = "ADADELTA's epsilon parameter (default = 1e-6).",
+					commandLineParamName = "epsilon", commandLineParamSynopsis = "-epsilon <double>",
+					displayOrder = 26)
 	public double getEpsilon() {
 		return this.epsilon;
 	}
@@ -328,6 +427,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.epsilon = epsilon;
 	}
 
+	@OptionMetadata(
+					displayName = "RMSPROP's RMS decay parameter",
+					description = "RMSPROP's RMS decay parameter (default = 0.95).",
+					commandLineParamName = "rmsDecay", commandLineParamSynopsis = "-rmsDecay <double>",
+					displayOrder = 27)
 	public double getRmsDecay() {
 		return this.rmsDecay;
 	}
@@ -335,11 +439,21 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.rmsDecay = rmsDecay;
 	}
 
+	@OptionMetadata(
+					displayName = "ADAM's mean decay parameter",
+					description = "ADAM's mean decay parameter (default 0.9).",
+					commandLineParamName = "adamMeanDecay", commandLineParamSynopsis = "-adamMeanDecay <double>",
+					displayOrder = 28)
 	public double getAdamMeanDecay() { return this.adamMeanDecay; }
 	public void setAdamMeanDecay(double adamMeanDecay) {
 		this.adamMeanDecay = adamMeanDecay;
 	}
 
+	@OptionMetadata(
+					displayName = "ADAMS's var decay parameter",
+					description = "ADAM's var decay parameter (default 0.999).",
+					commandLineParamName = "adamVarDecay", commandLineParamSynopsis = "-adamVarDecay <double>",
+					displayOrder = 29)
 	public double getAdamVarDecay() {
 		return this.adamVarDecay;
 	}
@@ -347,6 +461,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.adamVarDecay = adamVarDecay;
 	}
 
+	@OptionMetadata(
+					displayName = "gradient normalization method",
+					description = "The gradient normalization method (default = None).",
+					commandLineParamName = "gradientNormalization", commandLineParamSynopsis = "-gradientNormalization <specification>",
+					displayOrder = 30)
 	public GradientNormalization getGradientNormalization() {
 		return this.gradientNormalization;
 	}
@@ -354,6 +473,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.gradientNormalization = gradientNormalization;
 	}
 
+	@OptionMetadata(
+					displayName = "gradient normalization threshold",
+					description = "The gradient normalization threshold (default = 1).",
+					commandLineParamName = "gradNormThreshold", commandLineParamSynopsis = "-gradNormThreshold <double>",
+					displayOrder = 31)
 	public double getGradientNormalizationThreshold() {
 		return this.gradientNormalizationThreshold;
 	}
@@ -362,11 +486,13 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 	}
 
 	// The number of channels is set automatically based on the image reader
+	@ProgrammaticProperty
 	public int getNIn() { return super.getNIn(); }
 	public void setNIn(int nIn) {
 		this.nIn = nIn;
 	}
 
+	@ProgrammaticProperty
 	public int[] getPadding() {
 		return this.padding;
 	}
@@ -374,9 +500,11 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 		this.padding = padding;
 	}
 
+	@ProgrammaticProperty
 	public double getL1Bias() { return super.getL1Bias(); }
 	public void setL1Bias(int l1bias) { super.setL1Bias(l1bias); }
 
+	@ProgrammaticProperty
 	public double getL2Bias() { return super.getL2Bias(); }
 	public void setL2Bias(int l2bias) { super.setL2Bias(l2bias); }
 

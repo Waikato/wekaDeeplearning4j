@@ -58,7 +58,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
 	public SubsamplingLayer() {
 		setLayerName("Subsampling layer");
 		setConvolutionMode(ConvolutionMode.Truncate);
-		setKernelSize(new int[] {2, 2});
+		setKernelSize(new int[] {1, 1});
 		setStride(new int[] {2, 2});
 		setPadding(new int[] {0, 0});
 		setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType.MAX);
