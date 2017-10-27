@@ -52,7 +52,7 @@ public class DatasetLoader {
      * @return ImageInstanceIterator
      */
     public static ImageInstanceIterator loadMiniMnistImageIterator() {
-        return loadMnistImageIterator("datasets/nominal/mnist-minimal");
+        return loadMnistImageIterator("src/test/resources/nominal/mnist-minimal");
     }
 
 
@@ -80,7 +80,7 @@ public class DatasetLoader {
      * @throws Exception IO error.
      */
     public static Instances loadIris() throws Exception {
-        Instances data = new Instances(new FileReader("datasets/nominal/iris.arff"));
+        Instances data = new Instances(new FileReader("src/test/resources/nominal/iris.arff"));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
@@ -92,7 +92,7 @@ public class DatasetLoader {
      * @throws Exception IO error.
      */
     public static Instances loadDiabetes() throws Exception {
-        Instances data = new Instances(new FileReader("datasets/numeric/diabetes_numeric.arff"));
+        Instances data = new Instances(new FileReader("src/test/resources/numeric/diabetes_numeric.arff"));
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
@@ -104,7 +104,7 @@ public class DatasetLoader {
      * @throws Exception IO error.
      */
     public static Instances loadMiniMnistMeta() throws Exception {
-        return loadArff("datasets/nominal/mnist.meta.minimal.arff");
+        return loadArff("src/test/resources/nominal/mnist.meta.minimal.arff");
     }
 
     /**
@@ -115,6 +115,26 @@ public class DatasetLoader {
      */
     public static Instances loadMiniMnistArff() throws Exception {
         return loadArff("src/test/resources/nominal/mnist_784_train_minimal.arff");
+    }
+
+    /**
+     * Load the wine_date arff file
+     *
+     * @return Wine date data
+     * @throws Exception IO error.
+     */
+    public static Instances loadWineDate() throws Exception {
+        return loadArff("src/test/resources/date/wine_date.arff");
+    }
+
+    /**
+     * Load the fishcatch arff file
+     *
+     * @return Fish catch data
+     * @throws Exception IO error.
+     */
+    public static Instances loadFishCatch() throws Exception {
+        return loadArff("src/test/resources/numeric/fishcatch.arff");
     }
 
 
@@ -129,7 +149,6 @@ public class DatasetLoader {
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
-
 
 
 }
