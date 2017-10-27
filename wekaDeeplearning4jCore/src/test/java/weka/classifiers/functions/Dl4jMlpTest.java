@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
@@ -134,13 +136,13 @@ public class Dl4jMlpTest {
         // Define layers
         DenseLayer denseLayer = new DenseLayer();
         denseLayer.setNOut(32);
-        denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+        denseLayer.setActivationFn(new ActivationReLU());
         denseLayer.setWeightInit(WeightInit.XAVIER);
         denseLayer.setLayerName("Dense-layer");
 
         DenseLayer denseLayer2 = new DenseLayer();
         denseLayer2.setNOut(32);
-        denseLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+        denseLayer2.setActivationFn(new ActivationReLU());
         denseLayer2.setWeightInit(WeightInit.XAVIER);
         denseLayer2.setLayerName("Dense-layer");
 
@@ -230,18 +232,19 @@ public class Dl4jMlpTest {
         layers.add(convLayer1);
 
         BatchNormalization bn1 = new BatchNormalization();
-        bn1.setActivationFunction(Activation.RELU.getActivationFunction());
+        bn1.setActivationFunction(new ActivationReLU());
+        bn1.setActivationFunction(new ActivationReLU());
         layers.add(bn1);
 
         ConvolutionLayer convLayer2 = new ConvolutionLayer();
         convLayer2.setKernelSize(threeByThree);
         convLayer2.setStride(oneByOne);
-        convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+        convLayer2.setActivationFn(new ActivationReLU());
         convLayer2.setNOut(32);
         layers.add(convLayer2);
 
         BatchNormalization bn2 = new BatchNormalization();
-        bn2.setActivationFunction(Activation.RELU.getActivationFunction());
+        bn2.setActivationFunction(new ActivationReLU());
         layers.add(bn2);
 
 
@@ -258,7 +261,7 @@ public class Dl4jMlpTest {
         layers.add(convLayer3);
 
         BatchNormalization bn3 = new BatchNormalization();
-        bn3.setActivationFunction(Activation.RELU.getActivationFunction());
+        bn3.setActivationFunction(new ActivationReLU());
         layers.add(bn3);
 
         ConvolutionLayer convLayer4 = new ConvolutionLayer();
@@ -267,7 +270,7 @@ public class Dl4jMlpTest {
         layers.add(convLayer4);
 
         BatchNormalization bn4 = new BatchNormalization();
-        bn4.setActivationFunction(Activation.RELU.getActivationFunction());
+        bn4.setActivationFunction(new ActivationReLU());
         layers.add(bn4);
 
         SubsamplingLayer poolLayer2 = new SubsamplingLayer();
@@ -280,12 +283,12 @@ public class Dl4jMlpTest {
         layers.add(denseLayer1);
 
         BatchNormalization bn5 = new BatchNormalization();
-        bn5.setActivationFunction(Activation.RELU.getActivationFunction());
+        bn5.setActivationFunction(new ActivationReLU());
         bn5.setDropOut(0.2);
         layers.add(bn5);
 
         OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+        outputLayer.setActivationFn(new ActivationSoftmax());
         outputLayer.setLossFn(new LossMCXENT());
         layers.add(outputLayer);
 
@@ -314,17 +317,17 @@ public class Dl4jMlpTest {
         DenseLayer denseLayer = new DenseLayer();
         denseLayer.setNOut(256);
         denseLayer.setLayerName("Dense-layer");
-        denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+        denseLayer.setActivationFn(new ActivationReLU());
         denseLayer.setWeightInit(WeightInit.XAVIER);
 
         DenseLayer denseLayer2 = new DenseLayer();
         denseLayer2.setNOut(128);
         denseLayer2.setLayerName("Dense-layer");
-        denseLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+        denseLayer2.setActivationFn(new ActivationReLU());
         denseLayer2.setWeightInit(WeightInit.XAVIER);
 
         OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+        outputLayer.setActivationFn(new ActivationSoftmax());
         outputLayer.setLossFn(new LossMCXENT());
         outputLayer.setWeightInit(WeightInit.XAVIER);
         outputLayer.setLayerName("Output-layer");

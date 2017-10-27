@@ -8,7 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-        import weka.core.Instances;
+import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
@@ -117,6 +118,21 @@ public class TestUtil {
      */
     public static Instances[] splitTrainTest(Instances data) throws Exception {
         return splitTrainTest(data, 33);
+    }
+
+    /**
+     * Convert the classifier to commandline arguments
+     * @param clf Classifier
+     * @return CLF-String formatted as commandline argument
+     */
+    public static String toCmdLineArgs(Dl4jMlpClassifier clf){
+        String[] opts = clf.getOptions();
+        String res = "";
+        for (int i = 0; i < opts.length; i+=2) {
+            if (opts[i+1].equals("NaN"))continue;
+            res += opts[i] + " \"" + opts[i+1].replace("\"","\\\"") + "\" \\\n" ;
+        }
+        return res;
     }
 
 //
