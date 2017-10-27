@@ -51,7 +51,7 @@ case $key in
     install_pack=true
     shift # past argument
     ;;
-    -p|--package)
+    -b|--backend)
     backend="$2"
     shift # past argument
     shift # past value
