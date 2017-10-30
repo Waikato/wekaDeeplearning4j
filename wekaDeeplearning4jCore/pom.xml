@@ -6,7 +6,7 @@
 
     <groupId>nz.ac.waikato.cms.weka</groupId>
     <artifactId>wekaDeeplearning4j</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.1-SNAPSHOT</version>
     <name>wekaDeeplearning4j-dev</name>
     <description>Deep learning for WEKA</description>
     <packaging>jar</packaging>
@@ -87,9 +87,8 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
+            <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
-            <scope>test</scope>
         </dependency>
 
 
@@ -189,13 +188,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-                <!--Only compile for testing-->
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                    </execution>
-                </executions>
-
             </plugin>
         </plugins>
     </build>
