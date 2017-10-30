@@ -27,12 +27,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
-import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.optimize.api.TrainingListener;
+import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -48,11 +47,11 @@ import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.FileIterationListener;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.listener.IterationListener;
 import weka.dl4j.zoo.EmptyNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
@@ -60,8 +59,6 @@ import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
-
-import javax.naming.OperationNotSupportedException;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer
@@ -158,8 +155,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * Training listener list
    */
-  private List<TrainingListener> m_trainingListener = new ArrayList<>();
-  
+  private IterationListener m_iterationListener = new EpochListener();
+
   /**
    * The main method for running this class.
    *
@@ -299,7 +296,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     commandLineParamSynopsis = "-layer <string>", displayOrder = 2)
   public void setLayers(Layer[] layers) {
 
-    layers = correctDuplicateLayerNames(layers);
+    layers = fixDuplicateLayerNames(layers);
     m_layers = layers;
   }
 
@@ -308,7 +305,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @param layers Array of network layer
    * @return Array of network layer with corrected names
    */
-  private Layer[] correctDuplicateLayerNames(Layer[] layers) {
+  private Layer[] fixDuplicateLayerNames(Layer[] layers) {
     Set<String> names = Arrays.stream(layers).map(Layer::getLayerName).collect(Collectors.toSet());
 
     for (String name : names){
@@ -689,6 +686,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
 
     MultiLayerConfiguration conf = list.pretrain(false).backprop(true).build();
+    conf.setTrainingWorkspaceMode(WorkspaceMode.SEPARATE);
 
     // Build the actual model from the configuration defined above
     MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -700,33 +698,29 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * Get the iterationlistener
    * @throws Exception
    */
-  private List<org.deeplearning4j.optimize.api.IterationListener> getListener() throws Exception {
-    int numSamples = m_Data.numInstances();
-    List<org.deeplearning4j.optimize.api.IterationListener> listeners = new ArrayList<>();
+  private List<IterationListener> getListener() throws Exception {
+      int numSamples = m_Data.numInstances();
+      List<IterationListener> listeners = new ArrayList<>();
 
-    // Initialize weka listener
-    int trainBatchSize = getInstanceIterator().getTrainBatchSize();
-    for (TrainingListener tl : this.m_trainingListener) {
-      if (tl instanceof IterationListener){
-        int numEpochs = getNumEpochs();
-        ((IterationListener)tl).init(numEpochs, trainBatchSize, numSamples);
+      // Initialize weka listener
+      int trainBatchSize = getInstanceIterator().getTrainBatchSize();
+      if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
+          int numEpochs = getNumEpochs();
+          ((weka.dl4j.listener.IterationListener) m_iterationListener).init(numEpochs, trainBatchSize, numSamples);
       }
-    }
 
-    listeners.addAll(m_trainingListener);
+      listeners.add(m_iterationListener);
 
-    // if the log file doesn't point to a directory, set up the listener
-    if (getLogFile() != null && !getLogFile().isDirectory()) {
-      int numMiniBatches =
-              (int) Math.ceil(((double) numSamples)
-                      / ((double) trainBatchSize));
-      listeners.add(new FileIterationListener(getLogFile().getAbsolutePath(),
-              numMiniBatches));
-    }
+      // if the log file doesn't point to a directory, set up the listener
+      if (getLogFile() != null && !getLogFile().isDirectory()) {
+          int numMiniBatches =
+                  (int) Math.ceil(((double) numSamples)
+                          / ((double) trainBatchSize));
+          listeners.add(new FileIterationListener(getLogFile().getAbsolutePath(),
+                  numMiniBatches));
+      }
 
-//    listeners.add(new EvaluativeListener(getIterator(m_Data),1, InvocationType.EPOCH_END));
-
-    return listeners;
+      return listeners;
   }
 
   /**
@@ -784,20 +778,15 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return m_zooModel;
   }
 
-  public void addTrainingListener(TrainingListener trainingListener) {
-    this.m_trainingListener.add(trainingListener);
+  @OptionMetadata(displayName = "set the iteration listener",
+          description = "Set the iteration listener.", commandLineParamName = "iteration-listener",
+          commandLineParamSynopsis = "-iteration-listener <string>", displayOrder = 12)
+  public void setIterationListener(IterationListener l) {
+    m_iterationListener = l;
   }
 
-
-  @OptionMetadata(displayName = "set the TrainingListeners",
-          description = "Set the TrainingListeners.", commandLineParamName = "training-listener",
-          commandLineParamSynopsis = "-training-listener <string>", displayOrder = 12)
-  public void setTrainingListener(TrainingListener[] trainingListeners) {
-    Arrays.stream(trainingListeners).forEach(this::addTrainingListener);
-  }
-
-  public List<TrainingListener> getTrainingListener() {
-    return m_trainingListener;
+  public IterationListener getIterationListener() {
+    return m_iterationListener;
   }
 
   /**

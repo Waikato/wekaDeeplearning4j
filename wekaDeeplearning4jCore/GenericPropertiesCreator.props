@@ -22,7 +22,7 @@ org.nd4j.linalg.activations.IActivation =\
 weka.dl4j.zoo.ZooModel =\
  weka.dl4j.zoo
 
-weka.dl4j.listener.IterationListener =\
+org.deeplearning4j.optimize.api.IterationListener =\
  weka.dl4j.listener
 
 # Uncomment as soon as DL4J allows IUpdater to set the updater-configuration

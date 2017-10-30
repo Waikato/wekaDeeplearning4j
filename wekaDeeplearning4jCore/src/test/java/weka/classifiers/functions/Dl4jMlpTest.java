@@ -1,5 +1,6 @@
 package weka.classifiers.functions;
 
+import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -15,6 +16,7 @@ import org.junit.*;
 import org.junit.rules.TestName;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.convolution.ConvolutionInstance;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -121,7 +123,7 @@ public class Dl4jMlpTest {
 //        logger.info("Press anything to close");
 //        Scanner sc = new Scanner(System.in);
 //        sc.next();
-        double time = (System.currentTimeMillis() - startTime)/1000.0;
+        double time = (System.currentTimeMillis() - startTime) / 1000.0;
         logger.info("Testmethod: " + name.getMethodName());
         logger.info("Time: " + time + "s");
     }
@@ -161,7 +163,7 @@ public class Dl4jMlpTest {
 
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
-        clf.addTrainingListener(new EpochListener());
+        clf.setIterationListener(new EpochListener());
 
         TestUtil.holdout(clf, dataIris);
     }
@@ -340,7 +342,7 @@ public class Dl4jMlpTest {
         clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
-        clf.addTrainingListener(new EpochListener());
+        clf.setIterationListener(new EpochListener());
         TestUtil.holdout(clf, dataMnist);
     }
 
@@ -390,7 +392,7 @@ public class Dl4jMlpTest {
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(new EvaluativeListener(iii.getIterator(train,SEED, DEFAULT_BATCHSIZE),1, InvocationType.EPOCH_END));  //print the score with every iteration
+        model.setListeners(new EvaluativeListener(iii.getIterator(train, SEED, DEFAULT_BATCHSIZE), 1, InvocationType.EPOCH_END));  //print the score with every iteration
 
         logger.info("Train model....");
         for (int i = 0; i < DEFAULT_NUM_EPOCHS; i++) {
