@@ -7,8 +7,8 @@ As most of Weka, the WekaDeeplearning4j's functionality is accessible in three w
 - Programming with Weka in Java
 - Using the Weka workbench GUI
 
-All three ways are explained in the following. The main classifier exposed by this package is classed `Dl4jMlpClassifier`.
-Simple examples are given in the for the [Iris dataset](examples/classifying-iris) and the [MNIST dataset](examples/classifying-mnist) in the examples section.
+All three ways are explained in the following. The main classifier exposed by this package is named `Dl4jMlpClassifier`.
+Simple examples are given in the examples section for the [Iris dataset](examples/classifying-iris) and the [MNIST dataset](examples/classifying-mnist).
 
 ## Commandline Interface
 A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
