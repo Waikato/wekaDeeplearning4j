@@ -50,9 +50,6 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
 
 ```
 
-This trains a one-hidden-layer MLP with 10 units on the Iris dataset. Nesterov momentum is used in conjunction with SGD and the initial
-learning rate and momentum is set to 0.01 and 0.9, respectively. The network is trained for 100 iterations.
-
 ## Documentation
 
 The java-doc can be found [here](https://waikato.github.io/wekaDeeplearning4j/doc/).
