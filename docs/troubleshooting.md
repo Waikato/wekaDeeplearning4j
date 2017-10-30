@@ -2,7 +2,7 @@ This section shall provide solutions for issues that  may appear.
 
 ---------------------------------------------------------------
 ## CUDA: GOMP Version 4.0 not found
-##### Issue
+#### Issue
 Starting the `Dl4jMlpClassifier` while using the GPU version of the package results in something similar to:
 ```
 Caused by: java.lang.UnsatisfiedLinkError: 
@@ -22,7 +22,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 Therefore the libgomp.so.1 library is still of version 3.0, while the nd4j backend expects version 4.0.
 
-##### Solution
+#### Solution
 Download the latest version of libgomp for your system and export the following:
 ```bash
 export LD_PRELOAD=<PATH-TO-NEW-LIBGOMP.SO>
@@ -36,3 +36,9 @@ $ tar -xvf data.tar.xz
 This extracts the library to `./usr/lib/x86_64-linux-gnu/libgomp.so.1`. Afterward set the `LD_PRELOAD` variable to this path as an absolute path and export it as shown above.
 
 ---------------------------------------------------------------
+## CUDA: Failed to allocate X bytes from DEVICE memory
+#### Issue
+Your network architecture or your batch size consumes too much memory.
+
+#### Solution
+Use a lower batch size, or adjust your Java heap and off-heap limits to your available memory accordingly to the [official Dl4J memory description](https://deeplearning4j.org/memory).
