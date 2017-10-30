@@ -6,7 +6,7 @@
 PackageName=wekaDeeplearning4jGPU-dev
 
 # Version (required)
-Version=1.2.0
+Version={VERSION}
 
 #Date
 Date=2017-10-13
@@ -31,7 +31,7 @@ Description=Provides a wrapper classifier for feedforward networks, including co
 Changes=Update api to dl4j 0.9.1
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v1.2/wekaDeeplearning4jGPU-1.2.0-dev-$PLATFORM-x86_64.zip
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/wekaDeeplearning4jGPU-{VERSION}-dev-{PLATFORM}-x86_64.zip
 
 # URL for further information
 URL=https://github.com/Waikato/wekaDeeplearning4j
