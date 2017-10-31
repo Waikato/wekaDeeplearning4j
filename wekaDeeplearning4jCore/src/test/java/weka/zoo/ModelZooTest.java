@@ -3,6 +3,8 @@ package weka.zoo;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.optimize.api.InvocationType;
+import org.deeplearning4j.optimize.listeners.EvaluativeListener;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -56,11 +58,11 @@ public class ModelZooTest {
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
 
-        int SEED=42;
-        int DEFAULT_BATCHSIZE=1;
+        int SEED = 42;
+        int DEFAULT_BATCHSIZE = 1;
         ImageInstanceIterator iii = DatasetLoader.loadMiniMnistImageIterator();
         iii.setTrainBatchSize(DEFAULT_BATCHSIZE);
-        iii = new ResizeImageInstanceIterator(iii, width,height);
+        iii = new ResizeImageInstanceIterator(iii, width, height);
         Instances data = DatasetLoader.loadMiniMnistMeta();
         Instances[] split = TestUtil.splitTrainTest(data);
         Instances train = split[0];
@@ -105,6 +107,7 @@ public class ModelZooTest {
         clf.setNumEpochs(10);
         TestUtil.holdout(clf, data);
     }
+
     @Test
     public void testLeNetMnist() throws Exception {
         performZoo(new LeNet());
@@ -143,6 +146,7 @@ public class ModelZooTest {
         clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
         clf.setNumEpochs(10);
+//        clf.setIterationListener(new EvaluativeListener(iterator.getIterator(data, 42, 1), 1, InvocationType.EPOCH_END));
         TestUtil.holdout(clf, data);
     }
 }

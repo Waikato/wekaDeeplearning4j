@@ -64,23 +64,23 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   }
 
   @OptionMetadata(
+          displayName = "leaky relu alpha",
+          description = "The parameter for the leaky relu (default = 0.1).",
+          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
+          displayOrder = 1)
+  public double getLeakyreluAlpha() { return super.getLeakyreluAlpha(); }
+
+  public void setLeakyreluAlpha(double a) {
+    builder.leakyreluAlpha(a);
+  }
+  @OptionMetadata(
           description = "Optimization algorithm (LINE_GRADIENT_DESCENT,"
                   + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
                   + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
           displayName = "optimization algorithm", commandLineParamName = "algorithm",
           commandLineParamSynopsis = "-algorithm <string>", displayOrder = 0)
   public OptimizationAlgorithm getOptimizationAlgo() {
-    return super.getOptimizationAlgo();
-  }
-  
-  @OptionMetadata(
-          displayName = "leaky relu alpha",
-          description = "The parameter for the leaky relu (default = 0.1).",
-          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
-          displayOrder = 1)
-  public double getLeakyreluAlpha() { return super.getLeakyreluAlpha(); }
-  public void setLeakyreluAlpha(double a) {
-    builder.leakyreluAlpha(a);
+    return builder.getOptimizationAlgo();
   }
 
   public void setOptimizationAlgo(OptimizationAlgorithm optimAlgorithm) {

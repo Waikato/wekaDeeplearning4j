@@ -27,12 +27,17 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.optimize.api.InvocationType;
 import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.listeners.EvaluativeListener;
 import org.deeplearning4j.util.ModelSerializer;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.slf4j.Logger;
@@ -42,10 +47,7 @@ import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
-import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
-import weka.dl4j.iterators.instance.DefaultInstanceIterator;
-import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.iterators.instance.*;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.FileIterationListener;
@@ -59,6 +61,8 @@ import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
+
+import javax.naming.OperationNotSupportedException;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer
@@ -578,65 +582,63 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * not fit the chosen zooModel
    */
   private MultiLayerNetwork createZooModel() throws WekaException {
-//    int channels;
-//    int height;
-//    int width;
-//    if (getInstanceIterator() instanceof ImageInstanceIterator) {
-//      ImageInstanceIterator it = (ImageInstanceIterator) getInstanceIterator();
-//      channels = it.getNumChannels();
-//      height = it.getHeight();
-//      width = it.getWidth();
-//    } else {
-//      throw new WekaException("Your current configuration is not supported.");
-//    }
-//
-//    int[] shape = new int[]{channels, height, width};
-//    int[][] shapeWrap = new int[][]{shape}; // Necessity from Dl4j
-//    try {
-//      return m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
-//    } catch (DL4JInvalidConfigException e) {
-//
+    int channels;
+    int height;
+    int width;
+    if (getInstanceIterator() instanceof ImageInstanceIterator) {
+      ImageInstanceIterator it = (ImageInstanceIterator) getInstanceIterator();
+      channels = it.getNumChannels();
+      height = it.getHeight();
+      width = it.getWidth();
+    } else {
+      throw new WekaException("Your current configuration is not supported.");
+    }
 
-//      int newHeight = height;
-//      int newWidth = width;
-//
-//      boolean foundCorrectShape = false;
-
-//      ImageInstanceIterator iii = (ImageInstanceIterator) getInstanceIterator();
-
-//      while(!foundCorrectShape){
-//        // Increase size
-//        newHeight = (int)(1.1*newHeight);
-//        newWidth = (int)(1.1*newWidth);
-//
-//        shape = new int[]{channels, newHeight, newWidth};
-//        m_log.info("New shape = " + Arrays.toString(shape));
-//        shapeWrap = new int[][]{shape};
-//        try {
-//          // Try to initialize the zoomodel with the new shape
-//          MultiLayerNetwork net = m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
-//          // No exception thrown -> set new datasetiterator
-//          setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
-//          foundCorrectShape = true;
-//          return net;
-//        } catch (DL4JInvalidConfigException e2) {
-//          // Still incorrect (too small) shapes
-//          System.out.println();
-//
-//        } catch (OperationNotSupportedException e3) {
-//          throw new WekaException("This operation is not supported. ", e);
-//        }
-//      }
+    int[] shape = new int[]{channels, height, width};
+    int[][] shapeWrap = new int[][]{shape}; // Necessity from Dl4j
+    try {
+      return m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
+    } catch (DL4JInvalidConfigException e) {
 
 
-//      throw new WekaException("The provided dataset does not fit the selected model architecture " +
-//              "(input/ouput is set automatically, though convolution and pool might reduce the width and height " +
-//              "below 0 for this input dataset)", e);
-//    } catch (OperationNotSupportedException e) {
-//      throw new WekaException("This operation is not supported. ", e);
-//    }
-    // TODO: Fix
-    throw new WekaException("Not yet implemented.");
+      int newHeight = height;
+      int newWidth = width;
+
+      boolean foundCorrectShape = false;
+
+      ImageInstanceIterator iii = (ImageInstanceIterator) getInstanceIterator();
+
+      while(!foundCorrectShape){
+        // Increase size
+        newHeight = (int)(1.1*newHeight);
+        newWidth = (int)(1.1*newWidth);
+
+        shape = new int[]{channels, newHeight, newWidth};
+        m_log.info("New shape = " + Arrays.toString(shape));
+        shapeWrap = new int[][]{shape};
+        try {
+          // Try to initialize the zoomodel with the new shape
+          MultiLayerNetwork net = m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
+          // No exception thrown -> set new datasetiterator
+          setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+          foundCorrectShape = true;
+          return net;
+        } catch (DL4JInvalidConfigException e2) {
+          // Still incorrect (too small) shapes
+          System.out.println();
+
+        } catch (OperationNotSupportedException e3) {
+          throw new WekaException("This operation is not supported. ", e);
+        }
+      }
+
+
+      throw new WekaException("The provided dataset does not fit the selected model architecture " +
+              "(input/ouput is set automatically, though convolution and pool might reduce the width and height " +
+              "below 0 for this input dataset)", e);
+    } catch (OperationNotSupportedException e) {
+      throw new WekaException("This operation is not supported. ", e);
+    }
   }
 
   /**
@@ -761,11 +763,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    *
    * @param zooModel The predefined zooModel
    */
-  // Todo: Enable as soon as zoomodels work
-//  @OptionMetadata(displayName = "zooModel",
-//          description = "The model-architecture to choose from the modelzoo " +
-//                  "(default = no model).", commandLineParamName = "zooModel",
-//          commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
+  @OptionMetadata(displayName = "zooModel",
+          description = "The model-architecture to choose from the modelzoo " +
+                  "(default = no model).", commandLineParamName = "zooModel",
+          commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
   public void setZooModel(ZooModel zooModel){
     m_zooModel = zooModel;
   }
@@ -839,8 +840,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Get predictions
     final DataSetIterator it = getIterator(insts);
-    final INDArray features = it.next(insts.numInstances()).getFeatures();
-    INDArray predicted = m_model.output(features);
+
+//    final INDArray features = it.next(insts.numInstances()).getFeatures();
+    INDArray predicted = m_model.output(it, false);
 
     // Build weka distribution output
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
