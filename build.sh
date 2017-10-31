@@ -14,7 +14,7 @@ bold='\e[1m'
 green='\e[32m'
 
 # Project version
-version="1.2.1"
+version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' wekaDeeplearning4jCore/build_package.xml`
 
 # Module prefix
 prefix=wekaDeeplearning4j

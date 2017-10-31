@@ -8,6 +8,7 @@ import weka.core.Instances;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 import weka.util.DatasetLoader;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -58,7 +59,7 @@ public class ArffMetaDataLabelGeneratorTest {
             String label = inst.stringValue(1);
 
             Assert.assertEquals(label, this.gen.getLabelForPath(path).toString());
-            Assert.assertEquals(label, this.gen.getLabelForPath(URI.create(path)).toString());
+            Assert.assertEquals(label, this.gen.getLabelForPath(new File(path).toURI()).toString());
         }
     }
 
