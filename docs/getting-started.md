@@ -103,7 +103,6 @@ clf.setLayers(new Layer[]{denseLayer, outputLayer});
 ## GUI
 A tutorial on how to use the GUI is coming soon.
 
-<!--- //TODO: uncomment as soon as ModelZoo is working again
 # Model Zoo
 WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
 
@@ -116,4 +115,3 @@ WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possi
 This set of models will be extended over the time.
 
 To set a predefined model, e.g. LeNet, from the modelzoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier`.
--->
