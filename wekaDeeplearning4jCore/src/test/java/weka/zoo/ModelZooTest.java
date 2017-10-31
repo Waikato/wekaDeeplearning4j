@@ -90,7 +90,7 @@ public class ModelZooTest {
 
     }
 
-    @Test
+//    @Test
     public void testLeNetMnistReshaped() throws Exception {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
@@ -108,27 +108,27 @@ public class ModelZooTest {
         TestUtil.holdout(clf, data);
     }
 
-    @Test
+//    @Test
     public void testLeNetMnist() throws Exception {
         performZoo(new LeNet());
     }
 
-    @Test
+//    @Test
     public void testAlexNetMnist() throws Exception {
         performZoo(new AlexNet());
     }
 
-    @Test
+//    @Test
     public void testVGG16() throws Exception {
         performZoo(new VGG16());
     }
 
-    @Test
+//    @Test
     public void testVGG19() throws Exception {
         performZoo(new VGG19());
     }
 
-    @Test
+//    @Test
     public void testSimpleCNN() throws Exception {
         performZoo(new SimpleCNN());
     }
