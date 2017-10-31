@@ -840,17 +840,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Get predictions
     final DataSetIterator it = getIterator(insts);
-
-//    final INDArray features = it.next(insts.numInstances()).getFeatures();
-    INDArray predicted = m_model.output(it, false);
-
-    // Build weka distribution output
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
-    for (int i = 0; i < preds.length; i++) {
-      for (int j = 0; j < preds[i].length; j++) {
-        preds[i][j] = predicted.getDouble(i,j);
-      }
 
+    int offset = 0;
+    boolean next = true;
+    while (next){
+      INDArray predBatch = m_model.output(it.next().getFeatureMatrix());
+      int currentBatchSize = predBatch.shape()[0];
+      // Build weka distribution output
+      for (int i = 0; i < currentBatchSize; i++) {
+        for (int j = 0; j < insts.numClasses(); j++) {
+          preds[i + offset][j] = predBatch.getDouble(i, j);
+        }
+      }
+      offset += currentBatchSize; // add batchsize as offset
+      next = it.hasNext() || offset < insts.numInstances();
+    }
+
+
+
+    // Normalize
+    for (int i = 0; i < preds.length; i++) {
       // only normalise if we're dealing with classification
       if (preds[i].length > 1) {
         weka.core.Utils.normalize(preds[i]);
