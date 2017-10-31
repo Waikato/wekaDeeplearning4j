@@ -52,21 +52,6 @@ public class Dl4jMlpTest {
     private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
 
 
-    /**
-     * Default number of epochs
-     */
-    private static final int DEFAULT_NUM_EPOCHS = 10;
-
-    /**
-     * Seed
-     */
-    private static final int SEED = 42;
-
-    /**
-     * Default batch size
-     */
-    private static final int DEFAULT_BATCHSIZE = 32;
-
 
     /**
      * Classifier
@@ -103,14 +88,14 @@ public class Dl4jMlpTest {
     public void before() throws Exception {
         // Init mlp clf
         clf = new Dl4jMlpClassifier();
-        clf.setSeed(SEED);
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+        clf.setSeed(TestUtil.SEED);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setDebug(false);
 
         // Init data
         dataMnist = DatasetLoader.loadMiniMnistMeta();
         idiMnist = DatasetLoader.loadMiniMnistImageIterator();
-        idiMnist.setTrainBatchSize(DEFAULT_BATCHSIZE);
+        idiMnist.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
         dataIris = DatasetLoader.loadIris();
         startTime = System.currentTimeMillis();
 //        TestUtil.enableUIServer(clf);
@@ -337,9 +322,9 @@ public class Dl4jMlpTest {
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
         nnc.setPretrain(false);
-        nnc.setSeed(SEED);
+        nnc.setSeed(TestUtil.SEED);
 
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
         clf.setIterationListener(new EpochListener());
@@ -360,13 +345,13 @@ public class Dl4jMlpTest {
 
         //Get the DataSetIterators:
         ImageInstanceIterator iii = DatasetLoader.loadMiniMnistImageIterator();
-        iii.setTrainBatchSize(DEFAULT_BATCHSIZE);
+        iii.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
         Instances data = DatasetLoader.loadMiniMnistMeta();
         Instances[] split = TestUtil.splitTrainTest(data);
         Instances train = split[0];
         Instances test = split[1];
-        DataSetIterator trainIt = iii.getIterator(train, SEED, DEFAULT_BATCHSIZE);
-        DataSetIterator testIt = iii.getIterator(test, SEED, DEFAULT_BATCHSIZE);
+        DataSetIterator trainIt = iii.getIterator(train, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE);
+        DataSetIterator testIt = iii.getIterator(test, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE);
 
         logger.info("Build model....");
 
@@ -392,10 +377,10 @@ public class Dl4jMlpTest {
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
         model.init();
-        model.setListeners(new EvaluativeListener(iii.getIterator(train, SEED, DEFAULT_BATCHSIZE), 1, InvocationType.EPOCH_END));  //print the score with every iteration
+        model.setListeners(new EvaluativeListener(iii.getIterator(train, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE), 1, InvocationType.EPOCH_END));  //print the score with every iteration
 
         logger.info("Train model....");
-        for (int i = 0; i < DEFAULT_NUM_EPOCHS; i++) {
+        for (int i = 0; i < TestUtil.DEFAULT_NUM_EPOCHS; i++) {
             logger.info("Epoch " + i);
             model.fit(trainIt);
         }

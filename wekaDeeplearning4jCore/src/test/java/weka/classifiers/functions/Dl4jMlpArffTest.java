@@ -32,23 +32,7 @@ public class Dl4jMlpArffTest {
      * Logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpArffTest.class);
-
-
-    /**
-     * Default number of epochs
-     */
-    private static final int DEFAULT_NUM_EPOCHS = 10;
-
-    /**
-     * Seed
-     */
-    private static final int SEED = 42;
-
-    /**
-     * Default batch size
-     */
-    private static final int DEFAULT_BATCHSIZE = 32;
-
+    
 
     /**
      * Classifier
@@ -70,8 +54,8 @@ public class Dl4jMlpArffTest {
     public void before() throws Exception {
         // Init mlp clf
         clf = new Dl4jMlpClassifier();
-        clf.setSeed(SEED);
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+        clf.setSeed(TestUtil.SEED);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setDebug(false);
 
         // Init data
@@ -100,7 +84,7 @@ public class Dl4jMlpArffTest {
         cii.setNumChannels(1);
         cii.setHeight(28);
         cii.setWidth(28);
-        cii.setTrainBatchSize(DEFAULT_BATCHSIZE);
+        cii.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
         clf.setInstanceIterator(cii);
 
 
@@ -125,7 +109,7 @@ public class Dl4jMlpArffTest {
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
 
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
         TestUtil.holdout(clf, data);
@@ -145,7 +129,7 @@ public class Dl4jMlpArffTest {
         cii.setNumChannels(1);
         cii.setHeight(28);
         cii.setWidth(28);
-        cii.setTrainBatchSize(DEFAULT_BATCHSIZE);
+        cii.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
         clf.setInstanceIterator(cii);
 
         int[] threeByThree = {3, 3};

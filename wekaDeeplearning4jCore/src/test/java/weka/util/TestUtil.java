@@ -29,6 +29,23 @@ public class TestUtil {
      */
     private static final Logger logger = LoggerFactory.getLogger(TestUtil.class);
 
+
+
+    /**
+     * Default number of epochs
+     */
+    public static final int DEFAULT_NUM_EPOCHS = 5;
+
+    /**
+     * Seed
+     */
+    public static final int SEED = 42;
+
+    /**
+     * Default batch size
+     */
+    public static final int DEFAULT_BATCHSIZE = 32;
+
     /**
      * Perform simple holdout (2/3, 1/3 split)
      *

@@ -55,6 +55,7 @@ public class LayerTest {
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{pool, outputLayer});
 
+        clf.setNumEpochs(1);
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
@@ -74,6 +75,7 @@ public class LayerTest {
         clf.setLayers(new Layer[]{out});
         Instances data = DatasetLoader.loadDiabetes();
 
+        clf.setNumEpochs(1);
         clf.buildClassifier(data);
         final double[][] res = clf.distributionsForInstances(data);
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_DIABETES, res.length);
@@ -110,6 +112,7 @@ public class LayerTest {
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{bn, outputLayer});
 
+        clf.setNumEpochs(1);
         clf.buildClassifier(data);
         double[][] res = clf.distributionsForInstances(data);
         Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
@@ -145,6 +148,7 @@ public class LayerTest {
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
+        clf.setNumEpochs(1);
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{convLayer, outputLayer});
 
