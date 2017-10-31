@@ -14,7 +14,7 @@ bold='\e[1m'
 green='\e[32m'
 
 # Project version
-version="1.2.0"
+version="1.2.1"
 
 # Module prefix
 prefix=wekaDeeplearning4j
