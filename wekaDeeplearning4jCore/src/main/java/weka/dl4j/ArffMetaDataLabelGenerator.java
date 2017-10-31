@@ -3,6 +3,9 @@ package weka.dl4j;
 import org.datavec.api.io.labels.PathLabelGenerator;
 import org.datavec.api.writable.Text;
 import org.datavec.api.writable.Writable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -17,8 +20,10 @@ import java.util.stream.Collectors;
  *
  * @author Steven Lang
  */
-
 public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
+
+    /** The logger used in this class. */
+    protected final Logger log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
     /**
      * Mapping from paths to labels
@@ -63,7 +68,7 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
         for (Instance inst : metaData) {
             String fileName = inst.stringValue(0);
             String label = inst.stringValue(1);
-            String absPath = Paths.get(this.basePath, fileName).toString();
+            String absPath = Paths.get(this.basePath, fileName).toFile().getAbsolutePath();
             paths.add(absPath);
             labels.add(label);
             fileLabelMap.put(absPath, label);
@@ -77,14 +82,14 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
      */
     @Override
     public Writable getLabelForPath(String path) {
-        String absPath = URI.create(path).getRawPath();
+        String absPath = new File(path).getAbsolutePath();
         final String label = fileLabelMap.get(absPath);
         return new Text(label);
     }
 
     @Override
     public Writable getLabelForPath(URI uri) {
-        return getLabelForPath(uri.toString());
+        return getLabelForPath(uri.getRawPath());
     }
 
     /**
