@@ -7,12 +7,11 @@ Starting simple, the most straight forward way to create a neural network with t
 ```bash
 $ java -cp weka.jar weka.Run \
        .Dl4jMlpClassifier \
-       -S 1 \ 
+       -S 1 \
        -layer "weka.dl4j.layers.OutputLayer \
               -activation weka.dl4j.activations.ActivationSoftmax \
               -updater SGD \
               -lr 0.01 \
-              -blr 0.01 \
               -name \"Output layer\" \
               -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
        -numEpochs 10 \
@@ -39,7 +38,6 @@ OutputLayer outputLayer = new OutputLayer();
 outputLayer.setActivationFn(new ActivationSoftmax());
 outputLayer.setUpdater(Updater.SGD);
 outputLayer.setLearningRate(0.01);
-outputLayer.setBiasLearningRate(0.01);
 outputLayer.setLossFn(new LossMCXENT());
 
 // Add the layers to the classifier
