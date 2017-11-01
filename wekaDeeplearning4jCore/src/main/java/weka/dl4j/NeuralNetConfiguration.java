@@ -26,6 +26,7 @@ import java.util.Map;
  */
 public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNetConfiguration implements Serializable, OptionHandler {
 
+  private static final long serialVersionUID = -4384295102884151216L;
   /**
    * Internal configuration builder
    */
