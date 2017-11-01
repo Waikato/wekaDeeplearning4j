@@ -701,28 +701,26 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @throws Exception
    */
   private List<IterationListener> getListener() throws Exception {
-      int numSamples = m_Data.numInstances();
-      List<IterationListener> listeners = new ArrayList<>();
+    int numSamples = m_Data.numInstances();
+    List<IterationListener> listeners = new ArrayList<>();
 
-      // Initialize weka listener
-      int trainBatchSize = getInstanceIterator().getTrainBatchSize();
-      if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
-          int numEpochs = getNumEpochs();
-          ((weka.dl4j.listener.IterationListener) m_iterationListener).init(numEpochs, trainBatchSize, numSamples);
-      }
-
+    // Initialize weka listener
+    int trainBatchSize = getInstanceIterator().getTrainBatchSize();
+    if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
+      int numEpochs = getNumEpochs();
+      ((weka.dl4j.listener.IterationListener) m_iterationListener).init(numEpochs, trainBatchSize, numSamples, getIterator(m_Data));
       listeners.add(m_iterationListener);
+    }
 
-      // if the log file doesn't point to a directory, set up the listener
-      if (getLogFile() != null && !getLogFile().isDirectory()) {
-          int numMiniBatches =
-                  (int) Math.ceil(((double) numSamples)
-                          / ((double) trainBatchSize));
-          listeners.add(new FileIterationListener(getLogFile().getAbsolutePath(),
-                  numMiniBatches));
-      }
 
-      return listeners;
+    // if the log file doesn't point to a directory, set up the listener
+    if (getLogFile() != null && !getLogFile().isDirectory()) {
+      FileIterationListener fil = new FileIterationListener(getLogFile().getAbsolutePath());
+      fil.init(getNumEpochs(), trainBatchSize, numSamples, getIterator(m_Data));
+      listeners.add(fil);
+    }
+
+    return listeners;
   }
 
   /**
@@ -854,17 +852,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         }
       }
       offset += currentBatchSize; // add batchsize as offset
-      next = it.hasNext() || offset < insts.numInstances();
+      boolean hasInstancesLeft = offset < insts.numInstances();
+      next = it.hasNext() || hasInstancesLeft;
     }
 
 
 
-    // Normalize
+    // Fix classes
     for (int i = 0; i < preds.length; i++) {
       // only normalise if we're dealing with classification
       if (preds[i].length > 1) {
         weka.core.Utils.normalize(preds[i]);
       } else {
+        // Rescale numeric classes with the computed coefficients in the initialization phase
         preds[i][0] = preds[i][0] * m_x1 + m_x0;
       }
     }

@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import lombok.Builder;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.optimize.api.IterationListener;
 
@@ -32,76 +33,37 @@ import org.deeplearning4j.optimize.api.IterationListener;
  * Class for listening to performance stats and writing them to a file.
  *
  * @author Christopher Beckham
- *
- * @version $Revision: 11711 $
  */
-public class FileIterationListener extends weka.dl4j.listener.IterationListener {
+@Builder
+public class FileIterationListener extends weka.dl4j.listener.EpochListener {
 
-	/** The ID used for serializing this class */
-	private static final long serialVersionUID = 1948578564961956518L;
+    /**
+     * The ID used for serializing this class
+     */
+    private static final long serialVersionUID = 1948578564961956518L;
 
-	/** The print writer to use */
-	protected transient PrintWriter m_pw = null;
+    /**
+     * The print writer to use
+     */
+    private transient PrintWriter m_pw = null;
 
-	/** The number of mini batches. */
-	protected int m_numMiniBatches = 0;
+    /**
+     * Constructor for this listener.
+     *
+     * @param filename the file to write the information to
+     * @throws Exception
+     */
+    public FileIterationListener(String filename) throws Exception {
+        super();
+        File f = new File(filename);
+        if (f.exists()) f.delete();
+        System.out.println("Creating debug file at: " + filename);
+        m_pw = new PrintWriter(new FileWriter(filename, false));
+    }
 
-	/** Losses per epoch */
-	protected ArrayList<Double> lossesPerEpoch = new ArrayList<Double>();
-
-	/**
-	 * Constructor for this listener.
-	 *
-	 * @param filename the file to write the information to
-	 * @param numMiniBatches the number of mini batches
-	 * @throws Exception
-	 */
-	public FileIterationListener(String filename, int numMiniBatches) throws Exception {
-		super();
-		File f = new File(filename);
-		if(f.exists()) f.delete();
-		System.err.println("Creating debug file at: " + filename);
-		m_numMiniBatches = numMiniBatches;
-		m_pw = new PrintWriter(new FileWriter(filename, false));
-		m_pw.write("loss\n");
-	}
-
-	/**
-	 * No-op method.
-	 */
-	@Override
-	public void invoke() { }
-
-	/**
-	 * Always returns false.
-	 *
-	 * @return false
-	 */
-	@Override
-	public boolean invoked() {
-		return false;
-	}
-
-	/**
-	 * Method that gets called when an iteration is done.
-	 *
-	 * @param model the model to operate with
-	 * @param epoch the epoch number
-	 */
-	@Override
-	public void iterationDone(Model model, int epoch) {
-
-		lossesPerEpoch.add( model.score() );
-		if(lossesPerEpoch.size() == m_numMiniBatches) {
-			// calculate mean
-			double mean = 0;
-			for(double val : lossesPerEpoch) {
-				mean += val;
-			}
-			mean = mean / lossesPerEpoch.size();
-			m_pw.write(mean + "\n");
-			m_pw.flush();
-			lossesPerEpoch.clear();
-		}
-	}
+    @Override
+    public void log(String msg) {
+        m_pw.write(msg + "\n");
+        m_pw.flush();
+    }
 }
