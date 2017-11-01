@@ -49,7 +49,7 @@ clf.setDataSetIterator(imgIter);
 
 
 // Setup the network layers
-// First convolution layer, 32 3x3 filter 
+// First convolution layer, 8 3x3 filter 
 ConvolutionLayer convLayer1 = new ConvolutionLayer();
 convLayer1.setKernelSizeX(3);
 convLayer1.setKernelSizeY(3);
@@ -66,7 +66,7 @@ poolLayer1.setKernelSizeY(2);
 poolLayer1.setStrideX(1);
 poolLayer1.setStrideY(1);
 
-// Second convolution layer, 64 3x3 filter
+// Second convolution layer, 8 3x3 filter
 ConvolutionLayer convLayer2 = new ConvolutionLayer();
 convLayer2.setKernelSizeX(3);
 convLayer2.setKernelSizeY(3);
