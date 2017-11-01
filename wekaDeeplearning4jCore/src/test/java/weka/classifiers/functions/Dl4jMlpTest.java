@@ -114,46 +114,6 @@ public class Dl4jMlpTest {
     }
 
     /**
-     * Test single layer iris.
-     *
-     * @throws Exception the exception
-     */
-    @Test
-    public void testIris() throws Exception {
-        // Define layers
-        DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(32);
-        denseLayer.setActivationFn(new ActivationReLU());
-        denseLayer.setWeightInit(WeightInit.XAVIER);
-        denseLayer.setLayerName("Dense-layer");
-
-        DenseLayer denseLayer2 = new DenseLayer();
-        denseLayer2.setNOut(32);
-        denseLayer2.setActivationFn(new ActivationReLU());
-        denseLayer2.setWeightInit(WeightInit.XAVIER);
-        denseLayer2.setLayerName("Dense-layer");
-
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
-        outputLayer.setUpdater(Updater.ADAM);
-        outputLayer.setLearningRate(0.01);
-        outputLayer.setBiasLearningRate(0.01);
-        outputLayer.setLossFn(new LossMCXENT());
-
-        // Configure neural network
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        nnc.setUseRegularization(true);
-
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
-        clf.setIterationListener(new EpochListener());
-
-        TestUtil.holdout(clf, dataIris);
-    }
-
-    /**
      * Test image dataset iterator mnist.
      *
      * @throws Exception IO error.
@@ -287,6 +247,7 @@ public class Dl4jMlpTest {
         Layer[] ls = new Layer[layers.size()];
         layers.toArray(ls);
         clf.setLayers(ls);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS*2); // Needs some more epochs to achieve more %correct than %incorrect
 
         TestUtil.holdout(clf, dataMnist);
     }
@@ -331,7 +292,7 @@ public class Dl4jMlpTest {
         TestUtil.holdout(clf, dataMnist);
     }
 
-    @Test
+//    @Test
     public void testDl4j() throws Exception {
         //number of rows and columns in the input pictures
         final int numRows = 28;
