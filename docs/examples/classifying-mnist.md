@@ -96,7 +96,7 @@ clf.setNeuralNetConfiguration(nnc);
 
 
 // Set the layers
-clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, denseLayer, outputLayer});
+clf.setLayers(new Layer[]{convLayer1, poolLayer1, convLayer2, poolLayer2, outputLayer});
 
 
 // Evaluate the network
