@@ -84,7 +84,6 @@ echo -e ${ep}verbose       = "${verbose}"
 echo -e ${ep}install_pack  = "${install_pack}"
 echo -e ${ep}clean         = "${clean}"
 echo -e ${ep}package         = "${backend}"
-echo -e "Version found: ${version}";
 ### END parse arguments ###
 
 # Get platform
