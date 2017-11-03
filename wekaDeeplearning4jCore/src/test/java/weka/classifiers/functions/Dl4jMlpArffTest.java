@@ -140,7 +140,7 @@ public class Dl4jMlpArffTest {
         ConvolutionLayer convLayer1 = new ConvolutionLayer();
         convLayer1.setKernelSize(threeByThree);
         convLayer1.setStride(oneByOne);
-        convLayer1.setNOut(32);
+        convLayer1.setNOut(8);
         convLayer1.setLayerName("Conv-layer 1");
         layers.add(convLayer1);
 
@@ -152,7 +152,7 @@ public class Dl4jMlpArffTest {
         convLayer2.setKernelSize(threeByThree);
         convLayer2.setStride(oneByOne);
         convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
-        convLayer2.setNOut(32);
+        convLayer2.setNOut(8);
         layers.add(convLayer2);
 
         BatchNormalization bn2 = new BatchNormalization();
@@ -168,7 +168,7 @@ public class Dl4jMlpArffTest {
 
 
         ConvolutionLayer convLayer3 = new ConvolutionLayer();
-        convLayer3.setNOut(64);
+        convLayer3.setNOut(8);
         convLayer3.setKernelSize(threeByThree);
         layers.add(convLayer3);
 
@@ -177,7 +177,7 @@ public class Dl4jMlpArffTest {
         layers.add(bn3);
 
         ConvolutionLayer convLayer4 = new ConvolutionLayer();
-        convLayer4.setNOut(64);
+        convLayer4.setNOut(8);
         convLayer4.setKernelSize(threeByThree);
         layers.add(convLayer4);
 
@@ -189,10 +189,6 @@ public class Dl4jMlpArffTest {
         poolLayer2.setPoolingType(PoolingType.MAX);
         poolLayer2.setKernelSize(twoByTwo);
         layers.add(poolLayer2);
-
-        DenseLayer denseLayer1 = new DenseLayer();
-        denseLayer1.setNOut(512);
-        layers.add(denseLayer1);
 
         BatchNormalization bn5 = new BatchNormalization();
         bn5.setActivationFunction(Activation.RELU.getActivationFunction());
