@@ -27,17 +27,14 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
-import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.optimize.api.InvocationType;
 import org.deeplearning4j.optimize.api.IterationListener;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
 import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.slf4j.Logger;
@@ -55,6 +52,8 @@ import org.deeplearning4j.nn.conf.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.zoo.EmptyNet;
+import weka.dl4j.zoo.FaceNetNN4Small2;
+import weka.dl4j.zoo.GoogLeNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
@@ -99,7 +98,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
 
   /** The actual neural network model. **/
-  protected transient MultiLayerNetwork m_model;
+  protected transient ComputationGraph m_model;
 
   /** The model zoo model. **/
   protected ZooModel m_zooModel = new EmptyNet();
@@ -261,7 +260,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
           remaining -= len;
         }
         bos.flush();
-        m_model = ModelSerializer.restoreMultiLayerNetwork(tmpFile, false);
+        m_model = ModelSerializer.restoreComputationGraph(tmpFile, false);
       }
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -444,6 +443,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       return;
     } else {
       m_Data = data;
+      m_Iterator = getIterator(m_Data);
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -452,10 +452,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
       // If zoo model was set, use this model as internal MultiLayerNetwork
       if(!(m_zooModel instanceof EmptyNet)){
-        m_model = createZooModel();
+        createZooModel();
       } else {
-        m_model = createModel();
+        createModel();
       }
+      // Setup the iterator
 
       // Print model architecture
       if (getDebug()) {
@@ -467,7 +468,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       m_model.setListeners(getListener());
 
 
-      m_Iterator = getIterator(m_Data);
       m_NumEpochsPerformed = 0;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -577,93 +577,72 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   /**
    * Build the Zoomodel instance
-   * @return MultiLayerNetwork instance
+   * @return ComputationGraph instance
    * @throws WekaException Either the .init operation on the current zooModel was not supported or the data shape does
    * not fit the chosen zooModel
    */
-  private MultiLayerNetwork createZooModel() throws WekaException {
-    int channels;
-    int height;
-    int width;
-    if (getInstanceIterator() instanceof ImageInstanceIterator) {
-      ImageInstanceIterator it = (ImageInstanceIterator) getInstanceIterator();
-      channels = it.getNumChannels();
-      height = it.getHeight();
-      width = it.getWidth();
-    } else {
-      throw new WekaException("Your current configuration is not supported.");
-    }
-
-    int[] shape = new int[]{channels, height, width};
-    int[][] shapeWrap = new int[][]{shape}; // Necessity from Dl4j
-    try {
-      return m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
-    } catch (DL4JInvalidConfigException e) {
-
-
-      int newHeight = height;
-      int newWidth = width;
-
-      boolean foundCorrectShape = false;
-
+  private void createZooModel() throws WekaException {
       ImageInstanceIterator iii = (ImageInstanceIterator) getInstanceIterator();
+      int newWidth = iii.getWidth();
+      int newHeight = iii.getHeight();
+      int channels = iii.getNumChannels();
+      boolean initSuccessful = false;
+      while (!initSuccessful){
+        // Increase width and height
+        int[] newShape =  new int[]{channels, newHeight, newWidth};
+        int[][] shapeWrap = new int[][]{newShape};
+        initSuccessful = initZooModel(m_Data.numClasses(), getSeed(), shapeWrap);
+        setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
 
-      while(!foundCorrectShape){
-        // Increase size
-        newHeight = (int)(1.1*newHeight);
-        newWidth = (int)(1.1*newWidth);
-
-        shape = new int[]{channels, newHeight, newWidth};
-        m_log.info("New shape = " + Arrays.toString(shape));
-        shapeWrap = new int[][]{shape};
-        try {
-          // Try to initialize the zoomodel with the new shape
-          MultiLayerNetwork net = m_zooModel.init(m_Data.numClasses(), getSeed(), shapeWrap);
-          // No exception thrown -> set new datasetiterator
-          setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
-          foundCorrectShape = true;
-          return net;
-        } catch (DL4JInvalidConfigException e2) {
-          // Still incorrect (too small) shapes
-          System.out.println();
-
-        } catch (OperationNotSupportedException e3) {
-          throw new WekaException("This operation is not supported. ", e);
+        newWidth *= 1.2;
+        newHeight *= 1.2;
+        if (!initSuccessful){
+          m_log.warn("The shape of the data did not fit the chosen " +
+                  "model. It was resized to ({}x{}x{}).", channels, newHeight, newWidth);
         }
       }
 
+  }
 
-      throw new WekaException("The provided dataset does not fit the selected model architecture " +
-              "(input/ouput is set automatically, though convolution and pool might reduce the width and height " +
-              "below 0 for this input dataset)", e);
+  private boolean initZooModel(int numClasses, long seed, int[][] newShape){
+    try {
+      m_model = m_zooModel.init(numClasses, seed, newShape);
+      return true;
     } catch (OperationNotSupportedException e) {
-      throw new WekaException("This operation is not supported. ", e);
+      e.printStackTrace();
+      throw new RuntimeException("ZooModel was not set, but createZooModel could be called. Invalid situation");
+    } catch (DL4JInvalidConfigException e){
+      return false;
     }
   }
 
   /**
    * Build the multilayer network defined by the networkconfiguration and the list of layers.
-   * @return MultiLayerNetwork object
    * @throws Exception
    */
-  private MultiLayerNetwork createModel() throws Exception {
-    final INDArray features = getIterator(m_Data).next().getFeatures();
+  private void createModel() throws Exception {
+    final INDArray features = m_Iterator.next().getFeatures();
+    m_Iterator.reset();
+    ComputationGraphConfiguration.GraphBuilder gb = new NeuralNetConfiguration.Builder()
+            .seed(getSeed())
+            .graphBuilder();
 
-    // Get initial configuration
-    ListBuilder list = m_configuration.builder()
-            .seed(getSeed()) //include a random seed for reproducibility
-            .list();
 
     // Set ouput size
     ((OutputLayer)m_layers[m_layers.length-1]).setNOut(m_Data.numClasses());
 
+    String currentInput = "input";
+    gb.addInputs(currentInput);
     // Collect layers
-    for (int i = 0; i < m_layers.length; i++){
-      list.layer(i, m_layers[i]);
+    for (Layer m_layer : m_layers) {
+      String lName = m_layer.getLayerName();
+      gb.addLayer(lName, m_layer, currentInput);
+      currentInput = lName;
     }
+    gb.setOutputs(currentInput);
+    gb.setInputTypes(InputType.inferInputTypes(features));
 
 
-    list.setInputType(InputType.inferInputType(features));
 
     // Set input type for the first layer manually since the builder above does not overwrite
     // the input type. This is especially problematic in the Weka AbstractTest since no new CLF instance
@@ -687,13 +666,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       inputLayer.setNIn(InputType.inferInputType(features), override);
     }
 
-    MultiLayerConfiguration conf = list.pretrain(false).backprop(true).build();
-    conf.setTrainingWorkspaceMode(WorkspaceMode.SEPARATE);
-
-    // Build the actual model from the configuration defined above
-    MultiLayerNetwork model = new MultiLayerNetwork(conf);
+    ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
+    ComputationGraph model = new ComputationGraph(conf);
     model.init();
-    return model;
+    m_model = model;
   }
 
   /**
@@ -708,7 +684,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int trainBatchSize = getInstanceIterator().getTrainBatchSize();
     if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
       int numEpochs = getNumEpochs();
-      ((weka.dl4j.listener.IterationListener) m_iterationListener).init(numEpochs, trainBatchSize, numSamples, getIterator(m_Data));
+      ((weka.dl4j.listener.IterationListener) m_iterationListener).init
+              (numEpochs, trainBatchSize, numSamples, m_Iterator);
       listeners.add(m_iterationListener);
     }
 
@@ -716,7 +693,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // if the log file doesn't point to a directory, set up the listener
     if (getLogFile() != null && !getLogFile().isDirectory()) {
       FileIterationListener fil = new FileIterationListener(getLogFile().getAbsolutePath());
-      fil.init(getNumEpochs(), trainBatchSize, numSamples, getIterator(m_Data));
+      fil.init(getNumEpochs(), trainBatchSize, numSamples, m_Iterator);
       listeners.add(fil);
     }
 
@@ -766,6 +743,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
                   "(default = no model).", commandLineParamName = "zooModel",
           commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
   public void setZooModel(ZooModel zooModel){
+
+    if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
+      throw new RuntimeException("The zoomodel you have selected is currently" +
+              " not supported! Please select another one.");
+    }
+
     m_zooModel = zooModel;
   }
 
@@ -843,7 +826,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int offset = 0;
     boolean next = true;
     while (next){
-      INDArray predBatch = m_model.output(it.next().getFeatureMatrix());
+      INDArray predBatch = m_model.outputSingle(it.next().getFeatureMatrix());
       int currentBatchSize = predBatch.shape()[0];
       // Build weka distribution output
       for (int i = 0; i < currentBatchSize; i++) {
@@ -891,7 +874,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * Get the {@link MultiLayerNetwork} model
    * @return MultiLayerNetwork instance
    */
-  public MultiLayerNetwork getModel() {
+  public ComputationGraph getModel() {
     return m_model;
   }
 
@@ -904,7 +887,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public String toString() {
 
     if (m_replaceMissing != null) {
-      return m_model.getLayerWiseConfigurations().toYaml();
+      return m_model.getConfiguration().toYaml();
     }
     return null;
   }

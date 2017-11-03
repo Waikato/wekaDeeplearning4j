@@ -1,23 +1,52 @@
 package weka.dl4j.zoo;
 
+import lombok.Data;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.Layer;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
 import javax.naming.OperationNotSupportedException;
 import java.io.Serializable;
 import java.util.Enumeration;
+import java.util.List;
 
-public interface ZooModel extends Serializable, OptionHandler{
+public interface ZooModel extends Serializable, OptionHandler {
     /**
-     * Initialize the ZooModel
+     * Initialize the ZooModel as MLP
+     *
      * @param numLabels Number of labels to adjust the output
-     * @param seed Seed
-     * @param shape Input shape to adjust the input
+     * @param seed      Seed
      * @return MultiLayerNetwork of the specified ZooModel
      * @throws OperationNotSupportedException Init(...) was not supported (only EmptyNet)
      */
-    abstract public MultiLayerNetwork init(int numLabels, long seed, int[][] shape) throws OperationNotSupportedException;
+    ComputationGraph init(int numLabels, long seed, int[][] shape) throws OperationNotSupportedException;
+
+
+    default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape){
+        ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder().graphBuilder();
+        List<NeuralNetConfiguration> confs = mlc.getConfs();
+        String currentInput = "input";
+        builder.addInputs(currentInput);
+        for (NeuralNetConfiguration conf : confs){
+            Layer l = conf.getLayer();
+            String layerName = l.getLayerName();
+            builder.addLayer(layerName, l, currentInput);
+            currentInput = layerName;
+        }
+        builder.setOutputs(currentInput);
+        builder.setInputTypes(InputType.convolutional(shape[0][1], shape[0][2], shape[0][0]));
+        ComputationGraphConfiguration cgc = builder.build();
+        return new ComputationGraph(cgc);
+    }
+
+    int[][] getShape();
 
     /**
      * Returns an enumeration describing the available options.
@@ -45,7 +74,7 @@ public interface ZooModel extends Serializable, OptionHandler{
      * Parses a given list of options.
      *
      * @param options the list of options as an array of strings
-     * @exception Exception if an option is not supported
+     * @throws Exception if an option is not supported
      */
     default public void setOptions(String[] options) throws Exception {
 

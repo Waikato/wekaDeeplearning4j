@@ -1,7 +1,13 @@
 package weka.zoo;
 
+import org.deeplearning4j.datasets.iterator.impl.CifarDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.Layer;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.InvocationType;
 import org.deeplearning4j.optimize.listeners.EvaluativeListener;
@@ -12,16 +18,26 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.dl4j.zoo.*;
+import weka.filters.Filter;
+import weka.filters.unsupervised.instance.Randomize;
+import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 
 /**
- * JUnit tests for the ModelZoo ({@link weka.zoo}
+ * JUnit tests for the ModelZoo ({@link weka.zoo}). Mainly checks out whether the
+ * initialization of the models work.
  *
  * @author Steven Lang
  */
@@ -41,56 +57,70 @@ public class ModelZooTest {
      * @throws Exception
      */
 //    @Test
-    public void testPureAlexNet() throws Exception {
-        org.deeplearning4j.zoo.model.AlexNet m = new org.deeplearning4j.zoo.model.AlexNet(10, 32, 1);
+    public static void testPureLeNetCifar() throws Exception {
+        org.deeplearning4j.zoo.model.LeNet m = new org.deeplearning4j.zoo.model.LeNet(10, 32, 1);
 
+        CifarDataSetIterator cdiTrain = new CifarDataSetIterator(256, 40000,
+                true);
+        CifarDataSetIterator cdiTest = new CifarDataSetIterator(256, 10000,
+                false);
         int[][] inputShapeModel = m.metaData().getInputShape();
-        int height = inputShapeModel[0][1];
-        int width = inputShapeModel[0][2];
-
-        inputShapeModel[0][0] = 1;
-        inputShapeModel[0][1] = height;
-        inputShapeModel[0][2] = width;
-        System.out.println("width = " + width);
+        inputShapeModel[0][0] = 3;
+        inputShapeModel[0][1] = 32;
+        inputShapeModel[0][2] = 32;
         m.setInputShape(inputShapeModel);
 
         MultiLayerConfiguration conf = m.conf();
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
-        model.init();
+//        ComputationGraph model= mlpToCG(conf, inputShapeModel);
+//        model.init();
 
-        int SEED = 42;
-        int DEFAULT_BATCHSIZE = 1;
-        ImageInstanceIterator iii = DatasetLoader.loadMiniMnistImageIterator();
-        iii.setTrainBatchSize(DEFAULT_BATCHSIZE);
-        iii = new ResizeImageInstanceIterator(iii, width, height);
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-        Instances[] split = TestUtil.splitTrainTest(data);
-        Instances train = split[0];
-        Instances test = split[1];
-        DataSetIterator trainIt = iii.getIterator(train, SEED, DEFAULT_BATCHSIZE);
-        DataSetIterator testIt = iii.getIterator(test, SEED, DEFAULT_BATCHSIZE);
         logger.info("Train model....");
         for (int i = 0; i < 10; i++) {
             logger.info("Epoch " + i);
-            model.fit(trainIt);
-            Evaluation evaluate = model.evaluate(trainIt);
+            long t0 = System.currentTimeMillis();
+            model.fit(cdiTrain);
+            long t1 = System.currentTimeMillis();
+            System.out.println("(t1-t0)/1000 = " + (t1 - t0) / 1000d);
+            Evaluation evaluate = model.evaluate(cdiTrain);
             System.out.println("evaluate = " + evaluate.stats());
         }
 
 
         logger.info("Evaluate model....");
         Evaluation eval = new Evaluation(10); //create an evaluation object with 10 possible classes
-        while (testIt.hasNext()) {
-            DataSet next = testIt.next();
+        while (cdiTest.hasNext()) {
+            DataSet next = cdiTest.next();
+//            INDArray output = model.outputSingle(next.getFeatureMatrix()); //get the networks prediction
             INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
+//            INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
             eval.eval(next.getLabels(), output); //check the prediction against the true class
+
         }
         logger.info(eval.stats());
         logger.info("****************Example finished********************");
 
     }
 
-//    @Test
+    private ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape){
+        ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder().graphBuilder();
+        List<NeuralNetConfiguration> confs = mlc.getConfs();
+        String currentInput = "input";
+        builder.addInputs(currentInput);
+        for (NeuralNetConfiguration conf : confs){
+            Layer l = conf.getLayer();
+            String layerName = l.getLayerName();
+            builder.addLayer(layerName, l, currentInput);
+            currentInput = layerName;
+        }
+        builder.setOutputs(currentInput);
+        builder.setInputTypes(InputType.convolutional(shape[0][1], shape[0][2], shape[0][0]));
+        ComputationGraphConfiguration cgc = builder.build();
+        return new ComputationGraph(cgc);
+    }
+
+
+    //    @Test
     public void testLeNetMnistReshaped() throws Exception {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
@@ -108,29 +138,44 @@ public class ModelZooTest {
         TestUtil.holdout(clf, data);
     }
 
-//    @Test
+    @Test
     public void testLeNetMnist() throws Exception {
         performZoo(new LeNet());
     }
 
-//    @Test
+    @Test
     public void testAlexNetMnist() throws Exception {
         performZoo(new AlexNet());
     }
 
-//    @Test
+    @Test
     public void testVGG16() throws Exception {
         performZoo(new VGG16());
     }
 
-//    @Test
+    @Test
     public void testVGG19() throws Exception {
         performZoo(new VGG19());
     }
 
-//    @Test
-    public void testSimpleCNN() throws Exception {
-        performZoo(new SimpleCNN());
+    @Test
+    public void testFaceNetNN4Small2() throws Exception {
+        performZoo(new FaceNetNN4Small2());
+    }
+
+    @Test
+    public void testGoogLeNet() throws Exception {
+        performZoo(new GoogLeNet());
+    }
+
+    @Test
+    public void testInceptionResNetV1() throws Exception {
+        performZoo(new InceptionResNetV1());
+    }
+
+    @Test
+    public void testResNet50() throws Exception {
+        performZoo(new ResNet50());
     }
 
     public void performZoo(ZooModel model) throws Exception {
@@ -140,13 +185,26 @@ public class ModelZooTest {
 
         // Data
         Instances data = DatasetLoader.loadMiniMnistMeta();
-        data.setClassIndex(data.numAttributes() - 1);
+
+        ArrayList<Attribute> atts = new ArrayList<>();
+        for (int i = 0; i < data.numAttributes(); i++){
+            atts.add(data.attribute(i));
+        }
+        Instances shrinkedData = new Instances("shrinked", atts, 10);
+        shrinkedData.setClassIndex(1);
+        for (int i = 0; i < 100; i++){
+            Instance inst = data.get(i);
+            inst.setClassValue(i%10);
+            inst.setDataset(shrinkedData);
+            shrinkedData.add(inst);
+        }
+
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(16);
+        iterator.setTrainBatchSize(20);
         clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
-        clf.setNumEpochs(10);
-//        clf.setIterationListener(new EvaluativeListener(iterator.getIterator(data, 42, 1), 1, InvocationType.EPOCH_END));
-        TestUtil.holdout(clf, data);
+        clf.setNumEpochs(3);
+        clf.buildClassifier(shrinkedData);
+        clf.distributionsForInstances(shrinkedData);
     }
 }
