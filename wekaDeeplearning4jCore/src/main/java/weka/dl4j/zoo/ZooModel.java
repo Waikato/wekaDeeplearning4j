@@ -1,14 +1,12 @@
 package weka.dl4j.zoo;
 
-import lombok.Data;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
@@ -29,19 +27,39 @@ public interface ZooModel extends Serializable, OptionHandler {
     ComputationGraph init(int numLabels, long seed, int[][] shape) throws OperationNotSupportedException;
 
 
-    default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape){
-        ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder().graphBuilder();
+    /**
+     * Convert a MultiLayerConfiguration into a Computation graph
+     *
+     * @param mlc   Layer-wise configuration
+     * @param shape Inputshape
+     * @return ComputationGraph based on the configuration in the MLC
+     */
+    default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape) {
+        ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder()
+                .trainingWorkspaceMode(WorkspaceMode.SINGLE)
+                .inferenceWorkspaceMode(WorkspaceMode.SINGLE)
+                .graphBuilder();
         List<NeuralNetConfiguration> confs = mlc.getConfs();
+
+        // Start with input
         String currentInput = "input";
         builder.addInputs(currentInput);
-        for (NeuralNetConfiguration conf : confs){
+
+        // Iterate MLN configurations layer-wise
+        for (NeuralNetConfiguration conf : confs) {
             Layer l = conf.getLayer();
-            String layerName = l.getLayerName();
-            builder.addLayer(layerName, l, currentInput);
-            currentInput = layerName;
+            String lName = l.getLayerName();
+
+            // Connect current layer with last layer
+            builder.addLayer(lName, l, currentInput);
+            currentInput = lName;
         }
         builder.setOutputs(currentInput);
+
+        // Configure inputs
         builder.setInputTypes(InputType.convolutional(shape[0][1], shape[0][2], shape[0][0]));
+
+        // Build
         ComputationGraphConfiguration cgc = builder.build();
         return new ComputationGraph(cgc);
     }
