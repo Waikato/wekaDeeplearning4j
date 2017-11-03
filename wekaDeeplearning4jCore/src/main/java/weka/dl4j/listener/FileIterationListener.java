@@ -34,7 +34,6 @@ import org.deeplearning4j.optimize.api.IterationListener;
  *
  * @author Christopher Beckham
  */
-@Builder
 public class FileIterationListener extends weka.dl4j.listener.EpochListener {
 
     /**
