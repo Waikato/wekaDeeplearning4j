@@ -121,12 +121,12 @@ pack_name=${prefix}${backend}-${version}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
     rm lib/*
-    mvn clean > /dev/null # don't clutter with mvn clean output
+    mvn -q clean > ${out} # don't clutter with mvn clean output
 fi
 
 # Compile source code with maven
 echo -e "${ep}Pulling dependencies via maven..."
-mvn -DskipTests=true -P ${backend} install >  "$out"
+mvn -q -DskipTests=true -P ${backend} install >  "$out"
 
 echo -e "${ep}Starting ant build for ${bold}"${base}"-dev"${nc}
 
