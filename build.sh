@@ -13,15 +13,22 @@ nc='\e[0m' # Reset attributes
 bold='\e[1m'
 green='\e[32m'
 
-# Project version
-version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' wekaDeeplearning4jCore/build_package.xml`
 
 # Module prefix
 prefix=wekaDeeplearning4j
 
-cd ${prefix}Core
 
 ep="${bold}[${green}${prefix} build.sh${nc}${bold}]${nc}: "
+
+# Project version
+version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' wekaDeeplearning4jCore/build_package.xml`
+if echo ${version} | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+$"; then
+    echo -e "${ep}Using version: ${version}"
+else
+    echo -e "${ep}Error finding version. Unknown version: ${version}"
+    echo -e "${ep}Exiting now."
+    exit 1
+fi
 
 function show_usage {
     echo -e "Usage: build.sh"
@@ -77,7 +84,7 @@ echo -e ${ep}verbose       = "${verbose}"
 echo -e ${ep}install_pack  = "${install_pack}"
 echo -e ${ep}clean         = "${clean}"
 echo -e ${ep}package         = "${backend}"
-echo ""
+echo -e "Version found: ${version}";
 ### END parse arguments ###
 
 # Get platform
@@ -116,7 +123,11 @@ fi
 export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${ep}Classpath = " ${CLASSPATH}
 
+
 base=${prefix}Core
+cd ${base}
+
+
 pack_name=${prefix}${backend}-${version}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
