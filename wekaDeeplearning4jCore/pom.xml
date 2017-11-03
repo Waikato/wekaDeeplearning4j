@@ -6,7 +6,7 @@
 
     <groupId>nz.ac.waikato.cms.weka</groupId>
     <artifactId>wekaDeeplearning4j</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <name>wekaDeeplearning4j-dev</name>
     <description>Deep learning for WEKA</description>
     <packaging>jar</packaging>
@@ -90,7 +90,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.25</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.cmu.cs</groupId>
@@ -195,6 +194,32 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<archive>-->
+                                <!--<manifest>-->
+                                    <!--<mainClass>-->
+                                        <!--weka.Main-->
+                                    <!--</mainClass>-->
+                                <!--</manifest>-->
+                            <!--</archive>-->
+                            <!--<descriptorRefs>-->
+                                <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                            <!--</descriptorRefs>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>
