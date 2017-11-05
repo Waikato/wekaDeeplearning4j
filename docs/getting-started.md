@@ -111,6 +111,8 @@ WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possi
 - SimpleCNN
 - VGG16
 - VGG19
+- ResNet50
+- InceptionResNetV1
 
 This set of models will be extended over the time.
 
