@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Options
 install_pack=false
 verbose=false
@@ -20,7 +22,23 @@ prefix=wekaDeeplearning4j
 
 ep="${bold}[${green}${prefix} build.sh${nc}${bold}]${nc}: "
 
-# Project version
+### Check for color support ###
+# check if stdout is a terminal...
+if test -t 1; then
+
+    # see if it supports colors...
+    ncolors=$(tput colors)
+
+    if test -n "$ncolors" && test $ncolors -ge 8; then #Enable colors
+        ep="${bold}[${green}${prefix} build.sh${nc}${bold}]${nc}: "
+    else #Disable colors
+        ep="[${prefix} build.sh]:"
+        bold=""
+        nc=""
+    fi
+fi
+
+# Project version (TODO: Fix for non GNU grep versions)
 version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' wekaDeeplearning4jCore/build_package.xml`
 if echo ${version} | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+$"; then
     echo -e "${ep}Using version: ${version}"
