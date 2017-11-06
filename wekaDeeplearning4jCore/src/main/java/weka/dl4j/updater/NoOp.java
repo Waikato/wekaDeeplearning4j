@@ -12,12 +12,12 @@ public class NoOp extends org.nd4j.linalg.learning.config.NoOp implements Update
 
     @Override
     @ProgrammaticProperty
-    public void setLearningRate(double learningRate) {
+    public double getLearningRate() {
+        return 0;
     }
 
     @Override
     @ProgrammaticProperty
-    public double getLearningRate() {
-        return 0;
+    public void setLearningRate(double learningRate) {
     }
 }

@@ -1,6 +1,7 @@
 package weka.dl4j.updater;
 
 import weka.core.OptionMetadata;
+
 /**
  * A WEKA version of DeepLearning4j's AdaMax.
  *
@@ -9,21 +10,29 @@ import weka.core.OptionMetadata;
 public class AdaMax extends org.nd4j.linalg.learning.config.AdaMax implements Updater {
     private static final long serialVersionUID = 9196053591015785889L;
 
+
+    /**
+     * Default constructor setting Updater defaults
+     */
+    public AdaMax() {
+        setDefaults();
+    }
+
     @OptionMetadata(
             displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_ADAMAX_LEARNING_RATE + ").",
+            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
             commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
             displayOrder = 0)
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
-    
+
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);
     }
-    
+
     @OptionMetadata(
             displayName = "beta1MeanDecay",
             description = "The mean decay (default = " + DEFAULT_ADAMAX_BETA1_MEAN_DECAY + ").",
@@ -33,12 +42,12 @@ public class AdaMax extends org.nd4j.linalg.learning.config.AdaMax implements Up
     public double getBeta1() {
         return super.getBeta1();
     }
-    
+
     @Override
     public void setBeta1(double beta1) {
         super.setBeta1(beta1);
     }
-    
+
     @OptionMetadata(
             displayName = "beta2VarDecay",
             description = "The var decay (default = " + DEFAULT_ADAMAX_BETA2_VAR_DECAY + ").",
@@ -48,12 +57,12 @@ public class AdaMax extends org.nd4j.linalg.learning.config.AdaMax implements Up
     public double getBeta2() {
         return super.getBeta2();
     }
-    
+
     @Override
     public void setBeta2(double beta2) {
         super.setBeta2(beta2);
     }
-    
+
     @OptionMetadata(
             displayName = "epsilon",
             description = "The epsilon parameter (default = " + DEFAULT_ADAMAX_EPSILON + ").",
@@ -63,7 +72,7 @@ public class AdaMax extends org.nd4j.linalg.learning.config.AdaMax implements Up
     public double getEpsilon() {
         return super.getEpsilon();
     }
-    
+
     @Override
     public void setEpsilon(double epsilon) {
         super.setEpsilon(epsilon);

@@ -11,21 +11,28 @@ import weka.core.OptionMetadata;
 public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements Updater {
     private static final long serialVersionUID = 7400615175279701837L;
 
+    /**
+     * Default constructor setting Updater defaults
+     */
+    public RmsProp() {
+        setDefaults();
+    }
+
     @OptionMetadata(
             displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_RMSPROP_LEARNING_RATE + ").",
+            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
             commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
             displayOrder = 0)
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
-    
+
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);
     }
-    
+
     @OptionMetadata(
             displayName = "rmsDecay",
             description = "The rms decay (default = " + DEFAULT_RMSPROP_RMSDECAY + ").",
@@ -35,12 +42,12 @@ public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements 
     public double getRmsDecay() {
         return super.getRmsDecay();
     }
-    
+
     @Override
     public void setRmsDecay(double rmsDecay) {
         super.setRmsDecay(rmsDecay);
     }
-    
+
     @OptionMetadata(
             displayName = "epsilon",
             description = "The epsilon parameter (default = " + DEFAULT_RMSPROP_EPSILON + ").",
@@ -50,7 +57,7 @@ public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements 
     public double getEpsilon() {
         return super.getEpsilon();
     }
-    
+
     @Override
     public void setEpsilon(double epsilon) {
         super.setEpsilon(epsilon);
