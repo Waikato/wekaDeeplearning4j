@@ -92,17 +92,14 @@ public class Dl4jMlpArffTest {
         denseLayer.setNOut(256);
         denseLayer.setLayerName("Dense-layer");
         denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
-        denseLayer.setWeightInit(WeightInit.XAVIER);
 
         DenseLayer denseLayer2 = new DenseLayer();
         denseLayer2.setNOut(128);
         denseLayer2.setLayerName("Dense-layer");
         denseLayer2.setActivationFn(Activation.RELU.getActivationFunction());
-        denseLayer2.setWeightInit(WeightInit.XAVIER);
 
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
         outputLayer.setLayerName("Output-layer");
 
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();

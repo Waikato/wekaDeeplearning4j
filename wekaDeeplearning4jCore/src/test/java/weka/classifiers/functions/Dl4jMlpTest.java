@@ -180,7 +180,6 @@ public class Dl4jMlpTest {
 
         BatchNormalization bn1 = new BatchNormalization();
         bn1.setActivationFunction(new ActivationReLU());
-        bn1.setActivationFunction(new ActivationReLU());
         layers.add(bn1);
 
         ConvolutionLayer convLayer2 = new ConvolutionLayer();
@@ -262,18 +261,15 @@ public class Dl4jMlpTest {
         denseLayer.setNOut(256);
         denseLayer.setLayerName("Dense-layer");
         denseLayer.setActivationFn(new ActivationReLU());
-        denseLayer.setWeightInit(WeightInit.XAVIER);
 
         DenseLayer denseLayer2 = new DenseLayer();
         denseLayer2.setNOut(128);
         denseLayer2.setLayerName("Dense-layer");
         denseLayer2.setActivationFn(new ActivationReLU());
-        denseLayer2.setWeightInit(WeightInit.XAVIER);
 
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(new ActivationSoftmax());
         outputLayer.setLossFn(new LossMCXENT());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
         outputLayer.setLayerName("Output-layer");
 
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
