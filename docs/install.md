@@ -35,7 +35,7 @@ Installed	Repository	Loaded	Package
 ```
 
 # Using wekaDeeplearning4j in a maven project
-It is also possible to include this package as maven project. As of now it is now provided in any maven repository, therefore you need to install this package to your local `.m2` repository:
+It is also possible to include this package as maven project. As of now it is not provided in any maven repository, therefore you need to install this package to your local `.m2` repository:
 
 ```bash
 $ git clone https://github.com/Waikato/wekaDeeplearning4j.git
