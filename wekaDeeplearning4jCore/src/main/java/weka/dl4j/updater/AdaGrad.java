@@ -6,10 +6,11 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's AdaGrad.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 
 public class AdaGrad extends org.nd4j.linalg.learning.config.AdaGrad implements Updater {
+    private static final long serialVersionUID = 3881105990718165790L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_ADAGRAD_LEARNING_RATE + ").",

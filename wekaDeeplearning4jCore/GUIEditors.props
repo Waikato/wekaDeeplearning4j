@@ -21,7 +21,7 @@ org.nd4j.linalg.activations.IActivation=weka.gui.GenericObjectEditor
 weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor
 
 # Uncomment as soon as DL4J allows IUpdater to set the updater-configuration
-#org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor
+org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor
 
 # NLP
 

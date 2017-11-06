@@ -7,9 +7,10 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's Nesterovs.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class Nesterovs extends org.nd4j.linalg.learning.config.Nesterovs implements Updater {
+    private static final long serialVersionUID = 927121528229628203L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_NESTEROV_LEARNING_RATE + ").",

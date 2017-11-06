@@ -7,9 +7,10 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's RmsProp.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements Updater {
+    private static final long serialVersionUID = 7400615175279701837L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_RMSPROP_LEARNING_RATE + ").",

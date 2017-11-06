@@ -7,9 +7,10 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's Adam.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class Adam extends org.nd4j.linalg.learning.config.Adam implements Updater {
+    private static final long serialVersionUID = 667880237656554906L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_ADAM_EPSILON + ").",

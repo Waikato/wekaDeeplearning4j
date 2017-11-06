@@ -6,10 +6,11 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's Sgd.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class Sgd extends org.nd4j.linalg.learning.config.Sgd implements Updater {
-    
+
+    private static final long serialVersionUID = 1852959048173443658L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_SGD_LR + ").",

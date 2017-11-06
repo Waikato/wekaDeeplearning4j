@@ -2,14 +2,16 @@ package weka.dl4j.updater;
 
 
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's AdaDelta.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class AdaDelta extends org.nd4j.linalg.learning.config.AdaDelta implements Updater {
+    private static final long serialVersionUID = -5776515704843860182L;
+
     @OptionMetadata(
             displayName = "rho",
             description = "The rho parameter (default = " + DEFAULT_ADADELTA_RHO + ").",
@@ -39,5 +41,17 @@ public class AdaDelta extends org.nd4j.linalg.learning.config.AdaDelta implement
     @Override
     public void setEpsilon(double epsilon) {
         super.setEpsilon(epsilon);
+    }
+
+
+    @Override
+    @ProgrammaticProperty
+    public void setLearningRate(double learningRate) {
+    }
+
+    @Override
+    @ProgrammaticProperty
+    public double getLearningRate() {
+        return 0;
     }
 }

@@ -5,9 +5,10 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's AdaMax.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class AdaMax extends org.nd4j.linalg.learning.config.AdaMax implements Updater {
+    private static final long serialVersionUID = 9196053591015785889L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_ADAMAX_LEARNING_RATE + ").",

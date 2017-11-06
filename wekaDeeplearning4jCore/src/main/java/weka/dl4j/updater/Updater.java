@@ -11,10 +11,11 @@ import java.util.Enumeration;
  * Default Updater that implements WEKA option handling.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
-public interface Updater extends OptionHandler{
-    
+public interface Updater extends OptionHandler, IUpdater{
+
+    void setLearningRate(double learningRate);
+    double getLearningRate();
     
     
     /**

@@ -1,17 +1,21 @@
 package weka.dl4j;
 
-import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.*;
 import org.junit.rules.TestName;
+import org.nd4j.linalg.learning.config.IUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.*;
+import weka.dl4j.layers.BatchNormalization;
+import weka.dl4j.layers.ConvolutionLayer;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.updater.*;
 import weka.util.DatasetLoader;
 
 import java.io.IOException;
@@ -104,12 +108,23 @@ public class NeuralNetConfigurationTest {
 
     /**
      * Test
+     *
      * @throws Exception
      */
     @Test
     public void testNNCParameters() throws Exception {
-
-        for (Updater u : Updater.values()) {
+        weka.dl4j.updater.Updater[] updater = new weka.dl4j.updater.Updater[]{
+                new AdaDelta(),
+                new AdaGrad(),
+                new Adam(),
+                new AdaMax(),
+                new Nadam(),
+                new Nesterovs(),
+                new NoOp(),
+                new RmsProp(),
+                new Sgd()
+        };
+        for (weka.dl4j.updater.Updater u : updater) {
             // Define some architecture including all currently available layers
             ConvolutionLayer cl = new ConvolutionLayer();
             cl.setNOut(10);
@@ -123,30 +138,26 @@ public class NeuralNetConfigurationTest {
             // Setup the configuration
             NeuralNetConfiguration nnc;
 
-            // Skip custom
-            if (u.equals(Updater.CUSTOM)) continue;
-
-            // NADAM is not working as of dl4j 0.9.1
-            if (u.equals(Updater.NADAM)) continue;
-
             double l1 = 0.001;
             double l2 = 0.002;
             double l1Bias = 0.003;
             double l2Bias = 0.004;
-
-            int learningRate = 1;
+            if (u instanceof Adam) {
+                double lr = 5.0;
+                ((Adam) u).setLearningRate(lr);
+            }
             WeightInit weightInit = WeightInit.UNIFORM;
 
             nnc = new NeuralNetConfiguration();
             nnc.setUseRegularization(true);
             nnc.setUpdater(u);
+
             nnc.setL1(l1);
             nnc.setL2(l2);
 
             // Not working as of dl4j 0.9.1
 //            nnc.setBiasL1(l1Bias);
 //            nnc.setBiasL2(l2Bias);
-            nnc.setLearningRate(learningRate);
             nnc.setWeightInit(weightInit);
 
 
@@ -154,20 +165,19 @@ public class NeuralNetConfigurationTest {
             clf.initializeClassifier(dataMnist); // creates the model internally
 
             for (Layer l : layers) {
-                Updater u2 = ((BaseLayer) l).getUpdater();
+                IUpdater u2 = ((BaseLayer) l).getIUpdater();
                 double l11 = ((BaseLayer) l).getL1();
                 double l21 = ((BaseLayer) l).getL2();
-                double learningRate1 = ((BaseLayer) l).getLearningRate();
                 WeightInit weightInit1 = ((BaseLayer) l).getWeightInit();
+                double learningRate = ((BaseLayer) l).getLearningRate();
+                if (u instanceof Adam) {
+                    Assert.assertEquals(5.0, learningRate, 10e-6);
+                }
 
-                Assert.assertEquals(u.name(), u2.name());
+                Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
                 Assert.assertEquals(l1, l11, 10e-6);
                 Assert.assertEquals(l2, l21, 10e-6);
-                Assert.assertEquals(learningRate, learningRate1, 10e-6);
                 Assert.assertEquals(weightInit, weightInit1);
-                // Not working as of dl4j 0.9.1
-//                Assert.assertEquals(l1Bias, ((BaseLayer) l).getL1Bias(), 10e-6);
-//                Assert.assertEquals(l2Bias, ((BaseLayer) l).getL2Bias(), 10e-6);
             }
         }
     }

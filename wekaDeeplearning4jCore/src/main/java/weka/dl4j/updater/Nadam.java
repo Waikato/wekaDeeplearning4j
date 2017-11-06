@@ -5,9 +5,10 @@ import weka.core.OptionMetadata;
  * A WEKA version of DeepLearning4j's Nadam.
  *
  * @author Steven Lang
- * @version $Revision: 11711 $
  */
 public class Nadam extends org.nd4j.linalg.learning.config.Nadam implements Updater {
+    private static final long serialVersionUID = 4997617718703358847L;
+
     @OptionMetadata(
             displayName = "learningrate",
             description = "The learningrate to use (default = " + DEFAULT_NADAM_LEARNING_RATE + ").",

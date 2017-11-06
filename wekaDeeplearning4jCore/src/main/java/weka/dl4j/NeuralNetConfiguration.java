@@ -38,7 +38,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public NeuralNetConfiguration() {
     builder = new Builder();
 
-    setUpdater(Updater.ADAM);
+    setUpdater(new weka.dl4j.updater.Adam());
 
     this.leakyreluAlpha = 0.01D;
     this.miniBatch = true;
@@ -92,7 +92,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public void setL1ByParam(Map<String, Double> l1ByParam) {
     super.setL1ByParam(l1ByParam);
   }
-  
+
   @OptionMetadata(
           displayName = "learning rate policy",
           description = "The learning rate policy (default = None).",
@@ -175,25 +175,24 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public StepFunction getStepFunction() { return super.getStepFunction(); }
   public void setStepFunction(StepFunction f) { builder.stepFunction(f); }
 
+//  @OptionMetadata(
+//          displayName = "updater",
+//          description = "The updater to use (default = SGD).",
+//          commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
+//          displayOrder = 12)
+//  public Updater getUpdater() { return builder.getUpdater(); }
+//  public void setUpdater(Updater updater) {
+//    builder.updater(updater);
+//  }
   @OptionMetadata(
           displayName = "updater",
           description = "The updater to use (default = SGD).",
           commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
           displayOrder = 12)
-  public Updater getUpdater() { return builder.getUpdater(); }
-  public void setUpdater(Updater updater) {
+  public IUpdater getUpdater() { return builder.getIUpdater(); }
+  public void setUpdater(weka.dl4j.updater.Updater updater) {
     builder.updater(updater);
   }
-  @OptionMetadata(
-          displayName = "learning rate",
-          description = "The global learning rate (default = 0.01).",
-          commandLineParamName = "lr", commandLineParamSynopsis = "-lr <double>",
-          displayOrder = 13)
-  public double getLearningRate() { return builder.getLearningRate(); }
-  public void setLearningRate(double lr) {
-    builder.learningRate(lr);
-  }
-
   @OptionMetadata(
           displayName = "l1 regularization factor",
           description = "L1 regularization factor (default = 0.00).",
@@ -253,7 +252,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   }
 
 
-  
+
   @ProgrammaticProperty
   public int getIterationCount() { return super.getIterationCount(); }
   public void setIterationCount(int n) { super.setIterationCount(n); }
@@ -269,7 +268,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   @ProgrammaticProperty
   public boolean isPretrain() { return super.isPretrain(); }
   public void setPretrain(boolean b) { builder.setPretrain(b); }
-  
+
 
   /**
    * Returns an enumeration describing the available options.
@@ -306,6 +305,20 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
    * Dummy builder class
    */
   public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder implements Serializable{
+    private static final long serialVersionUID = 8968204740743541886L;
 
+    public Builder() {
+    }
+
+    public Builder(NeuralNetConfiguration newConf) {
+      super(newConf);
+      double lr = ((weka.dl4j.updater.Updater) newConf.getUpdater()).getLearningRate();
+      this.updater(newConf.getUpdater())
+              .learningRate(lr)
+              .l1(newConf.getL1())
+              .l2(newConf.getL2())
+              .weightInit(newConf.getWeightInit())
+              .seed(getSeed());
+    }
   }
 }
