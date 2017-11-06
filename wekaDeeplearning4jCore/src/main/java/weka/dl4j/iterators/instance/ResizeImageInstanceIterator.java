@@ -35,6 +35,11 @@ import weka.dl4j.ArffMetaDataLabelGenerator;
 public class ResizeImageInstanceIterator extends ImageInstanceIterator {
 
     /**
+     * SerialVersionUID
+     */
+    private static final long serialVersionUID = -3310258401133869149L;
+
+    /**
      * Default constructor with the new shape
      * @param iii Previous image iterator
      * @param newWidth New image width
