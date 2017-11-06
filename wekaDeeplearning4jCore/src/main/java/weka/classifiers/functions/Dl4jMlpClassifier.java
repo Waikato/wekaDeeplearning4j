@@ -626,6 +626,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final INDArray features = getIterator(m_Data).next().getFeatures();
     ComputationGraphConfiguration.GraphBuilder gb = new NeuralNetConfiguration
             .Builder(m_configuration)
+            .seed(getSeed())
             .graphBuilder();
 
 
