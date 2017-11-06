@@ -17,8 +17,8 @@
         <dl4j.version>0.9.1</dl4j.version>
         <weka.version>3.8.1</weka.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8
-        </project.reporting.outputEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <!--Global dependencies-->
@@ -118,6 +118,9 @@
     <profiles>
         <profile>
             <id>CPU</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <!--CPU Specific-->
                 <dependency>
