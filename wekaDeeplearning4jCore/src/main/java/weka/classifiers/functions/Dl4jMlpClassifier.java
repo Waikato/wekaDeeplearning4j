@@ -28,6 +28,7 @@ import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
+import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
@@ -443,7 +444,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       return;
     } else {
       m_Data = data;
-      m_Iterator = getIterator(m_Data);
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -456,7 +456,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       } else {
         createModel();
       }
-      // Setup the iterator
+      // Setup the iterator (needs to be done after the model initialization)
+      //
+      m_Iterator = getIterator(m_Data);
 
       // Print model architecture
       if (getDebug()) {
@@ -591,27 +593,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         // Increase width and height
         int[] newShape =  new int[]{channels, newHeight, newWidth};
         int[][] shapeWrap = new int[][]{newShape};
-        initSuccessful = initZooModel(m_Data.numClasses(), getSeed(), shapeWrap);
         setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+        initSuccessful = initZooModel(m_Data.numClasses(), getSeed(), shapeWrap);
 
         newWidth *= 1.2;
         newHeight *= 1.2;
         if (!initSuccessful){
           m_log.warn("The shape of the data did not fit the chosen " +
-                  "model. It was resized to ({}x{}x{}).", channels, newHeight, newWidth);
+                  "model. It was therefore resized to ({}x{}x{}).",
+                  channels, newHeight, newWidth);
         }
       }
 
   }
 
-  private boolean initZooModel(int numClasses, long seed, int[][] newShape){
+  private boolean initZooModel(int numClasses, long seed, int[][] newShape) {
     try {
       m_model = m_zooModel.init(numClasses, seed, newShape);
       return true;
     } catch (OperationNotSupportedException e) {
-      e.printStackTrace();
-      throw new RuntimeException("ZooModel was not set, but createZooModel could be called. Invalid situation");
-    } catch (DL4JInvalidConfigException e){
+      throw new RuntimeException("ZooModel was not set, but createZooModel could be called. Invalid situation", e);
+    } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
       return false;
     }
   }
@@ -621,10 +623,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @throws Exception
    */
   private void createModel() throws Exception {
-    final INDArray features = m_Iterator.next().getFeatures();
-    m_Iterator.reset();
-    ComputationGraphConfiguration.GraphBuilder gb = new NeuralNetConfiguration.Builder()
-            .seed(getSeed())
+    final INDArray features = getIterator(m_Data).next().getFeatures();
+    ComputationGraphConfiguration.GraphBuilder gb = new NeuralNetConfiguration
+            .Builder(m_configuration)
             .graphBuilder();
 
 
