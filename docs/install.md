@@ -33,3 +33,50 @@ Installed	Repository	Loaded	Package
 =========	==========	======	=======
 1.2.0    	-----     	Yes	    wekaDeeplearning4j<BACKEND>-dev: Weka wrappers for Deeplearning4j
 ```
+
+# Using wekaDeeplearning4j in a maven project
+It is also possible to include this package as maven project. As of now it is now provided in any maven repository, therefore you need to install this package to your local `.m2` repository:
+
+```bash
+$ git clone https://github.com/Waikato/wekaDeeplearning4j.git
+$ cd wekaDeeplearning4j/wekaDeeplearning4jCore
+$ mvn clean install -P <backend> # Replace <backend> with either "CPU" or "GPU"
+```
+
+Now you can add the maven dependency in your `pom.xml` file 
+```xml
+<dependency>
+    <groupId>nz.ac.waikato.cms.weka</groupId>
+    <artifactId>wekaDeeplearning4j</artifactId>
+    <version>${wekaDeeplearning4j.version}</version>
+</dependency>
+```
+
+When using the CPU the following two dependencies have to be added:
+```xml
+<!--CPU Specific-->
+<dependency>
+    <groupId>org.nd4j</groupId>
+    <artifactId>nd4j-native-platform</artifactId>
+    <version>${nd4j.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.bytedeco.javacpp-presets</groupId>
+    <artifactId>openblas-platform</artifactId>
+    <version>0.2.19-1.3</version>
+</dependency>
+```
+while using the GPU requires to add nd4j GPU dependencies:
+```xml
+<!--GPU Specific-->
+<dependency>
+    <groupId>org.bytedeco.javacpp-presets</groupId>
+    <artifactId>cuda</artifactId>
+    <version>8.0-6.0-1.3</version>
+</dependency>
+<dependency>
+    <groupId>org.nd4j</groupId>
+    <artifactId>nd4j-cuda-8.0-platform</artifactId>
+    <version>${nd4j.version}</version>
+</dependency>
+```
