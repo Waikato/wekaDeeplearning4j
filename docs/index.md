@@ -1,10 +1,9 @@
 # WekaDeeplearning4J: Deep Learning using Weka
-
+![Logo](img/Weka_3_full.png)
 WekaDeeplearning4J is a deep learning package for the [Weka](https://www.cs.waikato.ac.nz/ml/weka/index.html) workbench. It is developed to incorporate the modern techniques of deep learning into Weka. The backend is provided by the [Deeplearning4J](https://deeplearning4j.org/) Java library. 
 
 The source code for this package is available on [GitHub](https://github.com/Waikato/wekaDeeplearning4j). The java-doc can be found [here](https://waikato.github.io/wekaDeeplearning4j/doc/).
 
-![Weka workbench GUI](img/gui.png)
 
 **This documentation is still work in progress.**
 
@@ -19,3 +18,5 @@ The following Neural Network Layers are available to build sophisticated archite
 - **BatchNormalization**: applies the common batch normalization strategy on the activations of the parent layer
 - **OutputLayer**: generates `N` outputs based on a given activation function
 
+
+![Weka workbench GUI](img/gui.png)

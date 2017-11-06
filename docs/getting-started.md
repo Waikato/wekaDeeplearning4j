@@ -13,7 +13,7 @@ Simple examples are given in the examples section for the [Iris dataset](example
 ## Commandline Interface
 A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
-$ java -cp weka.jar weka.Run .Dl4jMlpClassifier -h
+$ java -cp $WEKA_HOME/weka.jar weka.Run .Dl4jMlpClassifier -h
 ```
 Below the general options, the specific ones are listed:
 ```
@@ -51,7 +51,7 @@ Options specific to weka.classifiers.functions.Dl4jMlpClassifier:
 The most interesting option may be the `-layer` specification. This option can be used multiple times and defines the architecture of the network layer-wise. 
 
 ```bash
-$ java -cp weka.jar weka.Run \
+$ java -cp $WEKA_HOME/weka.jar weka.Run \
        .Dl4jMlpClassifier \
        -layer "weka.dl4j.layers.DenseLayer \
               -activation weka.dl4j.activations.ActivationReLU \
@@ -77,20 +77,16 @@ The networks architecture can be set up by creating each layer step by step:
 DenseLayer denseLayer = new DenseLayer();
 denseLayer.setNOut(10);
 denseLayer.setActivationFn(new ActivationReLU());
-denseLayer.setWeightInit(WeightInit.XAVIER);
 
 // Define the output layer
 OutputLayer outputLayer = new OutputLayer();
 outputLayer.setActivationFn(new ActivationSoftmax());
-outputLayer.setUpdater(Updater.SGD);
-outputLayer.setLearningRate(0.01);
-outputLayer.setBiasLearningRate(0.01);
 ```
 
 Further configuration can be done by setting a `NeuralNetConfiguration`
 ```java
 NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+nnc.setUpdater(new Adam());
 clf.setNeuralNetConfiguration(nnc);
 ```
 

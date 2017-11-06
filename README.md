@@ -1,4 +1,7 @@
 # wekaDeeplearning4j
+
+![Logo](docs/img/Weka_3_full.png)
+
 DL4J wrapper for WEKA. Original code written by Mark Hall. This package currently introduces a new classifier,
 `Dl4jMlpClassifier`, which allows arbitrary-depth MLPs to be built with a degree of flexibility (e.g. type of weight initialisation,
 loss function, gradient descent algorithm, etc.).
@@ -38,16 +41,18 @@ Optional arguments:
 ## Usage
 
 An example script is provided that can be run on the Iris dataset in the `scripts` directory.
-
 ```bash
-java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
-     .Dl4jMlpClassifier -S 1 \
-     -normalization "Standardize training data" \
-     -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" -lossFn \"weka.dl4j.lossfunctions.LossMCXENT \" " \
-     -config "weka.dl4j.NeuralNetConfiguration -updater ADAM" \
-     -numEpochs 10 \
-     -t datasets/nominal/iris.arff
-
+$ java -cp $WEKA_HOME/weka.jar weka.Run \
+		.Dl4jMlpClassifier \
+		-S 1 \
+		-layer "weka.dl4j.layers.OutputLayer \
+		        -activation weka.dl4j.activations.ActivationSoftmax \
+		        -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
+		-config "weka.dl4j.NeuralNetConfiguration \
+		        -updater weka.dl4j.updater.Adam" \
+		-numEpochs 10 \
+		-t datasets/nominal/iris.arff \
+		-split-percentage 66
 ```
 
 ## Documentation

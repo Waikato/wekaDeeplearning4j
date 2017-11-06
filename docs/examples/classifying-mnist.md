@@ -1,4 +1,18 @@
 # The MNIST Dataset
+  
+![Mnist Example 0](../img/mnist/img_11854_0.jpg)
+![Mnist Example 1](../img/mnist/img_11253_1.jpg)
+![Mnist Example 2](../img/mnist/img_10320_2.jpg)
+![Mnist Example 3](../img/mnist/img_10324_3.jpg)
+![Mnist Example 4](../img/mnist/img_40694_4.jpg)
+![Mnist Example 5](../img/mnist/img_10596_5.jpg)
+![Mnist Example 6](../img/mnist/img_19625_6.jpg)
+![Mnist Example 7](../img/mnist/img_12452_7.jpg)
+![Mnist Example 8](../img/mnist/img_10828_8.jpg)
+![Mnist Example 9](../img/mnist/img_10239_9.jpg)
+
+
+
 The MNIST dataset provides images of handwritten digits of 10 classes (0-9) and suits the task of simple image classification. 
 
 The minimal MNIST arff file can be found in the `datasets/nominal` directory of the WekaDeeplearning4j package. This arff file lists all images in `datasets/nominal/mnist-minimal` and annotates their path with their class label.
@@ -8,7 +22,7 @@ The minimal MNIST arff file can be found in the `datasets/nominal` directory of 
 ## Commandline
 The following run creates a Conv(3x3x8)>Pool(2x2,MAX)>Conv(3x3x8)>Pool(2x2,MAX)>Out architecture
 ```bash
-$ java -Xmx5g -cp weka.jar weka.Run \
+$ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      .Dl4jMlpClassifier \
      -S 1 \
      -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -numChannels 1 -height 28 -width 28 -bs 16" \
@@ -17,7 +31,8 @@ $ java -Xmx5g -cp weka.jar weka.Run \
      -layer "weka.dl4j.layers.SubsamplingLayer -kernelSizeX 2 -kernelSizeY 2 -paddingX 0 -paddingY 0 -poolingType MAX -strideX 1 -strideY 1" \
      -layer "weka.dl4j.layers.ConvolutionLayer -nFilters 8 -activation weka.dl4j.activations.ActivationReLU -kernelSizeX 3 -kernelSizeY 3 -paddingX 0 -paddingY 0 -strideX 1 -strideY 1" \
      -layer "weka.dl4j.layers.SubsamplingLayer -kernelSizeX 2 -kernelSizeY 2 -paddingX 0 -paddingY 0 -poolingType MAX -strideX 1 -strideY 1" \
-     -layer "weka.dl4j.layers.OutputLayer -activation weka.dl4j.activations.ActivationSoftmax -lossFn weka.dl4j.lossfunctions.LossMCXENT -updater ADAM" \
+     -layer "weka.dl4j.layers.OutputLayer -activation weka.dl4j.activations.ActivationSoftmax -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
+     -config "weka.dl4j.NeuralNetConfiguration -updater weka.dl4j.updater.Adam" \
      -numEpochs 10 \
      -t datasets/nominal/mnist.meta.minimal.arff \
      -split-percentage 80
@@ -91,7 +106,7 @@ outputLayer.setLossFn(new LossMCXENT());
 
 // Set up the network configuration
 NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+nnc.setUpdater(new Adam());
 clf.setNeuralNetConfiguration(nnc);
 
 
