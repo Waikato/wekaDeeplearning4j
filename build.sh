@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 # Options
 install_pack=false
 verbose=false
@@ -32,7 +30,7 @@ if test -t 1; then
     if test -n "$ncolors" && test $ncolors -ge 8; then #Enable colors
         ep="${bold}[${green}${prefix} build.sh${nc}${bold}]${nc}: "
     else #Disable colors
-        ep="[${prefix} build.sh]:"
+        ep="[${prefix} build.sh]: "
         bold=""
         nc=""
     fi
