@@ -192,7 +192,7 @@ public class ModelZooTest {
         }
         Instances shrinkedData = new Instances("shrinked", atts, 10);
         shrinkedData.setClassIndex(1);
-        for (int i = 0; i < 100; i++){
+        for (int i = 0; i < 10; i++){
             Instance inst = data.get(i);
             inst.setClassValue(i%10);
             inst.setDataset(shrinkedData);
@@ -200,10 +200,10 @@ public class ModelZooTest {
         }
 
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(20);
+        iterator.setTrainBatchSize(10);
         clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
-        clf.setNumEpochs(3);
+        clf.setNumEpochs(1);
         clf.buildClassifier(shrinkedData);
         clf.distributionsForInstances(shrinkedData);
     }
