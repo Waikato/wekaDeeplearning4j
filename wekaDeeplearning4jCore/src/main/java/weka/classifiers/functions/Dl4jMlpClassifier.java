@@ -624,8 +624,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   private void createModel() throws Exception {
     final INDArray features = getIterator(m_Data).next().getFeatures();
-    ComputationGraphConfiguration.GraphBuilder gb = new NeuralNetConfiguration
-            .Builder(m_configuration)
+    ComputationGraphConfiguration.GraphBuilder gb = m_configuration.builder()
             .seed(getSeed())
             .graphBuilder();
 
