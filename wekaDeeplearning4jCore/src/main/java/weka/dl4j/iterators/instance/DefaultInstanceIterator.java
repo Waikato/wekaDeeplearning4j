@@ -32,11 +32,10 @@ import weka.core.Instances;
 import weka.core.OptionMetadata;
 import weka.core.WekaException;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
-import weka.dl4j.iterators.dataset.ShufflingDataSetIterator;
 
 
 /**
- * Converts the given Instances object into a DataSet and then constructs and returns a ShufflingDataSetIterator.
+ * Converts the given Instances object into a DataSet and then constructs and returns a DefaultDataSetIterator.
  *
  * @author Christopher Beckham
  * @author Eibe Frank

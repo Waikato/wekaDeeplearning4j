@@ -32,7 +32,7 @@ import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 import java.util.Enumeration;
 
 /**
- * Converts the given Instances object into a DataSet and then constructs and returns a ShufflingDataSetIterator.
+ * Converts the given Instances object into a DataSet and then constructs and returns a DefaultDataSetIterator.
  * This iterator is designed for training convolutional networks on data that is represented as standard WEKA instances.
  * It enables specification of filter width and height, and number of channels.
  *
