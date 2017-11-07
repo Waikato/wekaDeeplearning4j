@@ -1,6 +1,7 @@
 package weka.dl4j.updater;
 
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 
 /**
@@ -11,27 +12,18 @@ import weka.core.OptionMetadata;
 public class Adam extends org.nd4j.linalg.learning.config.Adam implements Updater {
     private static final long serialVersionUID = 667880237656554906L;
 
-    /**
-     * Default constructor setting Updater defaults
-     */
-    public Adam() {
-        setDefaults();
-    }
-
-    @OptionMetadata(
-            displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
-            commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-            displayOrder = 0)
+    @ProgrammaticProperty
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
 
+    @ProgrammaticProperty
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);
     }
+
 
     @OptionMetadata(
             displayName = "beta1MeanDecay",

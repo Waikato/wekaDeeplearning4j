@@ -1,6 +1,7 @@
 package weka.dl4j.updater;
 
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 
 /**
@@ -10,28 +11,18 @@ import weka.core.OptionMetadata;
  */
 public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements Updater {
     private static final long serialVersionUID = 7400615175279701837L;
-
-    /**
-     * Default constructor setting Updater defaults
-     */
-    public RmsProp() {
-        setDefaults();
-    }
-
-    @OptionMetadata(
-            displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
-            commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-            displayOrder = 0)
+    @ProgrammaticProperty
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
 
+    @ProgrammaticProperty
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);
     }
+
 
     @OptionMetadata(
             displayName = "rmsDecay",

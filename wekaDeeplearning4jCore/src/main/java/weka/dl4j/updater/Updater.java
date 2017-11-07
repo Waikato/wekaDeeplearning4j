@@ -12,16 +12,6 @@ import java.util.Enumeration;
  * @author Steven Lang
  */
 public interface Updater extends OptionHandler, IUpdater {
-
-    double DEFAULT_LEARNING_RATE = 0.1;
-
-    /**
-     * Constructor setting default learning rate to 0.1
-     */
-    default void setDefaults() {
-        setLearningRate(DEFAULT_LEARNING_RATE);
-    }
-
     /**
      * Get the learning rate
      *

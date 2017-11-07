@@ -12,12 +12,6 @@ import weka.gui.ProgrammaticProperty;
 public class AdaDelta extends org.nd4j.linalg.learning.config.AdaDelta implements Updater {
     private static final long serialVersionUID = -5776515704843860182L;
 
-    /**
-     * Default constructor setting Updater defaults
-     */
-    public AdaDelta() {
-        setDefaults();
-    }
 
     @OptionMetadata(
             displayName = "rho",

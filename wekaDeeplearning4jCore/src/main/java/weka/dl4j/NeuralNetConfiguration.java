@@ -2,18 +2,16 @@ package weka.dl4j;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.LearningRatePolicy;
-import org.deeplearning4j.nn.conf.Updater;
 import org.deeplearning4j.nn.conf.stepfunctions.StepFunction;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.learning.config.IUpdater;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.stepfunctions.NegativeGradientStepFunction;
 import weka.gui.ProgrammaticProperty;
-import java.io.Serializable;
 
+import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -38,7 +36,9 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public NeuralNetConfiguration() {
     builder = new Builder();
 
+    setLearningRate(0.1);
     setUpdater(new weka.dl4j.updater.Adam());
+    setWeightInit(WeightInit.XAVIER);
 
     this.leakyreluAlpha = 0.01D;
     this.miniBatch = true;
@@ -64,16 +64,8 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
     return builder;
   }
 
-  @OptionMetadata(
-          displayName = "leaky relu alpha",
-          description = "The parameter for the leaky relu (default = 0.1).",
-          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
-          displayOrder = 1)
-  public double getLeakyreluAlpha() { return super.getLeakyreluAlpha(); }
 
-  public void setLeakyreluAlpha(double a) {
-    builder.leakyreluAlpha(a);
-  }
+
   @OptionMetadata(
           description = "Optimization algorithm (LINE_GRADIENT_DESCENT,"
                   + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
@@ -175,23 +167,28 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public StepFunction getStepFunction() { return super.getStepFunction(); }
   public void setStepFunction(StepFunction f) { builder.stepFunction(f); }
 
-//  @OptionMetadata(
-//          displayName = "updater",
-//          description = "The updater to use (default = SGD).",
-//          commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
-//          displayOrder = 12)
-//  public Updater getUpdater() { return builder.getUpdater(); }
-//  public void setUpdater(Updater updater) {
-//    builder.updater(updater);
-//  }
   @OptionMetadata(
           displayName = "updater",
           description = "The updater to use (default = SGD).",
           commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
           displayOrder = 12)
-  public IUpdater getUpdater() { return builder.getIUpdater(); }
-  public void setUpdater(weka.dl4j.updater.Updater updater) {
+  public IUpdater getUpdater() {
+    return builder.getIUpdater();
+  }
+  public void setUpdater(IUpdater updater) {
     builder.updater(updater);
+  }
+  @OptionMetadata(
+          displayName = "learningrate",
+          description = "The learningrate to use (default = 0.1).",
+          commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
+          displayOrder = 13)
+  public double getLearningRate() {
+    return builder.getLearningRate();
+  }
+
+  public void setLearningRate(double learningRate) {
+    builder.learningRate(learningRate);
   }
   @OptionMetadata(
           displayName = "l1 regularization factor",
@@ -304,21 +301,8 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   /**
    * Dummy builder class
    */
-  public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder implements Serializable{
+  public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder implements Serializable {
     private static final long serialVersionUID = 8968204740743541886L;
 
-    public Builder() {
-    }
-
-    public Builder(NeuralNetConfiguration newConf) {
-      super(newConf);
-      double lr = ((weka.dl4j.updater.Updater) newConf.getUpdater()).getLearningRate();
-      this.updater(newConf.getUpdater())
-              .learningRate(lr)
-              .l1(newConf.getL1())
-              .l2(newConf.getL2())
-              .weightInit(newConf.getWeightInit())
-              .seed(getSeed());
-    }
   }
 }

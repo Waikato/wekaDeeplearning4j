@@ -140,15 +140,11 @@ public class NeuralNetConfigurationTest {
 
             double l1 = 0.001;
             double l2 = 0.002;
-            double l1Bias = 0.003;
-            double l2Bias = 0.004;
-            if (u instanceof Adam) {
-                double lr = 5.0;
-                ((Adam) u).setLearningRate(lr);
-            }
+            double lr = 5.0;
             WeightInit weightInit = WeightInit.UNIFORM;
 
             nnc = new NeuralNetConfiguration();
+            nnc.setLearningRate(lr);
             nnc.setUseRegularization(true);
             nnc.setUpdater(u);
 
@@ -170,10 +166,9 @@ public class NeuralNetConfigurationTest {
                 double l21 = ((BaseLayer) l).getL2();
                 WeightInit weightInit1 = ((BaseLayer) l).getWeightInit();
                 double learningRate = ((BaseLayer) l).getLearningRate();
-                if (u instanceof Adam) {
-                    Assert.assertEquals(5.0, learningRate, 10e-6);
+                if (!(u instanceof AdaDelta)){ // AdaDelta does not have any learning rate
+                    Assert.assertEquals(lr, learningRate, 10e-6);
                 }
-
                 Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
                 Assert.assertEquals(l1, l11, 10e-6);
                 Assert.assertEquals(l2, l21, 10e-6);

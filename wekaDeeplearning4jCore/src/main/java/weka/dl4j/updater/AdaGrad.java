@@ -1,6 +1,7 @@
 package weka.dl4j.updater;
 
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's AdaGrad.
@@ -11,24 +12,13 @@ import weka.core.OptionMetadata;
 public class AdaGrad extends org.nd4j.linalg.learning.config.AdaGrad implements Updater {
     private static final long serialVersionUID = 3881105990718165790L;
 
-
-    /**
-     * Default constructor setting Updater defaults
-     */
-    public AdaGrad() {
-        setDefaults();
-    }
-
-    @OptionMetadata(
-            displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
-            commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-            displayOrder = 0)
+    @ProgrammaticProperty
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
 
+    @ProgrammaticProperty
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);

@@ -1,6 +1,7 @@
 package weka.dl4j.updater;
 
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's Sgd.
@@ -10,26 +11,16 @@ import weka.core.OptionMetadata;
 public class Sgd extends org.nd4j.linalg.learning.config.Sgd implements Updater {
 
     private static final long serialVersionUID = 1852959048173443658L;
-
-    /**
-     * Default constructor setting Updater defaults
-     */
-    public Sgd() {
-        setDefaults();
-    }
-
-    @OptionMetadata(
-            displayName = "learningrate",
-            description = "The learningrate to use (default = " + DEFAULT_LEARNING_RATE + ").",
-            commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
-            displayOrder = 0)
+    @ProgrammaticProperty
     @Override
     public double getLearningRate() {
         return super.getLearningRate();
     }
 
+    @ProgrammaticProperty
     @Override
     public void setLearningRate(double learningRate) {
         super.setLearningRate(learningRate);
     }
+
 }
