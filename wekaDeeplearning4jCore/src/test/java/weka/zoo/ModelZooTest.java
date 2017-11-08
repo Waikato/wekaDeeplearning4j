@@ -1,5 +1,6 @@
 package weka.zoo;
 
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.datasets.iterator.impl.CifarDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
@@ -21,6 +22,7 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.dl4j.zoo.*;
@@ -42,101 +44,8 @@ import java.util.List;
  * @author Steven Lang
  */
 
-
+@Slf4j
 public class ModelZooTest {
-
-
-    /**
-     * Logger instance
-     */
-    private static final Logger logger = LoggerFactory.getLogger(ModelZooTest.class);
-
-    /**
-     * Test AlexNet with resizing Mnist (TODO: Fix)
-     *
-     * @throws Exception
-     */
-//    @Test
-    public static void testPureLeNetCifar() throws Exception {
-        org.deeplearning4j.zoo.model.LeNet m = new org.deeplearning4j.zoo.model.LeNet(10, 32, 1);
-
-        CifarDataSetIterator cdiTrain = new CifarDataSetIterator(256, 40000,
-                true);
-        CifarDataSetIterator cdiTest = new CifarDataSetIterator(256, 10000,
-                false);
-        int[][] inputShapeModel = m.metaData().getInputShape();
-        inputShapeModel[0][0] = 3;
-        inputShapeModel[0][1] = 32;
-        inputShapeModel[0][2] = 32;
-        m.setInputShape(inputShapeModel);
-
-        MultiLayerConfiguration conf = m.conf();
-        MultiLayerNetwork model = new MultiLayerNetwork(conf);
-//        ComputationGraph model= mlpToCG(conf, inputShapeModel);
-//        model.init();
-
-        logger.info("Train model....");
-        for (int i = 0; i < 10; i++) {
-            logger.info("Epoch " + i);
-            long t0 = System.currentTimeMillis();
-            model.fit(cdiTrain);
-            long t1 = System.currentTimeMillis();
-            System.out.println("(t1-t0)/1000 = " + (t1 - t0) / 1000d);
-            Evaluation evaluate = model.evaluate(cdiTrain);
-            System.out.println("evaluate = " + evaluate.stats());
-        }
-
-
-        logger.info("Evaluate model....");
-        Evaluation eval = new Evaluation(10); //create an evaluation object with 10 possible classes
-        while (cdiTest.hasNext()) {
-            DataSet next = cdiTest.next();
-//            INDArray output = model.outputSingle(next.getFeatureMatrix()); //get the networks prediction
-            INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
-//            INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
-            eval.eval(next.getLabels(), output); //check the prediction against the true class
-
-        }
-        logger.info(eval.stats());
-        logger.info("****************Example finished********************");
-
-    }
-
-    private ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape){
-        ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder().graphBuilder();
-        List<NeuralNetConfiguration> confs = mlc.getConfs();
-        String currentInput = "input";
-        builder.addInputs(currentInput);
-        for (NeuralNetConfiguration conf : confs){
-            Layer l = conf.getLayer();
-            String layerName = l.getLayerName();
-            builder.addLayer(layerName, l, currentInput);
-            currentInput = layerName;
-        }
-        builder.setOutputs(currentInput);
-        builder.setInputTypes(InputType.convolutional(shape[0][1], shape[0][2], shape[0][0]));
-        ComputationGraphConfiguration cgc = builder.build();
-        return new ComputationGraph(cgc);
-    }
-
-
-    //    @Test
-    public void testLeNetMnistReshaped() throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-        data.setClassIndex(data.numAttributes() - 1);
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(16);
-
-        clf.setInstanceIterator(new ResizeImageInstanceIterator(iterator, 80, 80));
-        clf.setZooModel(new LeNet());
-        clf.setNumEpochs(10);
-        TestUtil.holdout(clf, data);
-    }
 
     @Test
     public void testLeNetMnist() throws Exception {
@@ -204,6 +113,7 @@ public class ModelZooTest {
         clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
         clf.setNumEpochs(1);
+        clf.setEarlyStoppingConfiguration(new EarlyStopping(5, 0));
         clf.buildClassifier(shrinkedData);
         clf.distributionsForInstances(shrinkedData);
     }
