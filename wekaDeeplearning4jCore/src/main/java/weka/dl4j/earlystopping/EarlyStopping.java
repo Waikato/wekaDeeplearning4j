@@ -27,7 +27,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
     /**
      * Maximum of epochs without improvement
      */
-    private int maxEpochsNoImprovement = 5;
+    private int maxEpochsNoImprovement = 0;
 
     /**
      * Counter for the number of epochs without improvement
@@ -42,7 +42,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
     /**
      * Percentage of the training data to use as validation set
      */
-    private double validationSetPercentage = 10;
+    private double validationSetPercentage = 0;
 
     /**
      * Validation dataset
@@ -135,7 +135,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
     @OptionMetadata(
             displayName = "max epochs with no improvement",
-            description = "Terminate after N epochs in which the model has shown no improvement (default = 5).",
+            description = "Terminate after N epochs in which the model has shown no improvement (default = 0).",
             commandLineParamName = "maxEpochsNoImprovement", commandLineParamSynopsis = "-maxEpochsNoImprovement <int>",
             displayOrder = 0)
     public void setMaxEpochsNoImprovement(int maxEpochsNoIMprovement) {
@@ -153,7 +153,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
     @OptionMetadata(
             displayName = "validation set percentage (removed from training set)",
-            description = "Percentage of training set to use for validation (default = 10).",
+            description = "Percentage of training set to use for validation (default = 0).",
             commandLineParamName = "valPercentage", commandLineParamSynopsis = "-valPercentage <float>",
             displayOrder = 1)
     public void setValidationSetPercentage(double p) {
