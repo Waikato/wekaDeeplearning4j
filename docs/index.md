@@ -18,5 +18,5 @@ The following Neural Network Layers are available to build sophisticated archite
 - **BatchNormalization**: applies the common batch normalization strategy on the activations of the parent layer
 - **OutputLayer**: generates `N` outputs based on a given activation function
 
-
+Further configurations can be found in the [Getting Started](getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)

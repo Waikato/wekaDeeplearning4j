@@ -10,6 +10,7 @@ As most of Weka, the WekaDeeplearning4j's functionality is accessible in three w
 All three ways are explained in the following. The main classifier exposed by this package is named `Dl4jMlpClassifier`.
 Simple examples are given in the examples section for the [Iris dataset](examples/classifying-iris) and the [MNIST dataset](examples/classifying-mnist).
 
+Make sure your `WEKA_HOME` environment variable is set.
 ## Commandline Interface
 A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
@@ -96,6 +97,45 @@ Finally the layers are set with
 clf.setLayers(new Layer[]{denseLayer, outputLayer});
 ```
 
+If you are not using the package in a maven project as described [here](install#using-wekadeeplearning4j-in-a-maven-project), you need to add the following directories to your java classpath
+
+- `$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*`
+- `$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib*`
+
+Assuming you have the following `Main.java` file and installed the CPU package beforehand:
+```java
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.Instances;
+
+import java.io.FileReader;
+import java.nio.file.Paths;
+import java.util.Random;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        String irisPath = Paths.get(System.getenv("WEKA_HOME"), "packages", "wekaDeeplearning4jCPU-dev", "datasets", "nominal", "iris.arff").toString();
+        Instances inst = new Instances(new FileReader(irisPath));
+        inst.setClassIndex(inst.numAttributes() - 1);
+        Evaluation ev = new Evaluation(inst);
+        ev.crossValidateModel(clf, inst, 10, new Random(0));
+        System.out.println(ev.toSummaryString());
+    }
+}
+```
+
+You can now compile it including the libraries in the classpath:
+```bash
+javac -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib/*" Main.java
+```
+and run it with:
+```bash
+java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib/*:." Main
+```
+
+(Use `;` as classpath separator for Windows instead) 
+
 ## GUI
 A tutorial on how to use the GUI is coming soon.
 
@@ -112,4 +152,30 @@ WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possi
 
 This set of models will be extended over the time.
 
-To set a predefined model, e.g. LeNet, from the modelzoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier`.
+To set a predefined model, e.g. LeNet, from the modelzoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier` object.
+
+# Early Stopping
+Early stopping allows to stop the training process as soon as the network does not improve its loss on a validation set for `N` epochs. 
+
+The setup below adds an early stopping condition that checks whether the loss score on 20% of the training data did not improve successively for 10 epochs.
+**Commandline**
+```bash
+-early-stopping "weka.dl4j.earlystopping.EarlyStopping -maxEpochsNoImprovement 10 -valPercentage 20"
+```
+
+**Java**
+```java
+EarlyStopping es = new EarlyStopping();
+es.setMaxEpochsNoImprovement(10);
+es.setValidationSetPercentage(20);
+clf.setEarlyStopping(es)
+```
+or simpler
+```java
+clf.setEarlyStopping(new EarlyStopping(10, 20))
+```
+**GUI**
+
+The GUI provides a simple and intuitive interface to configure the early stopping parameters:
+
+![GUI](img/early-stopping.png)
