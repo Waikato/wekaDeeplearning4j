@@ -62,9 +62,9 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
 	 * @return the iterator
 	 * @throws Exception if the constructor cannot be constructed successfully
 	 */
-	public  DataSetIterator getIterator(Instances data, int seed) throws Exception {
+	public  DataSetIterator getDataSetIterator(Instances data, int seed) throws Exception {
 
-		return getIterator(data, seed, getTrainBatchSize());
+		return getDataSetIterator(data, seed, getTrainBatchSize());
 	}
 
 	/**
@@ -76,7 +76,7 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
 	 * @return the iterator
 	 * @throws Exception if the constructor cannot be constructed successfully
 	 */
-	public abstract DataSetIterator getIterator(Instances data, int seed, int batchSize) throws Exception;
+	public abstract DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) throws Exception;
 
 	/**
 	 * Setting the training batch size

@@ -62,12 +62,12 @@ public class ConvolutionInstancesIteratorTest {
 
 
     /**
-     * Test getIterator
+     * Test getDataSetIterator
      */
     @Test
     public void testGetIterator() throws Exception {
         final int batchSize = 1;
-        final DataSetIterator it = this.cii.getIterator(mnistMiniArff, SEED, batchSize);
+        final DataSetIterator it = this.cii.getDataSetIterator(mnistMiniArff, SEED, batchSize);
 
         Set<Integer> labels = new HashSet<>();
         for (int i = 0; i < mnistMiniArff.size(); i++) {

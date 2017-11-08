@@ -85,6 +85,7 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
 
 		// Special case: getRange() does not work as expected if there is just a single example
 		if ((cursor == 0) && (batchSize == 1) && (data.numExamples() == 1)) {
+			cursor += batchSize;
 			return data;
 		}
 		DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + batchSize);
@@ -143,6 +144,7 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
 	 */
 	@Override
 	public int totalOutcomes() {
+
 		return data.get(0).getLabels().columns();
 	}
 

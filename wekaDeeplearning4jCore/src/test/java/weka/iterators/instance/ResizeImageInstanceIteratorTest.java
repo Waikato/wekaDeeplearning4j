@@ -1,13 +1,11 @@
 package weka.iterators.instance;
 
 
-import org.datavec.image.recordreader.ImageRecordReader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -15,10 +13,6 @@ import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.util.DatasetLoader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InvalidObjectException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,13 +66,13 @@ public class ResizeImageInstanceIteratorTest {
     }
 
     /**
-     * Test getIterator
+     * Test getDataSetIterator
      */
     @Test
     public void testGetIterator() throws Exception {
         final Instances metaData = DatasetLoader.loadMiniMnistMeta();
         final int batchSize = 1;
-        final DataSetIterator it = this.rii.getIterator(metaData, SEED, batchSize);
+        final DataSetIterator it = this.rii.getDataSetIterator(metaData, SEED, batchSize);
 
         Set<Integer> labels = new HashSet<>();
         for (Instance inst : metaData) {

@@ -168,13 +168,14 @@ public class ImageInstanceIterator extends AbstractInstanceIterator {
      * @throws Exception
      */
     @Override
-    public DataSetIterator getIterator(Instances data, int seed, int batchSize) throws Exception {
+    public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) throws Exception {
 
         batchSize = Math.min(data.numInstances(), batchSize);
         validate(data);
         ImageRecordReader reader = getImageRecordReader(data);
-        final int numPossibleLabels = data.numClasses();
+
         final int labelIndex = 1; // Use explicit label index position
+        final int numPossibleLabels = data.numClasses();
         DataSetIterator tmpIter = new RecordReaderDataSetIterator( reader, batchSize, labelIndex, numPossibleLabels);
         DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
         scaler.fit(tmpIter);

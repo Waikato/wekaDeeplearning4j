@@ -77,7 +77,7 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
 	 * @return the DataSetIterator
 	 */
 	@Override
-	public DataSetIterator getIterator(Instances data, int seed, int batchSize) {
+	public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
 
 		// Convert Instances to DataSet
 		DataSet dataset = Utils.instancesToDataSet(data);

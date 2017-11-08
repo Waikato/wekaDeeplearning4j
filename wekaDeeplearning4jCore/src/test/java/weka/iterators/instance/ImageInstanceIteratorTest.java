@@ -119,14 +119,14 @@ public class ImageInstanceIteratorTest {
     }
 
     /**
-     * Test getIterator
+     * Test getDataSetIterator
      */
     @Test
     public void testGetIterator() throws Exception {
         final Instances metaData = DatasetLoader.loadMiniMnistMeta();
         this.idi.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         final int batchSize = 1;
-        final DataSetIterator it = this.idi.getIterator(metaData, SEED, batchSize);
+        final DataSetIterator it = this.idi.getDataSetIterator(metaData, SEED, batchSize);
 
         Set<Integer> labels = new HashSet<>();
         for(Instance inst : metaData){
@@ -140,6 +140,50 @@ public class ImageInstanceIteratorTest {
         Assert.assertEquals(10, labels.size());
         Assert.assertTrue(labels.containsAll(collect));
         Assert.assertTrue(collect.containsAll(labels));
-
     }
+
+
+    /**
+     * Test image instance iterator mnist.
+     *
+     * @throws Exception IO error.
+     */
+    @Test
+    public void testImageInstanceIteratorMnist() throws Exception {
+
+        // Data
+        Instances data = DatasetLoader.loadMiniMnistMeta();
+        data.setClassIndex(data.numAttributes() - 1);
+        ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
+
+        final int seed = 1;
+        for (int batchSize : new int[]{1, 2, 5, 10}) {
+            final int actual = countIterations(data, imgIter, seed, batchSize);
+            final int expected = data.numInstances() / batchSize;
+            Assert.assertEquals(expected, actual);
+        }
+    }
+
+    /**
+     * Counts the number of iterations an {@see ImageInstanceIterator}
+     *
+     * @param data      Instances to iterate
+     * @param imgIter   ImageInstanceIterator to be tested
+     * @param seed      Seed
+     * @param batchsize Size of the batch which is returned
+     *                  in {@see DataSetIterator#next}
+     * @return Number of iterations
+     * @throws Exception
+     */
+    private int countIterations(Instances data, ImageInstanceIterator imgIter,
+                                int seed, int batchsize) throws Exception {
+        DataSetIterator it = imgIter.getDataSetIterator(data, seed, batchsize);
+        int count = 0;
+        while (it.hasNext()) {
+            count++;
+            DataSet dataset = it.next();
+        }
+        return count;
+    }
+
 }
