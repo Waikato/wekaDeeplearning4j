@@ -47,7 +47,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
     /**
      * Validation dataset
      */
-    private DataSetIterator valDataSetIterator;
+    private transient DataSetIterator valDataSetIterator;
 
 
     public EarlyStopping() {
@@ -200,7 +200,6 @@ public class EarlyStopping implements OptionHandler, Serializable {
      * @throws Exception if an option is not supported
      */
     public void setOptions(String[] options) throws Exception {
-
         Option.setOptions(options, this, this.getClass());
     }
 }
