@@ -27,13 +27,9 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
