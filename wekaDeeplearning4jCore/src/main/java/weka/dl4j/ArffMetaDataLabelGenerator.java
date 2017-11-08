@@ -62,7 +62,7 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
         }
 
         // Fill mapping from image path to
-        fileLabelMap = new HashMap<>();
+        fileLabelMap = new TreeMap<>();
         paths = new ArrayList<>();
         labels = new ArrayList<>();
         for (Instance inst : metaData) {
