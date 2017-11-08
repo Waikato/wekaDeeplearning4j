@@ -117,7 +117,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected NeuralNetConfiguration m_netConfig = new NeuralNetConfiguration();
 
   /** The configuration for early stopping. */
-  protected EarlyStopping m_earlyStoppingConfig = new EarlyStopping();
+  protected EarlyStopping m_earlyStopping = new EarlyStopping();
 
   /** The number of epochs to perform. */
   protected int m_numEpochs = 10;
@@ -381,12 +381,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   @OptionMetadata(description = "The early stopping configuration to use.",
           displayName = "early stopping configuration", commandLineParamName = "early-stopping",
           commandLineParamSynopsis = "-early-stopping <string>", displayOrder = 7)
-  public EarlyStopping getEarlyStoppingConfiguration() {
-    return m_earlyStoppingConfig;
+  public EarlyStopping getEarlyStopping() {
+    return m_earlyStopping;
   }
 
-  public void setEarlyStoppingConfiguration(EarlyStopping config) {
-    m_earlyStoppingConfig = config;
+  public void setEarlyStopping(EarlyStopping config) {
+    m_earlyStopping = config;
   }
 
   @OptionMetadata(description = "The type of normalization to perform.",
@@ -461,7 +461,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     data = preProcessInput(data);
 
     // Split train/validation
-    double valSplit = m_earlyStoppingConfig.getValidationSetPercentage();
+    double valSplit = m_earlyStopping.getValidationSetPercentage();
     Instances trainData = null;
     Instances valData = null;
     if (useEarlyStopping()){
@@ -506,7 +506,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
       // Set the iteration listener
       m_model.setListeners(getListener());
-      m_earlyStoppingConfig.init(m_valIterator);
+      m_earlyStopping.init(m_valIterator);
 
       m_NumEpochsPerformed = 0;
     } finally {
@@ -515,7 +515,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   private void validateSplit(Instances trainData, Instances valData) throws WekaException {
-    if (m_earlyStoppingConfig.getValidationSetPercentage() < 10e-8){
+    if (m_earlyStopping.getValidationSetPercentage() < 10e-8){
       // Use no validation set at all
       return;
     }
@@ -809,12 +809,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Evaluate early stopping
     if (useEarlyStopping()){
-      boolean continueTraining = m_earlyStoppingConfig.evaluate(m_model);
+      boolean continueTraining = m_earlyStopping.evaluate(m_model);
       if (!continueTraining){
         log.info("Early stopping has stopped the training process. The " +
                         "validation has not improved anymore after {} epochs. Training " +
                         "finished.",
-                m_earlyStoppingConfig.getMaxEpochsNoImprovement());
+                m_earlyStopping.getMaxEpochsNoImprovement());
       }
       return continueTraining;
     }
@@ -828,7 +828,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @return True if early stopping should be used
    */
   public boolean useEarlyStopping(){
-    double p = m_earlyStoppingConfig.getValidationSetPercentage();
+    double p = m_earlyStopping.getValidationSetPercentage();
     return 0 < p && p < 100;
   }
 
