@@ -71,8 +71,7 @@ public class EpochListener extends IterationListener implements TrainingListener
                 s += String.format("Loss: %9f\n", score);
             }
         } catch (UnsupportedOperationException e) {
-            log.error("error: ", e);
-
+            return "Validation set is too small and does not contain all labels.";
         }
 
 
