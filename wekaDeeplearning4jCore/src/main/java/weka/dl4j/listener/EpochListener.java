@@ -1,25 +1,18 @@
 package weka.dl4j.listener;
 
-import lombok.Builder;
 import org.deeplearning4j.eval.Evaluation;
-import org.deeplearning4j.eval.IEvaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.logging.OutputLogger;
 
-import java.io.BufferedOutputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * A listener that prints the model score every epoch.
@@ -34,34 +27,56 @@ public class EpochListener extends IterationListener implements TrainingListener
 
     @Override
     public void onEpochEnd(Model model) {
-        iterator.reset();
         currentEpoch++;
-        String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]";
-        int numClasses = iterator.totalOutcomes();
-        boolean isClassification = numClasses > 1;
-        if (model instanceof ComputationGraph){
-            ComputationGraph net = (ComputationGraph) model;
+        String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
+        s += "Train:      " + evaluateDataSetIterator(model, trainIterator);
+        if (validationIterator != null){
+            s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
+        }
+        log(s);
+        trainIterator.reset();
+    }
 
-            Evaluation cEval = new Evaluation(numClasses);
-            RegressionEvaluation rEval = new RegressionEvaluation(1); // Currently no multitarget
-            while (iterator.hasNext()) {
-                DataSet next = iterator.next();
-                INDArray output = net.outputSingle(next.getFeatureMatrix()); //get the networks prediction
-                if (isClassification) cEval.eval(next.getLabels(), output);
-                else rEval.eval(next.getLabels(), output);
+    private String evaluateDataSetIterator(Model model, DataSetIterator iterator) {
+        iterator.reset();
+        String s = "";
+        try {
+            boolean isClassification = numClasses > 1;
+            if (model instanceof ComputationGraph) {
+                ComputationGraph net = (ComputationGraph) model;
+
+                double scoreSum = 0;
+                int iterations = 0;
+                Evaluation cEval = new Evaluation(numClasses);
+                RegressionEvaluation rEval = new RegressionEvaluation(1);
+                while (iterator.hasNext()) {
+                    DataSet next = iterator.next();
+                    scoreSum += net.score(next);
+                    iterations++;
+                    INDArray output = net.outputSingle(next.getFeatureMatrix()); //get the networks prediction
+                    if (isClassification) cEval.eval(next.getLabels(), output);
+                    else rEval.eval(next.getLabels(), output);
+                }
+
+                double score = 0;
+                if (iterations != 0){
+                    score = scoreSum/iterations;
+                }
+                if (isClassification) {
+                    s += String.format("Accuracy: %4.2f%%, ", cEval.accuracy() * 100);
+                } else {
+                    s += String.format("Avg R2: %4.2f, ", rEval.averagecorrelationR2());
+                    s += String.format(", Avg RMSE: %4.2f, ", rEval.averagerootMeanSquaredError());
+                }
+                s += String.format("Loss: %9f\n", score);
             }
-            if (isClassification){
-                s += String.format(", Accuracy: %4.2f%%", cEval.accuracy()*100);
-            } else {
-                s += String.format(", Avg R2: %4.2f", rEval.averagecorrelationR2());
-                s += String.format(", Avg RMSE: %4.2f", rEval.averagerootMeanSquaredError());
-            }
+        } catch (UnsupportedOperationException e) {
+            log.error("error: ", e);
+
         }
 
-        s += String.format(", Loss: %9f", model.score());
-        OutputLogger.log(weka.core.logging.Logger.Level.ALL, s);
-        log(s);
-        iterator.reset();
+
+        return s;
     }
 
     @Override

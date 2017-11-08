@@ -1,6 +1,5 @@
 package weka.classifiers.functions;
 
-import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -16,7 +15,6 @@ import org.junit.*;
 import org.junit.rules.TestName;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.convolution.ConvolutionInstance;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -26,6 +24,7 @@ import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
@@ -89,7 +88,9 @@ public class Dl4jMlpTest {
         // Init mlp clf
         clf = new Dl4jMlpClassifier();
         clf.setSeed(TestUtil.SEED);
-        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS*2);
+        clf.setEarlyStoppingConfiguration(new EarlyStopping(5, 15));
+
         clf.setDebug(false);
 
         // Init data
@@ -111,49 +112,6 @@ public class Dl4jMlpTest {
         double time = (System.currentTimeMillis() - startTime) / 1000.0;
         logger.info("Testmethod: " + name.getMethodName());
         logger.info("Time: " + time + "s");
-    }
-
-    /**
-     * Test image dataset iterator mnist.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testImageDatasetIteratorMnist() throws Exception {
-
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-        data.setClassIndex(data.numAttributes() - 1);
-        ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
-
-        final int seed = 1;
-        for (int batchSize : new int[]{1, 2, 5, 10}) {
-            final int actual = countIterations(data, imgIter, seed, batchSize);
-            final int expected = data.numInstances() / batchSize;
-            Assert.assertEquals(expected, actual);
-        }
-    }
-
-    /**
-     * Counts the number of iterations an {@see ImageInstanceIterator}
-     *
-     * @param data      Instances to iterate
-     * @param imgIter   ImageInstanceIterator to be tested
-     * @param seed      Seed
-     * @param batchsize Size of the batch which is returned
-     *                  in {@see DataSetIterator#next}
-     * @return Number of iterations
-     * @throws Exception
-     */
-    private int countIterations(Instances data, ImageInstanceIterator imgIter,
-                                int seed, int batchsize) throws Exception {
-        DataSetIterator it = imgIter.getIterator(data, seed, batchsize);
-        int count = 0;
-        while (it.hasNext()) {
-            count++;
-            DataSet dataset = it.next();
-        }
-        return count;
     }
 
 
@@ -178,22 +136,6 @@ public class Dl4jMlpTest {
         convLayer1.setLayerName("Conv-layer 1");
         layers.add(convLayer1);
 
-        BatchNormalization bn1 = new BatchNormalization();
-        bn1.setActivationFunction(new ActivationReLU());
-        layers.add(bn1);
-
-        ConvolutionLayer convLayer2 = new ConvolutionLayer();
-        convLayer2.setKernelSize(threeByThree);
-        convLayer2.setStride(oneByOne);
-        convLayer2.setActivationFn(new ActivationReLU());
-        convLayer2.setNOut(8);
-        layers.add(convLayer2);
-
-        BatchNormalization bn2 = new BatchNormalization();
-        bn2.setActivationFunction(new ActivationReLU());
-        layers.add(bn2);
-
-
         SubsamplingLayer poolLayer1 = new SubsamplingLayer();
         poolLayer1.setPoolingType(PoolingType.MAX);
         poolLayer1.setKernelSize(twoByTwo);
@@ -206,15 +148,6 @@ public class Dl4jMlpTest {
         convLayer3.setKernelSize(threeByThree);
         layers.add(convLayer3);
 
-        BatchNormalization bn3 = new BatchNormalization();
-        bn3.setActivationFunction(new ActivationReLU());
-        layers.add(bn3);
-
-        ConvolutionLayer convLayer4 = new ConvolutionLayer();
-        convLayer4.setNOut(8);
-        convLayer4.setKernelSize(threeByThree);
-        layers.add(convLayer4);
-
         BatchNormalization bn4 = new BatchNormalization();
         bn4.setActivationFunction(new ActivationReLU());
         layers.add(bn4);
@@ -223,11 +156,6 @@ public class Dl4jMlpTest {
         poolLayer2.setPoolingType(PoolingType.MAX);
         poolLayer2.setKernelSize(twoByTwo);
         layers.add(poolLayer2);
-
-        BatchNormalization bn5 = new BatchNormalization();
-        bn5.setActivationFunction(new ActivationReLU());
-        bn5.setDropOut(0.2);
-        layers.add(bn5);
 
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(new ActivationSoftmax());
@@ -242,7 +170,6 @@ public class Dl4jMlpTest {
         Layer[] ls = new Layer[layers.size()];
         layers.toArray(ls);
         clf.setLayers(ls);
-        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS*2); // Needs some more epochs to achieve more %correct than %incorrect
 
         TestUtil.holdout(clf, dataMnist);
     }
@@ -258,12 +185,12 @@ public class Dl4jMlpTest {
         clf.setInstanceIterator(idiMnist);
 
         DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(256);
+        denseLayer.setNOut(128);
         denseLayer.setLayerName("Dense-layer");
         denseLayer.setActivationFn(new ActivationReLU());
 
         DenseLayer denseLayer2 = new DenseLayer();
-        denseLayer2.setNOut(128);
+        denseLayer2.setNOut(32);
         denseLayer2.setLayerName("Dense-layer");
         denseLayer2.setActivationFn(new ActivationReLU());
 
@@ -277,76 +204,9 @@ public class Dl4jMlpTest {
         nnc.setPretrain(false);
         nnc.setSeed(TestUtil.SEED);
 
-        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setNeuralNetConfiguration(nnc);
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
         clf.setIterationListener(new EpochListener());
         TestUtil.holdout(clf, dataMnist);
-    }
-
-//    @Test
-    public void testDl4j() throws Exception {
-        //number of rows and columns in the input pictures
-        final int numRows = 28;
-        final int numColumns = 28;
-        int outputNum = 10; // number of output classes
-        int batchSize = 64; // batch size for each epoch
-        int rngSeed = 123; // random number seed for reproducibility
-        int numEpochs = 15; // number of epochs to perform
-        double rate = 0.0015; // learning rate
-        int nChannels = 1; // Number of input channels
-
-        //Get the DataSetIterators:
-        ImageInstanceIterator iii = DatasetLoader.loadMiniMnistImageIterator();
-        iii.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-        Instances[] split = TestUtil.splitTrainTest(data);
-        Instances train = split[0];
-        Instances test = split[1];
-        DataSetIterator trainIt = iii.getIterator(train, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE);
-        DataSetIterator testIt = iii.getIterator(test, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE);
-
-        logger.info("Build model....");
-
-        MultiLayerConfiguration conf = new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
-                .seed(rngSeed)
-                .iterations(1)
-                .learningRate(.01)
-                .weightInit(WeightInit.XAVIER)
-                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(Updater.NESTEROVS)
-                .list()
-                .layer(0, new DenseLayer.Builder().activation(Activation.RELU)
-                        .nOut(256).build())
-                .layer(1, new DenseLayer.Builder().activation(Activation.RELU)
-                        .nOut(128).build())
-                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-                        .nOut(outputNum)
-                        .activation(Activation.SOFTMAX)
-                        .build())
-                .setInputType(InputType.convolutional(28, 28, 1))
-                .backprop(true).pretrain(false).build();
-
-
-        MultiLayerNetwork model = new MultiLayerNetwork(conf);
-        model.init();
-        model.setListeners(new EvaluativeListener(iii.getIterator(train, TestUtil.SEED, TestUtil.DEFAULT_BATCHSIZE), 1, InvocationType.EPOCH_END));  //print the score with every iteration
-
-        logger.info("Train model....");
-        for (int i = 0; i < TestUtil.DEFAULT_NUM_EPOCHS; i++) {
-            logger.info("Epoch " + i);
-            model.fit(trainIt);
-        }
-
-
-        logger.info("Evaluate model....");
-        Evaluation eval = new Evaluation(outputNum); //create an evaluation object with 10 possible classes
-        while (testIt.hasNext()) {
-            DataSet next = testIt.next();
-            INDArray output = model.output(next.getFeatureMatrix()); //get the networks prediction
-            eval.eval(next.getLabels(), output); //check the prediction against the true class
-        }
-        logger.info(eval.stats());
-        logger.info("****************Example finished********************");
     }
 }

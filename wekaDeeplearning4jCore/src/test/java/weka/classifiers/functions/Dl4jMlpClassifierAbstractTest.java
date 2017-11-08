@@ -5,6 +5,7 @@ import org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.CheckClassifier;
 import weka.classifiers.Classifier;
+import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 
@@ -26,6 +27,7 @@ public class Dl4jMlpClassifierAbstractTest extends AbstractClassifierTest {
     ol.setLossFn(new LossSquaredHinge());
     mlp.setLayers(new Layer[] { dl, ol });
     mlp.setNumEpochs(1);
+    mlp.setEarlyStoppingConfiguration(new EarlyStopping(0, 0));
     return mlp;
   }
 
@@ -33,7 +35,7 @@ public class Dl4jMlpClassifierAbstractTest extends AbstractClassifierTest {
     return new TestSuite(Dl4jMlpClassifierAbstractTest.class);
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     junit.textui.TestRunner.run(suite());
   }
 }

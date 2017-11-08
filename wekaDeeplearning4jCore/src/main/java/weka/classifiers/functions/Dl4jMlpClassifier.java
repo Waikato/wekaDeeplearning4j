@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
@@ -31,20 +32,18 @@ import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
+import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.*;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.listener.EpochListener;
@@ -61,6 +60,8 @@ import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
+import weka.filters.unsupervised.instance.Randomize;
+import weka.filters.unsupervised.instance.RemovePercentage;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -73,14 +74,12 @@ import javax.naming.OperationNotSupportedException;
  *
  * @version $Revision: 11711 $
  */
+@Slf4j
 public class Dl4jMlpClassifier extends RandomizableClassifier implements
   BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
   /** The ID used for serializing this class. */
   protected static final long serialVersionUID = -6363254116597574265L;
-
-  /** The logger used in this class. */
-  protected final Logger m_log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
   /** Filter used to replace missing values. */
   protected ReplaceMissingValues m_replaceMissing;
@@ -114,7 +113,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected Layer[] m_layers = new Layer[] {new OutputLayer()};
 
   /** The configuration of the network. */
-  protected NeuralNetConfiguration m_configuration = new NeuralNetConfiguration();
+  protected NeuralNetConfiguration m_netConfig = new NeuralNetConfiguration();
+
+  /** The configuration for early stopping. */
+  protected EarlyStopping m_earlyStoppingConfig = new EarlyStopping();
 
   /** The number of epochs to perform. */
   protected int m_numEpochs = 10;
@@ -122,14 +124,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /** The number of epochs that have been performed. */
   protected int m_NumEpochsPerformed;
 
-  /** The dataset iterator. */
-  protected transient DataSetIterator m_Iterator;
+  /** The dataset trainIterator. */
+  protected transient DataSetIterator m_trainIterator;
+
+  /** The dataset validationIterator. */
+  protected transient DataSetIterator m_valIterator;
 
   /** The training instances (set to null when done() is called). */
-  protected Instances m_Data;
+  protected Instances m_trainData;
+
+  /** The validation instances (set to null when done() is called). */
+  protected Instances m_valData;
 
   /** The instance iterator to use. */
-  protected AbstractInstanceIterator m_iterator = new DefaultInstanceIterator();
+  protected AbstractInstanceIterator m_instanceIterator = new DefaultInstanceIterator();
 
   /** Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used) */
   protected int m_queueSize = 0;
@@ -343,30 +351,41 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     m_numEpochs = numEpochs;
   }
 
-  @OptionMetadata(description = "The instance iterator to use.",
-          displayName = "instance iterator", commandLineParamName = "iterator",
-          commandLineParamSynopsis = "-iterator <string>", displayOrder = 6)
+  @OptionMetadata(description = "The instance trainIterator to use.",
+          displayName = "instance trainIterator", commandLineParamName = "trainIterator",
+          commandLineParamSynopsis = "-trainIterator <string>", displayOrder = 6)
   public AbstractInstanceIterator getInstanceIterator() {
-    return m_iterator;
+    return m_instanceIterator;
   }
 
   public void setInstanceIterator(AbstractInstanceIterator iterator) {
-    m_iterator = iterator;
+    m_instanceIterator = iterator;
   }
 
   @OptionMetadata(description = "The neural network configuration to use.",
           displayName = "network configuration", commandLineParamName = "config",
           commandLineParamSynopsis = "-config <string>", displayOrder = 7)
   public NeuralNetConfiguration getNeuralNetConfiguration() {
-    return m_configuration;
+    return m_netConfig;
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
     if(!(m_zooModel instanceof EmptyNet)){
-      m_log.warn("Custom NeuralNetConfiguration was set while a ZooModel has been set." +
+      log.warn("Custom NeuralNetConfiguration was set while a ZooModel has been set." +
               "This has no effect.");
     }
-    m_configuration = config;
+    m_netConfig = config;
+  }
+
+  @OptionMetadata(description = "The early stopping configuration to use.",
+          displayName = "early stopping configuration", commandLineParamName = "early-stopping",
+          commandLineParamSynopsis = "-early-stopping <string>", displayOrder = 7)
+  public EarlyStopping getEarlyStoppingConfiguration() {
+    return m_earlyStoppingConfig;
+  }
+
+  public void setEarlyStoppingConfiguration(EarlyStopping config) {
+    m_earlyStoppingConfig = config;
   }
 
   @OptionMetadata(description = "The type of normalization to perform.",
@@ -440,10 +459,25 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // Apply preprocessing
     data = preProcessInput(data);
 
-    if (data == null) {
+    // Split train/validation
+    double valSplit = m_earlyStoppingConfig.getValidationSetPercentage();
+    Instances trainData = null;
+    Instances valData = null;
+    if (useEarlyStopping()){
+      Instances[] insts = splitTrainVal(data, valSplit);
+      trainData = insts[0];
+      valData = insts[1];
+      validateSplit(trainData, valData);
+    } else {
+      trainData = data;
+    }
+
+
+    if (trainData == null) {
       return;
     } else {
-      m_Data = data;
+      m_trainData = trainData;
+      m_valData = valData;
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -456,24 +490,75 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       } else {
         createModel();
       }
-      // Setup the iterator (needs to be done after the model initialization)
-      //
-      m_Iterator = getIterator(m_Data);
+      // Setup the datasetiterators (needs to be done after the model initialization)
+      m_trainIterator = getDataSetIterator(m_trainData);
+
+      if (useEarlyStopping()){
+        m_valIterator = getDataSetIterator(m_valData);
+      }
 
       // Print model architecture
       if (getDebug()) {
-        m_log.info(m_model.conf().toYaml());
+        log.info(m_model.conf().toYaml());
       }
 
 
       // Set the iteration listener
       m_model.setListeners(getListener());
-
+      m_earlyStoppingConfig.init(m_valIterator);
 
       m_NumEpochsPerformed = 0;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  private void validateSplit(Instances trainData, Instances valData) throws WekaException {
+    if (m_earlyStoppingConfig.getValidationSetPercentage() < 10e-8){
+      // Use no validation set at all
+      return;
+    }
+    int classIndex = trainData.classIndex();
+    int valDataNumDinstinctClassValues = valData.numDistinctValues(classIndex);
+    int trainDataNumDistinctClassValues = trainData.numDistinctValues(classIndex);
+    if(trainData.numClasses() > 1 && valDataNumDinstinctClassValues != trainDataNumDistinctClassValues){
+      throw new WekaException("The validation data did not contain the same classes as the training data. " +
+              "You should increase the validation split.");
+    }
+  }
+
+  /**
+   * Split the dataset into p% traind an (100-p)% test set
+   *
+   * @param data Input data
+   * @param p    train percentage
+   * @return Array of instances: (0) Train, (1) Test
+   * @throws Exception Filterapplication went wrong
+   */
+  public static Instances[] splitTrainVal(Instances data, double p) throws Exception {
+    // Validate percentage
+//    if (!(0 < p && p < 100)){
+//      throw new WekaException("Validation split size must be in 0 < p < 100.");
+//    }
+
+    Randomize rand = new Randomize();
+    rand.setInputFormat(data);
+    rand.setRandomSeed(42);
+    data = Filter.useFilter(data, rand);
+
+    RemovePercentage rp = new RemovePercentage();
+    rp.setInputFormat(data);
+    rp.setPercentage(p);
+    Instances train = Filter.useFilter(data, rp);
+
+
+    rp = new RemovePercentage();
+    rp.setInputFormat(data);
+    rp.setPercentage(p);
+    rp.setInvertSelection(true);
+    Instances test = Filter.useFilter(data, rp);
+
+    return new Instances[]{train, test};
   }
 
   /**
@@ -482,8 +567,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @return DataSetIterator
    * @throws Exception
    */
-  private DataSetIterator getIterator(Instances data) throws Exception {
-    DataSetIterator it = getInstanceIterator().getIterator(data, getSeed());
+  private DataSetIterator getDataSetIterator(Instances data) throws Exception {
+    DataSetIterator it = m_instanceIterator.getDataSetIterator(data, getSeed());
     if (m_queueSize > 0) {
       it = new AsyncDataSetIterator(it, m_queueSize);
     }
@@ -594,12 +679,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         int[] newShape =  new int[]{channels, newHeight, newWidth};
         int[][] shapeWrap = new int[][]{newShape};
         setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
-        initSuccessful = initZooModel(m_Data.numClasses(), getSeed(), shapeWrap);
+        initSuccessful = initZooModel(m_trainData.numClasses(), getSeed(), shapeWrap);
 
         newWidth *= 1.2;
         newHeight *= 1.2;
         if (!initSuccessful){
-          m_log.warn("The shape of the data did not fit the chosen " +
+          log.warn("The shape of the data did not fit the chosen " +
                   "model. It was therefore resized to ({}x{}x{}).",
                   channels, newHeight, newWidth);
         }
@@ -623,14 +708,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @throws Exception
    */
   private void createModel() throws Exception {
-    final INDArray features = getIterator(m_Data).next().getFeatures();
-    ComputationGraphConfiguration.GraphBuilder gb = m_configuration.builder()
+    final INDArray features = getDataSetIterator(m_trainData).next().getFeatures();
+    ComputationGraphConfiguration.GraphBuilder gb = m_netConfig.builder()
             .seed(getSeed())
             .graphBuilder();
 
 
     // Set ouput size
-    ((OutputLayer)m_layers[m_layers.length-1]).setNOut(m_Data.numClasses());
+    ((OutputLayer)m_layers[m_layers.length-1]).setNOut(m_trainData.numClasses());
 
     String currentInput = "input";
     gb.addInputs(currentInput);
@@ -678,15 +763,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @throws Exception
    */
   private List<IterationListener> getListener() throws Exception {
-    int numSamples = m_Data.numInstances();
+    int numSamples = m_trainData.numInstances();
     List<IterationListener> listeners = new ArrayList<>();
 
     // Initialize weka listener
-    int trainBatchSize = getInstanceIterator().getTrainBatchSize();
     if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
       int numEpochs = getNumEpochs();
       ((weka.dl4j.listener.IterationListener) m_iterationListener).init
-              (numEpochs, trainBatchSize, numSamples, m_Iterator);
+              (m_trainData.numClasses(), numEpochs, numSamples, m_trainIterator, m_valIterator);
       listeners.add(m_iterationListener);
     }
 
@@ -694,7 +778,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // if the log file doesn't point to a directory, set up the listener
     if (getLogFile() != null && !getLogFile().isDirectory()) {
       FileIterationListener fil = new FileIterationListener(getLogFile().getAbsolutePath());
-      fil.init(getNumEpochs(), trainBatchSize, numSamples, m_Iterator);
+      fil.init(m_trainData.numClasses(), getNumEpochs(), numSamples, m_trainIterator, m_valIterator);
       listeners.add(fil);
     }
 
@@ -706,24 +790,45 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   public boolean next() throws Exception {
 
-    if (m_NumEpochsPerformed >= getNumEpochs() || m_zeroR != null || m_Data == null) {
+    if (m_NumEpochsPerformed >= getNumEpochs() || m_zeroR != null || m_trainData == null) {
       return false;
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-      m_model.fit(m_Iterator); // Note that this calls the reset() method of the iterator
-
+      m_model.fit(m_trainIterator); // Note that this calls the reset() method of the trainIterator
       if (getDebug()) {
-        m_log.info("*** Completed epoch {} ***", m_NumEpochsPerformed + 1);
+        log.info("*** Completed epoch {} ***", m_NumEpochsPerformed + 1);
       }
       m_NumEpochsPerformed++;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
 
+    // Evaluate early stopping
+    if (useEarlyStopping()){
+      boolean continueTraining = m_earlyStoppingConfig.evaluate(m_model);
+      if (!continueTraining){
+        log.info("Early stopping has stopped the training process. The " +
+                        "validation has not improved anymore after {} epochs. Training " +
+                        "finished.",
+                m_earlyStoppingConfig.getMaxEpochsNoImprovement());
+      }
+      return continueTraining;
+    }
+
+
     return true;
+  }
+
+  /**
+   * Use early stopping only if valid split percentage
+   * @return True if early stopping should be used
+   */
+  public boolean useEarlyStopping(){
+    double p = m_earlyStoppingConfig.getValidationSetPercentage();
+    return 0 < p && p < 100;
   }
 
   /**
@@ -731,7 +836,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   public void done() {
 
-    m_Data = null;
+    m_trainData = null;
   }
 
   /**
@@ -744,6 +849,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
                   "(default = no model).", commandLineParamName = "zooModel",
           commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
   public void setZooModel(ZooModel zooModel){
+
 
     if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
       throw new RuntimeException("The zoomodel you have selected is currently" +
@@ -821,14 +927,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
 
     // Get predictions
-    final DataSetIterator it = getIterator(insts);
+    final DataSetIterator it = getDataSetIterator(insts);
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
 
     int offset = 0;
     boolean next = true;
+    // Get predictions batch-wise
     while (next){
       INDArray predBatch = m_model.outputSingle(it.next().getFeatureMatrix());
       int currentBatchSize = predBatch.shape()[0];
+
       // Build weka distribution output
       for (int i = 0; i < currentBatchSize; i++) {
         for (int j = 0; j < insts.numClasses(); j++) {

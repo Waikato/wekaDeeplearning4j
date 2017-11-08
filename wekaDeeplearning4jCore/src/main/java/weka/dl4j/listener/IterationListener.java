@@ -1,11 +1,9 @@
 package weka.dl4j.listener;
 
-import lombok.Builder;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
-import java.io.Serializable;
 import java.util.Enumeration;
 
 public abstract class IterationListener implements org.deeplearning4j.optimize.api.IterationListener, OptionHandler{
@@ -13,18 +11,18 @@ public abstract class IterationListener implements org.deeplearning4j.optimize.a
     private static final long serialVersionUID = 8106114790187499011L;
     protected boolean invoked;
 
-    protected int batchSize;
     protected int numEpochs;
     protected int numSamples;
-    protected int numBatches;
-    protected transient DataSetIterator iterator;
+    protected int numClasses;
+    protected transient DataSetIterator trainIterator;
+    protected transient DataSetIterator validationIterator;
 
-    public void init(int numEpochs, int batchSize, int numSamples, DataSetIterator iterator) {
+    public void init(int numClasses, int numEpochs, int numSamples, DataSetIterator trainIterator, DataSetIterator validationIterator) {
+        this.numClasses = numClasses;
         this.numEpochs = numEpochs;
-        this.batchSize = batchSize;
         this.numSamples = numSamples;
-        this.numBatches = numSamples/batchSize;
-        this.iterator = iterator;
+        this.trainIterator = trainIterator;
+        this.validationIterator = validationIterator;
     }
 
     public abstract void log(String msg);
