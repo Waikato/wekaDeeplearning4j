@@ -144,7 +144,7 @@ public class EarlyStoppingTest {
         EarlyStopping es = new EarlyStopping();
         es.setMaxEpochsNoImprovement(maxEpochsNoImprovement);
         es.setValidationSetPercentage(validationSplit);
-        clf.setEarlyStoppingConfiguration(es);
+        clf.setEarlyStopping(es);
         clf.setNumEpochs(maxEpochs);
         clf.buildClassifier(dataMnist);
     }
