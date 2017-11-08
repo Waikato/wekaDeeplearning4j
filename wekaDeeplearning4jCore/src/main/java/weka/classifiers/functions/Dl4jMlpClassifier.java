@@ -352,8 +352,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   @OptionMetadata(description = "The instance trainIterator to use.",
-          displayName = "instance trainIterator", commandLineParamName = "trainIterator",
-          commandLineParamSynopsis = "-trainIterator <string>", displayOrder = 6)
+          displayName = "instance iterator", commandLineParamName = "iterator",
+          commandLineParamSynopsis = "-iterator <string>", displayOrder = 6)
   public AbstractInstanceIterator getInstanceIterator() {
     return m_instanceIterator;
   }
