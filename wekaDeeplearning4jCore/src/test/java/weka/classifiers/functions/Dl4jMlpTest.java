@@ -89,7 +89,7 @@ public class Dl4jMlpTest {
         clf = new Dl4jMlpClassifier();
         clf.setSeed(TestUtil.SEED);
         clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS*2);
-        clf.setEarlyStoppingConfiguration(new EarlyStopping(5, 15));
+        clf.setEarlyStopping(new EarlyStopping(5, 15));
 
         clf.setDebug(false);
 

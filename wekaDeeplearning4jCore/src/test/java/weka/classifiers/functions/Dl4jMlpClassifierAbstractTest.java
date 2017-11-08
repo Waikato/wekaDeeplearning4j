@@ -27,7 +27,7 @@ public class Dl4jMlpClassifierAbstractTest extends AbstractClassifierTest {
     ol.setLossFn(new LossSquaredHinge());
     mlp.setLayers(new Layer[] { dl, ol });
     mlp.setNumEpochs(1);
-    mlp.setEarlyStoppingConfiguration(new EarlyStopping(0, 0));
+    mlp.setEarlyStopping(new EarlyStopping(0, 0));
     return mlp;
   }
 

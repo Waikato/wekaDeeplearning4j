@@ -113,7 +113,7 @@ public class ModelZooTest {
         clf.setInstanceIterator(iterator);
         clf.setZooModel(model);
         clf.setNumEpochs(1);
-        clf.setEarlyStoppingConfiguration(new EarlyStopping(5, 0));
+        clf.setEarlyStopping(new EarlyStopping(5, 0));
         clf.buildClassifier(shrinkedData);
         clf.distributionsForInstances(shrinkedData);
     }
