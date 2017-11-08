@@ -20,38 +20,32 @@
  */
 package weka.classifiers.functions;
 
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
-import org.deeplearning4j.nn.conf.*;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.api.ndarray.INDArray;
-
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
+import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.*;
 import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.FileIterationListener;
-import org.deeplearning4j.nn.conf.layers.Layer;
-import weka.dl4j.layers.OutputLayer;
-import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.zoo.EmptyNet;
 import weka.dl4j.zoo.FaceNetNN4Small2;
 import weka.dl4j.zoo.GoogLeNet;
@@ -65,6 +59,10 @@ import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
 
 import javax.naming.OperationNotSupportedException;
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer
@@ -446,7 +444,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void initializeClassifier(Instances data) throws Exception {
 
     // Can classifier handle the data?
-    getCapabilities().testWithFail(data);
+    try {
+      getCapabilities().testWithFail(data);
+    } catch (UnsupportedAttributeTypeException uate){
+      if (m_trainData.numAttributes() == 2 && m_trainData.attribute(0).isString()) {
+        throw new UnsupportedAttributeTypeException(
+                "It seems like you have chosen an ARFF file containing the " +
+                        "image paths without setting an ImageInstanceIterator");
+      } else {
+        throw uate;
+      }
+    }
 
     // Check basic network structure
     if (m_layers.length == 0) {
