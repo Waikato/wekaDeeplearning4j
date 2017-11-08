@@ -39,21 +39,6 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
     setLearningRate(0.1);
     setUpdater(new weka.dl4j.updater.Adam());
     setWeightInit(WeightInit.XAVIER);
-
-    this.leakyreluAlpha = 0.01D;
-    this.miniBatch = true;
-    this.numIterations = 1;
-    this.maxNumLineSearchIterations = 5;
-    this.useRegularization = true; // Changed this from the default in deepLearning4j.
-    this.optimizationAlgo = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
-    this.stepFunction = new NegativeGradientStepFunction();
-    this.useDropConnect = false;
-    this.minimize = true;
-    this.learningRatePolicy = LearningRatePolicy.None;
-    this.lrPolicyDecayRate = 0.0D / 0.0;
-    this.lrPolicySteps = 0.0D / 0.0;
-    this.lrPolicyPower = 0.0D / 0.0;
-    this.pretrain = false;
   }
 
   /**
@@ -64,6 +49,16 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
     return builder;
   }
 
+  @OptionMetadata(
+          displayName = "leaky relu alpha",
+          description = "The parameter for the leaky relu (default = 0.1).",
+          commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
+          displayOrder = 0)
+  public double getLeakyreluAlpha() { return builder.getLeakyreluAlpha(); }
+
+  public void setLeakyreluAlpha(double a) {
+    builder.leakyreluAlpha(a);
+  }
 
 
   @OptionMetadata(
@@ -71,7 +66,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
                   + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
                   + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
           displayName = "optimization algorithm", commandLineParamName = "algorithm",
-          commandLineParamSynopsis = "-algorithm <string>", displayOrder = 0)
+          commandLineParamSynopsis = "-algorithm <string>", displayOrder = 1)
   public OptimizationAlgorithm getOptimizationAlgo() {
     return builder.getOptimizationAlgo();
   }
@@ -100,7 +95,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The learning rate policy decay rate (default = NaN).",
           commandLineParamName = "lrPolicyDecayRate", commandLineParamSynopsis = "-lrPolicyDecayRate <double>",
           displayOrder = 3)
-  public double getLrPolicyDecayRate() { return super.getLrPolicyDecayRate(); }
+  public double getLrPolicyDecayRate() { return builder.getLrPolicyDecayRate(); }
   public void setLrPolicyDecayRate(double r) { builder.lrPolicyDecayRate(r); }
 
   @OptionMetadata(
@@ -108,7 +103,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The learning rate policy power (default = NaN).",
           commandLineParamName = "lrPolicyPower", commandLineParamSynopsis = "-lrPolicyPower <double>",
           displayOrder = 4)
-  public double getLrPolicyPower() { return super.getLrPolicyPower(); }
+  public double getLrPolicyPower() { return builder.getLrPolicyPower(); }
   public void setLrPolicyPower(double r) { builder.lrPolicyPower(r); }
 
   @OptionMetadata(
@@ -116,7 +111,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The learning rate policy steps (default = NaN).",
           commandLineParamName = "lrPolicySteps", commandLineParamSynopsis = "-lrPolicySteps <double>",
           displayOrder = 5)
-  public double getLrPolicySteps() { return super.getLrPolicySteps(); }
+  public double getLrPolicySteps() { return builder.getLrPolicySteps(); }
   public void setLrPolicySteps(double r) { builder.lrPolicySteps(r); }
 
   @OptionMetadata(
@@ -124,7 +119,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The maximum number of line search iterations (default = 5).",
           commandLineParamName = "maxNumLineSearchIterations", commandLineParamSynopsis = "-maxNumLineSearchIterations <int>",
           displayOrder = 6)
-  public int getMaxNumLineSearchIterations() { return super.getMaxNumLineSearchIterations(); }
+  public int getMaxNumLineSearchIterations() { return builder.getMaxNumLineSearchIterations(); }
   public void setMaxNumLineSearchIterations(int n) { builder.maxNumLineSearchIterations(n); }
 
   @OptionMetadata(
@@ -132,7 +127,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "Whether to minimize objective.", commandLineParamIsFlag = true,
           commandLineParamName = "minimize", commandLineParamSynopsis = "-minimize",
           displayOrder = 7)
-  public boolean isMinimize() { return super.isMinimize(); }
+  public boolean isMinimize() { return builder.isMinimize(); }
   public void setMinimize(boolean b) { builder.minimize(b); }
 
   @OptionMetadata(
@@ -140,7 +135,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "Whether to use drop connect.", commandLineParamIsFlag = true,
           commandLineParamName = "useDropConnect", commandLineParamSynopsis = "-useDropConnect",
           displayOrder = 8)
-  public boolean isUseDropConnect() { return super.isUseDropConnect(); }
+  public boolean isUseDropConnect() { return builder.isUseDropConnect(); }
   public void setUseDropConnect(boolean b) { builder.useDropConnect(b); }
 
   @OptionMetadata(
@@ -148,7 +143,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "Whether to use regularization.", commandLineParamIsFlag = true,
           commandLineParamName = "useRegularization", commandLineParamSynopsis = "-useRegularization",
           displayOrder = 9)
-  public boolean isUseRegularization() { return super.isUseRegularization(); }
+  public boolean isUseRegularization() { return builder.isUseRegularization(); }
   public void setUseRegularization(boolean b) { builder.regularization(b); }
 
   @OptionMetadata(
@@ -156,7 +151,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The number of iterations for optimization (default = 1).",
           commandLineParamName = "numIterations", commandLineParamSynopsis = "-numIterations <int>",
           displayOrder = 10)
-  public int getNumIterations() { return super.getNumIterations(); }
+  public int getNumIterations() { return builder.getNumIterations(); }
   public void setNumIterations(int n) { builder.iterations(n); }
 
   @OptionMetadata(
@@ -164,7 +159,7 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The step function to use (default = default).",
           commandLineParamName = "stepFunction", commandLineParamSynopsis = "-stepFunction <string>",
           displayOrder = 11)
-  public StepFunction getStepFunction() { return super.getStepFunction(); }
+  public StepFunction getStepFunction() { return builder.getStepFunction(); }
   public void setStepFunction(StepFunction f) { builder.stepFunction(f); }
 
   @OptionMetadata(
@@ -255,15 +250,15 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public void setIterationCount(int n) { super.setIterationCount(n); }
 
   @ProgrammaticProperty
-  public long getSeed() { return super.getSeed(); }
+  public long getSeed() { return builder.getSeed(); }
   public void setSeed(long n) { builder.seed(n); }
 
   @ProgrammaticProperty
-  public boolean isMiniBatch() { return super.isMiniBatch(); }
+  public boolean isMiniBatch() { return builder.isMiniBatch(); }
   public void setMiniBatch(boolean b) { builder.miniBatch(b); }
 
   @ProgrammaticProperty
-  public boolean isPretrain() { return super.isPretrain(); }
+  public boolean isPretrain() { return builder.isPretrain(); }
   public void setPretrain(boolean b) { builder.setPretrain(b); }
 
 
