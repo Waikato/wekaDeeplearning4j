@@ -89,7 +89,7 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
 
     @Override
     public Writable getLabelForPath(URI uri) {
-        return getLabelForPath(uri.getRawPath());
+        return getLabelForPath(uri.getPath());
     }
 
     /**
