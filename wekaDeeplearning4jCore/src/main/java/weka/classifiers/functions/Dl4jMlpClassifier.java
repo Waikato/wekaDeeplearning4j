@@ -293,7 +293,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   @OptionMetadata(displayName = "log file",
     description = "The name of the log file to write loss information to "
-      + "(default = no log file).", commandLineParamName = "logFile",
+      + "(default = $WEKA_HOME/network.log).", commandLineParamName = "logFile",
     commandLineParamSynopsis = "-logFile <string>", displayOrder = 1)
   public void setLogFile(File logFile) {
     m_logFile = logFile;
