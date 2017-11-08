@@ -6,11 +6,16 @@ import org.junit.Test;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.ArffMetaDataLabelGenerator;
+import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.util.DatasetLoader;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -76,4 +81,31 @@ public class ArffMetaDataLabelGeneratorTest {
         Assert.assertTrue(metaDataUris.containsAll(pathURIs));
         Assert.assertTrue(pathURIs.containsAll(metaDataUris));
     }
+
+
+    /**
+     * Test the getPathUris method.
+     */
+    @Test
+    public void testPathsWithSpaces() throws Exception {
+        String originalArff = "src/test/resources/nominal/mnist.meta.minimal.arff";
+        String originalDir = "src/test/resources/nominal/mnist-minimal";
+
+        final String dir = "/tmp/nominal dir/";
+        new File(dir).mkdir();
+        String tmpArff = dir + "mnist.meta.minimal.arff";
+        String tmpDir = dir + "mnist-minimal";
+        Files.copy(Paths.get(originalArff), Paths.get(tmpArff), StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Paths.get(originalDir), Paths.get(tmpDir), StandardCopyOption.REPLACE_EXISTING);
+
+        this.metaData = DatasetLoader.loadArff(tmpArff);
+        this.basePath = DatasetLoader.loadMnistImageIterator(tmpDir).getImagesLocation().getAbsolutePath();
+
+        this.gen = new ArffMetaDataLabelGenerator(this.metaData, this.basePath);
+        testGetLabelForPath();
+        testGetPathUris();
+    }
+
+
+
 }
