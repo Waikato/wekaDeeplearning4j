@@ -21,6 +21,7 @@
 package weka.classifiers.functions;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,7 +108,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected long m_modelSize;
 
   /** The file that log information will be written to. */
-  protected File m_logFile = new File(System.getProperty("user.dir"));
+  protected File m_logFile = new File(Paths.get(System.getenv("WEKA_HOME"), "network.log").toString());
 
   /** The layers of the network. */
   protected Layer[] m_layers = new Layer[] {new OutputLayer()};
