@@ -846,6 +846,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void done() {
 
     m_trainData = null;
+    m_valData = null;
   }
 
   /**
