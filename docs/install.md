@@ -34,7 +34,7 @@ Installed	Repository	Loaded	Package
 1.2.0    	-----     	Yes	    wekaDeeplearning4j<BACKEND>-dev: Weka wrappers for Deeplearning4j
 ```
 
-# Using wekaDeeplearning4j in a maven project
+# Using wekaDeeplearning4j in a Maven Project
 It is also possible to include this package as maven project. As of now it is not provided in any maven repository, therefore you need to install this package to your local `.m2` repository:
 
 ```bash
