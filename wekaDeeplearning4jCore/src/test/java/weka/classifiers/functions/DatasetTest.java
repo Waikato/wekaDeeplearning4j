@@ -120,6 +120,11 @@ public class DatasetTest {
         runClf(DatasetLoader.loadIris());
     }
 
+    @Test
+    public void testMissingValues() throws Exception {
+        runClf(DatasetLoader.loadIrisMissingValues());
+    }
+
     private void runClf(Instances data) throws Exception {
         // Data
         DenseLayer denseLayer = new DenseLayer();

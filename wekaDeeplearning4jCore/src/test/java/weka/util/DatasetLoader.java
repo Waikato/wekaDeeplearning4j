@@ -84,6 +84,17 @@ public class DatasetLoader {
         data.setClassIndex(data.numAttributes() - 1);
         return data;
     }
+    /**
+     * Load the iris arff file with missing values
+     *
+     * @return Iris data as Instances
+     * @throws Exception IO error.
+     */
+    public static Instances loadIrisMissingValues() throws Exception {
+        Instances data = new Instances(new FileReader("src/test/resources/nominal/iris-missing-values.arff"));
+        data.setClassIndex(data.numAttributes() - 1);
+        return data;
+    }
 
     /**
      * Load the diabetes arff file
