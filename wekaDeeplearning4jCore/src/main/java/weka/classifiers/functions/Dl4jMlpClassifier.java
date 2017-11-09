@@ -169,6 +169,15 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   private IterationListener m_iterationListener = new EpochListener();
 
   /**
+   * Default constructor fixing log file of WEKA_HOME variable is not set.
+   */
+  public Dl4jMlpClassifier(){
+    if (System.getenv("WEKA_HOME") == null){
+      m_logFile = new File("network.log");
+    }
+  }
+
+  /**
    * The main method for running this class.
    *
    * @param argv the command-line arguments
@@ -545,11 +554,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @throws Exception Filterapplication went wrong
    */
   public static Instances[] splitTrainVal(Instances data, double p) throws Exception {
-    // Validate percentage
-//    if (!(0 < p && p < 100)){
-//      throw new WekaException("Validation split size must be in 0 < p < 100.");
-//    }
-
     Randomize rand = new Randomize();
     rand.setInputFormat(data);
     rand.setRandomSeed(42);
@@ -861,10 +865,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(ZooModel zooModel){
 
 
-    if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
-      throw new RuntimeException("The zoomodel you have selected is currently" +
-              " not supported! Please select another one.");
-    }
+//    if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
+//      throw new RuntimeException("The zoomodel you have selected is currently" +
+//              " not supported! Please select another one.");
+//    }
 
     m_zooModel = zooModel;
   }
