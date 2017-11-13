@@ -37,9 +37,9 @@ if test -t 1; then
 fi
 
 # Project version (TODO: Fix for non GNU grep versions)
-version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' wekaDeeplearning4jCore/build_package.xml`
+version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+)(?=")' package/build_package.xml`
 if echo ${version} | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+$"; then
-    echo -e "${ep}Using version: ${version}"
+    echo -e "${ep}Building version: ${version}"
 else
     echo -e "${ep}Error finding version. Unknown version: ${version}"
     echo -e "${ep}Exiting now."
@@ -95,11 +95,12 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-echo -e ${ep}"Parameters:"
-echo -e ${ep}verbose       = "${verbose}"
-echo -e ${ep}install_pack  = "${install_pack}"
-echo -e ${ep}clean         = "${clean}"
-echo -e ${ep}package         = "${backend}"
+echo -e "${ep}Parameters:"
+echo -e "${ep}      verbose       = ${verbose}"
+echo -e "${ep}      install_pack  = ${install_pack}"
+echo -e "${ep}      clean         = ${clean}"
+echo -e "${ep}      package       = ${backend}"
+echo -e "${ep}"
 ### END parse arguments ###
 
 # Get platform
@@ -139,7 +140,7 @@ export CLASSPATH=${WEKA_HOME}/weka.jar
 echo -e "${ep}Classpath = " ${CLASSPATH}
 
 
-base=${prefix}Core
+base="package"
 cd ${base}
 
 
@@ -166,11 +167,16 @@ ant -f build_package.xml make_package_${backend} > "$out"
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev"
-        rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev"
+        rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev" &> "$out"
+        rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev" &> "$out"
     fi
     echo -e "${ep}Installing ${pack_name} package..."
-    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${pack_name}-${machine}-x86_64.zip
+    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${pack_name}-${machine}-x86_64.zip > "$out"
+    if [ $? -eq 0 ]; then
+        echo -e "${ep}Installation successful"
+    else
+        echo -e "${ep}Installation failed"
+    fi
 fi
 
 # Go back
