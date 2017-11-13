@@ -32,7 +32,8 @@ import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -88,7 +89,7 @@ public class Dl4jMlpTest {
         // Init mlp clf
         clf = new Dl4jMlpClassifier();
         clf.setSeed(TestUtil.SEED);
-        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS*2);
+        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
         clf.setEarlyStopping(new EarlyStopping(5, 15));
 
         clf.setDebug(false);
@@ -208,5 +209,51 @@ public class Dl4jMlpTest {
         clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
         clf.setIterationListener(new EpochListener());
         TestUtil.holdout(clf, dataMnist);
+    }
+
+    /**
+     * Test to serialization of the classifier. This is important for the GUI
+     * usage.
+     * @throws Exception Something went wrong.
+     */
+    @Test
+    public void testSerialization() throws Exception {
+        clf.setInstanceIterator(idiMnist);
+
+        DenseLayer denseLayer = new DenseLayer();
+        denseLayer.setNOut(8);
+        denseLayer.setLayerName("Dense-layer");
+        denseLayer.setActivationFn(new ActivationReLU());
+
+        DenseLayer denseLayer2 = new DenseLayer();
+        denseLayer2.setNOut(4);
+        denseLayer2.setLayerName("Dense-layer");
+        denseLayer2.setActivationFn(new ActivationReLU());
+
+        OutputLayer outputLayer = new OutputLayer();
+        outputLayer.setActivationFn(new ActivationSoftmax());
+        outputLayer.setLossFn(new LossMCXENT());
+        outputLayer.setLayerName("Output-layer");
+
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+        nnc.setPretrain(false);
+        nnc.setSeed(TestUtil.SEED);
+
+        clf.setNeuralNetConfiguration(nnc);
+        clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
+        clf.setIterationListener(new EpochListener());
+
+        File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
+        oos.writeObject(clf);
+
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(out));
+        Dl4jMlpClassifier clf2 = (Dl4jMlpClassifier) ois.readObject();
+
+        clf2.setNumEpochs(1);
+        clf2.initializeClassifier(dataMnist);
+        clf2.buildClassifier(dataMnist);
+
     }
 }
