@@ -28,6 +28,7 @@ import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -46,7 +47,7 @@ import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.FileIterationListener;
-import weka.dl4j.zoo.EmptyNet;
+import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.FaceNetNN4Small2;
 import weka.dl4j.zoo.GoogLeNet;
 import weka.dl4j.zoo.ZooModel;
@@ -65,8 +66,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A wrapper for DeepLearning4j that can be used to train a multi-layer
- * perceptron using that library.
+ * <!-- globalinfo-start --> A wrapper for DeepLearning4j that can be used
+ *  to train a multi-layer perceptron.
+ * <p/>
+ * <!-- globalinfo-end -->
+ *
+ *
  *
  * @author Christopher Beckham
  * @author Eibe Frank
@@ -100,7 +105,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected transient ComputationGraph m_model;
 
   /** The model zoo model. **/
-  protected ZooModel m_zooModel = new EmptyNet();
+  protected ZooModel m_zooModel = new CustomNet();
 
   /** The size of the serialized network model in bytes. **/
   protected long m_modelSize;
@@ -315,7 +320,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     commandLineParamName = "layer",
     commandLineParamSynopsis = "-layer <string>", displayOrder = 2)
   public void setLayers(Layer[] layers) {
-
+    // If something changed, set zoomodel to CustomNet
+    if (!Arrays.deepEquals(layers, m_layers)){
+      setCustomNet();
+    }
     layers = fixDuplicateLayerNames(layers);
     m_layers = layers;
   }
@@ -378,11 +386,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
-    if(!(m_zooModel instanceof EmptyNet)){
-      log.warn("Custom NeuralNetConfiguration was set while a ZooModel has been set." +
-              "This has no effect.");
+    if (!config.equals(m_netConfig)){
+      setCustomNet();
     }
     m_netConfig = config;
+  }
+
+  /**
+   * Reset zoomodel to CustomNet
+   */
+  private void setCustomNet() {
+    if(useZooModel()){
+      m_zooModel = new CustomNet();
+    }
   }
 
   @OptionMetadata(description = "The early stopping configuration to use.",
@@ -470,7 +486,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       throw new Exception("No layers have been added!");
     }
 
-    if (!(m_layers[m_layers.length - 1] instanceof OutputLayer)) {
+    final Layer lastLayer = m_layers[m_layers.length - 1];
+    if (!(lastLayer instanceof BaseOutputLayer)) {
       throw new Exception("Last layer in network must be an output layer!");
     }
 
@@ -503,7 +520,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
       // If zoo model was set, use this model as internal MultiLayerNetwork
-      if(!(m_zooModel instanceof EmptyNet)){
+      if(useZooModel()){
         createZooModel();
       } else {
         createModel();
@@ -682,26 +699,36 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * not fit the chosen zooModel
    */
   private void createZooModel() throws WekaException {
-      ImageInstanceIterator iii = (ImageInstanceIterator) getInstanceIterator();
-      int newWidth = iii.getWidth();
-      int newHeight = iii.getHeight();
-      int channels = iii.getNumChannels();
-      boolean initSuccessful = false;
-      while (!initSuccessful){
-        // Increase width and height
-        int[] newShape =  new int[]{channels, newHeight, newWidth};
-        int[][] shapeWrap = new int[][]{newShape};
-        setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
-        initSuccessful = initZooModel(m_trainData.numClasses(), getSeed(), shapeWrap);
+    final AbstractInstanceIterator it = getInstanceIterator();
+    final boolean isImageIterator = it instanceof ImageInstanceIterator;
 
-        newWidth *= 1.2;
-        newHeight *= 1.2;
-        if (!initSuccessful){
-          log.warn("The shape of the data did not fit the chosen " +
-                  "model. It was therefore resized to ({}x{}x{}).",
-                  channels, newHeight, newWidth);
-        }
+    // Make sure data is convolutional
+    if (!isImageIterator) {
+      throw new WekaException("ZooModels currently only support images. " +
+              "Please setup an ImageInstanceIterator.");
+    }
+
+    // Get the new width/heigth/channels from the iterator
+    ImageInstanceIterator iii = (ImageInstanceIterator) it;
+    int newWidth = iii.getWidth();
+    int newHeight = iii.getHeight();
+    int channels = iii.getNumChannels();
+    boolean initSuccessful = false;
+    while (!initSuccessful) {
+      // Increase width and height
+      int[] newShape = new int[]{channels, newHeight, newWidth};
+      int[][] shapeWrap = new int[][]{newShape};
+      setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+      initSuccessful = initZooModel(m_trainData.numClasses(), getSeed(), shapeWrap);
+
+      newWidth *= 1.2;
+      newHeight *= 1.2;
+      if (!initSuccessful) {
+        log.warn("The shape of the data did not fit the chosen " +
+                        "model. It was therefore resized to ({}x{}x{}).",
+                channels, newHeight, newWidth);
       }
+    }
 
   }
 
@@ -728,7 +755,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
 
     // Set ouput size
-    ((OutputLayer)m_layers[m_layers.length-1]).setNOut(m_trainData.numClasses());
+    final Layer lastLayer = m_layers[m_layers.length - 1];
+    final int nOut = m_trainData.numClasses();
+    if (lastLayer instanceof OutputLayer){
+      ((OutputLayer)lastLayer).setNOut(nOut);
+    } else if (lastLayer instanceof org.deeplearning4j.nn.conf.layers.OutputLayer){
+      ((org.deeplearning4j.nn.conf.layers.BaseOutputLayer)lastLayer).setNOut(nOut);
+    }
 
     String currentInput = "input";
     gb.addInputs(currentInput);
@@ -739,7 +772,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
-    gb.setInputTypes(InputType.inferInputTypes(features));
+    gb.setInputTypes(InputType.inferInputType(features));
 
 
 
@@ -762,6 +795,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       int channels = iii.getNumChannels();
       inputLayer.setNIn(InputType.convolutionalFlat(height, width, channels), override);
     } else {
+      // DefaultInstanceIterator
       inputLayer.setNIn(InputType.inferInputType(features), override);
     }
 
@@ -863,14 +897,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
                   "(default = no model).", commandLineParamName = "zooModel",
           commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
   public void setZooModel(ZooModel zooModel){
-
-
-//    if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
-//      throw new RuntimeException("The zoomodel you have selected is currently" +
-//              " not supported! Please select another one.");
-//    }
+    if (zooModel instanceof GoogLeNet || zooModel instanceof FaceNetNN4Small2){
+      throw new RuntimeException("The zoomodel you have selected is currently" +
+              " not supported! Please select another one.");
+    }
 
     m_zooModel = zooModel;
+
+    try {
+      // Try to parse the layers so the user can change them afterwards
+      final int dummyNumLabels = 2;
+      ComputationGraph tmpCg = zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape());
+      tmpCg.init();
+      m_layers = Arrays.stream(tmpCg.getLayers())
+              .map(l -> l.conf().getLayer())
+              .collect(Collectors.toList())
+              .toArray(new Layer[tmpCg.getLayers().length]);
+
+    } catch (OperationNotSupportedException e) {
+      log.error("Could not set layers from zoomodel.", e);
+    }
+
   }
 
   /**
@@ -895,7 +942,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * Performs efficient batch prediction
    *
-   * @return true, as LogitBoost can perform efficient batch prediction
+   * @return true
    */
   @Override
   public boolean implementsMoreEfficientBatchPrediction() {
@@ -946,6 +993,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     int offset = 0;
     boolean next = true;
+
     // Get predictions batch-wise
     while (next){
       INDArray predBatch = m_model.outputSingle(it.next().getFeatureMatrix());
@@ -1013,5 +1061,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       return m_model.getConfiguration().toYaml();
     }
     return null;
+  }
+
+  /**
+   * Check if the user has selected to use a zoomodel
+   * @return True if zoomodel is not CustomNet
+   */
+  private boolean useZooModel(){
+    return !(m_zooModel instanceof CustomNet);
   }
 }
