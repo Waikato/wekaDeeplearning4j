@@ -23,10 +23,6 @@ import java.util.Enumeration;
 import java.util.Map;
 
 /**
- * <!-- globalinfo-start --> Class for fine tuning configurations of the network.
- * Parameters set as NaN are unused.
- * <p/>
- * <!-- globalinfo-end -->
  *
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
  *
@@ -330,5 +326,16 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  /**
+   * Returns a string describing this search method
+   *
+   * @return a description of the search method suitable for displaying in the
+   *         explorer/experimenter gui
+   */
+  public String globalInfo() {
+    return "Class for fine tuning configurations of the network.\n" +
+            "Parameters set as NaN are unused.\n";
   }
 }

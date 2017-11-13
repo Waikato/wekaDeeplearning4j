@@ -66,16 +66,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * <!-- globalinfo-start --> A wrapper for DeepLearning4j that can be used
+ *  A wrapper for DeepLearning4j that can be used
  *  to train a multi-layer perceptron.
- * <p/>
- * <!-- globalinfo-end -->
- *
- *
  *
  * @author Christopher Beckham
  * @author Eibe Frank
- *
+ * @author Steven Lang
  *
  */
 @Slf4j
@@ -192,7 +188,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public String globalInfo() {
-    return "Classification and regression with multilayer perceptrons using DeepLearning4J.";
+    return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n" +
+            "Evaluations after each epoch are written to the log file.\n";
   }
 
   /**

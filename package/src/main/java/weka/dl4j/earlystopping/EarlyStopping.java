@@ -12,7 +12,8 @@ import java.io.Serializable;
 import java.util.Enumeration;
 
 /**
- * Weka implementation of the EarlyStopping from Dl4j.
+ * Early stopping implementation to stop training after N epochs without loss
+ * improvement on a separate validation set.
  *
  * @author Steven Lang
  */
@@ -152,7 +153,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
 
     @OptionMetadata(
-            displayName = "validation set percentage (removed from training set)",
+            displayName = "validation set percentage",
             description = "Percentage of training set to use for validation (default = 0).",
             commandLineParamName = "valPercentage", commandLineParamSynopsis = "-valPercentage <float>",
             displayOrder = 1)
@@ -166,10 +167,6 @@ public class EarlyStopping implements OptionHandler, Serializable {
     public double getValidationSetPercentage() {
         return validationSetPercentage;
     }
-
-//    public org.deeplearning4j.earlystopping.EarlyStopping getConf() {
-//        return conf;
-//    }
 
     /**
      * Returns an enumeration describing the available options.
@@ -201,5 +198,18 @@ public class EarlyStopping implements OptionHandler, Serializable {
      */
     public void setOptions(String[] options) throws Exception {
         Option.setOptions(options, this, this.getClass());
+    }
+
+    /**
+     * Returns a string describing this search method
+     *
+     * @return a description of the search method suitable for displaying in the
+     *         explorer/experimenter gui
+     */
+    public String globalInfo() {
+        return "This options allows to stop the training process" +
+                "as soon as the loss does not improve anymore for N epochs. " +
+                "The loss is evaluated on a validation set. This set is created" +
+                "by removing the given percentage from the training data.";
     }
 }
