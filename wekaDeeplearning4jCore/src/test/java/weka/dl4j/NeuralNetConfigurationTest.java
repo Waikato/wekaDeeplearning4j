@@ -18,7 +18,8 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.updater.*;
 import weka.util.DatasetLoader;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Paths;
 
 
 /**
@@ -38,7 +39,7 @@ public class NeuralNetConfigurationTest {
     /**
      * Default number of epochs
      */
-    private static final int DEFAULT_NUM_EPOCHS = 10;
+    private static final int DEFAULT_NUM_EPOCHS = 1;
 
     /**
      * Seed
@@ -175,5 +176,26 @@ public class NeuralNetConfigurationTest {
                 Assert.assertEquals(weightInit, weightInit1);
             }
         }
+    }
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setSeed(42);
+        nnc.builder().learningRate(5)
+                .weightInit(WeightInit.UNIFORM)
+                .biasLearningRate(5)
+                .l1(5)
+                .l2(5)
+                .updater(new AdaDelta()).build();
+
+        final File output = Paths.get(System.getProperty("java.io.tmpdir"),"nnc.object").toFile();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output));
+        oos.writeObject(nnc);
+        oos.close();
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output));
+        NeuralNetConfiguration nnc2 = (NeuralNetConfiguration) ois.readObject();
+        Assert.assertEquals(nnc, nnc2);
+        output.delete();
     }
 }
