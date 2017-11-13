@@ -22,7 +22,11 @@ or via the GUI package manager as described [here](http://weka.wikispaces.com/Ho
 
 ### Build locally
 Simply run the `build.sh` script. This assumes:
-* You have Ant and Maven installed.
+* Bash
+* GNU grep
+* GNU sed
+* Ant
+* Maven
 * WEKA's `weka.jar` file resides somewhere in your Java classpath. The latest and greatest WEKA installation is highly recommended; you
   can get the .jar of the nightly snapshot [here](http://www.cs.waikato.ac.nz/~ml/weka/snapshots/developer-branch.zip).
 
