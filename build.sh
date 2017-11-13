@@ -147,7 +147,7 @@ cd ${base}
 pack_name=${prefix}${backend}-${version}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    rm lib/*
+    rm lib/* &> ${out}
     mvn -q clean > ${out} # don't clutter with mvn clean output
 fi
 
