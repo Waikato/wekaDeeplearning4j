@@ -31,8 +31,6 @@ import java.util.Map;
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- * @version $Revision: 11711 $
  */
 @EqualsAndHashCode
 public class NeuralNetConfiguration implements Serializable, OptionHandler {
@@ -44,8 +42,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   protected Distribution dist = null;
   protected double learningRate = 1e-1;
   protected double biasLearningRate = Double.NaN;
-  protected Map<Integer, Double> learningRateSchedule = null;
-  protected double lrScoreBasedDecay;
   protected double l1 = Double.NaN;
   protected double l2 = Double.NaN;
   protected double l1Bias = Double.NaN;
@@ -94,6 +90,9 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
             .stepFunction(stepFunction)
             .updater(iUpdater)
             .weightInit(weightInit)
+            .dist(dist)
+            .biasInit(biasInit)
+            .biasLearningRate(biasLearningRate)
             .miniBatch(miniBatch)
             .minimize(minimize)
             .useDropConnect(useDropConnect);
@@ -187,13 +186,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   public boolean isUseRegularization() { return useRegularization; }
   public void setUseRegularization(boolean b) { useRegularization = b; }
 
-//  @OptionMetadata(
-//          displayName = "number of iterations for optimization",
-//          description = "The number of iterations for optimization (default = 1).",
-//          commandLineParamName = "numIterations", commandLineParamSynopsis = "-numIterations <int>",
-//          displayOrder = 10)
-//  public int getNumIterations() { return numIterations; }
-//  public void setNumIterations(int n) { numIterations = n; }
 
   @OptionMetadata(
           displayName = "step function",
@@ -226,6 +218,19 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   public void setLearningRate(double lr) {
     learningRate = lr;
   }
+
+  @OptionMetadata(
+          displayName = "bias learning rate",
+          description = "The bias learning rate (default = learningRate).",
+          commandLineParamName = "biasLearningRate", commandLineParamSynopsis = "-biasLearningRate <double>",
+          displayOrder = 14)
+  public double getBiasLearningRate() {
+    return this.biasLearningRate;
+  }
+  public void setBiasLearningRate(double biasLearningRate) {
+    this.biasLearningRate = biasLearningRate;
+  }
+
   @OptionMetadata(
           displayName = "l1 regularization factor",
           description = "L1 regularization factor (default = 0.00).",
@@ -246,31 +251,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     this.l2 = l2;
   }
 
-  // Not working as of dl4j 0.9.1
-//
-//  @OptionMetadata(
-//          displayName = "L1 bias",
-//          description = "The L1 bias parameter (default = 0).",
-//          commandLineParamName = "l1Bias", commandLineParamSynopsis = "-l1Bias <double>",
-//          displayOrder = 16)
-//  public double getBiasL1() {
-//    return builder.getL1Bias();
-//  }
-//  public void setBiasL1(double biasL1) {
-//    builder.l1Bias(biasL1);
-//  }
-//
-//  @OptionMetadata(
-//          displayName = "L2 bias",
-//          description = "The L2 bias parameter (default = 0).",
-//          commandLineParamName = "l2Bias", commandLineParamSynopsis = "-l2Bias <double>",
-//          displayOrder = 17)
-//  public double getBiasL2() {
-//    return builder.getL2Bias();
-//  }
-//  public void setBiasL2(double biasL2) {
-//    builder.l2Bias(biasL2);
-//  }
 
   @OptionMetadata(
           displayName = "weight initialization method",
@@ -284,6 +264,29 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     this.weightInit = weightInit;
   }
 
+  @OptionMetadata(
+          displayName = "distribution",
+          description = "The distribution (default = NormalDistribution(1e-3, 1)).",
+          commandLineParamName = "dist", commandLineParamSynopsis = "-dist <specification>",
+          displayOrder = 19)
+  public Distribution getDist() {
+    return dist;
+  }
+  public void setDist(Distribution dist) {
+    this.dist = dist;
+  }
+
+  @OptionMetadata(
+          displayName = "bias initialization",
+          description = "The bias initialization (default = 0.0).",
+          commandLineParamName = "biasInit", commandLineParamSynopsis = "-biasInit <double>",
+          displayOrder = 20)
+  public double getBiasInit() {
+    return this.biasInit;
+  }
+  public void setBiasInit(double biasInit) {
+    this.biasInit = biasInit;
+  }
 
   @ProgrammaticProperty
   public long getSeed() { return seed; }
