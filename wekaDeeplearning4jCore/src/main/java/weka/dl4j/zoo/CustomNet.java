@@ -9,7 +9,7 @@ import javax.naming.OperationNotSupportedException;
  *
  * @author Steven Lang
  */
-public class EmptyNet implements ZooModel {
+public class CustomNet implements ZooModel {
     private static final long serialVersionUID = 7131900848379752732L;
 
     @Override
