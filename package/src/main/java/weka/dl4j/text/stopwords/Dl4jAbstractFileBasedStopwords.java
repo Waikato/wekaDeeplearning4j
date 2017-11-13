@@ -39,7 +39,7 @@ import weka.core.Utils;
  * 
  * @author fracpete, Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 abstract class Dl4jAbstractFileBasedStopwords extends Dl4jAbstractStopwords {
 

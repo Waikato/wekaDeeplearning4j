@@ -41,7 +41,7 @@ import weka.core.Instances;
  * 
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class Word2VecLoader extends AbstractFileLoader implements BatchConverter{
 

@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("Softmax")
 public class ActivationSoftmax extends org.nd4j.linalg.activations.impl.ActivationSoftmax implements OptionHandler {

@@ -39,7 +39,7 @@ import weka.core.OptionHandler;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class TweetNLPTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
 	

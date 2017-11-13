@@ -36,7 +36,7 @@ import weka.core.stemmers.Stemmer;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class StemmingPreprocessor extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor implements  Serializable, OptionHandler{
 

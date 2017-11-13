@@ -8,7 +8,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
  * A WEKA version of DeepLearning4j's VGGN19 ZooModel.
  *
  * @author Steven Lang
- * @version $Revision: 1 $
+ *
  */
 public class VGG19 implements ZooModel {
     private static final long serialVersionUID = -4452023767749633607L;

@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("MCXENT")
 public class LossMCXENT extends org.nd4j.linalg.lossfunctions.impl.LossMCXENT implements OptionHandler {

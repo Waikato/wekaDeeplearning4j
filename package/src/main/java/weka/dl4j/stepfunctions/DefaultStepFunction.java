@@ -11,7 +11,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("default")
 public class DefaultStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction implements OptionHandler {

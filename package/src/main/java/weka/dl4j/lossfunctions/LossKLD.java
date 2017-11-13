@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("KLD")
 public class LossKLD extends org.nd4j.linalg.lossfunctions.impl.LossKLD implements OptionHandler {

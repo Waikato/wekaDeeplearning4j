@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("L2")
 public class LossL2 extends org.nd4j.linalg.lossfunctions.impl.LossL2 implements OptionHandler {

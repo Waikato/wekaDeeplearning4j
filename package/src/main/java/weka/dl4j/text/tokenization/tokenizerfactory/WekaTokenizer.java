@@ -34,7 +34,7 @@ import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class WekaTokenizer implements Tokenizer{
 

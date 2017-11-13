@@ -12,7 +12,7 @@ import weka.core.OptionHandler;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("negativeGradient")
 public class NegativeGradientStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.NegativeGradientStepFunction implements OptionHandler {

@@ -12,7 +12,7 @@ import weka.core.OptionHandler;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("negativeDefault")
 public class NegativeDefaultStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.NegativeDefaultStepFunction implements OptionHandler {

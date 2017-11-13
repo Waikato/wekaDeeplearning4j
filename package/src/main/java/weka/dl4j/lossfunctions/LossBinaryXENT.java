@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("BinaryXENT")
 public class LossBinaryXENT extends org.nd4j.linalg.lossfunctions.impl.LossBinaryXENT implements OptionHandler {

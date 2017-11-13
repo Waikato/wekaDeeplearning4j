@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("ReLU")
 public class ActivationReLU extends org.nd4j.linalg.activations.impl.ActivationReLU implements OptionHandler {

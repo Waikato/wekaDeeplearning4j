@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("MSLE")
 public class LossMSLE extends org.nd4j.linalg.lossfunctions.impl.LossMSLE implements OptionHandler {

@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("Cube")
 public class ActivationCube extends org.nd4j.linalg.activations.impl.ActivationCube implements OptionHandler {

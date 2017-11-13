@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("Hinge")
 public class LossHinge extends org.nd4j.linalg.lossfunctions.impl.LossHinge implements OptionHandler {

@@ -33,7 +33,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("uniform")
 public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution.UniformDistribution implements OptionHandler {

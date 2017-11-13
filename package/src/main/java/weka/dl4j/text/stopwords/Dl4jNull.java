@@ -31,7 +31,7 @@ import java.util.List;
 <!-- globalinfo-end -->
 *
 * @author  fracpete, Felipe Bravo-Marquez 
-* @version $Revision: 1 $
+*
 */
 public class Dl4jNull extends Dl4jAbstractStopwords {
 

@@ -36,7 +36,7 @@ import cmu.arktweetnlp.Twokenize;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class TweetNLPTokenizer implements Tokenizer{
 

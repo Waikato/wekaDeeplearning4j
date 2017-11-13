@@ -34,7 +34,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("binomial")
 public class BinomialDistribution extends org.deeplearning4j.nn.conf.distribution.BinomialDistribution implements OptionHandler {

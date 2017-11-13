@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * @author  fracpete, Felipe Bravo-Marquez 
- * @version $Revision: 1 $
+ *
  */
 public class Dl4jWordsFromFile extends Dl4jAbstractFileBasedStopwords {
 

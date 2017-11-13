@@ -33,7 +33,7 @@ import weka.core.OptionHandler;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class LowCasePreProcessor extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor implements Serializable, OptionHandler {
 

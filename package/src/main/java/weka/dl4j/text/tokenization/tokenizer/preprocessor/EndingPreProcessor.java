@@ -34,7 +34,7 @@ import weka.core.OptionHandler;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class EndingPreProcessor extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor implements Serializable, OptionHandler {
 

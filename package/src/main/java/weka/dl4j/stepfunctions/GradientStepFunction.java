@@ -12,7 +12,7 @@ import weka.core.OptionHandler;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("gradient")
 public class GradientStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.GradientStepFunction implements OptionHandler {

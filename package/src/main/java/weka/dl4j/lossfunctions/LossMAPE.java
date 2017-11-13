@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("MAPE")
 public class LossMAPE extends org.nd4j.linalg.lossfunctions.impl.LossMAPE implements OptionHandler {

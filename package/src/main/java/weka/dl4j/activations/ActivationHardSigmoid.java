@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("HardSigmoid")
 public class ActivationHardSigmoid extends org.nd4j.linalg.activations.impl.ActivationHardSigmoid implements OptionHandler {

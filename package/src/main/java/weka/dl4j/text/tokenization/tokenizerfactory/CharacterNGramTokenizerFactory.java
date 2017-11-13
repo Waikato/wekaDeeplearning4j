@@ -42,7 +42,7 @@ import weka.core.tokenizers.CharacterNGramTokenizer;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class CharacterNGramTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
 

@@ -39,7 +39,7 @@ import weka.core.Instances;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class WekaInstanceSentenceIterator extends  BaseSentenceIterator {
 

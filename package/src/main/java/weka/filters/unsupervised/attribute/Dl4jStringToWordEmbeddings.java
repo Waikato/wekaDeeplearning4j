@@ -59,7 +59,7 @@ import weka.filters.SimpleBatchFilter;
  *
  *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
- * @version $Revision: 1 $
+ *
  */
 
 

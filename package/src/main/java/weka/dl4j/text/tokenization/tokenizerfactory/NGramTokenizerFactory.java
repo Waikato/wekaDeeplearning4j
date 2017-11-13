@@ -41,7 +41,7 @@ import weka.core.tokenizers.NGramTokenizer;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class NGramTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
 

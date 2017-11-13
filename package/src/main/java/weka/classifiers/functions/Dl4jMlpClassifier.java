@@ -76,7 +76,7 @@ import java.util.stream.Collectors;
  * @author Christopher Beckham
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @Slf4j
 public class Dl4jMlpClassifier extends RandomizableClassifier implements

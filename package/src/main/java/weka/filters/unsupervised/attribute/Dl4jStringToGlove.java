@@ -57,7 +57,7 @@ import weka.dl4j.text.sentenceiterator.WekaInstanceSentenceIterator;
  *
  *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
- * @version $Revision: 1 $
+ *
  */
 public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 

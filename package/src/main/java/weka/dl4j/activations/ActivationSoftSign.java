@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("SoftSign")
 public class ActivationSoftSign extends org.nd4j.linalg.activations.impl.ActivationSoftSign implements OptionHandler {

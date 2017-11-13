@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("RationalTanh")
 public class ActivationRationalTanh extends org.nd4j.linalg.activations.impl.ActivationRationalTanh implements OptionHandler {

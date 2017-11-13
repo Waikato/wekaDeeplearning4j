@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("TanH")
 public class ActivationTanH extends org.nd4j.linalg.activations.impl.ActivationTanH implements OptionHandler {

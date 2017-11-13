@@ -33,7 +33,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("normal")
 public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.NormalDistribution implements OptionHandler {

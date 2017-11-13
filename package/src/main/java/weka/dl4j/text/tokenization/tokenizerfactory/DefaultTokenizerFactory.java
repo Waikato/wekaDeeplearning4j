@@ -35,7 +35,7 @@ import weka.core.OptionHandler;
  *
  * @author Felipe Bravo-Marquez
  *
- * @version $Revision: 1 $
+ *
  */
 public class DefaultTokenizerFactory extends org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory implements Serializable, OptionHandler {
 

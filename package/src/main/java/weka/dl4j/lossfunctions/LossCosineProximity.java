@@ -32,7 +32,7 @@ import java.util.Enumeration;
  *
  * @author Eibe Frank
  *
- * @version $Revision: 11711 $
+ *
  */
 @JsonTypeName("CosineProximity")
 public class LossCosineProximity extends org.nd4j.linalg.lossfunctions.impl.LossCosineProximity implements OptionHandler {
