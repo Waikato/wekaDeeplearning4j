@@ -41,7 +41,7 @@ public class DatasetTest {
     /**
      * Default number of epochs
      */
-    private static final int DEFAULT_NUM_EPOCHS = 10;
+    private static final int DEFAULT_NUM_EPOCHS = 1;
 
     /**
      * Seed

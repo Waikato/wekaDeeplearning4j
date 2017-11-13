@@ -100,6 +100,9 @@ public class LayerTest {
         final ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
         clf.setInstanceIterator(imgIter);
 
+        DenseLayer dl = new DenseLayer();
+        dl.setNOut(8);
+
         BatchNormalization bn = new BatchNormalization();
 
         OutputLayer outputLayer = new OutputLayer();
@@ -110,7 +113,7 @@ public class LayerTest {
         nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
         clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{bn, outputLayer});
+        clf.setLayers(new Layer[]{dl, bn, outputLayer});
 
         clf.setNumEpochs(1);
         clf.buildClassifier(data);
@@ -128,7 +131,7 @@ public class LayerTest {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setNumEpochs(10);
+        clf.setNumEpochs(1);
 
         // Data
         Instances data = DatasetLoader.loadMiniMnistMeta();
