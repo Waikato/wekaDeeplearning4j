@@ -1,10 +1,17 @@
 package weka.dl4j;
 
+import lombok.EqualsAndHashCode;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.LearningRatePolicy;
+import org.deeplearning4j.nn.conf.*;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder;
+import org.deeplearning4j.nn.conf.distribution.Distribution;
+import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.stepfunctions.StepFunction;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.IActivation;
+import org.nd4j.linalg.activations.impl.ActivationSigmoid;
 import org.nd4j.linalg.learning.config.IUpdater;
+import org.nd4j.linalg.learning.config.Sgd;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -16,26 +23,53 @@ import java.util.Enumeration;
 import java.util.Map;
 
 /**
+ * <!-- globalinfo-start --> Class for fine tuning configurations of the network.
+ * Parameters set as NaN are unused.
+ * <p/>
+ * <!-- globalinfo-end -->
+ *
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
  *
  * @author Eibe Frank
  *
  * @version $Revision: 11711 $
  */
-public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNetConfiguration implements Serializable, OptionHandler {
+@EqualsAndHashCode
+public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   private static final long serialVersionUID = -4384295102884151216L;
-  /**
-   * Internal configuration builder
-   */
-  private Builder builder = new Builder();
+
+  protected WeightInit weightInit = WeightInit.XAVIER;
+  protected double biasInit = 0.0;
+  protected Distribution dist = null;
+  protected double learningRate = 1e-1;
+  protected double biasLearningRate = Double.NaN;
+  protected Map<Integer, Double> learningRateSchedule = null;
+  protected double lrScoreBasedDecay;
+  protected double l1 = Double.NaN;
+  protected double l2 = Double.NaN;
+  protected double l1Bias = Double.NaN;
+  protected double l2Bias = Double.NaN;
+  protected double dropOut = 0;
+  protected IUpdater iUpdater = new Sgd();
+  protected double leakyreluAlpha = 0.01;
+  protected boolean miniBatch = true;
+  protected long seed = 0;
+  protected boolean useRegularization = false;
+  protected OptimizationAlgorithm optimizationAlgo = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
+  protected StepFunction stepFunction = null;
+  protected boolean useDropConnect = false;
+  protected boolean minimize = true;
+  protected LearningRatePolicy learningRatePolicy = LearningRatePolicy.None;
+  protected double lrPolicyDecayRate = Double.NaN;
+  protected double lrPolicySteps = Double.NaN;
+  protected double lrPolicyPower = Double.NaN;
+  protected boolean pretrain = false;
 
   /**
    * Constructor that provides default values for the settings.
    */
   public NeuralNetConfiguration() {
-    builder = new Builder();
-
     setLearningRate(0.1);
     setUpdater(new weka.dl4j.updater.Adam());
     setWeightInit(WeightInit.XAVIER);
@@ -46,6 +80,26 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
    * @return NeuralNetworkConfiguration
    */
   public org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder builder(){
+    Builder builder = new Builder();
+    builder.l1(l1)
+            .l2(l2)
+            .leakyreluAlpha(leakyreluAlpha)
+            .learningRate(learningRate)
+            .learningRateDecayPolicy(learningRatePolicy)
+            .lrPolicyDecayRate(lrPolicyDecayRate)
+            .lrPolicyPower(lrPolicyPower)
+            .lrPolicySteps(lrPolicySteps)
+            .optimizationAlgo(optimizationAlgo)
+            .seed(seed)
+            .stepFunction(stepFunction)
+            .updater(iUpdater)
+            .weightInit(weightInit)
+            .miniBatch(miniBatch)
+            .minimize(minimize)
+            .useDropConnect(useDropConnect);
+
+    builder.setUseRegularization(useRegularization);
+    builder.setPretrain(pretrain);
     return builder;
   }
 
@@ -54,10 +108,10 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The parameter for the leaky relu (default = 0.1).",
           commandLineParamName = "leakyreluAlpha", commandLineParamSynopsis = "-leakyreluAlpha <double>",
           displayOrder = 0)
-  public double getLeakyreluAlpha() { return builder.getLeakyreluAlpha(); }
+  public double getLeakyreluAlpha() { return leakyreluAlpha; }
 
   public void setLeakyreluAlpha(double a) {
-    builder.leakyreluAlpha(a);
+    leakyreluAlpha = a;
   }
 
 
@@ -68,16 +122,11 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           displayName = "optimization algorithm", commandLineParamName = "algorithm",
           commandLineParamSynopsis = "-algorithm <string>", displayOrder = 1)
   public OptimizationAlgorithm getOptimizationAlgo() {
-    return builder.getOptimizationAlgo();
+    return optimizationAlgo;
   }
 
   public void setOptimizationAlgo(OptimizationAlgorithm optimAlgorithm) {
-    builder.optimizationAlgo(optimAlgorithm);
-  }
-
-  @Override
-  public void setL1ByParam(Map<String, Double> l1ByParam) {
-    super.setL1ByParam(l1ByParam);
+    optimizationAlgo = optimAlgorithm;
   }
 
   @OptionMetadata(
@@ -85,9 +134,9 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The learning rate policy (default = None).",
           commandLineParamName = "learningRatePolicy", commandLineParamSynopsis = "-learningRatePolicy <string>",
           displayOrder = 2)
-  public LearningRatePolicy getLearningRatePolicy() { return super.getLearningRatePolicy(); }
+  public LearningRatePolicy getLearningRatePolicy() { return learningRatePolicy; }
   public void setLearningRatePolicy(LearningRatePolicy p) {
-    builder.learningRateDecayPolicy(p);
+    learningRatePolicy = p;
   }
 
   @OptionMetadata(
@@ -95,72 +144,64 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "The learning rate policy decay rate (default = NaN).",
           commandLineParamName = "lrPolicyDecayRate", commandLineParamSynopsis = "-lrPolicyDecayRate <double>",
           displayOrder = 3)
-  public double getLrPolicyDecayRate() { return builder.getLrPolicyDecayRate(); }
-  public void setLrPolicyDecayRate(double r) { builder.lrPolicyDecayRate(r); }
+  public double getLrPolicyDecayRate() { return lrPolicyDecayRate; }
+  public void setLrPolicyDecayRate(double r) { lrPolicyDecayRate = r; }
 
   @OptionMetadata(
           displayName = "learning rate policy power",
           description = "The learning rate policy power (default = NaN).",
           commandLineParamName = "lrPolicyPower", commandLineParamSynopsis = "-lrPolicyPower <double>",
           displayOrder = 4)
-  public double getLrPolicyPower() { return builder.getLrPolicyPower(); }
-  public void setLrPolicyPower(double r) { builder.lrPolicyPower(r); }
+  public double getLrPolicyPower() { return lrPolicyPower; }
+  public void setLrPolicyPower(double r) { lrPolicyPower = r; }
 
   @OptionMetadata(
           displayName = "learning rate policy steps",
           description = "The learning rate policy steps (default = NaN).",
           commandLineParamName = "lrPolicySteps", commandLineParamSynopsis = "-lrPolicySteps <double>",
           displayOrder = 5)
-  public double getLrPolicySteps() { return builder.getLrPolicySteps(); }
-  public void setLrPolicySteps(double r) { builder.lrPolicySteps(r); }
-
-  @OptionMetadata(
-          displayName = "maximum number of line search iterations",
-          description = "The maximum number of line search iterations (default = 5).",
-          commandLineParamName = "maxNumLineSearchIterations", commandLineParamSynopsis = "-maxNumLineSearchIterations <int>",
-          displayOrder = 6)
-  public int getMaxNumLineSearchIterations() { return builder.getMaxNumLineSearchIterations(); }
-  public void setMaxNumLineSearchIterations(int n) { builder.maxNumLineSearchIterations(n); }
+  public double getLrPolicySteps() { return lrPolicySteps; }
+  public void setLrPolicySteps(double r) { lrPolicySteps= r; }
 
   @OptionMetadata(
           displayName = "whether to minimize objective",
           description = "Whether to minimize objective.", commandLineParamIsFlag = true,
           commandLineParamName = "minimize", commandLineParamSynopsis = "-minimize",
           displayOrder = 7)
-  public boolean isMinimize() { return builder.isMinimize(); }
-  public void setMinimize(boolean b) { builder.minimize(b); }
+  public boolean isMinimize() { return minimize; }
+  public void setMinimize(boolean b) { minimize = b; }
 
   @OptionMetadata(
           displayName = "whether to use drop connect",
           description = "Whether to use drop connect.", commandLineParamIsFlag = true,
           commandLineParamName = "useDropConnect", commandLineParamSynopsis = "-useDropConnect",
           displayOrder = 8)
-  public boolean isUseDropConnect() { return builder.isUseDropConnect(); }
-  public void setUseDropConnect(boolean b) { builder.useDropConnect(b); }
+  public boolean isUseDropConnect() { return useDropConnect; }
+  public void setUseDropConnect(boolean b) { useDropConnect = b; }
 
   @OptionMetadata(
           displayName = "whether to use regularization",
           description = "Whether to use regularization.", commandLineParamIsFlag = true,
           commandLineParamName = "useRegularization", commandLineParamSynopsis = "-useRegularization",
           displayOrder = 9)
-  public boolean isUseRegularization() { return builder.isUseRegularization(); }
-  public void setUseRegularization(boolean b) { builder.regularization(b); }
+  public boolean isUseRegularization() { return useRegularization; }
+  public void setUseRegularization(boolean b) { useRegularization = b; }
 
-  @OptionMetadata(
-          displayName = "number of iterations for optimization",
-          description = "The number of iterations for optimization (default = 1).",
-          commandLineParamName = "numIterations", commandLineParamSynopsis = "-numIterations <int>",
-          displayOrder = 10)
-  public int getNumIterations() { return builder.getNumIterations(); }
-  public void setNumIterations(int n) { builder.iterations(n); }
+//  @OptionMetadata(
+//          displayName = "number of iterations for optimization",
+//          description = "The number of iterations for optimization (default = 1).",
+//          commandLineParamName = "numIterations", commandLineParamSynopsis = "-numIterations <int>",
+//          displayOrder = 10)
+//  public int getNumIterations() { return numIterations; }
+//  public void setNumIterations(int n) { numIterations = n; }
 
   @OptionMetadata(
           displayName = "step function",
           description = "The step function to use (default = default).",
           commandLineParamName = "stepFunction", commandLineParamSynopsis = "-stepFunction <string>",
           displayOrder = 11)
-  public StepFunction getStepFunction() { return builder.getStepFunction(); }
-  public void setStepFunction(StepFunction f) { builder.stepFunction(f); }
+  public StepFunction getStepFunction() { return stepFunction; }
+  public void setStepFunction(StepFunction f) { stepFunction = f; }
 
   @OptionMetadata(
           displayName = "updater",
@@ -168,10 +209,10 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           commandLineParamName = "updater", commandLineParamSynopsis = "-updater <string>",
           displayOrder = 12)
   public IUpdater getUpdater() {
-    return builder.getIUpdater();
+    return iUpdater;
   }
   public void setUpdater(IUpdater updater) {
-    builder.updater(updater);
+    iUpdater = updater;
   }
   @OptionMetadata(
           displayName = "learningrate",
@@ -179,20 +220,20 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           commandLineParamName = "learningRate", commandLineParamSynopsis = "-learningRate <double>",
           displayOrder = 13)
   public double getLearningRate() {
-    return builder.getLearningRate();
+    return learningRate;
   }
 
-  public void setLearningRate(double learningRate) {
-    builder.learningRate(learningRate);
+  public void setLearningRate(double lr) {
+    learningRate = lr;
   }
   @OptionMetadata(
           displayName = "l1 regularization factor",
           description = "L1 regularization factor (default = 0.00).",
           commandLineParamName = "l1", commandLineParamSynopsis = "-l1 <double>",
           displayOrder = 14)
-  public double getL1() { return builder.getL1(); }
+  public double getL1() { return l1; }
   public void setL1(double l1) {
-    builder.l1(l1);
+    this.l1 = l1;
   }
 
   @OptionMetadata(
@@ -200,9 +241,9 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           description = "L2 regularization factor (default = 0.00).",
           commandLineParamName = "l2", commandLineParamSynopsis = "-l2 <double>",
           displayOrder = 15)
-  public double getL2() { return builder.getL2(); }
+  public double getL2() { return l2; }
   public void setL2(double l2) {
-    builder.l2(l2);
+    this.l2 = l2;
   }
 
   // Not working as of dl4j 0.9.1
@@ -237,29 +278,24 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
           commandLineParamName = "weightInit", commandLineParamSynopsis = "-weightInit <specification>",
           displayOrder = 18)
   public WeightInit getWeightInit() {
-    return builder.getWeightInit();
+    return weightInit;
   }
   public void setWeightInit(WeightInit weightInit) {
-    builder.weightInit(weightInit);
+    this.weightInit = weightInit;
   }
 
 
+  @ProgrammaticProperty
+  public long getSeed() { return seed; }
+  public void setSeed(long n) { seed = n; }
 
   @ProgrammaticProperty
-  public int getIterationCount() { return super.getIterationCount(); }
-  public void setIterationCount(int n) { super.setIterationCount(n); }
+  public boolean isMiniBatch() { return miniBatch; }
+  public void setMiniBatch(boolean b) { miniBatch = b; }
 
   @ProgrammaticProperty
-  public long getSeed() { return builder.getSeed(); }
-  public void setSeed(long n) { builder.seed(n); }
-
-  @ProgrammaticProperty
-  public boolean isMiniBatch() { return builder.isMiniBatch(); }
-  public void setMiniBatch(boolean b) { builder.miniBatch(b); }
-
-  @ProgrammaticProperty
-  public boolean isPretrain() { return builder.isPretrain(); }
-  public void setPretrain(boolean b) { builder.setPretrain(b); }
+  public boolean isPretrain() { return pretrain; }
+  public void setPretrain(boolean b) { pretrain = b; }
 
 
   /**
@@ -291,13 +327,5 @@ public class NeuralNetConfiguration extends org.deeplearning4j.nn.conf.NeuralNet
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
-  }
-
-  /**
-   * Dummy builder class
-   */
-  public static class Builder extends org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder implements Serializable {
-    private static final long serialVersionUID = 8968204740743541886L;
-
   }
 }
