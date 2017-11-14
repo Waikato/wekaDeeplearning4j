@@ -1,23 +1,13 @@
 package weka.classifiers.functions;
 
-import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.api.InvocationType;
-import org.deeplearning4j.optimize.listeners.EvaluativeListener;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
@@ -25,6 +15,8 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.earlystopping.EarlyStopping;
+import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
+import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
@@ -34,7 +26,8 @@ import weka.util.TestUtil;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -50,7 +43,6 @@ public class Dl4jMlpTest {
      * Logger instance
      */
     private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
-
 
 
     /**
@@ -212,9 +204,88 @@ public class Dl4jMlpTest {
     }
 
     /**
+     * Test Layer setup DENSE to CONV which is currently not supported
+     *
+     * @throws Exception Could not build classifier.
+     */
+    @Test(expected = RuntimeException.class)
+    public void testIllegalIrisConv() throws Exception {
+        final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
+        it.setHeight(1);
+        it.setWidth(4);
+        clf.setInstanceIterator(it);
+
+
+        ConvolutionLayer cl = new ConvolutionLayer();
+        cl.setNOut(3);
+        cl.setKernelSize(new int[]{1, 1});
+        cl.setStride(new int[]{1, 1});
+
+
+        DenseLayer dl = new DenseLayer();
+        dl.setNOut(10);
+
+        OutputLayer ol = new OutputLayer();
+        clf.setLayers(new Layer[]{dl, cl, ol});
+        clf.buildClassifier(dataIris);
+    }
+
+    /**
+     * Test convolution while setting {@link DefaultInstanceIterator} which is
+     * forbidden.
+     *
+     * @throws Exception Could not build classifier.
+     */
+    @Test(expected = RuntimeException.class)
+    public void testIllegalIrisConvDefaultInstanceIterator() throws Exception {
+        // DefaultInstanceIterator should not be allowed in the combination with
+        // convolutional layers.
+        clf.setInstanceIterator(new DefaultInstanceIterator());
+
+
+        DenseLayer dl = new DenseLayer();
+        dl.setNOut(10);
+
+        ConvolutionLayer cl = new ConvolutionLayer();
+        cl.setNOut(3);
+        cl.setKernelSize(new int[]{1, 1});
+        cl.setStride(new int[]{1, 1});
+
+        OutputLayer ol = new OutputLayer();
+        clf.setLayers(new Layer[]{cl, dl, ol});
+        clf.buildClassifier(dataIris);
+    }
+
+    /**
+     * Test iris convolution.
+     *
+     * @throws Exception Could not build classifier.
+     */
+    @Test
+    public void testIrisConv() throws Exception {
+        final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
+        it.setHeight(1);
+        it.setWidth(4);
+        clf.setInstanceIterator(it);
+
+        DenseLayer dl = new DenseLayer();
+        dl.setNOut(10);
+
+        ConvolutionLayer cl = new ConvolutionLayer();
+        cl.setNOut(3);
+        cl.setKernelSize(new int[]{1, 1});
+        cl.setStride(new int[]{1, 1});
+
+        OutputLayer ol = new OutputLayer();
+        clf.setLayers(new Layer[]{cl, dl, ol});
+        clf.buildClassifier(dataIris);
+    }
+
+    /**
      * Test to serialization of the classifier. This is important for the GUI
      * usage.
-     * @throws Exception Something went wrong.
+     *
+     * @throws Exception Could not build classifier.
      */
     @Test
     public void testSerialization() throws Exception {
