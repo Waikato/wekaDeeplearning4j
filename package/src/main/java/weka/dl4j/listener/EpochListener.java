@@ -34,7 +34,6 @@ public class EpochListener extends IterationListener implements TrainingListener
             s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
         }
         log(s);
-        trainIterator.reset();
     }
 
     private String evaluateDataSetIterator(Model model, DataSetIterator iterator) {
@@ -63,15 +62,17 @@ public class EpochListener extends IterationListener implements TrainingListener
                     score = scoreSum/iterations;
                 }
                 if (isClassification) {
-                    s += String.format("Accuracy: %4.2f%%, ", cEval.accuracy() * 100);
+                    s += String.format("Accuracy: %4.2f%%", cEval.accuracy() * 100);
                 } else {
-                    s += String.format("Avg R2: %4.2f, ", rEval.averagecorrelationR2());
-                    s += String.format(", Avg RMSE: %4.2f, ", rEval.averagerootMeanSquaredError());
+                    s += String.format("Avg R2: %4.2f", rEval.averagecorrelationR2());
+                    s += String.format(", Avg RMSE: %4.2f", rEval.averagerootMeanSquaredError());
                 }
-                s += String.format("Loss: %9f\n", score);
+                s += String.format(", Loss: %9f\n", score);
             }
         } catch (UnsupportedOperationException e) {
             return "Validation set is too small and does not contain all labels.";
+        } finally {
+            iterator.reset();
         }
 
 
