@@ -1,5 +1,6 @@
 package weka.dl4j.listener;
 
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
@@ -8,9 +9,12 @@ import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import weka.core.OptionMetadata;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -20,19 +24,41 @@ import java.util.Map;
  *
  * @author Steven Lang
  */
+@Slf4j
 public class EpochListener extends IterationListener implements TrainingListener {
-    private static final Logger log = LoggerFactory.getLogger(weka.dl4j.listener.EpochListener.class);
     private static final long serialVersionUID = -8852994767947925554L;
+
+    /**
+     * Epoch counter
+     */
     private int currentEpoch = 0;
+
+    /**
+     * Evaluate every N epochs
+     */
+    private int n = 5;
+
+    /**
+     * Log to this file if set
+     */
+    private transient PrintWriter logFile;
 
     @Override
     public void onEpochEnd(Model model) {
         currentEpoch++;
+
+        // Skip if this is not an evaluation epoch
+        if (currentEpoch % n !=0){
+            return;
+        }
+
         String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
         s += "Train:      " + evaluateDataSetIterator(model, trainIterator);
-        if (validationIterator != null){
+
+        if (validationIterator != null) {
             s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
         }
+
         log(s);
     }
 
@@ -49,7 +75,9 @@ public class EpochListener extends IterationListener implements TrainingListener
                 Evaluation cEval = new Evaluation(numClasses);
                 RegressionEvaluation rEval = new RegressionEvaluation(1);
                 while (iterator.hasNext()) {
-                    DataSet next = iterator.next();
+                    // TODO: figure out which batch size is feasible for inference
+                    final int batch = iterator.batch() * 8;
+                    DataSet next = iterator.next(batch);
                     scoreSum += net.score(next);
                     iterations++;
                     INDArray output = net.outputSingle(next.getFeatureMatrix()); //get the networks prediction
@@ -58,8 +86,8 @@ public class EpochListener extends IterationListener implements TrainingListener
                 }
 
                 double score = 0;
-                if (iterations != 0){
-                    score = scoreSum/iterations;
+                if (iterations != 0) {
+                    score = scoreSum / iterations;
                 }
                 if (isClassification) {
                     s += String.format("Accuracy: %4.2f%%", cEval.accuracy() * 100);
@@ -71,6 +99,9 @@ public class EpochListener extends IterationListener implements TrainingListener
             }
         } catch (UnsupportedOperationException e) {
             return "Validation set is too small and does not contain all labels.";
+        } catch (Exception e) {
+            log.error("Evaluation after epoch failed. Error: ", e);
+            return "Not available";
         } finally {
             iterator.reset();
         }
@@ -79,9 +110,24 @@ public class EpochListener extends IterationListener implements TrainingListener
         return s;
     }
 
+    /**
+     * Set the log file
+     *
+     * @param logFile Logging file
+     */
+    public void setLogFile(File logFile) throws IOException {
+        if (logFile.exists()) logFile.delete();
+        System.out.println("Creating debug file at: " + logFile.getAbsolutePath());
+        this.logFile = new PrintWriter(new FileWriter(logFile, false));
+    }
+
     @Override
     public void log(String msg) {
         log.info(msg);
+        if (logFile != null){
+            logFile.write(msg + "\n");
+            logFile.flush();
+        }
     }
 
     @Override
@@ -110,5 +156,32 @@ public class EpochListener extends IterationListener implements TrainingListener
     @Override
     public void onBackwardPass(Model model) {
 
+    }
+
+    @OptionMetadata(
+            displayName = "evaluate every N epochs",
+            description = "Evaluate every N epochs (default = 5).",
+            commandLineParamName = "n", commandLineParamSynopsis = "-n <int>",
+            displayOrder = 0)
+    public void setN(int evaluateEveryNEpochs) {
+        if (evaluateEveryNEpochs < 1) {
+            // Never evaluate
+            this.n = Integer.MAX_VALUE;
+        }
+
+        this.n = evaluateEveryNEpochs;
+    }
+
+    public int getN(){return this.n;}
+
+    /**
+     * Returns a string describing this search method
+     *
+     * @return a description of the search method suitable for displaying in the
+     *         explorer/experimenter gui
+     */
+    public String globalInfo() {
+        return "A listener which evaluates the model while training every N " +
+                "epochs.";
     }
 }

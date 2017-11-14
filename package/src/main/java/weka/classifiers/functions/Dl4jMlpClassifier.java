@@ -47,7 +47,6 @@ import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
-import weka.dl4j.listener.FileIterationListener;
 import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.FaceNetNN4Small2;
 import weka.dl4j.zoo.GoogLeNet;
@@ -579,7 +578,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
       // Set the iteration listener
       m_model.setListeners(getListener());
-      m_earlyStopping.init(m_valIterator);
+
+      // Init early stopping
+      if (useEarlyStopping()){
+        m_earlyStopping.init(m_valIterator);
+      }
 
       m_NumEpochsPerformed = 0;
     } finally {
@@ -826,21 +829,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     List<IterationListener> listeners = new ArrayList<>();
 
     // Initialize weka listener
-    if (m_iterationListener instanceof weka.dl4j.listener.IterationListener) {
+    if (m_iterationListener instanceof weka.dl4j.listener.EpochListener) {
       int numEpochs = getNumEpochs();
-      ((weka.dl4j.listener.IterationListener) m_iterationListener).init
+      ((weka.dl4j.listener.EpochListener) m_iterationListener).init
               (m_trainData.numClasses(), numEpochs, numSamples, m_trainIterator, m_valIterator);
+      ((weka.dl4j.listener.EpochListener) m_iterationListener).setLogFile(m_logFile);
       listeners.add(m_iterationListener);
     }
-
-
-    // if the log file doesn't point to a directory, set up the listener
-    if (getLogFile() != null && !getLogFile().isDirectory()) {
-      FileIterationListener fil = new FileIterationListener(getLogFile().getAbsolutePath());
-      fil.init(m_trainData.numClasses(), getNumEpochs(), numSamples, m_trainIterator, m_valIterator);
-      listeners.add(fil);
-    }
-
     return listeners;
   }
 
