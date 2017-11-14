@@ -26,7 +26,7 @@ DenseLayer -> DenseLayer -> ... -> OutputLayer
 ```
 
 ## ConvolutionInstanceIterator
-To use convolutional neural networks in the case of a more sophisticated dataset, where the ARFF file represents flattened image pixels as e.g.:
+To use convolutional neural networks in the case of a more sophisticated dataset, where the ARFF file represents column-wise flattened image pixels as e.g.:
 ```
 @RELATION hotdog-3x3
 
