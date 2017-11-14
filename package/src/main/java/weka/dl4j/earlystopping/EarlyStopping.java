@@ -106,7 +106,9 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
             // Iterate batches
             while (valDataSetIterator.hasNext()) {
-                DataSet next = valDataSetIterator.next();
+                // TODO: figure out which batch size is feasible for inference
+                final int batch = valDataSetIterator.batch() * 8;
+                DataSet next = valDataSetIterator.next(batch);
                 scoreSum += model.score(next);
                 iterations++;
             }
