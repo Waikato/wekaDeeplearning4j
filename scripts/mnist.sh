@@ -10,6 +10,7 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
 	 -layer "weka.dl4j.layers.ConvolutionLayer -nFilters 8 -kernelSizeX 3 -kernelSizeY 3 -strideX 1 -strideY 1" \
 	 -layer "weka.dl4j.layers.SubsamplingLayer -kernelSizeX 2 -kernelSizeY 2 -strideX 2 -strideY 2" \
 	 -layer "weka.dl4j.layers.OutputLayer " \
+	 -early-stopping "weka.dl4j.earlystopping.EarlyStopping -valPercentage 10 -maxEpochsNoImprovement 5" \
      -numEpochs 10 \
      -t ../package/datasets/nominal/mnist.meta.minimal.arff \
      -split-percentage 66
