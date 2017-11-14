@@ -43,8 +43,9 @@ import weka.core.*;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.*;
-import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.FileIterationListener;
 import weka.dl4j.zoo.CustomNet;
@@ -317,12 +318,48 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     commandLineParamName = "layer",
     commandLineParamSynopsis = "-layer <string>", displayOrder = 2)
   public void setLayers(Layer[] layers) {
+    validateLayers(layers);
+
     // If something changed, set zoomodel to CustomNet
-    if (!Arrays.deepEquals(layers, m_layers)){
+    if (!Arrays.deepEquals(layers, m_layers)) {
       setCustomNet();
     }
     layers = fixDuplicateLayerNames(layers);
     m_layers = layers;
+  }
+
+  /**
+   * Validate whether the layers comply with the currently chosen instance
+   * iterator
+   * @param layers New set of layers
+   */
+  private void validateLayers(Layer[] layers) {
+    // Check if the layers contain convolution/subsampling
+    Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
+    final boolean containsConvLayer = layerSet.stream()
+            .filter(this::isNDLayer)
+            .collect(Collectors.toSet()).size() > 0;
+
+    final boolean isConvItertor = getInstanceIterator() instanceof Convolutional;
+    if (containsConvLayer && !isConvItertor){
+      throw new RuntimeException("A convolution/subsampling layer was set using " +
+              "the wrong instance iterator. Please select either " +
+              "ImageInstanceIterator for image files or " +
+              "ConvolutionInstanceIterator for ARFF files.");
+    }
+  }
+
+  /**
+   * Check if a given layer is a convolutional/subsampling layer
+   *
+   * @param layer Layer to check
+   * @return True if layer is convolutional/subsampling
+   */
+  private boolean isNDLayer(Layer layer) {
+    return layer instanceof ConvolutionLayer
+            || layer instanceof SubsamplingLayer
+            || layer instanceof org.deeplearning4j.nn.conf.layers.ConvolutionLayer
+            || layer instanceof org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
   }
 
   /**
@@ -754,9 +791,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // Set ouput size
     final Layer lastLayer = m_layers[m_layers.length - 1];
     final int nOut = m_trainData.numClasses();
-    if (lastLayer instanceof OutputLayer){
-      ((OutputLayer)lastLayer).setNOut(nOut);
-    } else if (lastLayer instanceof org.deeplearning4j.nn.conf.layers.OutputLayer){
+    if (lastLayer instanceof org.deeplearning4j.nn.conf.layers.BaseOutputLayer){
       ((org.deeplearning4j.nn.conf.layers.BaseOutputLayer)lastLayer).setNOut(nOut);
     }
 
@@ -770,31 +805,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
     gb.setOutputs(currentInput);
     gb.setInputTypes(InputType.inferInputType(features));
-
-
-
-    // Set input type for the first layer manually since the builder above does not overwrite
-    // the input type. This is especially problematic in the Weka AbstractTest since no new CLF instance
-    // is created on new tests and therefor buildClassifier is called multiple times.
-    boolean override = true;
-    Layer inputLayer = m_layers[0];
-    if (getInstanceIterator() instanceof ImageInstanceIterator
-            && (inputLayer instanceof DenseLayer || inputLayer instanceof OutputLayer)){
-      ImageInstanceIterator iii = ((ImageInstanceIterator)getInstanceIterator());
-      int height = iii.getHeight();
-      int width = iii.getWidth();
-      int channels = iii.getNumChannels();
-      inputLayer.setNIn(InputType.convolutionalFlat(height, width, channels), override);
-    } else if (getInstanceIterator() instanceof ConvolutionInstanceIterator && inputLayer instanceof DenseLayer){
-      ConvolutionInstanceIterator iii = ((ConvolutionInstanceIterator)getInstanceIterator());
-      int height = iii.getHeight();
-      int width = iii.getWidth();
-      int channels = iii.getNumChannels();
-      inputLayer.setNIn(InputType.convolutionalFlat(height, width, channels), override);
-    } else {
-      // DefaultInstanceIterator
-      inputLayer.setNIn(InputType.inferInputType(features), override);
-    }
 
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);
