@@ -45,7 +45,7 @@ import weka.dl4j.iterators.instance.AbstractInstanceIterator;
  * @author Steven Lang
  *
  */
-public class ImageInstanceIterator extends AbstractInstanceIterator {
+public class ImageInstanceIterator extends AbstractInstanceIterator implements Convolutional{
 
     /** The version ID used for serializing objects of this class */
     private static final long serialVersionUID = -3701309032945158130L;
