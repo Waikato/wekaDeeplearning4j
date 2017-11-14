@@ -85,9 +85,9 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
 	}
 
 	public String globalInfo() {
-		return "Instance iterator reads rows from the given ARFF file. This" +
-				"iterator is not compatible with convolution layers. See also:" +
-				" ConvolutionInstanceIterator/ImageInstanceIterator.";
+		return "Instance iterator reads rows from the given ARFF file. This " +
+				"iterator is not compatible with convolution layers. See also: " +
+				"ConvolutionInstanceIterator/ImageInstanceIterator.";
 	}
 
 }
