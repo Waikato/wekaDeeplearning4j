@@ -2,8 +2,8 @@ This section shall provide solutions for issues that  may appear.
 
 ---------------------------------------------------------------
 ## CUDA: GOMP Version 4.0 not found
-#### Issue
-Starting the `Dl4jMlpClassifier` while using the GPU version of the package results in something similar to:
+
+**Issue:** Starting the `Dl4jMlpClassifier` while using the GPU version of the package results in something similar to:
 ```
 Caused by: java.lang.UnsatisfiedLinkError: 
     /home/user/.javacpp/cache/nd4j-cuda-8.0-0.9.1-linux-x86_64.jar/org/nd4j/nativeblas/linux-x86_64/libjnind4jcuda.so: 
@@ -22,8 +22,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 Therefore the libgomp.so.1 library is still of version 3.0, while the nd4j backend expects version 4.0.
 
-#### Solution
-Download the latest version of libgomp for your system and export the following:
+**Solution**: Download the latest version of libgomp for your system and export the following:
 ```bash
 export LD_PRELOAD=<PATH-TO-NEW-LIBGOMP.SO>
 ```
@@ -37,8 +36,7 @@ This extracts the library to `./usr/lib/x86_64-linux-gnu/libgomp.so.1`. Afterwar
 
 ---------------------------------------------------------------
 ## CUDA: Failed to allocate X bytes from DEVICE memory
-#### Issue
-Your network architecture or your batch size consumes too much memory.
 
-#### Solution
-Use a lower batch size, or adjust your Java heap and off-heap limits to your available memory accordingly to the [official Dl4J memory description](https://deeplearning4j.org/memory).
+**Issue:** Your network architecture or your batch size consumes too much memory.
+
+**Solution**: Use a lower batch size, or adjust your Java heap and off-heap limits to your available memory accordingly to the [official Dl4J memory description](https://deeplearning4j.org/memory).

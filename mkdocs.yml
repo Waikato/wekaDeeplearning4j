@@ -7,6 +7,8 @@ pages:
     - Installation: install.md
 
     - Getting Started: getting-started.md
+    - User Guide:
+        - 'Loading Data': 'user-guide/data.md'
     - Examples:
         - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
         - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
