@@ -190,7 +190,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   public String globalInfo() {
     return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n" +
-            "Evaluations after each epoch are written to the log file.\n";
+            "Evaluations after each epoch are written to the log file.\n\n" +
+            "Iterator usage\n" +
+            "- DefaultInstanceIterator: Simple ARFF files without spatial interpretation\n" +
+            "- ConvolutionalInstanceIterator: ARFF files with spatial interpretation\n" +
+            "- ImageInstanceIterator: ARFF files containing meta-data linking to actual images\n" +
+            "(See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )";
   }
 
   /**

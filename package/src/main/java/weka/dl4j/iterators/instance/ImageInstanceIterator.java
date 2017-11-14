@@ -183,4 +183,10 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements C
         return tmpIter;
     }
 
+
+    public String globalInfo() {
+        return "Instance iterator that reads images based on the meta-data" +
+                "given in the ARFF file.";
+    }
+
 }

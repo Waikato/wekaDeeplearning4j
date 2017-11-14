@@ -161,4 +161,12 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
 
         Option.setOptions(options, this, this.getClass());
     }
+
+    public String globalInfo() {
+        return "Instance iterator that reads flattened matrices represented as " +
+                "rows in the ARFF dataset and transforms them into the shape " +
+                "(height x width x numChannels). It is necessary, that the " +
+                "height*width*numChannels is equal to the number of attributes " +
+                "in the ARFF file (excluding the class attribute).";
+    }
 }
