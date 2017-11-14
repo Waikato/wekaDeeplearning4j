@@ -93,4 +93,22 @@ public class ModelZooTest {
         clf.setEarlyStopping(new EarlyStopping(5, 0));
         clf.initializeClassifier(shrinkedData);
     }
+
+//    @Test
+    public void runLeNet() throws Exception {
+        // CLF
+        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+        clf.setSeed(1);
+
+        // Data
+        Instances data = DatasetLoader.loadMiniMnistMeta();
+
+        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+        iterator.setTrainBatchSize(32);
+        clf.setInstanceIterator(iterator);
+        clf.setZooModel(new LeNet());
+        clf.setNumEpochs(10);
+        clf.setEarlyStopping(new EarlyStopping(5, 0));
+        clf.buildClassifier(data);
+    }
 }
