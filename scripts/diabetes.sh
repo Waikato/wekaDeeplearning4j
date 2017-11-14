@@ -8,5 +8,5 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
      -layer "weka.dl4j.layers.DenseLayer -nOut 10 " \
      -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" -lossFn \"weka.dl4j.lossfunctions.LossMCXENT \"" \
      -numEpochs 10 \
-     -t ../wekaDeeplearning4jCore/datasets/numeric/diabetes_numeric.arff \
+     -t ../package/datasets/numeric/diabetes_numeric.arff \
      -split-percentage 66
