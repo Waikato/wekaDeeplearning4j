@@ -26,6 +26,10 @@ import java.util.Map;
  *
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
  *
+ * The duplicate code of configuration parameters is necessary since the dl4j
+ * NeuralNetConfiguration.Builder object is not serializable which is necessary
+ * for the weka GUI.
+ *
  * @author Eibe Frank
  */
 @EqualsAndHashCode
