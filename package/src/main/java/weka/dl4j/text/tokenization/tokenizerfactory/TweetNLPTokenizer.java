@@ -21,96 +21,84 @@
 
 package weka.dl4j.text.tokenization.tokenizerfactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import cmu.arktweetnlp.Twokenize;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 
-import cmu.arktweetnlp.Twokenize;
-
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A DeepLearning4j's Tokenizer interface for the CMU TweetNLP tokenizer.
  *
  * @author Felipe Bravo-Marquez
- *
- *
  */
-public class TweetNLPTokenizer implements Tokenizer{
+public class TweetNLPTokenizer implements Tokenizer {
 
+  /** The TokenPreProcess Object */
+  private TokenPreProcess tokenPreProcess;
 
-	/** The TokenPreProcess Object */
-	private TokenPreProcess tokenPreProcess;
+  /** The list of tokenized tokens */
+  private List<String> tokens;
 
-	/** The list of tokenized tokens */
-	private List<String> tokens;
+  /** The String iterator */
+  private Iterator<String> iterator;
 
-	/** The String iterator */
-	private Iterator<String> iterator;
+  /**
+   * initializes the Object
+   *
+   * @param content the String to tokenize
+   */
+  public TweetNLPTokenizer(String content) {
+    this.tokens = Twokenize.tokenizeRawTweetText(content);
+    this.iterator = tokens.iterator();
+  }
 
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#countTokens()
+   */
+  @Override
+  public int countTokens() {
+    return this.tokens.size();
+  }
 
-	/**
-	 * initializes the Object
-	 * 
-	 * @param content the String to tokenize
-	 */
-	public TweetNLPTokenizer(String content){
-		this.tokens=Twokenize.tokenizeRawTweetText(content);
-		this.iterator=tokens.iterator();	
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#getTokens()
+   */
+  @Override
+  public List<String> getTokens() {
+    List<String> tokens = new ArrayList<String>();
+    while (hasMoreTokens()) {
+      tokens.add(nextToken());
+    }
+    return tokens;
+  }
 
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
+   */
+  @Override
+  public void setTokenPreProcessor(TokenPreProcess tokenPreProcessor) {
+    this.tokenPreProcess = tokenPreProcessor;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#countTokens()
-	 */
-	@Override
-	public int countTokens() {
-		return this.tokens.size();
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#hasMoreTokens()
+   */
+  @Override
+  public boolean hasMoreTokens() {
+    return this.iterator.hasNext();
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#getTokens()
-	 */
-	@Override
-	public List<String> getTokens() {
-		List<String> tokens = new ArrayList<String>();
-		while (hasMoreTokens()) {
-			tokens.add(nextToken());
-		}
-		return tokens;
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#nextToken()
+   */
+  @Override
+  public String nextToken() {
 
-
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
-	 */
-	@Override
-	public void setTokenPreProcessor(TokenPreProcess tokenPreProcessor) {
-		this.tokenPreProcess = tokenPreProcessor;
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#hasMoreTokens()
-	 */
-	@Override
-	public boolean hasMoreTokens() {
-		return this.iterator.hasNext();		
-	}
-
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizer.Tokenizer#nextToken()
-	 */
-	@Override
-	public String nextToken() {
-
-		String base = this.iterator.next();
-		if (tokenPreProcess != null)
-			base = tokenPreProcess.preProcess(base);
-		return base;
-
-	}
-
+    String base = this.iterator.next();
+    if (tokenPreProcess != null) base = tokenPreProcess.preProcess(base);
+    return base;
+  }
 }

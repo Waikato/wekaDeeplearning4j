@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossSquaredHinge that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("SquaredHinge")
-public class LossSquaredHinge extends org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge implements OptionHandler {
+public class LossSquaredHinge extends org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class LossSquaredHinge extends org.nd4j.linalg.lossfunctions.impl.LossSqu
     Option.setOptions(options, this, this.getClass());
   }
 }
-

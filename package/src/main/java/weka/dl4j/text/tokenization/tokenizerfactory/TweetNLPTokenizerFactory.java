@@ -19,110 +19,95 @@
  *
  */
 
-
 package weka.dl4j.text.tokenization.tokenizerfactory;
+
+import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
+import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import weka.core.Option;
+import weka.core.OptionHandler;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Enumeration;
 
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-
-import weka.core.Option;
-import weka.core.OptionHandler;
-
-
 /**
  * A DeepLearning4j's TokenizerFactory interface for the CMU TweetNLP tokenizer.
  *
  * @author Felipe Bravo-Marquez
- *
- *
  */
 public class TweetNLPTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
-	
-	/** For Serialization */
-	private static final long serialVersionUID = 4694868790645893109L;
-	
-	/** The TokenPreProcess object */
-	private TokenPreProcess tokenPreProcess;
 
+  /** For Serialization */
+  private static final long serialVersionUID = 4694868790645893109L;
 
+  /** The TokenPreProcess object */
+  private TokenPreProcess tokenPreProcess;
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
-	 */
-	@Override
-	public Tokenizer create(String toTokenize) {
-		Tokenizer t=new TweetNLPTokenizer(toTokenize);
-		t.setTokenPreProcessor(tokenPreProcess);
-		return t;
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
-	 */
-	@Override
-	public Tokenizer create(InputStream toTokenize) {
-		return null;
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
+   */
+  @Override
+  public Tokenizer create(String toTokenize) {
+    Tokenizer t = new TweetNLPTokenizer(toTokenize);
+    t.setTokenPreProcessor(tokenPreProcess);
+    return t;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
-	 */
-	@Override
-	public void setTokenPreProcessor(TokenPreProcess preProcessor) {
-		this.tokenPreProcess = preProcessor;
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
+   */
+  @Override
+  public Tokenizer create(InputStream toTokenize) {
+    return null;
+  }
 
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
+   */
+  @Override
+  public TokenPreProcess getTokenPreProcessor() {
+    return tokenPreProcess;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
-	 */
-	@Override
-	public TokenPreProcess getTokenPreProcessor() {
-		return tokenPreProcess;
-	}
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
+   */
+  @Override
+  public void setTokenPreProcessor(TokenPreProcess preProcessor) {
+    this.tokenPreProcess = preProcessor;
+  }
 
-	/**
-	 * Returns a string describing this object.
-	 * 
-	 * @return a description of the object suitable for displaying in the
-	 *         explorer/experimenter gui
-	 */	
-	public String globalInfo() {	
-		return "Uses the CMU TweetNLP tokenizer.";
-	}
-	
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#listOptions()
-	 */
-	@Override
-	public Enumeration<Option> listOptions() {
-		return Option.listOptionsForClass(this.getClass()).elements();
-	}
+  /**
+   * Returns a string describing this object.
+   *
+   * @return a description of the object suitable for displaying in the explorer/experimenter gui
+   */
+  public String globalInfo() {
+    return "Uses the CMU TweetNLP tokenizer.";
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#listOptions()
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#setOptions(java.lang.String[])
-	 */
-	@Override
-	public void setOptions(String[] options) throws Exception {
-		Option.setOptions(options, this, this.getClass());
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#getOptions()
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptions(this, this.getClass());
+  }
 
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#getOptions()
-	 */
-	@Override
-	public String[] getOptions() {
-		return Option.getOptions(this, this.getClass());
-	}
-	
-
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#setOptions(java.lang.String[])
+   */
+  @Override
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptions(options, this, this.getClass());
+  }
 }

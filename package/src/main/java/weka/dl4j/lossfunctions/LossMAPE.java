@@ -31,8 +31,6 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossMAPE that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("MAPE")
 public class LossMAPE extends org.nd4j.linalg.lossfunctions.impl.LossMAPE implements OptionHandler {
@@ -70,4 +68,3 @@ public class LossMAPE extends org.nd4j.linalg.lossfunctions.impl.LossMAPE implem
     Option.setOptions(options, this, this.getClass());
   }
 }
-

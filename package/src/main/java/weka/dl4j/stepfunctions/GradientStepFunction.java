@@ -1,21 +1,19 @@
 package weka.dl4j.stepfunctions;
 
-import java.util.Enumeration;
-
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
-
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's GradientStepFunction that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("gradient")
-public class GradientStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.GradientStepFunction implements OptionHandler {
+public class GradientStepFunction
+    extends org.deeplearning4j.nn.conf.stepfunctions.GradientStepFunction implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.

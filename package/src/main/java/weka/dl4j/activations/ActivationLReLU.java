@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationLReLU that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("LReLU")
-public class ActivationLReLU extends org.nd4j.linalg.activations.impl.ActivationLReLU implements OptionHandler {
+public class ActivationLReLU extends org.nd4j.linalg.activations.impl.ActivationLReLU
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationLReLU extends org.nd4j.linalg.activations.impl.Activation
     Option.setOptions(options, this, this.getClass());
   }
 }
-

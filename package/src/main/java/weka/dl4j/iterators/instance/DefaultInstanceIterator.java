@@ -20,22 +20,16 @@
  */
 package weka.dl4j.iterators.instance;
 
-import org.deeplearning4j.datasets.iterator.BaseDatasetIterator;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.DataSet;
-
-import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.OptionMetadata;
-import weka.core.WekaException;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 
-
 /**
- * Converts the given Instances object into a DataSet and then constructs and returns a DefaultDataSetIterator.
+ * Converts the given Instances object into a DataSet and then constructs and returns a
+ * DefaultDataSetIterator.
  *
  * @author Christopher Beckham
  * @author Eibe Frank
@@ -43,51 +37,54 @@ import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
  */
 public class DefaultInstanceIterator extends AbstractInstanceIterator {
 
-	/** The ID used to serialize this class */
-	private static final long serialVersionUID = 1316260988724548474L;
+  /** The ID used to serialize this class */
+  private static final long serialVersionUID = 1316260988724548474L;
 
-	@OptionMetadata(displayName = "size of mini batch",
-										description = "The mini batch size to use in the iterator (default = 1).",
-										commandLineParamName = "bs", commandLineParamSynopsis = "-bs <int>",
-										displayOrder = 1)
-	public void setTrainBatchSize(int trainBatchSize) {
-		m_batchSize = trainBatchSize;
-	}
-	public int getTrainBatchSize() {
-		return m_batchSize;
-	}
+  public int getTrainBatchSize() {
+    return batchSize;
+  }
 
-	/**
-	 * Returns the number of predictor attributes for this dataset.
-	 *
-	 * @param data the dataset to compute the number of attributes from
-	 * @return the number of attributes in the Instances object minus one
-	 */
-	@Override
-	public int getNumAttributes(Instances data) {
-		return data.numAttributes() - 1;
-	}
+  @OptionMetadata(
+    displayName = "size of mini batch",
+    description = "The mini batch size to use in the iterator (default = 1).",
+    commandLineParamName = "bs",
+    commandLineParamSynopsis = "-bs <int>",
+    displayOrder = 1
+  )
+  public void setTrainBatchSize(int trainBatchSize) {
+    batchSize = trainBatchSize;
+  }
 
-	/**
-	 * Returns the actual iterator.
-	 *
-	 * @param data the dataset to use
-	 * @param seed the seed for the random number generator
-	 * @param batchSize the batch size to use
-	 * @return the DataSetIterator
-	 */
-	@Override
-	public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
+  /**
+   * Returns the number of predictor attributes for this dataset.
+   *
+   * @param data the dataset to compute the number of attributes from
+   * @return the number of attributes in the Instances object minus one
+   */
+  @Override
+  public int getNumAttributes(Instances data) {
+    return data.numAttributes() - 1;
+  }
 
-		// Convert Instances to DataSet
-		DataSet dataset = Utils.instancesToDataSet(data);
-		return new DefaultDataSetIterator(dataset, batchSize);
-	}
+  /**
+   * Returns the actual iterator.
+   *
+   * @param data the dataset to use
+   * @param seed the seed for the random number generator
+   * @param batchSize the batch size to use
+   * @return the DataSetIterator
+   */
+  @Override
+  public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
 
-	public String globalInfo() {
-		return "Instance iterator reads rows from the given ARFF file. This " +
-				"iterator is not compatible with convolution layers. See also: " +
-				"ConvolutionInstanceIterator/ImageInstanceIterator.";
-	}
+    // Convert Instances to DataSet
+    DataSet dataset = Utils.instancesToDataSet(data);
+    return new DefaultDataSetIterator(dataset, batchSize);
+  }
 
+  public String globalInfo() {
+    return "Instance iterator reads rows from the given ARFF file. This "
+        + "iterator is not compatible with convolution layers. See also: "
+        + "ConvolutionInstanceIterator/ImageInstanceIterator.";
+  }
 }

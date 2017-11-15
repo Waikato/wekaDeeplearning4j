@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationHardSigmoid that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("HardSigmoid")
-public class ActivationHardSigmoid extends org.nd4j.linalg.activations.impl.ActivationHardSigmoid implements OptionHandler {
+public class ActivationHardSigmoid extends org.nd4j.linalg.activations.impl.ActivationHardSigmoid
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationHardSigmoid extends org.nd4j.linalg.activations.impl.Acti
     Option.setOptions(options, this, this.getClass());
   }
 }
-

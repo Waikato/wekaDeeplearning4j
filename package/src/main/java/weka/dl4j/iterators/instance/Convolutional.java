@@ -7,9 +7,9 @@ package weka.dl4j.iterators.instance;
  */
 public interface Convolutional {
 
-    int getHeight();
+  int getHeight();
 
-    int getWidth();
+  int getWidth();
 
-    int getNumChannels();
+  int getNumChannels();
 }

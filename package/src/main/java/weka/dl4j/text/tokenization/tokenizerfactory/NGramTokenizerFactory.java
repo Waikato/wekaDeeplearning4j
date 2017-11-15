@@ -19,171 +19,155 @@
  *
  */
 
-
 package weka.dl4j.text.tokenization.tokenizerfactory;
-
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Enumeration;
 
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.core.tokenizers.NGramTokenizer;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
 
 /**
  * A DeepLearning4j's TokenizerFactory interface for Weka core tokenizers.
  *
  * @author Felipe Bravo-Marquez
- *
- *
  */
 public class NGramTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
 
-	/** For Serialization */
-	private static final long serialVersionUID = 4694868790645893109L;
+  /** For Serialization */
+  private static final long serialVersionUID = 4694868790645893109L;
+  /** the maximum number of N */
+  protected int nMax = 3;
+  /** the minimum number of N */
+  protected int nMin = 1;
+  /** Delimiters used in tokenization */
+  protected String delimiters = " \r\n\t.,;:'\"()?!";
+  /** The TokenPreProcess object */
+  private TokenPreProcess tokenPreProcess;
+  private NGramTokenizer wekaTokenizer;
 
-	/** The TokenPreProcess object */
-	private TokenPreProcess tokenPreProcess;
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
+   */
+  @Override
+  public Tokenizer create(String toTokenize) {
 
-	private NGramTokenizer wekaTokenizer; 
+    this.wekaTokenizer = new NGramTokenizer();
+    this.wekaTokenizer.setNGramMinSize(this.nMin);
+    this.wekaTokenizer.setNGramMaxSize(this.nMax);
+    this.wekaTokenizer.setDelimiters(this.delimiters);
 
-	/** the maximum number of N */
-	protected int m_NMax = 3;
+    WekaTokenizer t = new WekaTokenizer(toTokenize, wekaTokenizer);
+    t.setTokenPreProcessor(tokenPreProcess);
+    return t;
+  }
 
-	/** the minimum number of N */
-	protected int m_NMin = 1;
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
+   */
+  @Override
+  public Tokenizer create(InputStream toTokenize) {
+    return null;
+  }
 
-	/** Delimiters used in tokenization */
-	protected String m_Delimiters = " \r\n\t.,;:'\"()?!";
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
+   */
+  @Override
+  public TokenPreProcess getTokenPreProcessor() {
+    return tokenPreProcess;
+  }
 
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
+   */
+  @Override
+  public void setTokenPreProcessor(TokenPreProcess preProcessor) {
+    this.tokenPreProcess = preProcessor;
+  }
 
+  /**
+   * Returns a string describing this object.
+   *
+   * @return a description of the object suitable for displaying in the explorer/experimenter gui
+   */
+  public String globalInfo() {
+    return "Splits a string into an n-gram with min and max grams.";
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#listOptions()
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#getOptions()
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptions(this, this.getClass());
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
-	 */
-	@Override
-	public Tokenizer create(String toTokenize) {
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#setOptions(java.lang.String[])
+   */
+  @Override
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptions(options, this, this.getClass());
+  }
 
-		this.wekaTokenizer = new NGramTokenizer();
-		this.wekaTokenizer.setNGramMinSize(this.m_NMin);
-		this.wekaTokenizer.setNGramMaxSize(this.m_NMax);
-		this.wekaTokenizer.setDelimiters(this.m_Delimiters);
+  @OptionMetadata(
+    displayName = "NMax",
+    description = "NGram max size.",
+    commandLineParamName = "NMax",
+    commandLineParamSynopsis = "-NMax <int>",
+    displayOrder = 0
+  )
+  public int getNMax() {
+    return nMax;
+  }
 
-		WekaTokenizer t=new WekaTokenizer(toTokenize, wekaTokenizer);
-		t.setTokenPreProcessor(tokenPreProcess);
-		return t;
-	}
+  public void setNMax(int nMax) {
+    this.nMax = nMax;
+  }
 
+  @OptionMetadata(
+    displayName = "NMin",
+    description = "NGram min size.",
+    commandLineParamName = "NMin",
+    commandLineParamSynopsis = "-NMin <int>",
+    displayOrder = 1
+  )
+  public int getNMin() {
+    return nMin;
+  }
 
+  public void setNMin(int nMin) {
+    this.nMin = nMin;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
-	 */
-	@Override
-	public Tokenizer create(InputStream toTokenize) {
-		return null;
-	}
+  @OptionMetadata(
+    displayName = "delimiters",
+    description =
+        "Set of delimiter characters to use in tokenizing (\\r, \\n and \\t can be used for carriage-return, line-feed and tab).",
+    commandLineParamName = "delimiters",
+    commandLineParamSynopsis = "-delimiters <int>",
+    displayOrder = 2
+  )
+  public String getDelimiters() {
+    return delimiters;
+  }
 
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
-	 */
-	@Override
-	public void setTokenPreProcessor(TokenPreProcess preProcessor) {
-		this.tokenPreProcess = preProcessor;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
-	 */
-	@Override
-	public TokenPreProcess getTokenPreProcessor() {
-		return tokenPreProcess;
-	}
-
-	/**
-	 * Returns a string describing this object.
-	 * 
-	 * @return a description of the object suitable for displaying in the
-	 *         explorer/experimenter gui
-	 */	
-	public String globalInfo() {	
-		return "Splits a string into an n-gram with min and max grams.";
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#listOptions()
-	 */
-	@Override
-	public Enumeration<Option> listOptions() {
-		return Option.listOptionsForClass(this.getClass()).elements();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#setOptions(java.lang.String[])
-	 */
-	@Override
-	public void setOptions(String[] options) throws Exception {
-		Option.setOptions(options, this, this.getClass());
-
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#getOptions()
-	 */
-	@Override
-	public String[] getOptions() {
-		return Option.getOptions(this, this.getClass());
-	}
-
-
-	@OptionMetadata(displayName = "NMax", 
-			description = "NGram max size.",
-			commandLineParamName = "NMax", commandLineParamSynopsis = "-NMax <int>",
-			displayOrder = 0)		
-	public int getNMax() {
-		return m_NMax;
-	}
-	public void setNMax(int m_NMax) {
-		this.m_NMax = m_NMax;
-	}
-
-
-	@OptionMetadata(displayName = "NMin", 
-			description = "NGram min size.",
-			commandLineParamName = "NMin", commandLineParamSynopsis = "-NMin <int>",
-			displayOrder = 1)		
-	public int getNMin() {
-		return m_NMin;
-	}
-	public void setNMin(int m_NMin) {
-		this.m_NMin = m_NMin;
-	}
-
-
-
-
-	@OptionMetadata(displayName = "delimiters", 
-			description = "Set of delimiter characters to use in tokenizing (\\r, \\n and \\t can be used for carriage-return, line-feed and tab).",
-			commandLineParamName = "delimiters", commandLineParamSynopsis = "-delimiters <int>",
-			displayOrder = 2)	
-	public String getDelimiters() {
-		return m_Delimiters;
-	}
-	public void setDelimiters(String m_Delimiters) {
-		this.m_Delimiters = m_Delimiters;
-	}
-
-
+  public void setDelimiters(String delimiters) {
+    this.delimiters = delimiters;
+  }
 }

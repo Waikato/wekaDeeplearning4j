@@ -19,69 +19,57 @@
  *
  */
 
-
 package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 import weka.core.Option;
 import weka.core.OptionHandler;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 
 /**
  * A serializable version of DeepLearning4j's CommonPreprocessor.
  *
  * @author Felipe Bravo-Marquez
- *
- *
  */
-public class CommonPreprocessor extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor implements  Serializable, OptionHandler {
+public class CommonPreprocessor
+    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
+    implements Serializable, OptionHandler {
 
-	
-	
-	/** For serialization */
-	private static final long serialVersionUID = 7854676262098995012L;
+  /** For serialization */
+  private static final long serialVersionUID = 7854676262098995012L;
 
-	/**
-	 * Returns a string describing this object.
-	 * 
-	 * @return a description of the object suitable for displaying in the
-	 *         explorer/experimenter gui
-	 */	
-	public String globalInfo() {
-		return "All numbers, punctuation symbols and some special symbols are stripped off. \n"+
-				"Additionally it forces lower case for all tokens.\n";
-		
-	}
+  /**
+   * Returns a string describing this object.
+   *
+   * @return a description of the object suitable for displaying in the explorer/experimenter gui
+   */
+  public String globalInfo() {
+    return "All numbers, punctuation symbols and some special symbols are stripped off. \n"
+        + "Additionally it forces lower case for all tokens.\n";
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#listOptions()
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#listOptions()
-	 */
-	@Override
-	public Enumeration<Option> listOptions() {
-		return Option.listOptionsForClass(this.getClass()).elements();
-	}
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#getOptions()
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptions(this, this.getClass());
+  }
 
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#setOptions(java.lang.String[])
-	 */
-	@Override
-	public void setOptions(String[] options) throws Exception {
-		Option.setOptions(options, this, this.getClass());
-
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#getOptions()
-	 */
-	@Override
-	public String[] getOptions() {
-		return Option.getOptions(this, this.getClass());
-	}
-
-
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#setOptions(java.lang.String[])
+   */
+  @Override
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptions(options, this, this.getClass());
+  }
 }

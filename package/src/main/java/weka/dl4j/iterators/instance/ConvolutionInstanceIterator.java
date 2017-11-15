@@ -32,9 +32,10 @@ import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 import java.util.Enumeration;
 
 /**
- * Converts the given Instances object into a DataSet and then constructs and returns a DefaultDataSetIterator.
- * This iterator is designed for training convolutional networks on data that is represented as standard WEKA instances.
- * It enables specification of filter width and height, and number of channels.
+ * Converts the given Instances object into a DataSet and then constructs and returns a
+ * DefaultDataSetIterator. This iterator is designed for training convolutional networks on data
+ * that is represented as standard WEKA instances. It enables specification of filter width and
+ * height, and number of channels.
  *
  * @author Christopher Beckham
  * @author Eibe Frank
@@ -42,131 +43,143 @@ import java.util.Enumeration;
  */
 public class ConvolutionInstanceIterator extends DefaultInstanceIterator implements Convolutional {
 
-    /** The version ID used for serializing objects of this class */
-    private static final long serialVersionUID = -3101209034945158130L;
+  /** The version ID used for serializing objects of this class */
+  private static final long serialVersionUID = -3101209034945158130L;
 
-    /** The desired output height */
-    protected int m_height = 28;
+  /** The desired output height */
+  protected int height = 28;
 
-    /** The desired output width */
-    protected int m_width = 28;
+  /** The desired output width */
+  protected int width = 28;
 
-    /** The desired number of channels */
-    protected int m_numChannels = 1;
+  /** The desired number of channels */
+  protected int numChannels = 1;
 
+  public int getTrainBatchSize() {
+    return batchSize;
+  }
 
-    @OptionMetadata(displayName = "size of mini batch",
-            description = "The mini batch size to use in the iterator (default = 1).",
-            commandLineParamName = "bs", commandLineParamSynopsis = "-bs <int>",
-            displayOrder = 0)
-    public void setTrainBatchSize(int trainBatchSize) {
-        m_batchSize = trainBatchSize;
-    }
-    public int getTrainBatchSize() {
-        return m_batchSize;
-    }
+  @OptionMetadata(
+    displayName = "size of mini batch",
+    description = "The mini batch size to use in the iterator (default = 1).",
+    commandLineParamName = "bs",
+    commandLineParamSynopsis = "-bs <int>",
+    displayOrder = 0
+  )
+  public void setTrainBatchSize(int trainBatchSize) {
+    batchSize = trainBatchSize;
+  }
 
-    @OptionMetadata(
-            displayName = "desired width",
-            description = "The desired width of the images (default = 28).",
-            commandLineParamName = "width", commandLineParamSynopsis = "-width <int>",
-            displayOrder = 1)
-    public int getWidth() {
-        return m_width;
-    }
-    public void setWidth(int width) {
-        m_width = width;
-    }
+  @OptionMetadata(
+    displayName = "desired width",
+    description = "The desired width of the images (default = 28).",
+    commandLineParamName = "width",
+    commandLineParamSynopsis = "-width <int>",
+    displayOrder = 1
+  )
+  public int getWidth() {
+    return width;
+  }
 
-    @OptionMetadata(
-            displayName = "desired height",
-            description = "The desired height of the images (default = 28).",
-            commandLineParamName = "height", commandLineParamSynopsis = "-height <int>",
-            displayOrder = 2)
-    public int getHeight() {
-        return m_height;
-    }
-    public void setHeight(int height) {
-        m_height = height;
-    }
+  public void setWidth(int width) {
+    this.width = width;
+  }
 
-    @OptionMetadata(
-            displayName = "desired number of channels",
-            description = "The desired number of channels (default = 1).",
-            commandLineParamName = "numChannels", commandLineParamSynopsis = "-numChannels <int>",
-            displayOrder = 3)
-    public int getNumChannels() {
-        return m_numChannels;
-    }
-    public void setNumChannels(int numChannels) {
-        m_numChannels = numChannels;
-    }
+  @OptionMetadata(
+    displayName = "desired height",
+    description = "The desired height of the images (default = 28).",
+    commandLineParamName = "height",
+    commandLineParamSynopsis = "-height <int>",
+    displayOrder = 2
+  )
+  public int getHeight() {
+    return height;
+  }
 
-    /**
-     * Returns the number of predictor attributes for this dataset.
-     *
-     * @param data the dataset to compute the number of attributes from
-     * @return the number of attributes in the Instances object minus one
-     */
-    @Override
-    public int getNumAttributes(Instances data) {
-        return data.numAttributes() - 1;
-    }
+  public void setHeight(int height) {
+    this.height = height;
+  }
 
-    /**
-     * Returns the actual iterator.
-     *
-     * @param data the dataset to use
-     * @param seed the seed for the random number generator
-     * @param batchSize the batch size to use
-     * @return the DataSetIterator
-     */
-    @Override
-    public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
-        // Convert Instances to DataSet
-        DataSet dataset = Utils.instancesToConvDataSet(data, getHeight(), getWidth(), getNumChannels());
+  @OptionMetadata(
+    displayName = "desired number of channels",
+    description = "The desired number of channels (default = 1).",
+    commandLineParamName = "numChannels",
+    commandLineParamSynopsis = "-numChannels <int>",
+    displayOrder = 3
+  )
+  public int getNumChannels() {
+    return numChannels;
+  }
 
-        return new DefaultDataSetIterator(dataset, batchSize);
-    }
+  public void setNumChannels(int numChannels) {
+    this.numChannels = numChannels;
+  }
 
-    /**
-     * Returns an enumeration describing the available options.
-     *
-     * @return an enumeration of all the available options.
-     */
-    @Override
-    public Enumeration<Option> listOptions() {
+  /**
+   * Returns the number of predictor attributes for this dataset.
+   *
+   * @param data the dataset to compute the number of attributes from
+   * @return the number of attributes in the Instances object minus one
+   */
+  @Override
+  public int getNumAttributes(Instances data) {
+    return data.numAttributes() - 1;
+  }
 
-        return Option.listOptionsForClass(this.getClass()).elements();
-    }
+  /**
+   * Returns the actual iterator.
+   *
+   * @param data the dataset to use
+   * @param seed the seed for the random number generator
+   * @param batchSize the batch size to use
+   * @return the DataSetIterator
+   */
+  @Override
+  public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
+    // Convert Instances to DataSet
+    DataSet dataset = Utils.instancesToConvDataSet(data, getHeight(), getWidth(), getNumChannels());
 
-    /**
-     * Gets the current settings of the Classifier.
-     *
-     * @return an array of strings suitable for passing to setOptions
-     */
-    @Override
-    public String[] getOptions() {
+    return new DefaultDataSetIterator(dataset, batchSize);
+  }
 
-        return Option.getOptions(this, this.getClass());
-    }
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
 
-    /**
-     * Parses a given list of options.
-     *
-     * @param options the list of options as an array of strings
-     * @exception Exception if an option is not supported
-     */
-    public void setOptions(String[] options) throws Exception {
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
-        Option.setOptions(options, this, this.getClass());
-    }
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
 
-    public String globalInfo() {
-        return "Instance iterator that reads flattened matrices represented as " +
-                "column-wise formatted vectors in the ARFF dataset and transforms them into the shape " +
-                "(height x width x numChannels). It is necessary, that the " +
-                "height*width*numChannels is equal to the number of attributes " +
-                "in the ARFF file (excluding the class attribute).";
-    }
+    return Option.getOptions(this, this.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @exception Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+
+    Option.setOptions(options, this, this.getClass());
+  }
+
+  public String globalInfo() {
+    return "Instance iterator that reads flattened matrices represented as "
+        + "column-wise formatted vectors in the ARFF dataset and transforms them into the shape "
+        + "(height x width x numChannels). It is necessary, that the "
+        + "height*width*numChannels is equal to the number of attributes "
+        + "in the ARFF file (excluding the class attribute).";
+  }
 }

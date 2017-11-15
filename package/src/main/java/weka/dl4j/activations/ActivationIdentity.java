@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationIdentity that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("Identity")
-public class ActivationIdentity extends org.nd4j.linalg.activations.impl.ActivationIdentity implements OptionHandler {
+public class ActivationIdentity extends org.nd4j.linalg.activations.impl.ActivationIdentity
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationIdentity extends org.nd4j.linalg.activations.impl.Activat
     Option.setOptions(options, this, this.getClass());
   }
 }
-

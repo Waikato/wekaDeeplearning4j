@@ -10,11 +10,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's DefaultStepFunction that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("default")
-public class DefaultStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction implements OptionHandler {
+public class DefaultStepFunction
+    extends org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.

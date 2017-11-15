@@ -21,181 +21,155 @@ import weka.util.DatasetLoader;
 import java.io.*;
 import java.nio.file.Paths;
 
-
 /**
- * JUnit tests for the NeuralNetConfiguration.
- * Tests setting parameters and different configurations.
+ * JUnit tests for the NeuralNetConfiguration. Tests setting parameters and different
+ * configurations.
  *
  * @author Steven Lang
  */
 public class NeuralNetConfigurationTest {
 
-    /**
-     * Logger instance
-     */
-    private static final Logger logger = LoggerFactory.getLogger(NeuralNetConfigurationTest.class);
+  /** Logger instance */
+  private static final Logger logger = LoggerFactory.getLogger(NeuralNetConfigurationTest.class);
 
+  /** Default number of epochs */
+  private static final int DEFAULT_NUM_EPOCHS = 1;
 
-    /**
-     * Default number of epochs
-     */
-    private static final int DEFAULT_NUM_EPOCHS = 1;
+  /** Seed */
+  private static final int SEED = 42;
 
-    /**
-     * Seed
-     */
-    private static final int SEED = 42;
+  /** Default batch size */
+  private static final int DEFAULT_BATCHSIZE = 32;
+  /** Current name */
+  @Rule public TestName name = new TestName();
+  /** Classifier */
+  private Dl4jMlpClassifier clf;
+  /** Dataset mnist */
+  private Instances dataMnist;
+  /** Mnist image loader */
+  private ImageInstanceIterator idiMnist;
+  /** Start time for time measurement */
+  private long startTime;
 
-    /**
-     * Default batch size
-     */
-    private static final int DEFAULT_BATCHSIZE = 32;
+  @Before
+  public void before() throws Exception {
+    // Init mlp clf
+    clf = new Dl4jMlpClassifier();
+    clf.setSeed(SEED);
+    clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+    clf.setDebug(false);
 
+    // Init data
+    dataMnist = DatasetLoader.loadMiniMnistMeta();
+    idiMnist = DatasetLoader.loadMiniMnistImageIterator();
+    idiMnist.setTrainBatchSize(DEFAULT_BATCHSIZE);
+    startTime = System.currentTimeMillis();
+    clf.setInstanceIterator(idiMnist);
+    //        TestUtil.enableUIServer(clf);
+  }
 
-    /**
-     * Classifier
-     */
-    private Dl4jMlpClassifier clf;
+  @After
+  public void after() throws IOException {
 
-    /**
-     * Dataset mnist
-     */
-    private Instances dataMnist;
+    //        logger.info("Press anything to close");
+    //        Scanner sc = new Scanner(System.in);
+    //        sc.next();
+    double time = (System.currentTimeMillis() - startTime) / 1000.0;
+    logger.info("Testmethod: " + name.getMethodName());
+    logger.info("Time: " + time + "s");
+  }
 
-    /**
-     * Mnist image loader
-     */
-    private ImageInstanceIterator idiMnist;
-
-    /**
-     * Current name
-     */
-    @Rule
-    public TestName name = new TestName();
-
-    /**
-     * Start time for time measurement
-     */
-    private long startTime;
-
-    @Before
-    public void before() throws Exception {
-        // Init mlp clf
-        clf = new Dl4jMlpClassifier();
-        clf.setSeed(SEED);
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
-        clf.setDebug(false);
-
-        // Init data
-        dataMnist = DatasetLoader.loadMiniMnistMeta();
-        idiMnist = DatasetLoader.loadMiniMnistImageIterator();
-        idiMnist.setTrainBatchSize(DEFAULT_BATCHSIZE);
-        startTime = System.currentTimeMillis();
-        clf.setInstanceIterator(idiMnist);
-//        TestUtil.enableUIServer(clf);
-    }
-
-
-    @After
-    public void after() throws IOException {
-
-//        logger.info("Press anything to close");
-//        Scanner sc = new Scanner(System.in);
-//        sc.next();
-        double time = (System.currentTimeMillis() - startTime) / 1000.0;
-        logger.info("Testmethod: " + name.getMethodName());
-        logger.info("Time: " + time + "s");
-    }
-
-    /**
-     * Test
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testNNCParameters() throws Exception {
-        weka.dl4j.updater.Updater[] updater = new weka.dl4j.updater.Updater[]{
-                new AdaDelta(),
-                new AdaGrad(),
-                new Adam(),
-                new AdaMax(),
-                new Nadam(),
-                new Nesterovs(),
-                new NoOp(),
-                new RmsProp(),
-                new Sgd()
+  /**
+   * Test
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testNNCParameters() throws Exception {
+    weka.dl4j.updater.Updater[] updater =
+        new weka.dl4j.updater.Updater[] {
+          new AdaDelta(),
+          new AdaGrad(),
+          new Adam(),
+          new AdaMax(),
+          new Nadam(),
+          new Nesterovs(),
+          new NoOp(),
+          new RmsProp(),
+          new Sgd()
         };
-        for (weka.dl4j.updater.Updater u : updater) {
-            // Define some architecture including all currently available layers
-            ConvolutionLayer cl = new ConvolutionLayer();
-            cl.setNOut(10);
-            DenseLayer dl = new DenseLayer();
-            dl.setNOut(10);
-            BatchNormalization bn = new BatchNormalization();
-            OutputLayer ol = new OutputLayer();
-            Layer[] layers = {dl, bn, ol};
-            clf.setLayers(layers);
+    for (weka.dl4j.updater.Updater u : updater) {
+      // Define some architecture including all currently available layers
+      ConvolutionLayer cl = new ConvolutionLayer();
+      cl.setNOut(10);
+      DenseLayer dl = new DenseLayer();
+      dl.setNOut(10);
+      BatchNormalization bn = new BatchNormalization();
+      OutputLayer ol = new OutputLayer();
+      Layer[] layers = {dl, bn, ol};
+      clf.setLayers(layers);
 
-            // Setup the configuration
-            NeuralNetConfiguration nnc;
+      // Setup the configuration
+      NeuralNetConfiguration nnc;
 
-            double l1 = 0.001;
-            double l2 = 0.002;
-            double lr = 5.0;
-            WeightInit weightInit = WeightInit.UNIFORM;
+      double l1 = 0.001;
+      double l2 = 0.002;
+      double lr = 5.0;
+      WeightInit weightInit = WeightInit.UNIFORM;
 
-            nnc = new NeuralNetConfiguration();
-            nnc.setLearningRate(lr);
-            nnc.setUseRegularization(true);
-            nnc.setUpdater(u);
+      nnc = new NeuralNetConfiguration();
+      nnc.setLearningRate(lr);
+      nnc.setUseRegularization(true);
+      nnc.setUpdater(u);
 
-            nnc.setL1(l1);
-            nnc.setL2(l2);
+      nnc.setL1(l1);
+      nnc.setL2(l2);
 
-            // Not working as of dl4j 0.9.1
-//            nnc.setBiasL1(l1Bias);
-//            nnc.setBiasL2(l2Bias);
-            nnc.setWeightInit(weightInit);
+      // Not working as of dl4j 0.9.1
+      //            nnc.setBiasL1(l1Bias);
+      //            nnc.setBiasL2(l2Bias);
+      nnc.setWeightInit(weightInit);
 
+      clf.setNeuralNetConfiguration(nnc);
+      clf.initializeClassifier(dataMnist); // creates the model internally
 
-            clf.setNeuralNetConfiguration(nnc);
-            clf.initializeClassifier(dataMnist); // creates the model internally
-
-            for (Layer l : layers) {
-                IUpdater u2 = ((BaseLayer) l).getIUpdater();
-                double l11 = ((BaseLayer) l).getL1();
-                double l21 = ((BaseLayer) l).getL2();
-                WeightInit weightInit1 = ((BaseLayer) l).getWeightInit();
-                double learningRate = ((BaseLayer) l).getLearningRate();
-                if (!(u instanceof AdaDelta)){ // AdaDelta does not have any learning rate
-                    Assert.assertEquals(lr, learningRate, 10e-6);
-                }
-                Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
-                Assert.assertEquals(l1, l11, 10e-6);
-                Assert.assertEquals(l2, l21, 10e-6);
-                Assert.assertEquals(weightInit, weightInit1);
-            }
+      for (Layer l : layers) {
+        IUpdater u2 = ((BaseLayer) l).getIUpdater();
+        double l11 = ((BaseLayer) l).getL1();
+        double l21 = ((BaseLayer) l).getL2();
+        WeightInit weightInit1 = ((BaseLayer) l).getWeightInit();
+        double learningRate = ((BaseLayer) l).getLearningRate();
+        if (!(u instanceof AdaDelta)) { // AdaDelta does not have any learning rate
+          Assert.assertEquals(lr, learningRate, 10e-6);
         }
+        Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
+        Assert.assertEquals(l1, l11, 10e-6);
+        Assert.assertEquals(l2, l21, 10e-6);
+        Assert.assertEquals(weightInit, weightInit1);
+      }
     }
+  }
 
-    @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setSeed(42);
-        nnc.builder().learningRate(5)
-                .weightInit(WeightInit.UNIFORM)
-                .biasLearningRate(5)
-                .l1(5)
-                .l2(5)
-                .updater(new AdaDelta()).build();
+  @Test
+  public void testSerialization() throws IOException, ClassNotFoundException {
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setSeed(42);
+    nnc.builder()
+        .learningRate(5)
+        .weightInit(WeightInit.UNIFORM)
+        .biasLearningRate(5)
+        .l1(5)
+        .l2(5)
+        .updater(new AdaDelta())
+        .build();
 
-        final File output = Paths.get(System.getProperty("java.io.tmpdir"),"nnc.object").toFile();
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output));
-        oos.writeObject(nnc);
-        oos.close();
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output));
-        NeuralNetConfiguration nnc2 = (NeuralNetConfiguration) ois.readObject();
-        Assert.assertEquals(nnc, nnc2);
-        output.delete();
-    }
+    final File output = Paths.get(System.getProperty("java.io.tmpdir"), "nnc.object").toFile();
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output));
+    oos.writeObject(nnc);
+    oos.close();
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output));
+    NeuralNetConfiguration nnc2 = (NeuralNetConfiguration) ois.readObject();
+    Assert.assertEquals(nnc, nnc2);
+    output.delete();
+  }
 }

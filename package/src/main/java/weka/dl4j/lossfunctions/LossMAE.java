@@ -31,8 +31,6 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossMAE that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("MAE")
 public class LossMAE extends org.nd4j.linalg.lossfunctions.impl.LossMAE implements OptionHandler {
@@ -70,4 +68,3 @@ public class LossMAE extends org.nd4j.linalg.lossfunctions.impl.LossMAE implemen
     Option.setOptions(options, this, this.getClass());
   }
 }
-

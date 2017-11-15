@@ -16,56 +16,58 @@ import weka.util.DatasetLoader;
  * @author Steven Lang
  */
 public class ActivationTest {
-    /**
-     * Test all activation functions with a dummy network
-     * @throws Exception
-     */
-    @Test
-    public void testActivations() throws Exception {
-        IActivation[] acts = new IActivation[]{
-                new ActivationCube(),
-                new ActivationELU(),
-                new ActivationHardSigmoid(),
-                new ActivationHardTanH(),
-                new ActivationIdentity(),
-                new ActivationLReLU(),
-                new ActivationRationalTanh(),
-                new ActivationReLU(),
-                new ActivationRReLU(),
-                new ActivationHardSigmoid(),
-                new ActivationSoftmax(),
-                new ActivationSoftPlus(),
-                new ActivationSoftSign(),
-                new ActivationHardTanH()
+  /**
+   * Run dummy network with give activationfunction for the first layer
+   *
+   * @param act Activation function to test
+   * @throws Exception Something went wrong.
+   */
+  public static void runClf(IActivation act) throws Exception {
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    // Data
+    DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(2);
+    denseLayer.setLayerName("Dense-layer");
+    denseLayer.setActivationFn(act);
+
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setLayerName("Output-layer");
+
+    clf.setNumEpochs(1);
+    clf.setLayers(new Layer[] {denseLayer, outputLayer});
+
+    final Instances data = DatasetLoader.loadIris();
+    clf.buildClassifier(data);
+    clf.distributionsForInstances(data);
+  }
+
+  /**
+   * Test all activation functions with a dummy network
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testActivations() throws Exception {
+    IActivation[] acts =
+        new IActivation[] {
+          new ActivationCube(),
+          new ActivationELU(),
+          new ActivationHardSigmoid(),
+          new ActivationHardTanH(),
+          new ActivationIdentity(),
+          new ActivationLReLU(),
+          new ActivationRationalTanh(),
+          new ActivationReLU(),
+          new ActivationRReLU(),
+          new ActivationHardSigmoid(),
+          new ActivationSoftmax(),
+          new ActivationSoftPlus(),
+          new ActivationSoftSign(),
+          new ActivationHardTanH()
         };
-        for (IActivation act :
-                acts) {
-            runClf(act);
-        }
+    for (IActivation act : acts) {
+      runClf(act);
     }
-
-    /**
-     * Run dummy network with give activationfunction for the first layer
-     * @param act Activation function to test
-     * @throws Exception Something went wrong.
-     */
-    public static void runClf(IActivation act) throws Exception {
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        // Data
-        DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(2);
-        denseLayer.setLayerName("Dense-layer");
-        denseLayer.setActivationFn(act);
-
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setLayerName("Output-layer");
-
-        clf.setNumEpochs(1);
-        clf.setLayers(new Layer[]{denseLayer, outputLayer});
-
-        final Instances data = DatasetLoader.loadIris();
-        clf.buildClassifier(data);
-        clf.distributionsForInstances(data);
-    }
+  }
 }

@@ -34,33 +34,34 @@ import weka.dl4j.ArffMetaDataLabelGenerator;
  */
 public class ResizeImageInstanceIterator extends ImageInstanceIterator {
 
-    /**
-     * SerialVersionUID
-     */
-    private static final long serialVersionUID = -3310258401133869149L;
+  /** SerialVersionUID */
+  private static final long serialVersionUID = -3310258401133869149L;
 
-    /**
-     * Default constructor with the new shape
-     * @param iii Previous image iterator
-     * @param newWidth New image width
-     * @param newHeight New image height
-     */
-    public ResizeImageInstanceIterator(ImageInstanceIterator iii, int newWidth, int newHeight) {
-        super();
-        this.m_height = newHeight;
-        this.m_width = newWidth;
-        this.setTrainBatchSize(iii.getTrainBatchSize());
-        this.setImagesLocation(iii.getImagesLocation());
-        this.setNumChannels(iii.getNumChannels());
-    }
+  /**
+   * Default constructor with the new shape
+   *
+   * @param iii Previous image iterator
+   * @param newWidth New image width
+   * @param newHeight New image height
+   */
+  public ResizeImageInstanceIterator(ImageInstanceIterator iii, int newWidth, int newHeight) {
+    super();
+    this.height = newHeight;
+    this.width = newWidth;
+    this.setTrainBatchSize(iii.getTrainBatchSize());
+    this.setImagesLocation(iii.getImagesLocation());
+    this.setNumChannels(iii.getNumChannels());
+  }
 
-    @Override
-    protected ImageRecordReader getImageRecordReader(Instances data) throws Exception {
-        ArffMetaDataLabelGenerator labelGenerator = new ArffMetaDataLabelGenerator(data, getImagesLocation().toString());
-        ResizeImageTransform rit = new ResizeImageTransform(m_width, m_height);
-        ImageRecordReader reader = new ImageRecordReader(m_height, m_width, getNumChannels(), labelGenerator, rit);
-        CollectionInputSplit cis = new CollectionInputSplit(labelGenerator.getPathURIs());
-        reader.initialize(cis);
-        return reader;
-    }
+  @Override
+  protected ImageRecordReader getImageRecordReader(Instances data) throws Exception {
+    ArffMetaDataLabelGenerator labelGenerator =
+        new ArffMetaDataLabelGenerator(data, getImagesLocation().toString());
+    ResizeImageTransform rit = new ResizeImageTransform(width, height);
+    ImageRecordReader reader =
+        new ImageRecordReader(height, width, getNumChannels(), labelGenerator, rit);
+    CollectionInputSplit cis = new CollectionInputSplit(labelGenerator.getPathURIs());
+    reader.initialize(cis);
+    return reader;
+  }
 }

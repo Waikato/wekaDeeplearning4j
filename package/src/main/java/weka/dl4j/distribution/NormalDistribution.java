@@ -32,36 +32,42 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's NormalDistribution that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("normal")
-public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.NormalDistribution implements OptionHandler {
+public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.NormalDistribution
+    implements OptionHandler {
 
-  /**
-   * Constructions normal distribution with mean 0 and unit variance.
-   */
+  /** Constructions normal distribution with mean 0 and unit variance. */
   public NormalDistribution() {
     super(1e-3, 1.0);
   }
 
   @OptionMetadata(
-          displayName = "mean",
-          description = "The mean (default = 1e-3).",
-          commandLineParamName = "mean", commandLineParamSynopsis = "-mean <double>",
-          displayOrder = 1)
-  public double getMean() { return super.getMean(); }
+    displayName = "mean",
+    description = "The mean (default = 1e-3).",
+    commandLineParamName = "mean",
+    commandLineParamSynopsis = "-mean <double>",
+    displayOrder = 1
+  )
+  public double getMean() {
+    return super.getMean();
+  }
+
   public void setMean(double mean) {
     super.setMean(mean);
   }
 
-
   @OptionMetadata(
-          displayName = "standard deviation",
-          description = "The standard deviation (default = 1).",
-          commandLineParamName = "std", commandLineParamSynopsis = "-std <double>",
-          displayOrder = 2)
-  public double getStd() { return super.getStd(); }
+    displayName = "standard deviation",
+    description = "The standard deviation (default = 1).",
+    commandLineParamName = "std",
+    commandLineParamSynopsis = "-std <double>",
+    displayOrder = 2
+  )
+  public double getStd() {
+    return super.getStd();
+  }
+
   public void setStd(double std) {
     super.setStd(std);
   }
@@ -99,4 +105,3 @@ public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.
     Option.setOptions(options, this, this.getClass());
   }
 }
-

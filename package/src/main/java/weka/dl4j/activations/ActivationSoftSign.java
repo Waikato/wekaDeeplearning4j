@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationSoftSign that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("SoftSign")
-public class ActivationSoftSign extends org.nd4j.linalg.activations.impl.ActivationSoftSign implements OptionHandler {
+public class ActivationSoftSign extends org.nd4j.linalg.activations.impl.ActivationSoftSign
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationSoftSign extends org.nd4j.linalg.activations.impl.Activat
     Option.setOptions(options, this, this.getClass());
   }
 }
-

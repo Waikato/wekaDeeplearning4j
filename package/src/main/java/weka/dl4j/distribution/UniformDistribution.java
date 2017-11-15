@@ -32,36 +32,42 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's UniformDistribution that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("uniform")
-public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution.UniformDistribution implements OptionHandler {
+public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution.UniformDistribution
+    implements OptionHandler {
 
-  /**
-   * Constructions normal distribution with lower limit -1 and upper limit 1.
-   */
+  /** Constructions normal distribution with lower limit -1 and upper limit 1. */
   public UniformDistribution() {
     super(-1.0, 1.0);
   }
 
   @OptionMetadata(
-          displayName = "lower limit",
-          description = "The lower limit (default = -1.0).",
-          commandLineParamName = "lower", commandLineParamSynopsis = "-lower <double>",
-          displayOrder = 1)
-  public double getLower() { return super.getLower(); }
+    displayName = "lower limit",
+    description = "The lower limit (default = -1.0).",
+    commandLineParamName = "lower",
+    commandLineParamSynopsis = "-lower <double>",
+    displayOrder = 1
+  )
+  public double getLower() {
+    return super.getLower();
+  }
+
   public void setLower(double mean) {
     super.setLower(mean);
   }
 
-
   @OptionMetadata(
-          displayName = "upper limit",
-          description = "The upper limit (default = 1.0).",
-          commandLineParamName = "upper", commandLineParamSynopsis = "-upper <double>",
-          displayOrder = 2)
-  public double getUpper() { return super.getUpper(); }
+    displayName = "upper limit",
+    description = "The upper limit (default = 1.0).",
+    commandLineParamName = "upper",
+    commandLineParamSynopsis = "-upper <double>",
+    displayOrder = 2
+  )
+  public double getUpper() {
+    return super.getUpper();
+  }
+
   public void setUpper(double std) {
     super.setUpper(std);
   }
@@ -99,4 +105,3 @@ public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution
     Option.setOptions(options, this, this.getClass());
   }
 }
-

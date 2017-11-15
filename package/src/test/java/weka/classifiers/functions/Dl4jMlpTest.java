@@ -31,349 +31,314 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
- * JUnit tests for the Dl4jMlpClassifier.
- * Tests nominal classes with iris, numerical classes with diabetes and image
- * classification with minimal mnist.
+ * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
+ * diabetes and image classification with minimal mnist.
  *
  * @author Steven Lang
  */
 public class Dl4jMlpTest {
 
-    /**
-     * Logger instance
-     */
-    private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
+  /** Logger instance */
+  private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
+  /** Current name */
+  @Rule public TestName name = new TestName();
+  /** Classifier */
+  private Dl4jMlpClassifier clf;
+  /** Dataset mnist */
+  private Instances dataMnist;
+  /** Mnist image loader */
+  private ImageInstanceIterator idiMnist;
+  /** Dataset iris */
+  private Instances dataIris;
+  /** Start time for time measurement */
+  private long startTime;
 
+  @Before
+  public void before() throws Exception {
+    // Init mlp clf
+    clf = new Dl4jMlpClassifier();
+    clf.setSeed(TestUtil.SEED);
+    clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
+    clf.setEarlyStopping(new EarlyStopping(5, 15));
 
-    /**
-     * Classifier
-     */
-    private Dl4jMlpClassifier clf;
+    clf.setDebug(false);
 
-    /**
-     * Dataset mnist
-     */
-    private Instances dataMnist;
+    // Init data
+    dataMnist = DatasetLoader.loadMiniMnistMeta();
+    idiMnist = DatasetLoader.loadMiniMnistImageIterator();
+    idiMnist.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
+    dataIris = DatasetLoader.loadIris();
+    startTime = System.currentTimeMillis();
+    //        TestUtil.enableUIServer(clf);
+  }
 
-    /**
-     * Mnist image loader
-     */
-    private ImageInstanceIterator idiMnist;
+  @After
+  public void after() throws IOException {
 
-    /**
-     * Dataset iris
-     */
-    private Instances dataIris;
+    //        logger.info("Press anything to close");
+    //        Scanner sc = new Scanner(System.in);
+    //        sc.next();
+    double time = (System.currentTimeMillis() - startTime) / 1000.0;
+    logger.info("Testmethod: " + name.getMethodName());
+    logger.info("Time: " + time + "s");
+  }
 
-    /**
-     * Current name
-     */
-    @Rule
-    public TestName name = new TestName();
+  /**
+   * Test minimal mnist conv net.
+   *
+   * @throws Exception IO error.
+   */
+  @Test
+  public void testMinimalMnistConvNet() throws Exception {
+    clf.setInstanceIterator(idiMnist);
 
-    /**
-     * Start time for time measurement
-     */
-    private long startTime;
+    int[] threeByThree = {3, 3};
+    int[] twoByTwo = {2, 2};
+    int[] oneByOne = {1, 1};
+    List<Layer> layers = new ArrayList<>();
 
-    @Before
-    public void before() throws Exception {
-        // Init mlp clf
-        clf = new Dl4jMlpClassifier();
-        clf.setSeed(TestUtil.SEED);
-        clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
-        clf.setEarlyStopping(new EarlyStopping(5, 15));
+    ConvolutionLayer convLayer1 = new ConvolutionLayer();
+    convLayer1.setKernelSize(threeByThree);
+    convLayer1.setStride(oneByOne);
+    convLayer1.setNOut(8);
+    convLayer1.setLayerName("Conv-layer 1");
+    layers.add(convLayer1);
 
-        clf.setDebug(false);
+    SubsamplingLayer poolLayer1 = new SubsamplingLayer();
+    poolLayer1.setPoolingType(PoolingType.MAX);
+    poolLayer1.setKernelSize(twoByTwo);
+    poolLayer1.setLayerName("Pool1");
+    layers.add(poolLayer1);
 
-        // Init data
-        dataMnist = DatasetLoader.loadMiniMnistMeta();
-        idiMnist = DatasetLoader.loadMiniMnistImageIterator();
-        idiMnist.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
-        dataIris = DatasetLoader.loadIris();
-        startTime = System.currentTimeMillis();
-//        TestUtil.enableUIServer(clf);
-    }
+    ConvolutionLayer convLayer3 = new ConvolutionLayer();
+    convLayer3.setNOut(8);
+    convLayer3.setKernelSize(threeByThree);
+    layers.add(convLayer3);
 
+    BatchNormalization bn4 = new BatchNormalization();
+    bn4.setActivationFunction(new ActivationReLU());
+    layers.add(bn4);
 
-    @After
-    public void after() throws IOException {
+    SubsamplingLayer poolLayer2 = new SubsamplingLayer();
+    poolLayer2.setPoolingType(PoolingType.MAX);
+    poolLayer2.setKernelSize(twoByTwo);
+    layers.add(poolLayer2);
 
-//        logger.info("Press anything to close");
-//        Scanner sc = new Scanner(System.in);
-//        sc.next();
-        double time = (System.currentTimeMillis() - startTime) / 1000.0;
-        logger.info("Testmethod: " + name.getMethodName());
-        logger.info("Time: " + time + "s");
-    }
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setLossFn(new LossMCXENT());
+    layers.add(outputLayer);
 
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setUseRegularization(true);
 
-    /**
-     * Test minimal mnist conv net.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testMinimalMnistConvNet() throws Exception {
-        clf.setInstanceIterator(idiMnist);
+    clf.setNeuralNetConfiguration(nnc);
+    Layer[] ls = new Layer[layers.size()];
+    layers.toArray(ls);
+    clf.setLayers(ls);
 
-        int[] threeByThree = {3, 3};
-        int[] twoByTwo = {2, 2};
-        int[] oneByOne = {1, 1};
-        List<Layer> layers = new ArrayList<>();
+    TestUtil.holdout(clf, dataMnist);
+  }
 
-        ConvolutionLayer convLayer1 = new ConvolutionLayer();
-        convLayer1.setKernelSize(threeByThree);
-        convLayer1.setStride(oneByOne);
-        convLayer1.setNOut(8);
-        convLayer1.setLayerName("Conv-layer 1");
-        layers.add(convLayer1);
+  /**
+   * Test minimal mnist dense net.
+   *
+   * @throws Exception IO error.
+   */
+  @Test
+  public void testMinimalMnistDense() throws Exception {
+    clf.setInstanceIterator(idiMnist);
 
-        SubsamplingLayer poolLayer1 = new SubsamplingLayer();
-        poolLayer1.setPoolingType(PoolingType.MAX);
-        poolLayer1.setKernelSize(twoByTwo);
-        poolLayer1.setLayerName("Pool1");
-        layers.add(poolLayer1);
+    DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(128);
+    denseLayer.setLayerName("Dense-layer");
+    denseLayer.setActivationFn(new ActivationReLU());
 
+    DenseLayer denseLayer2 = new DenseLayer();
+    denseLayer2.setNOut(32);
+    denseLayer2.setLayerName("Dense-layer");
+    denseLayer2.setActivationFn(new ActivationReLU());
 
-        ConvolutionLayer convLayer3 = new ConvolutionLayer();
-        convLayer3.setNOut(8);
-        convLayer3.setKernelSize(threeByThree);
-        layers.add(convLayer3);
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setLossFn(new LossMCXENT());
+    outputLayer.setLayerName("Output-layer");
 
-        BatchNormalization bn4 = new BatchNormalization();
-        bn4.setActivationFunction(new ActivationReLU());
-        layers.add(bn4);
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setPretrain(false);
+    nnc.setSeed(TestUtil.SEED);
 
-        SubsamplingLayer poolLayer2 = new SubsamplingLayer();
-        poolLayer2.setPoolingType(PoolingType.MAX);
-        poolLayer2.setKernelSize(twoByTwo);
-        layers.add(poolLayer2);
+    clf.setNeuralNetConfiguration(nnc);
+    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setIterationListener(new EpochListener());
+    TestUtil.holdout(clf, dataMnist);
+  }
 
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(new ActivationSoftmax());
-        outputLayer.setLossFn(new LossMCXENT());
-        layers.add(outputLayer);
+  /**
+   * Test Layer setup DENSE to CONV which is currently not supported
+   *
+   * @throws Exception Could not build classifier.
+   */
+  @Test(expected = RuntimeException.class)
+  public void testIllegalIrisConv() throws Exception {
+    final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
+    it.setHeight(1);
+    it.setWidth(4);
+    clf.setInstanceIterator(it);
 
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        nnc.setUseRegularization(true);
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[] {1, 1});
+    cl.setStride(new int[] {1, 1});
 
-        clf.setNeuralNetConfiguration(nnc);
-        Layer[] ls = new Layer[layers.size()];
-        layers.toArray(ls);
-        clf.setLayers(ls);
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
 
-        TestUtil.holdout(clf, dataMnist);
-    }
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(new Layer[] {dl, cl, ol});
+    clf.buildClassifier(dataIris);
+  }
 
+  /**
+   * Test convolution while setting {@link DefaultInstanceIterator} which is forbidden.
+   *
+   * @throws Exception Could not build classifier.
+   */
+  @Test(expected = RuntimeException.class)
+  public void testIllegalIrisConvDefaultInstanceIterator() throws Exception {
+    // DefaultInstanceIterator should not be allowed in the combination with
+    // convolutional layers.
+    clf.setInstanceIterator(new DefaultInstanceIterator());
 
-    /**
-     * Test minimal mnist dense net.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testMinimalMnistDense() throws Exception {
-        clf.setInstanceIterator(idiMnist);
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
 
-        DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(128);
-        denseLayer.setLayerName("Dense-layer");
-        denseLayer.setActivationFn(new ActivationReLU());
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[] {1, 1});
+    cl.setStride(new int[] {1, 1});
 
-        DenseLayer denseLayer2 = new DenseLayer();
-        denseLayer2.setNOut(32);
-        denseLayer2.setLayerName("Dense-layer");
-        denseLayer2.setActivationFn(new ActivationReLU());
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.buildClassifier(dataIris);
+  }
 
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(new ActivationSoftmax());
-        outputLayer.setLossFn(new LossMCXENT());
-        outputLayer.setLayerName("Output-layer");
+  /**
+   * Test iris convolution.
+   *
+   * @throws Exception Could not build classifier.
+   */
+  @Test
+  public void testIrisConv() throws Exception {
+    final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
+    it.setHeight(1);
+    it.setWidth(4);
+    clf.setInstanceIterator(it);
 
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        nnc.setPretrain(false);
-        nnc.setSeed(TestUtil.SEED);
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
 
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
-        clf.setIterationListener(new EpochListener());
-        TestUtil.holdout(clf, dataMnist);
-    }
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[] {1, 1});
+    cl.setStride(new int[] {1, 1});
 
-    /**
-     * Test Layer setup DENSE to CONV which is currently not supported
-     *
-     * @throws Exception Could not build classifier.
-     */
-    @Test(expected = RuntimeException.class)
-    public void testIllegalIrisConv() throws Exception {
-        final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
-        it.setHeight(1);
-        it.setWidth(4);
-        clf.setInstanceIterator(it);
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.buildClassifier(dataIris);
+  }
 
+  /**
+   * Test to serialization of the classifier. This is important for the GUI usage.
+   *
+   * @throws Exception Could not build classifier.
+   */
+  @Test
+  public void testSerialization() throws Exception {
+    clf.setInstanceIterator(idiMnist);
 
-        ConvolutionLayer cl = new ConvolutionLayer();
-        cl.setNOut(3);
-        cl.setKernelSize(new int[]{1, 1});
-        cl.setStride(new int[]{1, 1});
+    DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(8);
+    denseLayer.setLayerName("Dense-layer");
+    denseLayer.setActivationFn(new ActivationReLU());
 
+    DenseLayer denseLayer2 = new DenseLayer();
+    denseLayer2.setNOut(4);
+    denseLayer2.setLayerName("Dense-layer");
+    denseLayer2.setActivationFn(new ActivationReLU());
 
-        DenseLayer dl = new DenseLayer();
-        dl.setNOut(10);
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setLossFn(new LossMCXENT());
+    outputLayer.setLayerName("Output-layer");
 
-        OutputLayer ol = new OutputLayer();
-        clf.setLayers(new Layer[]{dl, cl, ol});
-        clf.buildClassifier(dataIris);
-    }
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setPretrain(false);
+    nnc.setSeed(TestUtil.SEED);
 
-    /**
-     * Test convolution while setting {@link DefaultInstanceIterator} which is
-     * forbidden.
-     *
-     * @throws Exception Could not build classifier.
-     */
-    @Test(expected = RuntimeException.class)
-    public void testIllegalIrisConvDefaultInstanceIterator() throws Exception {
-        // DefaultInstanceIterator should not be allowed in the combination with
-        // convolutional layers.
-        clf.setInstanceIterator(new DefaultInstanceIterator());
+    clf.setNeuralNetConfiguration(nnc);
+    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setIterationListener(new EpochListener());
 
+    File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
+    oos.writeObject(clf);
 
-        DenseLayer dl = new DenseLayer();
-        dl.setNOut(10);
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(out));
+    Dl4jMlpClassifier clf2 = (Dl4jMlpClassifier) ois.readObject();
 
-        ConvolutionLayer cl = new ConvolutionLayer();
-        cl.setNOut(3);
-        cl.setKernelSize(new int[]{1, 1});
-        cl.setStride(new int[]{1, 1});
+    clf2.setNumEpochs(1);
+    clf2.initializeClassifier(dataMnist);
+    clf2.buildClassifier(dataMnist);
+  }
 
-        OutputLayer ol = new OutputLayer();
-        clf.setLayers(new Layer[]{cl, dl, ol});
-        clf.buildClassifier(dataIris);
-    }
+  /**
+   * Test UnsupportedAttributeTypeException
+   *
+   * @throws Exception
+   */
+  @Test(expected = UnsupportedAttributeTypeException.class)
+  public void testWrongArffFormat() throws Exception {
+    Attribute att1 = new Attribute("1", true);
+    Attribute att2 = new Attribute("2", Arrays.asList("1", "2"));
+    ArrayList<Attribute> atts = new ArrayList<>();
+    atts.add(att1);
+    atts.add(att2);
+    Instances inst = new Instances("", atts, 10);
+    Instance ins = new DenseInstance(1);
+    ins.setDataset(inst);
+    inst.setClassIndex(0);
+    ins.setValue(0, "1");
+    inst.add(ins);
+    clf.initializeClassifier(inst);
+  }
 
-    /**
-     * Test iris convolution.
-     *
-     * @throws Exception Could not build classifier.
-     */
-    @Test
-    public void testIrisConv() throws Exception {
-        final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
-        it.setHeight(1);
-        it.setWidth(4);
-        clf.setInstanceIterator(it);
+  /**
+   * Test no outputlayer
+   *
+   * @throws MissingOutputLayerException
+   */
+  @Test(expected = MissingOutputLayerException.class)
+  public void testLastLayerNoOutputLayer() throws Exception {
+    clf.setLayers(new Layer[] {new DenseLayer()});
+    clf.initializeClassifier(dataIris);
+  }
 
-        DenseLayer dl = new DenseLayer();
-        dl.setNOut(10);
-
-        ConvolutionLayer cl = new ConvolutionLayer();
-        cl.setNOut(3);
-        cl.setKernelSize(new int[]{1, 1});
-        cl.setStride(new int[]{1, 1});
-
-        OutputLayer ol = new OutputLayer();
-        clf.setLayers(new Layer[]{cl, dl, ol});
-        clf.buildClassifier(dataIris);
-    }
-
-    /**
-     * Test to serialization of the classifier. This is important for the GUI
-     * usage.
-     *
-     * @throws Exception Could not build classifier.
-     */
-    @Test
-    public void testSerialization() throws Exception {
-        clf.setInstanceIterator(idiMnist);
-
-        DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(8);
-        denseLayer.setLayerName("Dense-layer");
-        denseLayer.setActivationFn(new ActivationReLU());
-
-        DenseLayer denseLayer2 = new DenseLayer();
-        denseLayer2.setNOut(4);
-        denseLayer2.setLayerName("Dense-layer");
-        denseLayer2.setActivationFn(new ActivationReLU());
-
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(new ActivationSoftmax());
-        outputLayer.setLossFn(new LossMCXENT());
-        outputLayer.setLayerName("Output-layer");
-
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-        nnc.setPretrain(false);
-        nnc.setSeed(TestUtil.SEED);
-
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{denseLayer, denseLayer2, outputLayer});
-        clf.setIterationListener(new EpochListener());
-
-        File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
-        oos.writeObject(clf);
-
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(out));
-        Dl4jMlpClassifier clf2 = (Dl4jMlpClassifier) ois.readObject();
-
-        clf2.setNumEpochs(1);
-        clf2.initializeClassifier(dataMnist);
-        clf2.buildClassifier(dataMnist);
-    }
-
-    /**
-     * Test UnsupportedAttributeTypeException
-     * @throws Exception
-     */
-    @Test(expected = UnsupportedAttributeTypeException.class)
-    public void testWrongArffFormat() throws Exception {
-        Attribute att1 = new Attribute("1", true);
-        Attribute att2 = new Attribute("2", Arrays.asList("1","2"));
-        ArrayList<Attribute> atts = new ArrayList<>();
-        atts.add(att1);
-        atts.add(att2);
-        Instances inst = new Instances("", atts, 10);
-        Instance ins = new DenseInstance(1);
-        ins.setDataset(inst);
-        inst.setClassIndex(0);
-        ins.setValue(0, "1");
-        inst.add(ins);
-        clf.initializeClassifier(inst);
-    }
-
-    /**
-     * Test no outputlayer
-     * @throws MissingOutputLayerException
-     */
-    @Test(expected = MissingOutputLayerException.class)
-    public void testLastLayerNoOutputLayer() throws Exception {
-        clf.setLayers(new Layer[]{new DenseLayer()});
-        clf.initializeClassifier(dataIris);
-    }
-
-    /**
-     * Test async iterator
-     */
-    @Test
-    public void testAsyncIterator() throws Exception {
-        clf.setQueueSize(4);
-        clf.buildClassifier(dataIris);
-    }
-    /**
-     * Test zoo model with wrong iterator
-     */
-    @Test(expected = WrongIteratorException.class)
-    public void testZooModelWithoutImageIterator() throws Exception {
-        clf.setZooModel(new LeNet());
-        clf.setInstanceIterator(new DefaultInstanceIterator());
-        clf.buildClassifier(dataIris);
-    }
+  /** Test async iterator */
+  @Test
+  public void testAsyncIterator() throws Exception {
+    clf.setQueueSize(4);
+    clf.buildClassifier(dataIris);
+  }
+  /** Test zoo model with wrong iterator */
+  @Test(expected = WrongIteratorException.class)
+  public void testZooModelWithoutImageIterator() throws Exception {
+    clf.setZooModel(new LeNet());
+    clf.setInstanceIterator(new DefaultInstanceIterator());
+    clf.buildClassifier(dataIris);
+  }
 }

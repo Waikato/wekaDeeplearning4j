@@ -1,9 +1,6 @@
 package weka.classifiers.functions;
 
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.Layer;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
-import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -14,16 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
-import weka.dl4j.layers.*;
-import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.OutputLayer;
 import weka.util.DatasetLoader;
-import weka.util.TestUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * JUnit tests applying the classifier to different arff datasets.
@@ -32,117 +24,96 @@ import java.util.List;
  */
 public class DatasetTest {
 
-    /**
-     * Logger instance
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DatasetTest.class);
+  /** Logger instance */
+  private static final Logger logger = LoggerFactory.getLogger(DatasetTest.class);
 
+  /** Default number of epochs */
+  private static final int DEFAULT_NUM_EPOCHS = 1;
 
-    /**
-     * Default number of epochs
-     */
-    private static final int DEFAULT_NUM_EPOCHS = 1;
+  /** Seed */
+  private static final int SEED = 42;
 
-    /**
-     * Seed
-     */
-    private static final int SEED = 42;
+  /** Default batch size */
+  private static final int DEFAULT_BATCHSIZE = 32;
+  /** Current name */
+  @Rule public TestName name = new TestName();
+  /** Classifier */
+  private Dl4jMlpClassifier clf;
+  /** Start time for time measurement */
+  private long startTime;
 
-    /**
-     * Default batch size
-     */
-    private static final int DEFAULT_BATCHSIZE = 32;
+  @Before
+  public void before() throws Exception {
+    // Init mlp clf
+    clf = new Dl4jMlpClassifier();
+    clf.setSeed(SEED);
+    clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+    clf.setDebug(false);
 
+    // Init data
+    startTime = System.currentTimeMillis();
+    //        TestUtil.enableUIServer(clf);
+  }
 
-    /**
-     * Classifier
-     */
-    private Dl4jMlpClassifier clf;
+  @After
+  public void after() throws IOException {
+    double time = (System.currentTimeMillis() - startTime) / 1000.0;
+    logger.info("Testmethod: " + name.getMethodName());
+    logger.info("Time: " + time + "s");
+  }
 
-    /**
-     * Current name
-     */
-    @Rule
-    public TestName name = new TestName();
+  /**
+   * Test date class.
+   *
+   * @throws Exception IO error.
+   */
+  @Test
+  public void testDateClass() throws Exception {
+    runClf(DatasetLoader.loadWineDate());
+  }
+  /**
+   * Test numeric class.
+   *
+   * @throws Exception IO error.
+   */
+  @Test
+  public void testNumericClass() throws Exception {
+    runClf(DatasetLoader.loadFishCatch());
+  }
 
-    /**
-     * Start time for time measurement
-     */
-    private long startTime;
+  /**
+   * Test nominal class.
+   *
+   * @throws Exception IO error.
+   */
+  @Test
+  public void testNominal() throws Exception {
+    runClf(DatasetLoader.loadIris());
+  }
 
-    @Before
-    public void before() throws Exception {
-        // Init mlp clf
-        clf = new Dl4jMlpClassifier();
-        clf.setSeed(SEED);
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
-        clf.setDebug(false);
+  @Test
+  public void testMissingValues() throws Exception {
+    runClf(DatasetLoader.loadIrisMissingValues());
+  }
 
-        // Init data
-        startTime = System.currentTimeMillis();
-//        TestUtil.enableUIServer(clf);
-    }
+  private void runClf(Instances data) throws Exception {
+    // Data
+    DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(32);
+    denseLayer.setLayerName("Dense-layer");
+    denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
 
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setLayerName("Output-layer");
 
-    @After
-    public void after() throws IOException {
-        double time = (System.currentTimeMillis() - startTime)/1000.0;
-        logger.info("Testmethod: " + name.getMethodName());
-        logger.info("Time: " + time + "s");
-    }
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
 
-    /**
-     * Test date class.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testDateClass() throws Exception {
-        runClf(DatasetLoader.loadWineDate());
-    }
-    /**
-     * Test numeric class.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testNumericClass() throws Exception {
-        runClf(DatasetLoader.loadFishCatch());
-    }
+    clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
+    clf.setNeuralNetConfiguration(nnc);
+    clf.setLayers(new Layer[] {denseLayer, outputLayer});
 
-    /**
-     * Test nominal class.
-     *
-     * @throws Exception IO error.
-     */
-    @Test
-    public void testNominal() throws Exception {
-        runClf(DatasetLoader.loadIris());
-    }
-
-    @Test
-    public void testMissingValues() throws Exception {
-        runClf(DatasetLoader.loadIrisMissingValues());
-    }
-
-    private void runClf(Instances data) throws Exception {
-        // Data
-        DenseLayer denseLayer = new DenseLayer();
-        denseLayer.setNOut(32);
-        denseLayer.setLayerName("Dense-layer");
-        denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
-
-        OutputLayer outputLayer = new OutputLayer();
-        outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setLayerName("Output-layer");
-
-        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-
-        clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
-        clf.setNeuralNetConfiguration(nnc);
-        clf.setLayers(new Layer[]{denseLayer, outputLayer});
-
-        clf.buildClassifier(data);
-        clf.distributionsForInstances(data);
-    }
+    clf.buildClassifier(data);
+    clf.distributionsForInstances(data);
+  }
 }

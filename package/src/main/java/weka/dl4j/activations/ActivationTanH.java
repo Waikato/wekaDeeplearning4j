@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationTanH that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("TanH")
-public class ActivationTanH extends org.nd4j.linalg.activations.impl.ActivationTanH implements OptionHandler {
+public class ActivationTanH extends org.nd4j.linalg.activations.impl.ActivationTanH
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationTanH extends org.nd4j.linalg.activations.impl.ActivationT
     Option.setOptions(options, this, this.getClass());
   }
 }
-

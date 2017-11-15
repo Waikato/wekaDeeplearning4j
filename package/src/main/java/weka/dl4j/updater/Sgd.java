@@ -1,6 +1,5 @@
 package weka.dl4j.updater;
 
-import weka.core.OptionMetadata;
 import weka.gui.ProgrammaticProperty;
 
 /**
@@ -10,17 +9,17 @@ import weka.gui.ProgrammaticProperty;
  */
 public class Sgd extends org.nd4j.linalg.learning.config.Sgd implements Updater {
 
-    private static final long serialVersionUID = 1852959048173443658L;
-    @ProgrammaticProperty
-    @Override
-    public double getLearningRate() {
-        return super.getLearningRate();
-    }
+  private static final long serialVersionUID = 1852959048173443658L;
 
-    @ProgrammaticProperty
-    @Override
-    public void setLearningRate(double learningRate) {
-        super.setLearningRate(learningRate);
-    }
+  @ProgrammaticProperty
+  @Override
+  public double getLearningRate() {
+    return super.getLearningRate();
+  }
 
+  @ProgrammaticProperty
+  @Override
+  public void setLearningRate(double learningRate) {
+    super.setLearningRate(learningRate);
+  }
 }

@@ -14,110 +14,106 @@ import weka.util.DatasetLoader;
 import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 
-
 /**
- * JUnit tests for the ModelZoo ({@link weka.zoo}). Mainly checks out whether the
- * initialization of the models work.
+ * JUnit tests for the ModelZoo ({@link weka.zoo}). Mainly checks out whether the initialization of
+ * the models work.
  *
  * @author Steven Lang
  */
-
 @Slf4j
 public class ModelZooTest {
 
-    @Test
-    public void testLeNetMnist() throws Exception {
-        initModel(new LeNet());
+  @Test
+  public void testLeNetMnist() throws Exception {
+    initModel(new LeNet());
+  }
+
+  @Test
+  public void testAlexNetMnist() throws Exception {
+    initModel(new AlexNet());
+  }
+
+  @Test
+  public void testVGG16() throws Exception {
+    initModel(new VGG16());
+  }
+
+  @Test
+  public void testVGG19() throws Exception {
+    initModel(new VGG19());
+  }
+
+  @Test
+  public void testFaceNetNN4Small2() throws Exception {
+    initModel(new FaceNetNN4Small2());
+  }
+
+  @Test
+  public void testGoogLeNet() throws Exception {
+    initModel(new GoogLeNet());
+  }
+
+  @Test
+  public void testInceptionResNetV1() throws Exception {
+    initModel(new InceptionResNetV1());
+  }
+
+  @Test
+  public void testResNet50() throws Exception {
+    initModel(new ResNet50());
+  }
+
+  public void initModel(ZooModel model) throws Exception {
+    // CLF
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    clf.setSeed(1);
+
+    // Data
+    Instances data = DatasetLoader.loadMiniMnistMeta();
+
+    ArrayList<Attribute> atts = new ArrayList<>();
+    for (int i = 0; i < data.numAttributes(); i++) {
+      atts.add(data.attribute(i));
+    }
+    Instances shrinkedData = new Instances("shrinked", atts, 10);
+    shrinkedData.setClassIndex(1);
+    for (int i = 0; i < 10; i++) {
+      Instance inst = data.get(i);
+      inst.setClassValue(i % 10);
+      inst.setDataset(shrinkedData);
+      shrinkedData.add(inst);
     }
 
-    @Test
-    public void testAlexNetMnist() throws Exception {
-        initModel(new AlexNet());
-    }
+    ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+    iterator.setTrainBatchSize(10);
+    clf.setInstanceIterator(iterator);
+    clf.setZooModel(model);
+    clf.setNumEpochs(1);
+    clf.setEarlyStopping(new EarlyStopping(5, 0));
+    clf.initializeClassifier(shrinkedData);
+  }
 
-    @Test
-    public void testVGG16() throws Exception {
-        initModel(new VGG16());
-    }
+  //    @Test
+  public void runLeNet() throws Exception {
+    // CLF
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    clf.setSeed(1);
 
-    @Test
-    public void testVGG19() throws Exception {
-        initModel(new VGG19());
-    }
+    // Data
+    Instances data = DatasetLoader.loadMiniMnistMeta();
 
-    @Test
-    public void testFaceNetNN4Small2() throws Exception {
-        initModel(new FaceNetNN4Small2());
-    }
+    ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+    iterator.setTrainBatchSize(32);
+    clf.setInstanceIterator(iterator);
+    clf.setZooModel(new LeNet());
+    clf.setNumEpochs(10);
+    clf.setEarlyStopping(new EarlyStopping(5, 0));
+    clf.buildClassifier(data);
+  }
 
-    @Test
-    public void testGoogLeNet() throws Exception {
-        initModel(new GoogLeNet());
-    }
-
-    @Test
-    public void testInceptionResNetV1() throws Exception {
-        initModel(new InceptionResNetV1());
-    }
-
-    @Test
-    public void testResNet50() throws Exception {
-        initModel(new ResNet50());
-    }
-
-    public void initModel(ZooModel model) throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-
-        ArrayList<Attribute> atts = new ArrayList<>();
-        for (int i = 0; i < data.numAttributes(); i++){
-            atts.add(data.attribute(i));
-        }
-        Instances shrinkedData = new Instances("shrinked", atts, 10);
-        shrinkedData.setClassIndex(1);
-        for (int i = 0; i < 10; i++){
-            Instance inst = data.get(i);
-            inst.setClassValue(i%10);
-            inst.setDataset(shrinkedData);
-            shrinkedData.add(inst);
-        }
-
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(10);
-        clf.setInstanceIterator(iterator);
-        clf.setZooModel(model);
-        clf.setNumEpochs(1);
-        clf.setEarlyStopping(new EarlyStopping(5, 0));
-        clf.initializeClassifier(shrinkedData);
-    }
-
-//    @Test
-    public void runLeNet() throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(32);
-        clf.setInstanceIterator(iterator);
-        clf.setZooModel(new LeNet());
-        clf.setNumEpochs(10);
-        clf.setEarlyStopping(new EarlyStopping(5, 0));
-        clf.buildClassifier(data);
-    }
-
-    /**
-     * Test CustomNet init
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testCustomNetInit() throws OperationNotSupportedException {
-        new CustomNet().init(0, 0, null);
-    }
+  /** Test CustomNet init */
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCustomNetInit() throws OperationNotSupportedException {
+    new CustomNet().init(0, 0, null);
+  }
 }

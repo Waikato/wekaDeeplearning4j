@@ -31,8 +31,6 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossMSE that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("MSE")
 public class LossMSE extends org.nd4j.linalg.lossfunctions.impl.LossMSE implements OptionHandler {
@@ -70,4 +68,3 @@ public class LossMSE extends org.nd4j.linalg.lossfunctions.impl.LossMSE implemen
     Option.setOptions(options, this, this.getClass());
   }
 }
-

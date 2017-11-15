@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationSigmoid that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("Sigmoid")
-public class ActivationSigmoid extends org.nd4j.linalg.activations.impl.ActivationSigmoid implements OptionHandler {
+public class ActivationSigmoid extends org.nd4j.linalg.activations.impl.ActivationSigmoid
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationSigmoid extends org.nd4j.linalg.activations.impl.Activati
     Option.setOptions(options, this, this.getClass());
   }
 }
-

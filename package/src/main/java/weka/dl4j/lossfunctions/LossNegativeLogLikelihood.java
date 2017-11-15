@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossNegativeLogLikelihood that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("NegativeLogLikelihood")
-public class LossNegativeLogLikelihood extends org.nd4j.linalg.lossfunctions.impl.LossNegativeLogLikelihood implements OptionHandler {
+public class LossNegativeLogLikelihood
+    extends org.nd4j.linalg.lossfunctions.impl.LossNegativeLogLikelihood implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class LossNegativeLogLikelihood extends org.nd4j.linalg.lossfunctions.imp
     Option.setOptions(options, this, this.getClass());
   }
 }
-

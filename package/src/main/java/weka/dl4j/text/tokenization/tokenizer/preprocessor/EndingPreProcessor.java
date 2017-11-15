@@ -19,63 +19,56 @@
  *
  */
 
-
 package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 import weka.core.Option;
 import weka.core.OptionHandler;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 
 /**
  * A serializable version of DeepLearning4j's EndingPreProcessor.
  *
  * @author Felipe Bravo-Marquez
- *
- *
  */
-public class EndingPreProcessor extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor implements Serializable, OptionHandler {
+public class EndingPreProcessor
+    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor
+    implements Serializable, OptionHandler {
 
-	/** For Serialization */
-	private static final long serialVersionUID = -7863874149371478868L;
+  /** For Serialization */
+  private static final long serialVersionUID = -7863874149371478868L;
 
-	/**
-	 * Returns a string describing this object.
-	 * 
-	 * @return a description of the object suitable for displaying in the
-	 *         explorer/experimenter gui
-	 */	
-	public String globalInfo() {
-		return "Gets rid of endings: ed,ing, ly, s, ..\n";
-	}
+  /**
+   * Returns a string describing this object.
+   *
+   * @return a description of the object suitable for displaying in the explorer/experimenter gui
+   */
+  public String globalInfo() {
+    return "Gets rid of endings: ed,ing, ly, s, ..\n";
+  }
 
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#listOptions()
-	 */
-	@Override
-	public Enumeration<Option> listOptions() {
-		return Option.listOptionsForClass(this.getClass()).elements();
-	}
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#listOptions()
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#getOptions()
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptions(this, this.getClass());
+  }
 
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#setOptions(java.lang.String[])
-	 */
-	@Override
-	public void setOptions(String[] options) throws Exception {
-		Option.setOptions(options, this, this.getClass());
-
-	}
-
-
-	/* (non-Javadoc)
-	 * @see weka.core.OptionHandler#getOptions()
-	 */
-	@Override
-	public String[] getOptions() {
-		return Option.getOptions(this, this.getClass());
-	}
-
+  /* (non-Javadoc)
+   * @see weka.core.OptionHandler#setOptions(java.lang.String[])
+   */
+  @Override
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptions(options, this, this.getClass());
+  }
 }

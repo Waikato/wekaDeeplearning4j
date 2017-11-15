@@ -19,212 +19,168 @@
  *
  */
 
-
-
 package weka.core.converters;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
 
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
-
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
 /**
- * Loads Word2Vec seriliazed embeddings into Weka. 
- * 
+ * Loads Word2Vec seriliazed embeddings into Weka.
+ *
  * @author Felipe Bravo-Marquez
- *
- *
  */
-public class Word2VecLoader extends AbstractFileLoader implements BatchConverter{
+public class Word2VecLoader extends AbstractFileLoader implements BatchConverter {
 
+  /** For serialization */
+  private static final long serialVersionUID = -5963779116425129124L;
 
+  /** the file extension. */
+  public static String FILE_EXTENSION = ".bin";
 
-	/** For serialization */
-	private static final long serialVersionUID = -5963779116425129124L;
+  /** the extension for compressed files. */
+  public static String FILE_EXTENSION_COMPRESSED = FILE_EXTENSION + ".gz";
 
+  /** Word2Vec object */
+  private Word2Vec vec;
 
-	/** the file extension. */
-	public static String FILE_EXTENSION = ".bin";
+  /**
+   * Main method for testing this class.
+   *
+   * @param args should contain &lt;filestem&gt;[.names | data]
+   */
+  public static void main(String[] args) {
+    runFileLoader(new Word2VecLoader(), args);
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.converters.FileSourcedConverter#getFileExtension()
+   */
+  @Override
+  public String getFileExtension() {
+    // TODO Auto-generated method stub
+    return FILE_EXTENSION;
+  }
 
-	/** the extension for compressed files. */
-	public static String FILE_EXTENSION_COMPRESSED = FILE_EXTENSION + ".gz";
+  @Override
+  /*
+   * Gets all the file extensions used for this type of file.
+   *
+   * @return the file extensions
+   */
+  public String[] getFileExtensions() {
+    return new String[] {FILE_EXTENSION, FILE_EXTENSION_COMPRESSED};
+  }
 
-	/** Word2Vec object */
-	private Word2Vec vec;
+  /* (non-Javadoc)
+   * @see weka.core.converters.FileSourcedConverter#getFileDescription()
+   */
+  @Override
+  public String getFileDescription() {
+    return "W2V binary word embeddings.";
+  }
 
+  /* (non-Javadoc)
+   * @see weka.core.RevisionHandler#getRevision()
+   */
+  @Override
+  public String getRevision() {
+    return "$Revision: 1 $";
+  }
 
+  /**/
+  public void setStructure() {
+    ArrayList<Attribute> att = new ArrayList<Attribute>();
 
-	/* (non-Javadoc)
-	 * @see weka.core.converters.FileSourcedConverter#getFileExtension()
-	 */
-	@Override
-	public String getFileExtension() {
-		// TODO Auto-generated method stub
-		return FILE_EXTENSION;
-	}
+    // Add one attribute for each embedding dimension
+    for (int i = 0; i < this.vec.getLayerSize(); i++) {
+      att.add(new Attribute("embedding-" + i));
+    }
 
-	@Override
-	/*	
-	 * Gets all the file extensions used for this type of file.
-	 *
-	 * @return the file extensions
-	 */
-	public String[] getFileExtensions() {
-		return new String[]{FILE_EXTENSION, FILE_EXTENSION_COMPRESSED};
-	}
+    att.add(new Attribute("word_id", (ArrayList<String>) null));
 
-	/* (non-Javadoc)
-	 * @see weka.core.converters.FileSourcedConverter#getFileDescription()
-	 */
-	@Override
-	public String getFileDescription() {
-		return "W2V binary word embeddings.";
-	}
+    m_structure = new Instances("W2V model loaded from " + this.m_File.toString(), att, 0);
+  }
 
-	/* (non-Javadoc)
-	 * @see weka.core.RevisionHandler#getRevision()
-	 */
-	@Override
-	public String getRevision() {
-		return "$Revision: 1 $";
-	}
+  @Override
+  public Instances getStructure() throws IOException {
+    if (m_sourceFile == null) {
+      throw new IOException("No source has been specified.");
+    }
 
-	
-	
-	/**
-	 * 
-	 */
-	public void setStructure(){
-		ArrayList<Attribute> att = new ArrayList<Attribute>();
+    if (m_structure == null) {
+      setSource(m_sourceFile);
+      this.vec = WordVectorSerializer.readWord2VecModel(m_sourceFile);
+      this.setStructure();
+    }
 
-		
+    return m_structure;
+  }
 
-		// Add one attribute for each embedding dimension
-		for(int i=0;i<this.vec.getLayerSize();i++){
-			att.add(new Attribute("embedding-"+i));
-		}	
-		
-		att.add(new Attribute("word_id", (ArrayList<String>) null));
+  @Override
+  public Instances getDataSet() throws IOException {
+    if (m_sourceFile == null) {
+      throw new IOException("No source has been specified");
+    }
 
+    if (getRetrieval() == INCREMENTAL) {
+      throw new IOException("This loader cannot load instances incrementally.");
+    }
+    setRetrieval(BATCH);
 
+    if (m_structure == null) {
+      getStructure();
+    }
 
+    Instances result = new Instances(m_structure);
 
-		m_structure = new Instances("W2V model loaded from "+this.m_File.toString(), att, 0);
+    for (String word : vec.getVocab().words()) {
+      double[] values = new double[result.numAttributes()];
 
-	}
+      for (int i = 0; i < this.vec.getWordVector(word).length; i++)
+        values[i] = this.vec.getWordVector(word)[i];
 
+      values[result.numAttributes() - 1] = result.attribute("word_id").addStringValue(word);
 
-	@Override
-	public Instances getStructure() throws IOException {
-		if (m_sourceFile == null) {
-			throw new IOException("No source has been specified.");
-		}
+      Instance inst = new DenseInstance(1, values);
 
-		if (m_structure == null) {
-			setSource(m_sourceFile);
-			this.vec = WordVectorSerializer.readWord2VecModel(m_sourceFile);
-			this.setStructure();						
-		}
+      inst.setDataset(result);
 
-		return m_structure;
-	}
+      result.add(inst);
+    }
 
-	@Override
-	public Instances getDataSet() throws IOException {
-		if (m_sourceFile == null) {
-			throw new IOException("No source has been specified");
-		}
+    return result;
+  }
 
-		if (getRetrieval() == INCREMENTAL) {
-			throw new IOException(
-					"This loader cannot load instances incrementally.");
-		}
-		setRetrieval(BATCH);
+  /**
+   * Resets the Loader object and sets the source of the data set to be the supplied File object.
+   *
+   * @param file the source file.
+   * @throws IOException if an error occurs
+   */
+  public void setSource(File file) throws IOException {
+    m_structure = null;
 
-		if (m_structure == null) {
-			getStructure();
-		}
+    setRetrieval(NONE);
 
+    if (file == null) throw new IOException("Source file object is null!");
 
+    m_sourceFile = file;
+    m_File = file.getAbsolutePath();
+  }
 
-		Instances result=new Instances(m_structure);
-
-		for (String word:vec.getVocab().words()){
-			double[] values = new double[result.numAttributes()];
-
-						
-			for(int i=0;i<this.vec.getWordVector(word).length;i++)
-				values[i]=this.vec.getWordVector(word)[i];
-
-			values[result.numAttributes()-1] = result.attribute("word_id").addStringValue(word);
-			
-
-			Instance inst = new DenseInstance(1, values);
-
-			inst.setDataset(result);
-
-
-			result.add(inst);
-
-		}
-
-
-
-		return result;
-	}
-
-
-
-
-	/**
-	 * Resets the Loader object and sets the source of the data set to be 
-	 * the supplied File object.
-	 *
-	 * @param file 		the source file.
-	 * @throws IOException 	if an error occurs
-	 */
-	public void setSource(File file) throws IOException {
-		m_structure = null;
-
-		setRetrieval(NONE);
-
-		if (file == null)
-			throw new IOException("Source file object is null!");
-
-
-		m_sourceFile = file;
-		m_File       = file.getAbsolutePath();
-
-	}
-	
-	/* (non-Javadoc)
-	 * @see weka.core.converters.AbstractLoader#getNextInstance(weka.core.Instances)
-	 */
-	@Override
-	public Instance getNextInstance(Instances structure) throws IOException {
-		throw new IOException("This loader cannot load data incrementally.");
-		
-	}
-
-
-	/**
-	 * Main method for testing this class.
-	 * 
-	 * @param args should contain &lt;filestem&gt;[.names | data]
-	 */
-	public static void main(String[] args) {
-		runFileLoader(new Word2VecLoader(), args);
-	}
-
-
-
+  /* (non-Javadoc)
+   * @see weka.core.converters.AbstractLoader#getNextInstance(weka.core.Instances)
+   */
+  @Override
+  public Instance getNextInstance(Instances structure) throws IOException {
+    throw new IOException("This loader cannot load data incrementally.");
+  }
 }

@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossBinaryXENT that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("BinaryXENT")
-public class LossBinaryXENT extends org.nd4j.linalg.lossfunctions.impl.LossBinaryXENT implements OptionHandler {
+public class LossBinaryXENT extends org.nd4j.linalg.lossfunctions.impl.LossBinaryXENT
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class LossBinaryXENT extends org.nd4j.linalg.lossfunctions.impl.LossBinar
     Option.setOptions(options, this, this.getClass());
   }
 }
-

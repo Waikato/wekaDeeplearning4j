@@ -33,27 +33,27 @@ import java.util.Enumeration;
  * Currently only allows one trial.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("binomial")
-public class BinomialDistribution extends org.deeplearning4j.nn.conf.distribution.BinomialDistribution implements OptionHandler {
+public class BinomialDistribution
+    extends org.deeplearning4j.nn.conf.distribution.BinomialDistribution implements OptionHandler {
 
-  /**
-   * Constructs binomial distribution with 1 trial and success probability 0.5.
-   */
+  /** Constructs binomial distribution with 1 trial and success probability 0.5. */
   public BinomialDistribution() {
     super(1, 0.5);
   }
 
   @OptionMetadata(
-          displayName = "probability of success",
-          description = "The probability of success (default = 0.5).",
-          commandLineParamName = "prob", commandLineParamSynopsis = "-prob <double>",
-          displayOrder = 1)
+    displayName = "probability of success",
+    description = "The probability of success (default = 0.5).",
+    commandLineParamName = "prob",
+    commandLineParamSynopsis = "-prob <double>",
+    displayOrder = 1
+  )
   public double getProbabilityOfSuccess() {
     return super.getProbabilityOfSuccess();
   }
+
   public void setProbabilityOfSuccess(double probabilityOfSuccess) {
     super.setProbabilityOfSuccess(probabilityOfSuccess);
   }
@@ -91,4 +91,3 @@ public class BinomialDistribution extends org.deeplearning4j.nn.conf.distributio
     Option.setOptions(options, this, this.getClass());
   }
 }
-

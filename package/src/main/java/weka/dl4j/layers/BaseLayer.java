@@ -1,24 +1,24 @@
-//package weka.dl4j.layers;
+// package weka.dl4j.layers;
 //
-//import org.deeplearning4j.nn.conf.GradientNormalization;
-//import org.deeplearning4j.nn.conf.Updater;
-//import org.deeplearning4j.nn.conf.distribution.Distribution;
-//import org.deeplearning4j.nn.conf.inputs.InputType;
-//import org.deeplearning4j.nn.conf.layers.FeedForwardLayer;
-//import org.deeplearning4j.nn.weights.WeightInit;
-//import org.nd4j.linalg.activations.IActivation;
-//import weka.core.OptionMetadata;
-//import weka.gui.ProgrammaticProperty;
+// import org.deeplearning4j.nn.conf.GradientNormalization;
+// import org.deeplearning4j.nn.conf.Updater;
+// import org.deeplearning4j.nn.conf.distribution.Distribution;
+// import org.deeplearning4j.nn.conf.inputs.InputType;
+// import org.deeplearning4j.nn.conf.layers.FeedForwardLayer;
+// import org.deeplearning4j.nn.weights.WeightInit;
+// import org.nd4j.linalg.activations.IActivation;
+// import weka.core.OptionMetadata;
+// import weka.gui.ProgrammaticProperty;
 //
-//import java.util.Map;
+// import java.util.Map;
 //
-///**
+/// **
 // * An nd4j mini-batch iterator that iterates a given dataset.
 // *
 // * @author Steven Lang
 // */
 //
-//public interface BaseLayer {
+// public interface BaseLayer {
 //
 //    private static final long serialVersionUID = -3870462244324681550L;
 //
@@ -267,4 +267,4 @@
 //    public void setGradientNormalizationThreshold(double gradientNormalizationThreshold) {
 //        super.setGradientNormalizationThreshold(gradientNormalizationThreshold);
 //    }
-//}
+// }

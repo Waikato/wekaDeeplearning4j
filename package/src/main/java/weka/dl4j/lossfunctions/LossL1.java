@@ -31,8 +31,6 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's LossL1 that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("L1")
 public class LossL1 extends org.nd4j.linalg.lossfunctions.impl.LossL1 implements OptionHandler {
@@ -70,4 +68,3 @@ public class LossL1 extends org.nd4j.linalg.lossfunctions.impl.LossL1 implements
     Option.setOptions(options, this, this.getClass());
   }
 }
-

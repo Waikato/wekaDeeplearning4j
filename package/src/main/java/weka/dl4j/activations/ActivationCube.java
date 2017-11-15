@@ -31,11 +31,10 @@ import java.util.Enumeration;
  * A version of DeepLearning4j's ActivationCube that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("Cube")
-public class ActivationCube extends org.nd4j.linalg.activations.impl.ActivationCube implements OptionHandler {
+public class ActivationCube extends org.nd4j.linalg.activations.impl.ActivationCube
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.
@@ -70,4 +69,3 @@ public class ActivationCube extends org.nd4j.linalg.activations.impl.ActivationC
     Option.setOptions(options, this, this.getClass());
   }
 }
-

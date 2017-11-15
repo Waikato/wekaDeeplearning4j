@@ -1,21 +1,20 @@
 package weka.dl4j.stepfunctions;
 
-import java.util.Enumeration;
-
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
-
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's NegativeDefaultStepFunction that implements WEKA option handling.
  *
  * @author Eibe Frank
- *
- *
  */
 @JsonTypeName("negativeDefault")
-public class NegativeDefaultStepFunction extends org.deeplearning4j.nn.conf.stepfunctions.NegativeDefaultStepFunction implements OptionHandler {
+public class NegativeDefaultStepFunction
+    extends org.deeplearning4j.nn.conf.stepfunctions.NegativeDefaultStepFunction
+    implements OptionHandler {
 
   /**
    * Returns an enumeration describing the available options.

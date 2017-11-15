@@ -8,35 +8,35 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-
 public class AdaGrad extends org.nd4j.linalg.learning.config.AdaGrad implements Updater {
-    private static final long serialVersionUID = 3881105990718165790L;
+  private static final long serialVersionUID = 3881105990718165790L;
 
-    @ProgrammaticProperty
-    @Override
-    public double getLearningRate() {
-        return super.getLearningRate();
-    }
+  @ProgrammaticProperty
+  @Override
+  public double getLearningRate() {
+    return super.getLearningRate();
+  }
 
-    @ProgrammaticProperty
-    @Override
-    public void setLearningRate(double learningRate) {
-        super.setLearningRate(learningRate);
-    }
+  @ProgrammaticProperty
+  @Override
+  public void setLearningRate(double learningRate) {
+    super.setLearningRate(learningRate);
+  }
 
+  @OptionMetadata(
+    displayName = "epsilon",
+    description = "The epsilon parameter (default = " + DEFAULT_ADAGRAD_EPSILON + ").",
+    commandLineParamName = "epsilon",
+    commandLineParamSynopsis = "-epsilon <double>",
+    displayOrder = 1
+  )
+  @Override
+  public double getEpsilon() {
+    return super.getEpsilon();
+  }
 
-    @OptionMetadata(
-            displayName = "epsilon",
-            description = "The epsilon parameter (default = " + DEFAULT_ADAGRAD_EPSILON + ").",
-            commandLineParamName = "epsilon", commandLineParamSynopsis = "-epsilon <double>",
-            displayOrder = 1)
-    @Override
-    public double getEpsilon() {
-        return super.getEpsilon();
-    }
-
-    @Override
-    public void setEpsilon(double epsilon) {
-        super.setEpsilon(epsilon);
-    }
+  @Override
+  public void setEpsilon(double epsilon) {
+    super.setEpsilon(epsilon);
+  }
 }

@@ -24,12 +24,10 @@ package weka.classifiers.functions.dl4j;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instance;
 import weka.core.Instances;
-
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -38,17 +36,13 @@ import weka.core.Instances;
  */
 public class Utils {
 
-
-  /**
-   * Logger instance
-   */
+  /** Logger instance */
   private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   /**
-   * Converts a set of training instances to a DataSet. Assumes that the
-   * instances have been suitably preprocessed - i.e. missing values replaced
-   * and nominals converted to binary/numeric. Also assumes that the class index
-   * has been set
+   * Converts a set of training instances to a DataSet. Assumes that the instances have been
+   * suitably preprocessed - i.e. missing values replaced and nominals converted to binary/numeric.
+   * Also assumes that the class index has been set
    *
    * @param insts the instances to convert
    * @return a DataSet
@@ -88,8 +82,8 @@ public class Utils {
   }
 
   /**
-   * Converts a set of training instances to a DataSet prepared for the convolution operation using the height, width
-   * and number of channels
+   * Converts a set of training instances to a DataSet prepared for the convolution operation using
+   * the height, width and number of channels
    *
    * @param height image height
    * @param width image width
@@ -97,12 +91,13 @@ public class Utils {
    * @param insts the instances to convert
    * @return a DataSet
    */
-  public static DataSet instancesToConvDataSet(Instances insts, int height, int width, int channels) {
+  public static DataSet instancesToConvDataSet(
+      Instances insts, int height, int width, int channels) {
     DataSet ds = instancesToDataSet(insts);
     INDArray data = Nd4j.zeros(insts.numInstances(), channels, height, width);
     ds.getFeatures();
 
-    for (int i = 0; i < insts.numInstances(); i++){
+    for (int i = 0; i < insts.numInstances(); i++) {
       INDArray row = ds.getFeatures().getRow(i);
       row = row.reshape(1, channels, height, width);
       data.putRow(i, row);
@@ -112,18 +107,16 @@ public class Utils {
   }
 
   /**
-   * Converts a set of training instances corresponding to a time series to a
-   * DataSet. For RNNs, the input of the network is 3 dimensional of dimensions
-   * [numExamples, numInputs, numTimeSteps] Assumes that the instances have been
-   * suitably preprocessed - i.e. missing values replaced and nominals converted
-   * to binary/numeric. Also assumes that the class index has been set
+   * Converts a set of training instances corresponding to a time series to a DataSet. For RNNs, the
+   * input of the network is 3 dimensional of dimensions [numExamples, numInputs, numTimeSteps]
+   * Assumes that the instances have been suitably preprocessed - i.e. missing values replaced and
+   * nominals converted to binary/numeric. Also assumes that the class index has been set
    *
    * @param insts the instances to convert
    * @return a DataSet
    */
   public static DataSet RNNinstancesToDataSet(Instances insts) {
-    INDArray data =
-      Nd4j.ones(1, insts.numAttributes() - 1, insts.numInstances());
+    INDArray data = Nd4j.ones(1, insts.numAttributes() - 1, insts.numInstances());
     INDArray labels = Nd4j.ones(1, insts.numClasses(), insts.numInstances());
     double[] outcomes = new double[insts.numInstances()];
 
@@ -139,14 +132,12 @@ public class Utils {
         }
       }
 
-      INDArray ind =
-        Nd4j.create(independent, new int[] { 1, insts.numAttributes() - 1, 1 });
+      INDArray ind = Nd4j.create(independent, new int[] {1, insts.numAttributes() - 1, 1});
       for (int k = 0; k < independent.length; k++) {
         data.putScalar(0, k, i, ind.getDouble(k));
       }
     }
-    INDArray outcomesNDArray =
-      Nd4j.create(outcomes, new int[] { 1, insts.numInstances(), 1 });
+    INDArray outcomesNDArray = Nd4j.create(outcomes, new int[] {1, insts.numInstances(), 1});
     labels.putColumn(0, outcomesNDArray);
 
     DataSet dataSet = new DataSet(data, labels);
@@ -154,8 +145,8 @@ public class Utils {
   }
 
   /**
-   * Converts an instance to an INDArray. Only the values of the non-class
-   * attributes are copied over.
+   * Converts an instance to an INDArray. Only the values of the non-class attributes are copied
+   * over.
    *
    * @param inst
    * @return the INDArray
