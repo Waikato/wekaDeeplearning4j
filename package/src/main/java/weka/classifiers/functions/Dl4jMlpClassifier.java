@@ -27,6 +27,7 @@ import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
@@ -793,14 +794,16 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final INDArray features = getDataSetIterator(m_trainData).next().getFeatures();
     ComputationGraphConfiguration.GraphBuilder gb = m_netConfig.builder()
             .seed(getSeed())
+            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE)
+            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
             .graphBuilder();
 
 
     // Set ouput size
     final Layer lastLayer = m_layers[m_layers.length - 1];
     final int nOut = m_trainData.numClasses();
-    if (lastLayer instanceof org.deeplearning4j.nn.conf.layers.BaseOutputLayer){
-      ((org.deeplearning4j.nn.conf.layers.BaseOutputLayer)lastLayer).setNOut(nOut);
+    if (lastLayer instanceof BaseOutputLayer){
+      ((BaseOutputLayer)lastLayer).setNOut(nOut);
     }
 
     String currentInput = "input";
@@ -813,6 +816,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
     gb.setOutputs(currentInput);
     gb.setInputTypes(InputType.inferInputType(features));
+
+    // TODO: Fix input types for test cases where the classifier is reused
+//    if (getInstanceIterator() instanceof Convolutional){
+//      Convolutional conv = (Convolutional) getInstanceIterator();
+//      m_layers[0].setNIn(InputType.convolutionalFlat(conv.getHeight(), conv.getWidth(), conv.getNumChannels()), true);
+//    } else {
+//      m_layers[0].setNIn(InputType.feedForward(m_trainData.numAttributes() - 1), true);
+//    }
 
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);

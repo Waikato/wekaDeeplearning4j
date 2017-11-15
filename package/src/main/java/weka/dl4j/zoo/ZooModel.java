@@ -36,8 +36,8 @@ public interface ZooModel extends Serializable, OptionHandler {
      */
     default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape) {
         ComputationGraphConfiguration.GraphBuilder builder = new NeuralNetConfiguration.Builder()
-                .trainingWorkspaceMode(WorkspaceMode.SINGLE)
-                .inferenceWorkspaceMode(WorkspaceMode.SINGLE)
+                .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
+                .inferenceWorkspaceMode(WorkspaceMode.SEPARATE)
                 .graphBuilder();
         List<NeuralNetConfiguration> confs = mlc.getConfs();
 
