@@ -511,7 +511,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     try {
       getCapabilities().testWithFail(data);
     } catch (UnsupportedAttributeTypeException uate){
-      if (m_trainData.numAttributes() == 2 && m_trainData.attribute(0).isString()) {
+      if (data.numAttributes() == 2 && data.attribute(0).isString()) {
         throw new UnsupportedAttributeTypeException(
                 "It seems like you have chosen an ARFF file containing the " +
                         "image paths without setting an ImageInstanceIterator");
@@ -522,12 +522,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Check basic network structure
     if (m_layers.length == 0) {
-      throw new Exception("No layers have been added!");
+      throw new MissingOutputLayerException("No layers have been added!");
     }
 
     final Layer lastLayer = m_layers[m_layers.length - 1];
     if (!(lastLayer instanceof BaseOutputLayer)) {
-      throw new Exception("Last layer in network must be an output layer!");
+      throw new MissingOutputLayerException("Last layer in network must be an output layer!");
     }
 
     // Apply preprocessing
@@ -600,13 +600,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int valDataNumDinstinctClassValues = valData.numDistinctValues(classIndex);
     int trainDataNumDistinctClassValues = trainData.numDistinctValues(classIndex);
     if(trainData.numClasses() > 1 && valDataNumDinstinctClassValues != trainDataNumDistinctClassValues){
-      throw new WekaException("The validation data did not contain the same classes as the training data. " +
-              "You should increase the validation split.");
+      throw new InvalidValidationPercentageException("The validation data did not contain the same classes as the training data. " +
+              "You should increase the validation percentage in the EarlyStopping configuration.");
     }
   }
 
   /**
-   * Split the dataset into p% traind an (100-p)% test set
+   * Split the dataset into p% train an (100-p)% test set
    *
    * @param data Input data
    * @param p    train percentage
@@ -747,7 +747,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Make sure data is convolutional
     if (!isImageIterator) {
-      throw new WekaException("ZooModels currently only support images. " +
+      throw new WrongIteratorException("ZooModels currently only support images. " +
               "Please setup an ImageInstanceIterator.");
     }
 
@@ -779,8 +779,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     try {
       m_model = m_zooModel.init(numClasses, seed, newShape);
       return true;
-    } catch (OperationNotSupportedException e) {
-      throw new RuntimeException("ZooModel was not set, but createZooModel could be called. Invalid situation", e);
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException("ZooModel was not set (CustomNet), but createZooModel could be called. Invalid situation", e);
     } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
       return false;
     }
@@ -863,9 +863,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
       m_model.fit(m_trainIterator); // Note that this calls the reset() method of the trainIterator
-      if (getDebug()) {
-        log.info("*** Completed epoch {} ***", m_NumEpochsPerformed + 1);
-      }
       m_NumEpochsPerformed++;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -932,7 +929,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
               .collect(Collectors.toList())
               .toArray(new Layer[tmpCg.getLayers().length]);
 
-    } catch (OperationNotSupportedException e) {
+    } catch (UnsupportedOperationException e) {
       log.error("Could not set layers from zoomodel.", e);
     }
 

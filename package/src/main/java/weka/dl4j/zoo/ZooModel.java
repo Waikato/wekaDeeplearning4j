@@ -22,9 +22,9 @@ public interface ZooModel extends Serializable, OptionHandler {
      * @param numLabels Number of labels to adjust the output
      * @param seed      Seed
      * @return MultiLayerNetwork of the specified ZooModel
-     * @throws OperationNotSupportedException Init(...) was not supported (only CustomNet)
+     * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
      */
-    ComputationGraph init(int numLabels, long seed, int[][] shape) throws OperationNotSupportedException;
+    ComputationGraph init(int numLabels, long seed, int[][] shape) throws UnsupportedOperationException;
 
 
     /**

@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.Instances;
+import weka.core.*;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
@@ -21,12 +21,14 @@ import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.dl4j.zoo.LeNet;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -325,6 +327,53 @@ public class Dl4jMlpTest {
         clf2.setNumEpochs(1);
         clf2.initializeClassifier(dataMnist);
         clf2.buildClassifier(dataMnist);
+    }
 
+    /**
+     * Test UnsupportedAttributeTypeException
+     * @throws Exception
+     */
+    @Test(expected = UnsupportedAttributeTypeException.class)
+    public void testWrongArffFormat() throws Exception {
+        Attribute att1 = new Attribute("1", true);
+        Attribute att2 = new Attribute("2", Arrays.asList("1","2"));
+        ArrayList<Attribute> atts = new ArrayList<>();
+        atts.add(att1);
+        atts.add(att2);
+        Instances inst = new Instances("", atts, 10);
+        Instance ins = new DenseInstance(1);
+        ins.setDataset(inst);
+        inst.setClassIndex(0);
+        ins.setValue(0, "1");
+        inst.add(ins);
+        clf.initializeClassifier(inst);
+    }
+
+    /**
+     * Test no outputlayer
+     * @throws MissingOutputLayerException
+     */
+    @Test(expected = MissingOutputLayerException.class)
+    public void testLastLayerNoOutputLayer() throws Exception {
+        clf.setLayers(new Layer[]{new DenseLayer()});
+        clf.initializeClassifier(dataIris);
+    }
+
+    /**
+     * Test async iterator
+     */
+    @Test
+    public void testAsyncIterator() throws Exception {
+        clf.setQueueSize(4);
+        clf.buildClassifier(dataIris);
+    }
+    /**
+     * Test zoo model with wrong iterator
+     */
+    @Test(expected = WrongIteratorException.class)
+    public void testZooModelWithoutImageIterator() throws Exception {
+        clf.setZooModel(new LeNet());
+        clf.setInstanceIterator(new DefaultInstanceIterator());
+        clf.buildClassifier(dataIris);
     }
 }

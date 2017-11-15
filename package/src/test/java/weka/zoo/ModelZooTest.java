@@ -11,6 +11,7 @@ import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.*;
 import weka.util.DatasetLoader;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 
 
@@ -110,5 +111,13 @@ public class ModelZooTest {
         clf.setNumEpochs(10);
         clf.setEarlyStopping(new EarlyStopping(5, 0));
         clf.buildClassifier(data);
+    }
+
+    /**
+     * Test CustomNet init
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testCustomNetInit() throws OperationNotSupportedException {
+        new CustomNet().init(0, 0, null);
     }
 }

@@ -131,16 +131,12 @@ public class DatasetTest {
         denseLayer.setNOut(32);
         denseLayer.setLayerName("Dense-layer");
         denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
-        denseLayer.setWeightInit(WeightInit.XAVIER);
 
         OutputLayer outputLayer = new OutputLayer();
         outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-        outputLayer.setWeightInit(WeightInit.XAVIER);
         outputLayer.setLayerName("Output-layer");
 
         NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-        nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-
 
         clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
         clf.setNeuralNetConfiguration(nnc);
