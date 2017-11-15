@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Options
 install_pack=false
 verbose=false
@@ -147,7 +149,7 @@ cd ${base}
 pack_name=${prefix}${backend}-${version}"-dev"
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    rm lib/* &> ${out}
+    [[ -d lib ]] && rm lib/* &> ${out}
     mvn -q clean > ${out} # don't clutter with mvn clean output
 fi
 
@@ -167,8 +169,8 @@ ant -f build_package.xml make_package_${backend} > "$out"
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev" &> "$out"
-        rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev" &> "$out"
+        [[ -d ${WEKA_HOME}/packages/${prefix}"CPU-dev" ]] && rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev" &> "$out"
+        [[ -d ${WEKA_HOME}/packages/${prefix}"GPU-dev" ]] && rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev" &> "$out"
     fi
     echo -e "${ep}Installing ${pack_name} package..."
     java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${pack_name}-${machine}-x86_64.zip > "$out"
