@@ -117,7 +117,6 @@ public class EpochListener extends IterationListener implements TrainingListener
      */
     public void setLogFile(File logFile) throws IOException {
         if (logFile.exists()) logFile.delete();
-        System.out.println("Creating debug file at: " + logFile.getAbsolutePath());
         this.logFile = new PrintWriter(new FileWriter(logFile, false));
     }
 
@@ -167,9 +166,9 @@ public class EpochListener extends IterationListener implements TrainingListener
         if (evaluateEveryNEpochs < 1) {
             // Never evaluate
             this.n = Integer.MAX_VALUE;
+        }else{
+            this.n = evaluateEveryNEpochs;
         }
-
-        this.n = evaluateEveryNEpochs;
     }
 
     public int getN(){return this.n;}
