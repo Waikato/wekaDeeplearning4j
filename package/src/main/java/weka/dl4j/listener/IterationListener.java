@@ -6,18 +6,38 @@ import weka.core.OptionHandler;
 
 import java.util.Enumeration;
 
+/**
+ * Iteration listener that can be attached to a Dl4j model.
+ *
+ * @author Steven Lang
+ */
 public abstract class IterationListener
     implements org.deeplearning4j.optimize.api.IterationListener, OptionHandler {
-
+  /** SerialVersionUID */
   private static final long serialVersionUID = 8106114790187499011L;
+
+  /** Flag if already invoked */
   protected boolean invoked;
 
-  protected int numEpochs;
+  /** Number of samples */
   protected int numSamples;
+  /** Number of epochs */
   protected int numClasses;
-  protected transient DataSetIterator trainIterator;
+  /** Number of classes */
+  protected int numEpochs;
+  /** Training dataset iterator */
   protected transient DataSetIterator validationIterator;
+  /** Validation dataset iterator */
+  protected transient DataSetIterator trainIterator;
 
+  /**
+   * Initialize the iterator with its necessary member variables
+   * @param numClasses Number of classes
+   * @param numEpochs Number of epochs
+   * @param numSamples Number of Samples
+   * @param trainIterator Training iterator
+   * @param validationIterator Validation iterator
+   */
   public void init(
       int numClasses,
       int numEpochs,
@@ -31,6 +51,10 @@ public abstract class IterationListener
     this.validationIterator = validationIterator;
   }
 
+  /**
+   * Log a message
+   * @param msg Message
+   */
   public abstract void log(String msg);
 
   @Override
