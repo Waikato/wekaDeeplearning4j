@@ -36,7 +36,7 @@ PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VER
 URL=https://github.com/Waikato/wekaDeeplearning4j
 
 # Dependencies
-Depends=weka (>=3.8.1)
+Depends=weka (>=3.8.0)
 
 # Package(s) that can't be installed alongside this one
 # - old wekaDeeplearning4j
