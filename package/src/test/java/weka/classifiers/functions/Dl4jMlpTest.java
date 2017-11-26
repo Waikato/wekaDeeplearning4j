@@ -341,4 +341,26 @@ public class Dl4jMlpTest {
     clf.setInstanceIterator(new DefaultInstanceIterator());
     clf.buildClassifier(dataIris);
   }
+
+  @Test
+  public void testConjugateGradientDescent() throws Exception {
+    DenseLayer dl1 = new DenseLayer();
+    dl1.setNOut(16);
+
+    OutputLayer ol = new OutputLayer();
+
+    Layer[] ls = new Layer[]{dl1, ol};
+
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT);
+    nnc.setSeed(TestUtil.SEED);
+    clf.setNeuralNetConfiguration(nnc);
+
+    clf.setNumEpochs(200);
+    clf.setLayers(ls);
+    final EarlyStopping config = new EarlyStopping(0, 0);
+    clf.setEarlyStopping(config);
+    TestUtil.crossValidate(clf, DatasetLoader.loadGlass());
+
+  }
 }
