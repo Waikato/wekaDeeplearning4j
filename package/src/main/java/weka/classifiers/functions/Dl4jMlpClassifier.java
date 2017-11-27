@@ -36,11 +36,16 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.cache.DataSetCache;
+import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
+import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
+import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.*;
@@ -135,6 +140,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected double x0 = 0.0;
   /** Coefficient x1 used for normalizing the class */
   protected double x1 = 1.0;
+  /** Caching mode to use for loading data */
+  protected CacheMode cacheMode = CacheMode.NONE;
   /** Training listener list */
   private IterationListener iterationListener = new EpochListener();
 
@@ -634,6 +641,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   private DataSetIterator getDataSetIterator(Instances data) throws Exception {
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
+
+    // Use caching if set
+    switch (cacheMode){
+      case MEMORY:
+        it = new CachingDataSetIterator(it, new InMemoryDataSetCache());
+        break;
+      case FILESYSTEM:
+        it = new CachingDataSetIterator(it,
+            new InFileDataSetCache(System.getProperty("java.io.tmpdir")));
+        break;
+    }
 
     // Use async dataset iteration of queue size was set
     if (queueSize > 0) {
