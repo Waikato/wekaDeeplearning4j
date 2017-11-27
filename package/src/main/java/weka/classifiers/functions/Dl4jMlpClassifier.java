@@ -106,7 +106,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected long modelSize;
   /** The file that log information will be written to. */
   protected File logFile =
-      new File(Paths.get(System.getenv("WEKA_HOME"), "network.log").toString());
+      new File(Paths.get(WekaPackageManager.getPackageHome().getAbsolutePath(), "network.log").toString());
   /** The layers of the network. */
   protected Layer[] layers = new Layer[] {new OutputLayer()};
   /** The configuration of the network. */
@@ -135,16 +135,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected double x0 = 0.0;
   /** Coefficient x1 used for normalizing the class */
   protected double x1 = 1.0;
-
   /** Training listener list */
   private IterationListener iterationListener = new EpochListener();
-
-  /** Default constructor fixing log file of WEKA_HOME variable is not set. */
-  public Dl4jMlpClassifier() {
-    if (System.getenv("WEKA_HOME") == null) {
-      logFile = new File("network.log");
-    }
-  }
 
   /**
    * The main method for running this class.
@@ -642,6 +634,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   private DataSetIterator getDataSetIterator(Instances data) throws Exception {
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
+
+    // Use async dataset iteration of queue size was set
     if (queueSize > 0) {
       it = new AsyncDataSetIterator(it, queueSize);
     }
