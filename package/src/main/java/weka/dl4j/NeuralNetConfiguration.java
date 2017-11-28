@@ -1,7 +1,10 @@
 package weka.dl4j;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.LearningRatePolicy;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder;
 import org.deeplearning4j.nn.conf.distribution.Distribution;
@@ -13,9 +16,6 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.gui.ProgrammaticProperty;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's NeuralNetConfiguration that implements WEKA option handling.
@@ -55,6 +55,8 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   protected double lrPolicySteps = Double.NaN;
   protected double lrPolicyPower = Double.NaN;
   protected boolean pretrain = false;
+  protected GradientNormalization gradientNormalization = GradientNormalization.None;
+  protected double gradientNormalizationThreshold = 1.0;
 
   /** Constructor that provides default values for the settings. */
   public NeuralNetConfiguration() {
@@ -89,7 +91,10 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
         .biasLearningRate(biasLearningRate)
         .miniBatch(miniBatch)
         .minimize(minimize)
-        .useDropConnect(useDropConnect);
+        .useDropConnect(useDropConnect)
+        .gradientNormalization(gradientNormalization)
+        .gradientNormalizationThreshold(gradientNormalizationThreshold)
+        .iterations(1);
 
     builder.setUseRegularization(useRegularization);
     builder.setPretrain(pretrain);
@@ -340,6 +345,36 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   public void setWeightInit(WeightInit weightInit) {
     this.weightInit = weightInit;
+  }
+
+  @OptionMetadata(
+    displayName = "gradient normalization method",
+    description = "The gradient normalization method (default = None).",
+    commandLineParamName = "gradientNormalization",
+    commandLineParamSynopsis = "-gradientNormalization <specification>",
+    displayOrder = 22
+  )
+  public GradientNormalization getGradientNormalization() {
+    return this.gradientNormalization;
+  }
+
+  public void setGradientNormalization(GradientNormalization gradientNormalization) {
+    this.gradientNormalization = gradientNormalization;
+  }
+
+  @OptionMetadata(
+    displayName = "gradient normalization threshold",
+    description = "The gradient normalization threshold (default = 1).",
+    commandLineParamName = "gradNormThreshold",
+    commandLineParamSynopsis = "-gradNormThreshold <double>",
+    displayOrder = 23
+  )
+  public double getGradientNormalizationThreshold() {
+    return this.gradientNormalizationThreshold;
+  }
+
+  public void setGradientNormalizationThreshold(double gradientNormalizationThreshold) {
+    this.gradientNormalizationThreshold = gradientNormalizationThreshold;
   }
 
   @OptionMetadata(
