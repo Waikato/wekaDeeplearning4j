@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 # Options
 install_pack=false
 verbose=false

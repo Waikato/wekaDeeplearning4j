@@ -917,15 +917,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       return false;
     }
 
+    // Check if trainIterator was reset properly
+    if (!trainIterator.hasNext()){
+      throw new RuntimeException("The iterator has no next elements at the beginning of the epoch.");
+    }
+
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
       StopWatch sw = new StopWatch();
       sw.start();
-      model.fit(trainIterator); // Note that this calls the reset() method of the trainIterator
+      model.fit(trainIterator);
+      trainIterator.reset();
       sw.stop();
       log.info("Epoch {}/{} took {}", numEpochsPerformed, numEpochs, sw.toString());
-      trainIterator.reset();
       numEpochsPerformed++;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
