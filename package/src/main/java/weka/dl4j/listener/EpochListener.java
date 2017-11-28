@@ -1,6 +1,7 @@
 package weka.dl4j.listener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
@@ -37,6 +38,9 @@ public class EpochListener extends IterationListener implements TrainingListener
   /** Log to this file if set */
   private transient PrintWriter logFile;
 
+  /** Enable intermediate evaluations */
+  private boolean enableIntermediateEvaluations = true;
+
   @Override
   public void onEpochEnd(Model model) {
     currentEpoch++;
@@ -47,10 +51,12 @@ public class EpochListener extends IterationListener implements TrainingListener
     }
 
     String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
-    s += "Train:      " + evaluateDataSetIterator(model, trainIterator);
 
-    if (validationIterator != null) {
-      s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
+    if (enableIntermediateEvaluations){
+      s += "Train:      " + evaluateDataSetIterator(model, trainIterator);
+      if (validationIterator != null) {
+        s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
+      }
     }
 
     log(s);
@@ -69,9 +75,14 @@ public class EpochListener extends IterationListener implements TrainingListener
         Evaluation cEval = new Evaluation(numClasses);
         RegressionEvaluation rEval = new RegressionEvaluation(1);
         while (iterator.hasNext()) {
-          // TODO: figure out which batch size is feasible for inference
-          final int batch = iterator.batch() * 8;
-          DataSet next = iterator.next(batch);
+          DataSet next;
+          if (iterator instanceof AsyncDataSetIterator){
+            next = iterator.next();
+          } else {
+            // TODO: figure out which batch size is feasible for inference
+            final int batch = iterator.batch() * 8;
+            next = iterator.next(batch);
+          }
           scoreSum += net.score(next);
           iterations++;
           INDArray output =
@@ -160,6 +171,23 @@ public class EpochListener extends IterationListener implements TrainingListener
       this.n = evaluateEveryNEpochs;
     }
   }
+
+  @OptionMetadata(
+      displayName = "enable intermediate evaluations",
+      description = "Enable intermediate evaluations (default = true).",
+      commandLineParamName = "eval",
+      commandLineParamSynopsis = "-eval <boolean>",
+      displayOrder = 0
+  )
+  public boolean isEnableIntermediateEvaluations() {
+    return enableIntermediateEvaluations;
+  }
+
+  public void setEnableIntermediateEvaluations(boolean enableIntermediateEvaluations) {
+    this.enableIntermediateEvaluations = enableIntermediateEvaluations;
+  }
+
+
 
   /**
    * Returns a string describing this search method
