@@ -55,21 +55,6 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
   /** The desired number of channels */
   protected int numChannels = 1;
 
-  public int getTrainBatchSize() {
-    return batchSize;
-  }
-
-  @OptionMetadata(
-    displayName = "size of mini batch",
-    description = "The mini batch size to use in the iterator (default = 1).",
-    commandLineParamName = "bs",
-    commandLineParamSynopsis = "-bs <int>",
-    displayOrder = 0
-  )
-  public void setTrainBatchSize(int trainBatchSize) {
-    batchSize = trainBatchSize;
-  }
-
   @OptionMetadata(
     displayName = "desired width",
     description = "The desired width of the images (default = 28).",
@@ -115,16 +100,6 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
     this.numChannels = numChannels;
   }
 
-  /**
-   * Returns the number of predictor attributes for this dataset.
-   *
-   * @param data the dataset to compute the number of attributes from
-   * @return the number of attributes in the Instances object minus one
-   */
-  @Override
-  public int getNumAttributes(Instances data) {
-    return data.numAttributes() - 1;
-  }
 
   /**
    * Returns the actual iterator.
