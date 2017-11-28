@@ -644,6 +644,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
     if (queueSize > 0) {
       it = new AsyncDataSetIterator(it, queueSize);
+      if(!it.hasNext()){
+        throw new RuntimeException("AsyncDataSetIterator was empty.");
+      }
     }
     return it;
   }
@@ -798,7 +801,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @throws Exception
    */
   private void createModel() throws Exception {
-    final INDArray features = getDataSetIterator(trainData).next().getFeatures();
+    final DataSetIterator it = getDataSetIterator(trainData);
+    final INDArray features;
+    if (it.hasNext()){
+      features = it.next().getFeatures();
+    } else {
+      throw new RuntimeException("Iterator was empty.");
+    }
+
     ComputationGraphConfiguration.GraphBuilder gb =
         netConfig
             .builder()
@@ -870,7 +880,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-      model.fit(trainIterator); // Note that this calls the reset() method of the trainIterator
+      model.fit(trainIterator);
+      trainIterator.reset();
       numEpochsPerformed++;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
