@@ -63,6 +63,9 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
     setL1(Double.NaN);
     setL2(Double.NaN);
     setRho(Double.NaN);
+    setGradientNormalization(null);
+    setGradientNormalizationThreshold(Double.NaN);
+
     setConvolutionMode(ConvolutionMode.Truncate);
     setKernelSize(new int[] {5, 5});
     setStride(new int[] {1, 1});
