@@ -139,3 +139,6 @@ dist/
 wekarefs/
 site/
 coverage-report/
+
+# Vector models
+*.bin.gz
