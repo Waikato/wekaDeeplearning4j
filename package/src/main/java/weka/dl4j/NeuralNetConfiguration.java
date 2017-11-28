@@ -60,7 +60,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   /** Constructor that provides default values for the settings. */
   public NeuralNetConfiguration() {
-    setLearningRate(0.1);
+    setLearningRate(0.001);
     setUpdater(new weka.dl4j.updater.Adam());
     setWeightInit(WeightInit.XAVIER);
   }

@@ -109,6 +109,15 @@ public class DatasetLoader {
   public static Instances loadMiniMnistMeta() throws Exception {
     return loadArff("src/test/resources/nominal/mnist.meta.minimal.arff");
   }
+  /**
+   * Load the glass arff file
+   *
+   * @return Glass data as Instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadGlass() throws Exception {
+    return loadArff("src/test/resources/nominal/glass.arff");
+  }
 
   /**
    * Load the ReutersCorn train arff file (minimal)
