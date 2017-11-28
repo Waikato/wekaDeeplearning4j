@@ -1,18 +1,19 @@
 package weka.core;
 
 /**
- * Exception raised in the case of a wrong iterator
+ * Exception raised when the iterator was unexpectedly empty
  *
  * @author Steven Lang
  */
-public class WrongIteratorException extends WekaException {
-  private static final long serialVersionUID = 1038306995981039092L;
+public class EmptyIteratorException extends WekaException {
 
-  public WrongIteratorException(String message) {
+  private static final long serialVersionUID = 7159773687653762115L;
+
+  public EmptyIteratorException(String message) {
     super(message);
   }
 
-  public WrongIteratorException(String message, Throwable cause) {
+  public EmptyIteratorException(String message, Throwable cause) {
     super(message, cause);
   }
 }

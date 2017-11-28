@@ -59,6 +59,7 @@ import weka.classifiers.rules.ZeroR;
 import weka.core.BatchPredictor;
 import weka.core.Capabilities;
 import weka.core.CapabilitiesHandler;
+import weka.core.EmptyIteratorException;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidValidationPercentageException;
@@ -919,7 +920,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Check if trainIterator was reset properly
     if (!trainIterator.hasNext()){
-      throw new RuntimeException("The iterator has no next elements at the beginning of the epoch.");
+      throw new EmptyIteratorException("The iterator has no next elements "
+          + "at the beginning of the epoch.");
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
