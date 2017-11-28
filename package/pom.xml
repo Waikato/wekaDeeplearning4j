@@ -54,11 +54,26 @@
             <version>${dl4j.version}</version>
         </dependency>
         <!--Include for Dl4j UI usage-->
-        <!--<dependency>-->
-            <!--<groupId>org.deeplearning4j</groupId>-->
-            <!--<artifactId>deeplearning4j-ui_2.10</artifactId>-->
-            <!--<version>${dl4j.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-ui_2.10</artifactId>
+            <version>${dl4j.version}</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jul-to-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.nd4j</groupId>
             <artifactId>nd4j-native-api</artifactId>
