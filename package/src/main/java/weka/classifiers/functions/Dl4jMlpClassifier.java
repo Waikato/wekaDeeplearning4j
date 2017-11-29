@@ -53,10 +53,9 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.dataset.api.iterator.cache.DataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
@@ -75,7 +74,6 @@ import weka.core.UnsupportedAttributeTypeException;
 import weka.core.WekaException;
 import weka.core.WekaPackageManager;
 import weka.core.WrongIteratorException;
-import weka.core.*;
 import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
@@ -141,7 +139,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected long modelSize;
   /** The file that log information will be written to. */
   protected File logFile =
-      new File(Paths.get(WekaPackageManager.getPackageHome().getAbsolutePath(), "network.log").toString());
+      new File(
+          Paths.get(WekaPackageManager.getPackageHome().getAbsolutePath(), "network.log")
+              .toString());
   /** The layers of the network. */
   protected Layer[] layers = new Layer[] {new OutputLayer()};
   /** The configuration of the network. */
@@ -676,20 +676,24 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
 
     // Use caching if set
-    switch (cacheMode){
-      case MEMORY:
-        it = new CachingDataSetIterator(it, new InMemoryDataSetCache());
+    switch (cacheMode) {
+      case MEMORY: // Use memory as cache
+        final InMemoryDataSetCache memCache = new InMemoryDataSetCache();
+        it = new CachingDataSetIterator(it, memCache);
         break;
-      case FILESYSTEM:
-        it = new CachingDataSetIterator(it,
-            new InFileDataSetCache(System.getProperty("java.io.tmpdir")));
+      case FILESYSTEM: // use filesystem as cache
+        final String tmpDir = System.getProperty("java.io.tmpdir");
+        final File cacheDir = Paths.get(tmpDir, "dataset-cache").toFile();
+        cacheDir.delete(); // remove old existing cache
+        final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
+        it = new CachingDataSetIterator(it, fsCache);
         break;
     }
 
-    // Use async dataset iteration of queue size was set
+    // Use async dataset iteration if queue size was set
     if (queueSize > 0) {
       it = new AsyncDataSetIterator(it, queueSize);
-      if (!it.hasNext()){
+      if (!it.hasNext()) {
         throw new RuntimeException("AsyncDataSetIterator could not load any datasets.");
       }
     }
@@ -855,7 +859,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
             .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
             .graphBuilder();
 
-
     // Set ouput size
     final Layer lastLayer = layers[layers.length - 1];
     final int nOut = trainData.numClasses();
@@ -882,7 +885,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     //    } else {
     //      layers[0].setNIn(InputType.feedForward(trainData.numAttributes() - 1), true);
     //    }
-
 
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);
@@ -936,9 +938,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
 
     // Check if trainIterator was reset properly
-    if (!trainIterator.hasNext()){
-      throw new EmptyIteratorException("The iterator has no next elements "
-          + "at the beginning of the epoch.");
+    if (!trainIterator.hasNext()) {
+      throw new EmptyIteratorException(
+          "The iterator has no next elements " + "at the beginning of the epoch.");
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
