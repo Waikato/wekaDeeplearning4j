@@ -361,11 +361,10 @@ public class Dl4jMlpTest {
     nnc.setSeed(TestUtil.SEED);
     clf.setNeuralNetConfiguration(nnc);
 
-    clf.setNumEpochs(200);
+    clf.setNumEpochs(3);
     clf.setLayers(ls);
     final EarlyStopping config = new EarlyStopping(0, 0);
     clf.setEarlyStopping(config);
     TestUtil.crossValidate(clf, DatasetLoader.loadGlass());
-
   }
 }
