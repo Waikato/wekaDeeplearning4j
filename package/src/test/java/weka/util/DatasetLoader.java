@@ -180,6 +180,16 @@ public class DatasetLoader {
   }
 
   /**
+   * Load the anger arff file
+   *
+   * @return Anger data
+   * @throws Exception IO error.
+   */
+  public static Instances loadAnger() throws Exception {
+    return loadArff("src/test/resources/numeric/anger.arff");
+  }
+
+  /**
    * Load an arbitrary arff file
    *
    * @return Instances
