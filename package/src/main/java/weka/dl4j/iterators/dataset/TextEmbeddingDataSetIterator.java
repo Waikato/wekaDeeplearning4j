@@ -1,18 +1,13 @@
 package weka.dl4j.iterators.dataset;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
@@ -27,12 +22,11 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.core.Instances;
 
 /**
- * A DataSetIterator implementation that reads text documents from an arff file and translates
- * each document to a sequence of wordvectors, given a wordvector model.
+ * A DataSetIterator implementation that reads text documents from an arff file and translates each
+ * document to a sequence of wordvectors, given a wordvector model.
  *
  * @author Steven Lang
  */
-
 @Slf4j
 public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializable {
 
@@ -71,11 +65,11 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   public DataSet next(int num) {
     if (cursor >= data.numInstances()) throw new NoSuchElementException();
     try {
-//      StopWatch sw = new StopWatch();
-//      sw.start();
+      //      StopWatch sw = new StopWatch();
+      //      sw.start();
       final DataSet dataSet = nextDataSet(num);
-//      sw.stop();
-//      log.info("Batch of size {} took {}", num, sw.toString());
+      //      sw.stop();
+      //      log.info("Batch of size {} took {}", num, sw.toString());
       return dataSet;
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -132,35 +126,50 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     for (int i = 0; i < numDocuments; i++) {
       List<String> tokens = allTokens.get(i);
 
+      // Check for empty document
+      if (tokens.isEmpty()) {
+        continue;
+      }
+
       // Get the sequence length of document (i)
-      int seqLength = Math.min(tokens.size(), maxLength);
+      int lastIdx = Math.min(tokens.size(), maxLength);
 
       // Get all wordvectors in batch
-      final INDArray vectors = wordVectors.getWordVectors(tokens.subList(0, seqLength)).transpose();
+      final INDArray vectors = wordVectors.getWordVectors(tokens.subList(0, lastIdx)).transpose();
 
       // Put wordvectors into features array: instead of putting one vector at position (j) we put
-      // an array of vectors in the interval of [0, seqLength)
+      // an array of vectors in the interval of [0, lastIdx)
       features.put(
           new INDArrayIndex[] {
-              NDArrayIndex.point(i), NDArrayIndex.all(), NDArrayIndex.interval(0, seqLength)
+            NDArrayIndex.point(i), NDArrayIndex.all(), NDArrayIndex.interval(0, lastIdx)
           },
           vectors);
 
       // Assign "1" to each position where a feature is present, that is, in the interval of
-      // [0, seqLength)
-      featuresMask.get(new INDArrayIndex[] {NDArrayIndex.point(i), NDArrayIndex.interval(0, seqLength)}).assign(1);
+      // [0, lastIdx)
+      featuresMask
+          .get(new INDArrayIndex[] {NDArrayIndex.point(i), NDArrayIndex.interval(0, lastIdx)})
+          .assign(1);
 
+      /*
+       Put the labels in the labels and labelsMask arrays
+      */
 
+      // Differ between classification and regression task
+      if (data.numClasses() == 1) { // Regression
+        double val = lbls.get(i);
+        labels.putScalar(new int[] {i, 0, lastIdx - 1}, val);
+      } else if (data.numClasses() > 1) { // Classification
+        // One-Hot-Encoded class
+        int idx = lbls.get(i).intValue();
+        // Set label
+        labels.putScalar(new int[] {i, idx, lastIdx - 1}, 1.0);
+      } else {
+        throw new RuntimeException("Could not detect classification or regression task.");
+      }
 
-      int idx = lbls.get(i).intValue();
-      int lastIdx = Math.min(tokens.size(), maxLength);
-      labels.putScalar(
-          new int[] {i, idx, lastIdx - 1},
-          1.0); // Set label: [0,1] for negative, [1,0] for positive
-      labelsMask.putScalar(
-          new int[] {i, lastIdx - 1},
-          1.0); // Specify that an output exists at the final time step for this example
-
+      // Specify that an output exists at the final time step for this example
+      labelsMask.putScalar(new int[] {i, lastIdx - 1}, 1.0);
     }
 
     // Cache the dataset
