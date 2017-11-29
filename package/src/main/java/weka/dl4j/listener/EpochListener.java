@@ -70,8 +70,6 @@ public class EpochListener extends IterationListener implements TrainingListener
       if (model instanceof ComputationGraph) {
         ComputationGraph net = (ComputationGraph) model;
 
-        double scoreSum = 0;
-        int iterations = 0;
         Evaluation cEval = new Evaluation(numClasses);
         RegressionEvaluation rEval = new RegressionEvaluation(1);
         while (iterator.hasNext()) {
@@ -83,18 +81,13 @@ public class EpochListener extends IterationListener implements TrainingListener
             final int batch = iterator.batch() * 8;
             next = iterator.next(batch);
           }
-          scoreSum += net.score(next);
-          iterations++;
           INDArray output =
               net.outputSingle(next.getFeatureMatrix()); // get the networks prediction
-          if (isClassification) cEval.eval(next.getLabels(), output);
-          else rEval.eval(next.getLabels(), output);
+          if (isClassification) cEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          else rEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
         }
 
-        double score = 0;
-        if (iterations != 0) {
-          score = scoreSum / iterations;
-        }
+        double score = model.score();
         if (isClassification) {
           s += String.format("Accuracy: %4.2f%%", cEval.accuracy() * 100);
         } else {
