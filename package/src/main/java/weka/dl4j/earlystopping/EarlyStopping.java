@@ -166,6 +166,14 @@ public class EarlyStopping implements OptionHandler, Serializable {
   }
 
   /**
+   * Get the validation dataset iterator
+   * @return DataSetIterator for the validation set
+   */
+  public DataSetIterator getValDataSetIterator() {
+    return valDataSetIterator;
+  }
+
+  /**
    * Returns an enumeration describing the available options.
    *
    * @return an enumeration of all the available options.
