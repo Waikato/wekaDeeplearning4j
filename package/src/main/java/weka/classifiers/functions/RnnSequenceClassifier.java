@@ -25,6 +25,7 @@ import weka.core.Instances;
 import weka.core.MissingOutputLayerException;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.CacheMode;
 import weka.dl4j.iterators.instance.TextInstanceIterator;
 
 /**
@@ -234,7 +235,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     insts = applyFilters(insts);
 
     // Get predictions
-    final DataSetIterator it = getDataSetIterator(insts);
+    final DataSetIterator it = getDataSetIterator(insts, CacheMode.NONE);
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
 
     if (it.resetSupported()) {
