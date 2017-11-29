@@ -133,7 +133,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);
     model.init();
-    log.info(conf.toYaml());
     this.model = model;
   }
 
