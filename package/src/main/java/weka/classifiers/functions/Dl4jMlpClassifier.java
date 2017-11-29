@@ -872,20 +872,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     // Collect layers
     for (Layer layer : layers) {
       String lName = layer.getLayerName();
-      gb.addLayer(lName, layer, currentInput);
+      gb.addLayer(lName, layer.clone(), currentInput);
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
     gb.setInputTypes(InputType.inferInputType(features));
-
-    // TODO: Fix input types for test cases where the classifier is reused
-    //    if (getInstanceIterator() instanceof Convolutional){
-    //      Convolutional conv = (Convolutional) getInstanceIterator();
-    //      layers[0].setNIn(InputType.convolutionalFlat(conv.getHeight(), conv.getWidth(),
-    // conv.getNumChannels()), true);
-    //    } else {
-    //      layers[0].setNIn(InputType.feedForward(trainData.numAttributes() - 1), true);
-    //    }
 
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);
