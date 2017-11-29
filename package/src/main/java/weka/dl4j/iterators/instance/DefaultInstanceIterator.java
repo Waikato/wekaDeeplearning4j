@@ -43,7 +43,7 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
 
   @Override
   public void validate(Instances data) throws InvalidInputDataException {
-    if (data.classIndex() <= 0){
+    if (data.classIndex() < 0){
       throw new InvalidInputDataException("Class index not set.");
     }
   }
