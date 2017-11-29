@@ -29,10 +29,12 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.iterators.instance.TextInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
+import weka.dl4j.lossfunctions.LossMSE;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
@@ -82,6 +84,7 @@ public class RnnSequenceClassifierTest {
     clf = new RnnSequenceClassifier();
     clf.setSeed(TestUtil.SEED);
     clf.setDebug(false);
+    clf.setNumEpochs(epochs);
 
     // Init data
     data = DatasetLoader.loadImdb();
@@ -113,7 +116,7 @@ public class RnnSequenceClassifierTest {
   }
 
   @Test
-  public void testImdb() throws Exception {
+  public void testImdbClassification() throws Exception {
     TestUtil.addStatsListener(clf, fss);
     // Define layers
     LSTM lstm1 = new LSTM();
@@ -132,7 +135,6 @@ public class RnnSequenceClassifierTest {
 
     // Config classifier
     clf.setLayers(new Layer[] {lstm1, rnnOut});
-    clf.setNumEpochs(epochs);
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
@@ -149,6 +151,42 @@ public class RnnSequenceClassifierTest {
     data = Filter.useFilter(data, rp);
 
     TestUtil.holdout(clf, data, 50, tii);
+  }
+
+  @Test
+  public void testAngerRegression() throws Exception {
+    TestUtil.addStatsListener(clf, fss);
+    // Define layers
+    LSTM lstm1 = new LSTM();
+    lstm1.setNOut(128);
+    lstm1.setActivationFunction(new ActivationTanH());
+
+    RnnOutputLayer rnnOut = new RnnOutputLayer();
+    rnnOut.setLossFn(new LossMSE());
+    rnnOut.setActivationFunction(new ActivationIdentity());
+
+    // Network config
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setL2(1e-5);
+    nnc.setUseRegularization(true);
+    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+    nnc.setGradientNormalizationThreshold(1.0);
+    nnc.setLearningRate(0.02);
+
+    tii.setTruncateLength(140);
+    // Config classifier
+    clf.setLayers(new Layer[] {lstm1, rnnOut});
+    clf.setNeuralNetConfiguration(nnc);
+    clf.settBPTTbackwardLength(140);
+    clf.settBPTTforwardLength(140);
+    clf.setQueueSize(4);
+    clf.setNumEpochs(50);
+    log.info(TestUtil.toCmdLineArgs(clf));
+
+    data = DatasetLoader.loadAnger();
+    // Randomize data
+    data.randomize(new Random(42));
+    TestUtil.holdout(clf, data, 33, tii);
   }
 
 //  @Test
