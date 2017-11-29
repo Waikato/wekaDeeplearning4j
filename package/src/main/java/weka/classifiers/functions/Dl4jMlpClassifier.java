@@ -61,6 +61,7 @@ import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
 import weka.core.BatchPredictor;
 import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.CapabilitiesHandler;
 import weka.core.EmptyIteratorException;
 import weka.core.Instance;
@@ -234,21 +235,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // attributes
     if (getInstanceIterator() instanceof ImageInstanceIterator) {
-      result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+      result.enable(Capability.STRING_ATTRIBUTES);
     } else {
-      result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
-      result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
-      result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
-      result.enable(Capabilities.Capability.MISSING_VALUES);
-      result.enableDependency(
-          Capabilities.Capability.STRING_ATTRIBUTES); // User might switch to ImageDSI in GUI
+      result.enable(Capability.NOMINAL_ATTRIBUTES);
+      result.enable(Capability.NUMERIC_ATTRIBUTES);
+      result.enable(Capability.DATE_ATTRIBUTES);
+      result.enable(Capability.MISSING_VALUES);
+      result.enableDependency(Capability.STRING_ATTRIBUTES); // User might switch to ImageDSI in GUI
     }
 
     // class
-    result.enable(Capabilities.Capability.NOMINAL_CLASS);
-    result.enable(Capabilities.Capability.NUMERIC_CLASS);
-    result.enable(Capabilities.Capability.DATE_CLASS);
-    result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+    result.enable(Capability.NOMINAL_CLASS);
+    result.enable(Capability.NUMERIC_CLASS);
+    result.enable(Capability.DATE_CLASS);
+    result.enable(Capability.MISSING_CLASS_VALUES);
 
     return result;
   }
