@@ -168,7 +168,8 @@ ant -f build_package.xml make_package_${backend} > ${out}
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        [[ -d ${WEKA_HOME}/packages/${pack_name} ]] && rm -r ${WEKA_HOME}/packages/${pack_name} &> ${out}
+        [[ -d ${WEKA_HOME}/packages/${prefix}-CPU-${platform} ]] && rm -r ${WEKA_HOME}/packages/${prefix}-CPU-${platform} &> ${out}
+        [[ -d ${WEKA_HOME}/packages/${prefix}-GPU-${platform} ]] && rm -r ${WEKA_HOME}/packages/${prefix}-GPU-${platform} &> ${out}
     fi
     echo -e "${ep}Installing ${pack_name} package..."
     java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${zip_name} > ${out}
