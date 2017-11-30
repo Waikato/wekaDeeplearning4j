@@ -259,17 +259,17 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "negativeSamplingValue",
-    description = "The negativeSamplingValue sampling value for skip-gram algorithm (default = 0.0).",
-    commandLineParamName = "negativeSamplingValue",
-    commandLineParamSynopsis = "-negativeSamplingValue <double>",
+    displayName = "negative",
+    description = "The negative sampling value for skip-gram algorithm (default = 0.0).",
+    commandLineParamName = "negative",
+    commandLineParamSynopsis = "-negative <double>",
     displayOrder = 19
   )
-  public double getNegativeSamplingValue() {
+  public double getNegative() {
     return negativeSamplingValue;
   }
 
-  public void setNegativeSamplingValue(double m_negative) {
+  public void setNegative(double m_negative) {
     this.negativeSamplingValue = m_negative;
   }
 
