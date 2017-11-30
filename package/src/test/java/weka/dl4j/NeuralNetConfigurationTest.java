@@ -1,5 +1,8 @@
 package weka.dl4j;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
@@ -139,7 +142,10 @@ public class NeuralNetConfigurationTest {
       clf.setNeuralNetConfiguration(nnc);
       clf.initializeClassifier(dataMnist); // creates the model internally
 
-      for (Layer l : layers) {
+      // Get configured layers
+      final List<Layer> confLayers = Arrays.stream(clf.getModel().getLayers())
+          .map(l -> l.conf().getLayer()).collect(Collectors.toList());
+      for (Layer l : confLayers) {
         final BaseLayer bl = (BaseLayer) l;
         IUpdater u2 = bl.getIUpdater();
         double l11 = bl.getL1();
