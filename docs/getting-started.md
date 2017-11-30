@@ -97,12 +97,13 @@ Finally the layers are set with
 clf.setLayers(new Layer[]{denseLayer, outputLayer});
 ```
 
+### Without Maven
 If you are not using the package in a maven project as described [here](install#using-wekadeeplearning4j-in-a-maven-project), you need to add the following directories to your java classpath
 
-- `$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*`
-- `$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib*`
+- `$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/*`
+- `$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/lib*`
 
-Assuming you have the following `Main.java` file and installed the CPU package beforehand:
+Assuming you have the following `Main.java` file:
 ```java
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -115,7 +116,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) throws Exception {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        String irisPath = Paths.get(System.getenv("WEKA_HOME"), "packages", "wekaDeeplearning4jCPU-dev", "datasets", "nominal", "iris.arff").toString();
+        String irisPath = Paths.get(System.getenv("WEKA_HOME"), "packages", "wekaDeeplearning4j-<BACKEND>-<PLATFORM>", "datasets", "nominal", "iris.arff").toString();
         Instances inst = new Instances(new FileReader(irisPath));
         inst.setClassIndex(inst.numAttributes() - 1);
         Evaluation ev = new Evaluation(inst);
@@ -127,11 +128,11 @@ public class Main {
 
 You can now compile it including the libraries in the classpath:
 ```bash
-javac -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib/*" Main.java
+javac -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/*:$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/lib/*" Main.java
 ```
 and run it with:
 ```bash
-java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/lib/*:." Main
+java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j<BACKEND>-<PLATFORM>/*:$WEKA_HOME/packages/wekaDeeplearning4j<BACKEND>-<PLATFORM>/lib/*:." Main
 ```
 
 (Use `;` as classpath separator for Windows instead) 
@@ -140,7 +141,7 @@ java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4jCPU-dev/*:$W
 A tutorial on how to use the GUI is coming soon.
 
 # Model Zoo
-WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
+WekaDeeplearning4j adapts the model zoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
 
 - AlexNet
 - LeNet
@@ -152,27 +153,28 @@ WekaDeeplearning4j adapts the modelzoo of Deeplearning4j. That means it is possi
 
 This set of models will be extended over the time.
 
-To set a predefined model, e.g. LeNet, from the modelzoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier` object.
+To set a predefined model, e.g. LeNet, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier` object.
 
 # Early Stopping
 Early stopping allows to stop the training process as soon as the network does not improve its loss on a validation set for `N` epochs. 
 
-The setup below adds an early stopping condition that checks whether the loss score on 20% of the training data did not improve successively for 10 epochs.
+The setup below adds an early stopping condition that checks whether the loss score on 10% of the training data did not improve successively for 5 epochs.
+
 **Commandline**
 ```bash
--early-stopping "weka.dl4j.earlystopping.EarlyStopping -maxEpochsNoImprovement 10 -valPercentage 20"
+-early-stopping "weka.dl4j.earlystopping.EarlyStopping -maxEpochsNoImprovement 5 -valPercentage 10"
 ```
 
 **Java**
 ```java
 EarlyStopping es = new EarlyStopping();
-es.setMaxEpochsNoImprovement(10);
-es.setValidationSetPercentage(20);
+es.setMaxEpochsNoImprovement(5);
+es.setValidationSetPercentage(10);
 clf.setEarlyStopping(es)
 ```
 or simpler
 ```java
-clf.setEarlyStopping(new EarlyStopping(10, 20))
+clf.setEarlyStopping(new EarlyStopping(5, 10))
 ```
 **GUI**
 

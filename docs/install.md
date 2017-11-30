@@ -1,6 +1,6 @@
 # Prerequisites
-- Weka 3.8.1 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
-- WekaDeeplearning4j package 1.2 or above ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
+- Weka 3.8.0 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
+- WekaDeeplearning4j package 1.3.4 or above ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
 
 You need to unzip the Weka zip file to a directory of your choice.
 
@@ -18,9 +18,9 @@ The GPU package needs the CUDA 8.0 backend to be installed on your system. Nvidi
 Weka packages can be easily installed either via the user interface as described [here](https://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2), or simply via the commandline:
 ```bash
 $ java -cp <WEKA-JAR-PATH> weka.core.WekaPackageManager \
-       -install-package wekaDeeplearning4j<BACKEND>-dev.zip
+       -install-package wekaDeeplearning4j-<BACKEND>-<PLATFORM>.zip
 ```
-where `<WEKA-JAR-PATH>` must be replaced by the path pointing to the Weka jar file and `<BACKEND>` must be replaced by either `CPU` or `GPU`, depending on which version you chose.
+where `<WEKA-JAR-PATH>` must be replaced by the path pointing to the Weka jar file, `<BACKEND>` must be replaced by either `CPU` or `GPU`, depending on which version you chose and `<PLATFORM>` must be replaced with your operating system (linux, macosx, windows).
 
 You can check whether the installation was successful with
 ```bash
@@ -31,7 +31,7 @@ which results in
 ```
 Installed	Repository	Loaded	Package
 =========	==========	======	=======
-1.2.0    	-----     	Yes	    wekaDeeplearning4j<BACKEND>-dev: Weka wrappers for Deeplearning4j
+1.3.4    	-----     	Yes	    wekaDeeplearning4j-<BACKEND>-<PLATFORM>: Weka wrappers for Deeplearning4j
 ```
 
 # Using wekaDeeplearning4j in a Maven Project
@@ -39,7 +39,7 @@ It is also possible to include this package as maven project. As of now it is no
 
 ```bash
 $ git clone https://github.com/Waikato/wekaDeeplearning4j.git
-$ cd wekaDeeplearning4j/wekaDeeplearning4jCore
+$ cd wekaDeeplearning4j/package
 $ mvn clean install -P <backend> # Replace <backend> with either "CPU" or "GPU"
 ```
 
