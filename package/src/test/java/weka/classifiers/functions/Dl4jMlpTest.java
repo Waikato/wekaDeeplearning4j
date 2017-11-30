@@ -60,7 +60,6 @@ public class Dl4jMlpTest {
     clf = new Dl4jMlpClassifier();
     clf.setSeed(TestUtil.SEED);
     clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
-    clf.setEarlyStopping(new EarlyStopping(5, 15));
 
     clf.setDebug(false);
 
@@ -298,21 +297,22 @@ public class Dl4jMlpTest {
 
   /**
    * Test UnsupportedAttributeTypeException
-   *
+   * //TODO: Fix
    * @throws Exception
    */
   @Test(expected = UnsupportedAttributeTypeException.class)
   public void testWrongArffFormat() throws Exception {
-    Attribute att1 = new Attribute("1", true);
-    Attribute att2 = new Attribute("2", Arrays.asList("1", "2"));
+    Attribute att1 = new Attribute("1"); // numeric
+    Attribute att2 = new Attribute("2", Arrays.asList("1", "2")); // string
     ArrayList<Attribute> atts = new ArrayList<>();
     atts.add(att1);
     atts.add(att2);
     Instances inst = new Instances("", atts, 10);
-    Instance ins = new DenseInstance(1);
+    Instance ins = new DenseInstance(2);
     ins.setDataset(inst);
     inst.setClassIndex(0);
-    ins.setValue(0, "1");
+    ins.setValue(0, 10);
+    ins.setValue(1, "1");
     inst.add(ins);
     clf.initializeClassifier(inst);
   }
