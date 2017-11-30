@@ -48,4 +48,4 @@ Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wek
 OSName={OSNAME}
 
 # Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
-OSArch={OSARCH}
+OSArch=64
