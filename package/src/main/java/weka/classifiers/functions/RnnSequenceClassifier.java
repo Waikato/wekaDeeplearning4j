@@ -137,17 +137,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     this.model = model;
   }
 
-  /**
-   * Set the layers for this classifier.
-   *
-   * @param layers Array of layers.
-   */
-  @Override
-  public void setLayers(Layer[] layers) {
-    validateLayers(layers);
-    fixDuplicateLayerNames(layers);
-    this.layers = layers;
-  }
 
   /**
    * Validate if the given layers are compatible with this classifier.
