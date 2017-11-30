@@ -10,7 +10,7 @@
   -->
 
   <!-- set global properties for this build -->
-  <property name="version" value="1.3.3" />
+  <property name="version" value="1.3.4" />
   <property name="src" value="src/main/java"/>
   <property name="src-test" value="src/test/java"/>
   <property name="lib" value="lib" />
