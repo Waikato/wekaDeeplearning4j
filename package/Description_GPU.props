@@ -51,7 +51,7 @@ MessageToDisplayOnInstallation=This package requires CUDA to be installed.
 
 
 # Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
-OSName={PLATFORM}
+OSName={OSNAME}
 
 # Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
-OSArch=64
+OSArch={OSARCH}

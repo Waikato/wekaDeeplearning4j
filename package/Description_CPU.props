@@ -45,7 +45,7 @@ Depends=weka (>=3.8.0)
 Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jGPU-dev, wekaDeeplearning4j-GPU-{PLATFORM}, {PRECLUDES}
 
 # Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
-OSName={PLATFORM}
+OSName={OSNAME}
 
 # Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
-OSArch=64
+OSArch={OSARCH}

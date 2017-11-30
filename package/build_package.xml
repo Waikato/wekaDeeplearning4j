@@ -346,6 +346,14 @@
                   sed -i 's/{PLATFORM}/windows/g' ${dist}/${package-windows}/Description.props "/>
     </exec>
 
+    <!--Replace OSNAME in Description.props with appropriate os name-->
+    <exec executable="/bin/bash">
+      <arg value="-c"/>
+      <arg value="sed -i 's/{OSNAME}/Linux/g' ${dist}/${package-linux}/Description.props;
+                  sed -i 's/{OSNAME}/Mac/g' ${dist}/${package-macosx}/Description.props;
+                  sed -i 's/{OSNAME}/Windows/g' ${dist}/${package-windows}/Description.props "/>
+    </exec>
+
     <!--Replace PRECLUDES in Description.props with appropriate preclude list-->
     <exec executable="/bin/bash">
       <arg value="-c"/>
