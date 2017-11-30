@@ -325,6 +325,14 @@
                   sed -i 's/{VERSION}/${version}/g' ${dist}/${package-windows}/Description.props "/>
     </exec>
 
+    <!--Replace DATE in Description.props with current DATE-->
+    <exec executable="/bin/bash">
+      <arg value="-c"/>
+      <arg value='sed -i "s/{DATE}/`date  +"%Y-%m-%d"`/g" ${dist}/${package-linux}/Description.props;
+                  sed -i "s/{DATE}/`date  +"%Y-%m-%d"`/g" ${dist}/${package-macosx}/Description.props;
+                  sed -i "s/{DATE}/`date  +"%Y-%m-%d"`/g" ${dist}/${package-windows}/Description.props '/>
+    </exec>
+
 
     <!--Remove wrong libraries from platform packages-->
     <!--Keep linux-x86_64 libs-->
