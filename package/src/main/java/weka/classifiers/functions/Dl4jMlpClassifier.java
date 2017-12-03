@@ -139,10 +139,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /** The size of the serialized network model in bytes. */
   protected long modelSize;
   /** The file that log information will be written to. */
-  protected File logFile =
-      new File(
-          Paths.get(WekaPackageManager.getPackageHome().getAbsolutePath(), "network.log")
-              .toString());
+  protected File logFile = new File(
+          Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
   /** The layers of the network. */
   protected Layer[] layers = new Layer[] {new OutputLayer()};
   /** The configuration of the network. */
