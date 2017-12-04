@@ -39,7 +39,7 @@ import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
- * TextInstanceIterator.
+ * TextEmbeddingInstanceIterator.
  *
  * <p>Assumes the instance object is of the following structure:
  *
@@ -51,7 +51,7 @@ import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
  * @author Steven Lang
  */
 @Slf4j
-public class TextInstanceIterator extends AbstractInstanceIterator {
+public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   /** The ID used to serialize this class */
   private static final long serialVersionUID = 1316260988724548474L;
@@ -105,7 +105,7 @@ public class TextInstanceIterator extends AbstractInstanceIterator {
     description = "The word vectors location.",
     commandLineParamName = "wordVectorLocation",
     commandLineParamSynopsis = "-wordVectorLocation <string>",
-    displayOrder = 1
+    displayOrder = 2
   )
   public File getWordVectorLocation() {
     return wordVectorLocation;

@@ -18,7 +18,7 @@ import weka.core.Instances;
  * @author Steven Lang
  */
 @Slf4j
-public class TextFileEmbeddingDataSetIterator extends TextEmbeddingDataSetIterator {
+public class TextFilesEmbeddingDataSetIterator extends TextEmbeddingDataSetIterator {
 
   private static final long serialVersionUID = 2569158554412509023L;
   /** Location of the text files */
@@ -33,7 +33,7 @@ public class TextFileEmbeddingDataSetIterator extends TextEmbeddingDataSetIterat
    * @param truncateLength If reviews exceed
    * @param textsLocation Location of the text files
    */
-  public TextFileEmbeddingDataSetIterator(Instances data,
+  public TextFilesEmbeddingDataSetIterator(Instances data,
       WordVectors wordVectors, int batchSize, int truncateLength, File textsLocation) throws IOException {
     super(new Instances(data), wordVectors, batchSize, truncateLength);
     this.textsLocation = textsLocation;
