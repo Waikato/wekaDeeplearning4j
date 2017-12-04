@@ -65,12 +65,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   public DataSet next(int num) {
     if (cursor >= data.numInstances()) throw new NoSuchElementException();
     try {
-      //      StopWatch sw = new StopWatch();
-      //      sw.start();
-      final DataSet dataSet = nextDataSet(num);
-      //      sw.stop();
-      //      log.info("Batch of size {} took {}", num, sw.toString());
-      return dataSet;
+      return nextDataSet(num);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
