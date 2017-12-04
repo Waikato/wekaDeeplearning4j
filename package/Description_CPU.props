@@ -3,13 +3,13 @@
 #
 
 # Package name (required)
-PackageName=wekaDeeplearning4jCPU-dev
+PackageName=wekaDeeplearning4j-CPU-{PLATFORM}
 
 # Version (required)
 Version={VERSION}
 
 #Date
-Date=2017-10-13
+Date={DATE}
 
 # Title (required)
 Title=Weka wrappers for Deeplearning4j
@@ -17,7 +17,7 @@ Title=Weka wrappers for Deeplearning4j
 Category=Classification/Regression
 
 # Author (required)
-Author=Christopher Beckham, Eibe Frank and Mark Hall
+Author=Christopher Beckham, Eibe Frank, Mark Hall and Steven Lang
 
 # Maintainer (required)
 Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
@@ -30,7 +30,7 @@ Description=Provides a wrapper classifier for feedforward networks, including co
 Changes=Update api to dl4j 0.9.1
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/wekaDeeplearning4jCPU-{VERSION}-dev-{PLATFORM}-x86_64.zip
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/wekaDeeplearning4j-CPU-{VERSION}-{PLATFORM}-x86_64.zip
 
 # URL for further information
 URL=https://github.com/Waikato/wekaDeeplearning4j
@@ -41,4 +41,11 @@ Depends=weka (>=3.8.0)
 # Package(s) that can't be installed alongside this one
 # - old wekaDeeplearning4j
 # - GPU version of this package (GPU-dev)
-Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jGPU-dev
+# - other platforms inserted on build time
+Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jGPU-dev, wekaDeeplearning4j-GPU-{PLATFORM}, {PRECLUDES}
+
+# Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
+OSName={OSNAME}
+
+# Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
+OSArch=64

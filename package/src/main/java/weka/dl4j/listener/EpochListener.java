@@ -131,7 +131,7 @@ public class EpochListener extends IterationListener implements TrainingListener
   public void log(String msg) {
     log.info(msg);
     if (logFile != null) {
-      logFile.write(msg + "\n");
+      logFile.write(msg + System.lineSeparator());
       logFile.flush();
     }
   }

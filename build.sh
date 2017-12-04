@@ -106,11 +106,11 @@ echo -e "${ep}"
 # Get platform
 unameOut="$(uname -s)"
 case "${unameOut}" in
-    Linux*)     machine=linux;;
-    Darwin*)    machine=macosx;;
-    CYGWIN*)    machine=windows;;
-    MINGW*)     machine=windows;;
-    *)          machine="UNKNOWN:${unameOut}"
+    Linux*)     platform=linux;;
+    Darwin*)    platform=macosx;;
+    CYGWIN*)    platform=windows;;
+    MINGW*)     platform=windows;;
+    *)          platform="UNKNOWN:${unameOut}"
 esac
 
 
@@ -144,34 +144,35 @@ base="package"
 cd ${base}
 
 
-pack_name=${prefix}${backend}-${version}"-dev"
+pack_name=${prefix}-${backend}-${platform}
+zip_name=${prefix}-${backend}-${version}-${platform}-x86_64.zip
 # Clean up lib folders and classes
 if [[ "$clean" = true ]]; then
-    [[ -d lib ]] && rm lib -r &> ${out}
-    mvn -q clean > ${out} # don't clutter with mvn clean output
+    [[ -d lib ]] && rm lib/* &> ${out}
+    mvn -q clean > /dev/null # don't clutter with mvn clean output
 fi
 
 # Compile source code with maven
 echo -e "${ep}Pulling dependencies via maven..."
-mvn -q -DskipTests=true -P ${backend} install >  "$out"
+mvn -q -DskipTests=true -P ${backend} install >  ${out}
 
-echo -e "${ep}Starting ant build for ${bold}"${base}"-dev"${nc}
+echo -e "${ep}Starting ant build for ${bold}"${base}${nc}
 
 # Clean-up
 ant -f build_package.xml clean > /dev/null # don't clutter with ant clean output
 
 # Build the package
-ant -f build_package.xml make_package_${backend} > "$out"
+ant -f build_package.xml make_package_${backend} > ${out}
 
 # Install package from dist dir
 if [[ "$install_pack" = true ]]; then
     # Remove up old packages
     if [[ "$clean" = true ]]; then
-        [[ -d ${WEKA_HOME}/packages/${prefix}"CPU-dev" ]] && rm -r ${WEKA_HOME}/packages/${prefix}"CPU-dev" &> "$out"
-        [[ -d ${WEKA_HOME}/packages/${prefix}"GPU-dev" ]] && rm -r ${WEKA_HOME}/packages/${prefix}"GPU-dev" &> "$out"
+        [[ -d ${WEKA_HOME}/packages/${prefix}-CPU-${platform} ]] && rm -r ${WEKA_HOME}/packages/${prefix}-CPU-${platform} &> ${out}
+        [[ -d ${WEKA_HOME}/packages/${prefix}-GPU-${platform} ]] && rm -r ${WEKA_HOME}/packages/${prefix}-GPU-${platform} &> ${out}
     fi
     echo -e "${ep}Installing ${pack_name} package..."
-    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${pack_name}-${machine}-x86_64.zip > "$out"
+    java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${zip_name} > ${out}
     if [ $? -eq 0 ]; then
         echo -e "${ep}Installation successful"
     else

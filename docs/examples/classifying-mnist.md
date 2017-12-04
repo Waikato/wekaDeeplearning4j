@@ -20,7 +20,7 @@ The minimal MNIST arff file can be found in the `datasets/nominal` directory of 
 **Important note:** The arff dataset contains two features, the first one being the `filename` and the second one being the `class`. Therefore it is necessary to define an `ImageDataSetIterator` which uses these filenames in the directory given by the option `-imagesLocation`.
 
 ## Commandline
-The following run creates a Conv(3x3x8)>Pool(2x2,MAX)>Conv(3x3x8)>Pool(2x2,MAX)>Out architecture
+The following run creates a Conv(3x3x8) > Pool(2x2,MAX) > Conv(3x3x8) > Pool(2x2,MAX) > Out architecture
 ```bash
 $ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
      .Dl4jMlpClassifier \
