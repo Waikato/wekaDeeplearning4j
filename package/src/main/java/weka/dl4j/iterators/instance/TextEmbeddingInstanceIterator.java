@@ -22,16 +22,10 @@ package weka.dl4j.iterators.instance;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.dataset.api.iterator.cache.InFileAndMemoryDataSetCache;
-import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
-import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
@@ -113,15 +107,15 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   public void setWordVectorLocation(File file) {
     this.wordVectorLocation = file;
-    initWordVectors();
+    if (file != null && !file.equals(wordVectorLocation)){
+      initWordVectors();
+    }
   }
 
   /** Initialize the word vectors from the given file */
   protected void initWordVectors() {
-    if (wordVectors == null) {
-      log.debug("Loading word vector model");
-      wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
-    }
+    log.debug("Loading word vector model");
+    wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
   }
 
   @OptionMetadata(
