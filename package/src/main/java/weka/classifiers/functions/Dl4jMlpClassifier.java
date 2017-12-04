@@ -139,8 +139,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /** The size of the serialized network model in bytes. */
   protected long modelSize;
   /** The file that log information will be written to. */
-  protected File logFile = new File(
-          Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
+  protected File logFile =
+      new File(Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
   /** The layers of the network. */
   protected Layer[] layers = new Layer[] {new OutputLayer()};
   /** The configuration of the network. */
@@ -586,27 +586,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Apply preprocessing
     data = preProcessInput(data);
+    data = initEarlyStopping(data);
 
-    // Split train/validation
-    double valSplit = earlyStopping.getValidationSetPercentage();
-    Instances trainData = null;
-    Instances valData = null;
-    if (useEarlyStopping()) {
-      Instances[] insts = splitTrainVal(data, valSplit);
-      trainData = insts[0];
-      valData = insts[1];
-      validateSplit(trainData, valData);
-      DataSetIterator valIterator = getDataSetIterator(valData, CacheMode.NONE);
-      earlyStopping.init(valIterator);
-
-    } else {
+    if (data != null) {
       trainData = data;
-    }
-
-    if (trainData == null) {
-      return;
     } else {
-      this.trainData = trainData;
+      return;
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -622,7 +607,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       // Setup the datasetiterators (needs to be done after the model initialization)
       trainIterator = getDataSetIterator(this.trainData);
 
-
       // Print model architecture
       if (getDebug()) {
         log.info(model.conf().toYaml());
@@ -635,6 +619,34 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  /**
+   * Initialize early stopping with the given data
+   *
+   * @param data Data
+   * @return Augmented data - if early stopping applies, return train set without validation set
+   * @throws Exception
+   */
+  protected Instances initEarlyStopping(Instances data) throws Exception {
+    // Split train/validation
+    double valSplit = earlyStopping.getValidationSetPercentage();
+    Instances trainData;
+    Instances valData;
+    if (useEarlyStopping()) {
+      // Split in train and validation
+      Instances[] insts = splitTrainVal(data, valSplit);
+      trainData = insts[0];
+      valData = insts[1];
+      validateSplit(trainData, valData);
+      DataSetIterator valIterator = getDataSetIterator(valData, CacheMode.NONE);
+      earlyStopping.init(valIterator);
+    } else {
+      // Keep the full data
+      trainData = data;
+    }
+
+    return trainData;
   }
 
   private void validateSplit(Instances trainData, Instances valData) throws WekaException {
@@ -911,7 +923,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
       int numEpochs = getNumEpochs();
       ((EpochListener) iterationListener)
-          .init(trainData.numClasses(), numEpochs, numSamples, trainIterator, earlyStopping.getValDataSetIterator());
+          .init(
+              trainData.numClasses(),
+              numEpochs,
+              numSamples,
+              trainIterator,
+              earlyStopping.getValDataSetIterator());
       ((EpochListener) iterationListener).setLogFile(logFile);
       listeners.add(iterationListener);
     } else {
