@@ -165,43 +165,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
         || layer instanceof RnnOutputLayer;
   }
 
-  //  /**
-  //   * Perform another epoch
-  //   *
-  //   * @return Whether to continue or not
-  //   * @throws Exception
-  //   */
-  //  @Override
-  //  public boolean next() throws Exception {
-  //
-  //    if (numEpochsPerformed >= getNumEpochs() || zeroR != null || trainData == null) {
-  //      return false;
-  //    }
-  //
-  //    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-  //    try {
-  //      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-  //      model.fit(trainIterator); // Note that this calls the reset() method of the trainIterator
-  //      numEpochsPerformed++;
-  //    } finally {
-  //      Thread.currentThread().setContextClassLoader(origLoader);
-  //    }
-  //
-  //    // Evaluate early stopping
-  //    if (useEarlyStopping()) {
-  //      boolean continueTraining = earlyStopping.evaluate(model);
-  //      if (!continueTraining) {
-  //        log.info(
-  //            "Early stopping has stopped the training process. The "
-  //                + "validation has not improved anymore after {} epochs. Training "
-  //                + "finished.",
-  //            earlyStopping.getMaxEpochsNoImprovement());
-  //      }
-  //      return continueTraining;
-  //    }
-  //    return true;
-  //  }
-
   /**
    * The method to use when making predictions for test instances.
    *
