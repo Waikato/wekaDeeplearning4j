@@ -76,6 +76,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
+      data = initEarlyStopping(data);
       this.trainData = data;
 
       createModel();
@@ -248,7 +249,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     displayName = "truncated backprop through time backward",
     commandLineParamName = "tBPTTBackward",
     commandLineParamSynopsis = "-tBPTTBackward <int>",
-    displayOrder = 3
+    displayOrder = 20
   )
   public int gettBPTTbackwardLength() {
     return tBPTTbackwardLength;
@@ -263,7 +264,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     displayName = "truncated backprop through time forward",
     commandLineParamName = "tBPTTForward",
     commandLineParamSynopsis = "-tBPTTForward <int>",
-    displayOrder = 4
+    displayOrder = 21
   )
   public int gettBPTTforwardLength() {
     return tBPTTforwardLength;
