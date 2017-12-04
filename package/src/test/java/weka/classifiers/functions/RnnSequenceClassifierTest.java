@@ -34,6 +34,7 @@ import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.iterators.instance.TextInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
+import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMSE;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
@@ -86,11 +87,9 @@ public class RnnSequenceClassifierTest {
     clf.setDebug(false);
     clf.setNumEpochs(epochs);
 
-    // Init data
-    data = DatasetLoader.loadImdb();
     clf.setInstanceIterator(tii);
     startTime = System.currentTimeMillis();
-    setupUi();
+//    setupUi();
   }
 
   private void setupUi() {
@@ -117,7 +116,10 @@ public class RnnSequenceClassifierTest {
 
   @Test
   public void testImdbClassification() throws Exception {
-    TestUtil.addStatsListener(clf, fss);
+
+    // Init data
+    data = DatasetLoader.loadImdb();
+
     // Define layers
     LSTM lstm1 = new LSTM();
     lstm1.setNOut(3);
@@ -139,7 +141,6 @@ public class RnnSequenceClassifierTest {
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
     clf.setQueueSize(0);
-    log.info(TestUtil.toCmdLineArgs(clf));
 
     // Randomize data
     data.randomize(new Random(42));
@@ -155,10 +156,9 @@ public class RnnSequenceClassifierTest {
 
   @Test
   public void testAngerRegression() throws Exception {
-    TestUtil.addStatsListener(clf, fss);
     // Define layers
     LSTM lstm1 = new LSTM();
-    lstm1.setNOut(128);
+    lstm1.setNOut(32);
     lstm1.setActivationFunction(new ActivationTanH());
 
     RnnOutputLayer rnnOut = new RnnOutputLayer();
@@ -173,20 +173,21 @@ public class RnnSequenceClassifierTest {
     nnc.setGradientNormalizationThreshold(1.0);
     nnc.setLearningRate(0.02);
 
-    tii.setTruncateLength(140);
+    tii.setTruncateLength(80);
     // Config classifier
     clf.setLayers(new Layer[] {lstm1, rnnOut});
     clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(140);
-    clf.settBPTTforwardLength(140);
-    clf.setQueueSize(4);
-    clf.setNumEpochs(50);
-    log.info(TestUtil.toCmdLineArgs(clf));
-
+    clf.settBPTTbackwardLength(20);
+    clf.settBPTTforwardLength(20);
+//    clf.setQueueSize(4);
+    clf.setNumEpochs(3);
+    final EpochListener l = new EpochListener();
+    l.setN(1);
+    clf.setIterationListener(l);
     data = DatasetLoader.loadAnger();
     // Randomize data
     data.randomize(new Random(42));
-    TestUtil.holdout(clf, data, 33, tii);
+    TestUtil.holdout(clf, data, 33);
   }
 
 //  @Test
