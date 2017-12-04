@@ -57,13 +57,13 @@ public class TextInstanceIterator extends AbstractInstanceIterator {
   private static final long serialVersionUID = 1316260988724548474L;
 
   /** Word vector file location */
-  private File wordVectorLocation = new File(System.getProperty("user.dir"));
+  protected File wordVectorLocation = new File(System.getProperty("user.dir"));
 
   /** Loaded word vectors */
-  private transient WordVectors wordVectors;
+  protected transient WordVectors wordVectors;
 
   /** Truncation length (maximum number of tokens per document) */
-  private int truncateLength = 100;
+  protected int truncateLength = 100;
 
   @Override
   public void validate(Instances data) throws InvalidInputDataException {
@@ -117,7 +117,7 @@ public class TextInstanceIterator extends AbstractInstanceIterator {
   }
 
   /** Initialize the word vectors from the given file */
-  private void initWordVectors() {
+  protected void initWordVectors() {
     if (wordVectors == null) {
       log.debug("Loading word vector model");
       wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
