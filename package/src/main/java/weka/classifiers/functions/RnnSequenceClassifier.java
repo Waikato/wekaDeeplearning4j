@@ -259,17 +259,16 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       next = it.hasNext() || hasInstancesLeft;
     }
 
-    //  TODO: enable
-    //    // Fix classes
-    //    for (int i = 0; i < preds.length; i++) {
-    //      // only normalise if we're dealing with classification
-    //      if (preds[i].length > 1) {
-    //        weka.core.Utils.normalize(preds[i]);
-    //      } else {
-    //        // Rescale numeric classes with the computed coefficients in the initialization phase
-    //        preds[i][0] = preds[i][0] * x1 + x0;
-    //      }
-    //    }
+    // Fix classes
+    for (int i = 0; i < preds.length; i++) {
+      // only normalise if we're dealing with classification
+      if (preds[i].length > 1) {
+        weka.core.Utils.normalize(preds[i]);
+      } else {
+        // Rescale numeric classes with the computed coefficients in the initialization phase
+        preds[i][0] = preds[i][0] * x1 + x0;
+      }
+    }
     return preds;
   }
 
