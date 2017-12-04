@@ -36,8 +36,8 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   private final int vectorSize;
   private final int truncateLength;
 
-  private int cursor = 0;
-  private final Instances data;
+  protected int cursor = 0;
+  protected final Instances data;
   private final TokenizerFactory tokenizerFactory;
 
   /**
