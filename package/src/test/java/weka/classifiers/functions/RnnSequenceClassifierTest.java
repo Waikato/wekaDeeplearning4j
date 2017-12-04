@@ -31,6 +31,8 @@ import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
+import weka.dl4j.earlystopping.EarlyStopping;
+import weka.dl4j.iterators.instance.TextFileInstanceIterator;
 import weka.dl4j.iterators.instance.TextInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
@@ -189,6 +191,54 @@ public class RnnSequenceClassifierTest {
     data.randomize(new Random(42));
     TestUtil.holdout(clf, data, 33);
   }
+
+
+
+  @Test
+  public void testAngerMetaRegression() throws Exception {
+    // Define layers
+    LSTM lstm1 = new LSTM();
+    lstm1.setNOut(32);
+    lstm1.setActivationFunction(new ActivationTanH());
+
+    RnnOutputLayer rnnOut = new RnnOutputLayer();
+    rnnOut.setLossFn(new LossMSE());
+    rnnOut.setActivationFunction(new ActivationIdentity());
+
+    // Network config
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setL2(1e-5);
+    nnc.setUseRegularization(true);
+    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+    nnc.setGradientNormalizationThreshold(1.0);
+    nnc.setLearningRate(0.02);
+
+    final TextFileInstanceIterator tfii = new TextFileInstanceIterator();
+    tfii.setTextsLocation(new File("src/test/resources/numeric/anger-texts"));
+    tfii.setTruncateLength(80);
+    tfii.setTrainBatchSize(64);
+    tfii.setWordVectorLocation(modelSlim);
+    clf.setInstanceIterator(tfii);
+
+
+    // Config classifier
+    clf.setLayers(new Layer[] {lstm1, rnnOut});
+    clf.setNeuralNetConfiguration(nnc);
+    clf.settBPTTbackwardLength(20);
+    clf.settBPTTforwardLength(20);
+    clf.setNumEpochs(3);
+
+    final EpochListener l = new EpochListener();
+    l.setN(1);
+    clf.setIterationListener(l);
+    clf.setEarlyStopping(new EarlyStopping(5, 10));
+    data = DatasetLoader.loadArff("src/test/resources/numeric/anger.meta.arff");
+    // Randomize data
+    data.randomize(new Random(42));
+    TestUtil.holdout(clf, data, 33);
+  }
+
+
 
 //  @Test
 //  public void testImdbDl4j() throws Exception {
