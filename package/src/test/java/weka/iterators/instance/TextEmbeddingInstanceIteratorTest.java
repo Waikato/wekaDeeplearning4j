@@ -12,25 +12,25 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
-import weka.dl4j.iterators.instance.TextInstanceIterator;
+import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
 /**
- * JUnit tests for the {@link TextInstanceIterator}
+ * JUnit tests for the {@link TextEmbeddingInstanceIterator}
  *
  * @author Steven Lang
  */
 @Slf4j
-public class TextInstanceIteratorTest {
+public class TextEmbeddingInstanceIteratorTest {
   /** ImageInstanceIterator object */
-  private TextInstanceIterator tii;
+  private TextEmbeddingInstanceIterator tii;
   /** WordVec size */
   private static final int WORD_VEC_SIZE = 300;
   /** Initialize iterator */
   @Before
   public void init() {
-    this.tii = new TextInstanceIterator();
+    this.tii = new TextEmbeddingInstanceIterator();
     final String modelPath = "/home/slang/Downloads/GoogleNews-vectors-negative300-SLIM.bin.gz";
     this.tii.setWordVectorLocation(new File(modelPath));
     this.tii.setTrainBatchSize(10);

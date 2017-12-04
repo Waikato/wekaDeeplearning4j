@@ -5,17 +5,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.StopWatch;
-import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
-import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.layers.Layer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.junit.After;
 import org.junit.Before;
@@ -23,17 +14,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.TextFileInstanceIterator;
-import weka.dl4j.iterators.instance.TextInstanceIterator;
+import weka.dl4j.iterators.instance.TextFilesEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
 import weka.dl4j.listener.EpochListener;
@@ -65,7 +52,7 @@ public class RnnSequenceClassifierTest {
   private static final int epochs = 2;
   private static final int truncateLength = 10;
 
-  private static TextInstanceIterator tii;
+  private static TextEmbeddingInstanceIterator tii;
   private long startTime;
 
   private FileStatsStorage fss;
@@ -74,7 +61,7 @@ public class RnnSequenceClassifierTest {
   @BeforeClass
   public static void init() throws IOException {
     modelSlim = DatasetLoader.loadGoogleNewsVectors();
-    tii = new TextInstanceIterator();
+    tii = new TextEmbeddingInstanceIterator();
     tii.setWordVectorLocation(modelSlim);
     tii.setTruncateLength(truncateLength);
     tii.setTrainBatchSize(batchSize);
@@ -213,7 +200,7 @@ public class RnnSequenceClassifierTest {
     nnc.setGradientNormalizationThreshold(1.0);
     nnc.setLearningRate(0.02);
 
-    final TextFileInstanceIterator tfii = new TextFileInstanceIterator();
+    final TextFilesEmbeddingInstanceIterator tfii = new TextFilesEmbeddingInstanceIterator();
     tfii.setTextsLocation(new File("src/test/resources/numeric/anger-texts"));
     tfii.setTruncateLength(80);
     tfii.setTrainBatchSize(64);
@@ -245,7 +232,7 @@ public class RnnSequenceClassifierTest {
 //
 //    int vectorSize = 300; // Size of the word vectors. 300 in the Google News model
 //
-//    tii = new TextInstanceIterator();
+//    tii = new TextEmbeddingInstanceIterator();
 //    tii.setTruncateLength(truncateLength);
 //    tii.setWordVectorLocation(modelSlim);
 //    final int bs = batchSize;

@@ -26,7 +26,7 @@ import weka.core.MissingOutputLayerException;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
-import weka.dl4j.iterators.instance.TextInstanceIterator;
+import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
 
 /**
  * A classifier that can handle sequences.
@@ -47,7 +47,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   public RnnSequenceClassifier() {
     super();
     layers = new Layer[] {new weka.dl4j.layers.RnnOutputLayer()};
-    instanceIterator = new TextInstanceIterator();
+    instanceIterator = new TextEmbeddingInstanceIterator();
   }
 
   /**

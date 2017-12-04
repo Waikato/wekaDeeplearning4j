@@ -6,11 +6,11 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
-import weka.dl4j.iterators.dataset.TextFileEmbeddingDataSetIterator;
+import weka.dl4j.iterators.dataset.TextFilesEmbeddingDataSetIterator;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
- * TextInstanceIterator.
+ * TextEmbeddingInstanceIterator.
  *
  * <p>Assumes the instance object is of the following structure:
  *
@@ -21,7 +21,7 @@ import weka.dl4j.iterators.dataset.TextFileEmbeddingDataSetIterator;
  *
  * @author Steven Lang
  */
-public class TextFileInstanceIterator extends TextInstanceIterator {
+public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIterator {
 
   private static final long serialVersionUID = -1065956690877737854L;
   private File textsLocation = new File(System.getProperty("user.dir"));
@@ -31,17 +31,33 @@ public class TextFileInstanceIterator extends TextInstanceIterator {
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextFileEmbeddingDataSetIterator(
+    return new TextFilesEmbeddingDataSetIterator(
         data, wordVectors, batchSize, truncateLength, textsLocation);
   }
 
+  /**
+   * Validates the input dataset
+   *
+   * @param data the input dataset
+   * @throws InvalidInputDataException if validation is unsuccessful
+   */
+  public void validate(Instances data) throws InvalidInputDataException {
+
+    if (!getTextsLocation().isDirectory()) {
+      throw new InvalidInputDataException("Directory not valid: " + getTextsLocation());
+    }
+    if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
+      throw new InvalidInputDataException(
+          "An ARFF is required with a string attribute and a class attribute");
+    }
+  }
 
   @OptionMetadata(
-      displayName = "directory of text files",
-      description = "The directory containing the text files (default = user home).",
-      commandLineParamName = "textsLocation",
-      commandLineParamSynopsis = "-textsLocation <string>",
-      displayOrder = 1
+    displayName = "directory of text files",
+    description = "The directory containing the text files (default = user home).",
+    commandLineParamName = "textsLocation",
+    commandLineParamSynopsis = "-textsLocation <string>",
+    displayOrder = 3
   )
   public File getTextsLocation() {
     return textsLocation;
@@ -50,5 +66,4 @@ public class TextFileInstanceIterator extends TextInstanceIterator {
   public void setTextsLocation(File textsLocation) {
     this.textsLocation = textsLocation;
   }
-
 }
