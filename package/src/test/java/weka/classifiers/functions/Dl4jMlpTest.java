@@ -1,6 +1,5 @@
 package weka.classifiers.functions;
 
-import java.util.Scanner;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
@@ -21,9 +20,7 @@ import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
-import weka.dl4j.lossfunctions.LossL2;
 import weka.dl4j.lossfunctions.LossMCXENT;
-import weka.dl4j.lossfunctions.LossMSE;
 import weka.dl4j.zoo.LeNet;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
@@ -72,15 +69,15 @@ public class Dl4jMlpTest {
     idiMnist.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
     dataIris = DatasetLoader.loadIris();
     startTime = System.currentTimeMillis();
-//    TestUtil.enableUiServer(clf);
+    //        TestUtil.enableUIServer(clf);
   }
 
   @After
   public void after() throws IOException {
 
-            logger.info("Press anything to close");
-//            Scanner sc = new Scanner(System.in);
-//            sc.next();
+    //        logger.info("Press anything to close");
+    //        Scanner sc = new Scanner(System.in);
+    //        sc.next();
     double time = (System.currentTimeMillis() - startTime) / 1000.0;
     logger.info("Testmethod: " + name.getMethodName());
     logger.info("Time: " + time + "s");
@@ -172,6 +169,7 @@ public class Dl4jMlpTest {
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
     nnc.setPretrain(false);
     nnc.setSeed(TestUtil.SEED);
+
     clf.setNeuralNetConfiguration(nnc);
     clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
     clf.setIterationListener(new EpochListener());
@@ -334,9 +332,6 @@ public class Dl4jMlpTest {
   @Test
   public void testAsyncIterator() throws Exception {
     clf.setQueueSize(4);
-    final DefaultInstanceIterator it = new DefaultInstanceIterator();
-    it.setTrainBatchSize(32);
-    clf.setInstanceIterator(it);
     clf.buildClassifier(dataIris);
   }
   /** Test zoo model with wrong iterator */
