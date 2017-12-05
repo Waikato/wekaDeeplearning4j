@@ -31,8 +31,7 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextFilesEmbeddingDataSetIterator(
-        data, wordVectors, batchSize, truncateLength, textsLocation);
+    return new TextFilesEmbeddingDataSetIterator(data, wordVectors, tokenizerFactory, tokenPreProcess, stopwords, batchSize, truncateLength, textsLocation);
   }
 
   /**
