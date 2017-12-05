@@ -3,11 +3,10 @@ package weka.classifiers.functions;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.Layer;
@@ -22,15 +21,17 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stemmers.SnowballStemmer;
-import weka.core.stopwords.AbstractStopwords;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.TextFilesEmbeddingInstanceIterator;
 import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.TextFilesEmbeddingInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
 import weka.dl4j.listener.EpochListener;
@@ -319,6 +320,36 @@ public class RnnSequenceClassifierTest {
       });
       Assert.fail();
     }
+  }
+
+  @Test
+  public void testClassIndexAtPosZero() throws Exception {
+    data = DatasetLoader.loadAnger();
+
+    RnnOutputLayer out = new RnnOutputLayer();
+    out.setLossFn(new LossMSE());
+    out.setActivationFn(new ActivationIdentity());
+    clf.setLayers(out);
+
+    // Create reversed attribute list
+    ArrayList<Attribute> attsReversed = new ArrayList<>();
+    for (int i = data.numAttributes() - 1; i >= 0; i--){
+      attsReversed.add(data.attribute(i));
+    }
+
+    // Create copy with class at pos 0 and text at pos 1
+    Instances copy = new Instances("reversed", attsReversed,data.numInstances());
+    data.forEach(d -> {
+      Instance inst = new DenseInstance(2);
+      inst.setDataset(copy);
+      inst.setValue(0, d.classValue());
+      inst.setValue(1, d.stringValue(0));
+      copy.add(inst);
+    });
+
+    copy.setClassIndex(0);
+
+    TestUtil.holdout(clf, copy);
   }
 
 
