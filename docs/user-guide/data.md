@@ -94,6 +94,9 @@ If you are going to process text data, it is usually necessary to project the do
 Available parameters:
 
 - `wordVectorLocation`: File which provides the iterator with a serialized word embedding
+- `stopWords`: Stopword strategy to filter unnecessary words
+- `tokenizerFactory`: Defines how tokens are created
+- `tokenPreProcess`: Defines how tokens are preprocessed
 - `truncateLength`: Maximum number of words per document
 
 
@@ -113,6 +116,9 @@ review_1.txt,neg
 Available parameters:
 
 - `wordVectorLocation`: File which provides the iterator with a serialized word embedding
+- `stopWords`: Stopword strategy to filter unnecessary words
+- `tokenizerFactory`: Defines how tokens are created
+- `tokenPreProcess`: Defines how tokens are preprocessed
 - `truncateLength`: Maximum number of words per document
 - `textsLocation`: The absolute path to the location of the text files listed in the meta data ARFF file
 
