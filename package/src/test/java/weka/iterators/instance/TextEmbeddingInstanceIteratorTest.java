@@ -1,9 +1,13 @@
 package weka.iterators.instance;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -86,5 +90,29 @@ public class TextEmbeddingInstanceIteratorTest {
           final double actual = lbls.getDouble(0, 1, lbls.shape()[2] - 1);
           assertEquals(expected, actual, 10e-5);
         });
+  }
+
+  /**
+   * Test different word vector formats crafted by hand.
+   */
+  @Test
+  public void testDifferentEmbeddings() {
+    File embDir = new File("src/test/resources/embeddings/small");
+    final File[] embeddings = embDir.listFiles();
+    Set<String> words = new HashSet<>();
+    words.add("snowball");
+    words.add("christmas");
+    words.add("tree");
+
+    for (File f : embeddings) {
+      log.info("Testing embedding {}", f.getAbsolutePath());
+      TextEmbeddingInstanceIterator teii = new TextEmbeddingInstanceIterator();
+      if (f.getAbsolutePath().contains("gz")) {
+        log.info("");
+      }
+      teii.setWordVectorLocation(f);
+      final Collection ws = teii.getWordVectors().vocab().words();
+      assertTrue(ws.containsAll(words) && words.containsAll(ws));
+    }
   }
 }
