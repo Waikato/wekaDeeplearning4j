@@ -65,4 +65,11 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
   public void setTextsLocation(File textsLocation) {
     this.textsLocation = textsLocation;
   }
+
+  public String globalInfo() {
+    return "Text iterator that reads documents from each file that is listed in a meta arff file. "
+        + "Each document is then "
+        + "processed by the tokenization, stopwords, token-preprocessing and afterwards mapped into "
+        + "an embedding space with the given word-vector model.";
+  }
 }

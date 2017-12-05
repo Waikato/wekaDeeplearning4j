@@ -390,8 +390,8 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
   }
 
   public String globalInfo() {
-    return "Instance iterator reads rows from the given ARFF file. This "
-        + "iterator is not compatible with convolution layers. See also: "
-        + "ConvolutionInstanceIterator/ImageInstanceIterator.";
+    return "Text iterator that reads documents line wise from an ARFF file. Each document is then "
+        + "processed by the tokenization, stopwords, token-preprocessing and afterwards mapped into "
+        + "an embedding space with the given word-vector model.";
   }
 }
