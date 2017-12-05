@@ -73,7 +73,7 @@ public class Dl4jMlpTest {
   }
 
   @After
-  public void after() throws IOException {
+  public void after() {
 
     //        logger.info("Press anything to close");
     //        Scanner sc = new Scanner(System.in);
@@ -171,7 +171,7 @@ public class Dl4jMlpTest {
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
     clf.setIterationListener(new EpochListener());
     TestUtil.holdout(clf, dataMnist);
   }
@@ -197,7 +197,7 @@ public class Dl4jMlpTest {
     dl.setNOut(10);
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {dl, cl, ol});
+    clf.setLayers(dl, cl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -221,7 +221,7 @@ public class Dl4jMlpTest {
     cl.setStride(new int[] {1, 1});
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.setLayers(cl, dl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -246,7 +246,7 @@ public class Dl4jMlpTest {
     cl.setStride(new int[] {1, 1});
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.setLayers(cl, dl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -280,7 +280,7 @@ public class Dl4jMlpTest {
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
     clf.setIterationListener(new EpochListener());
 
     File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
@@ -324,7 +324,7 @@ public class Dl4jMlpTest {
    */
   @Test(expected = MissingOutputLayerException.class)
   public void testLastLayerNoOutputLayer() throws Exception {
-    clf.setLayers(new Layer[] {new DenseLayer()});
+    clf.setLayers(new DenseLayer());
     clf.initializeClassifier(dataIris);
   }
 

@@ -354,7 +354,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     commandLineParamSynopsis = "-layer <string>",
     displayOrder = 2
   )
-  public void setLayers(Layer[] layers) {
+  public void setLayers(Layer... layers) {
     validateLayers(layers);
 
     // If something changed, set zoomodel to CustomNet

@@ -35,7 +35,7 @@ public class ActivationTest {
     outputLayer.setLayerName("Output-layer");
 
     clf.setNumEpochs(1);
-    clf.setLayers(new Layer[] {denseLayer, outputLayer});
+    clf.setLayers(denseLayer, outputLayer);
 
     final Instances data = DatasetLoader.loadIris();
     clf.buildClassifier(data);
