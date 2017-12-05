@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -38,6 +39,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
+import weka.core.converters.CSVSaver;
 import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
 import weka.gui.ProgrammaticProperty;
 
@@ -130,14 +132,17 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
   protected void initWordVectors() {
     log.debug("Loading word vector model");
 
-    // Check if file is CSV
-    if (wordVectorLocation.getAbsolutePath().endsWith(".csv")) {
-      // Try loading plain CSV
+    final String path = wordVectorLocation.getAbsolutePath();
+    final String pathLower = path.toLowerCase();
+    if (pathLower.endsWith(".arff")) {
+      loadEmbeddingFromArff(path);
+    } else if (pathLower.endsWith(".csv")) {
+      // Check if file is CSV
       boolean success = loadEmbeddingFromCSV(wordVectorLocation);
       if (!success) {
         throw new RuntimeException("Could not load the word vector file.");
       }
-    } else if (wordVectorLocation.getAbsolutePath().endsWith(".csv.gz")) {
+    } else if (pathLower.endsWith(".csv.gz")) {
       // If the file is gzipped, try the dl4j gzipped format
       try {
         wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
@@ -169,6 +174,33 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
     } else {
       // If no file extension was caught before, try loading as is
       wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+    }
+  }
+
+  /**
+   * Load the embedding from a given arff file. First converts the ARFF to a temporary CSV file and
+   * continues the loading mechanism with the CSV file afterwards
+   *
+   * @param path Path to the ARFF file
+   */
+  private void loadEmbeddingFromArff(String path) {
+    // Try loading ARFF file
+    try {
+      Instances insts = new Instances(new FileReader(path));
+      CSVSaver saver = new CSVSaver();
+      saver.setFieldSeparator(" ");
+      saver.setInstances(insts);
+      final File tmpFile =
+          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString(), ".csv")
+              .toFile();
+      saver.setFile(tmpFile);
+      saver.setNoHeaderRow(true);
+      saver.writeBatch();
+      loadEmbeddingFromCSV(tmpFile);
+      tmpFile.delete();
+    } catch (Exception e) {
+      throw new RuntimeException(
+          "ARFF file could not be read (" + wordVectorLocation.getAbsolutePath() + ")", e);
     }
   }
 
