@@ -107,7 +107,7 @@ public class TextEmbeddingInstanceIteratorTest {
     for (File f : embeddings) {
       log.info("Testing embedding {}", f.getAbsolutePath());
       TextEmbeddingInstanceIterator teii = new TextEmbeddingInstanceIterator();
-      if (f.getAbsolutePath().contains("gz")) {
+      if (f.getAbsolutePath().contains("arff")) {
         log.info("");
       }
       teii.setWordVectorLocation(f);
