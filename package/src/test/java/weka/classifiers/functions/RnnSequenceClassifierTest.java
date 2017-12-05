@@ -3,18 +3,28 @@ package weka.classifiers.functions;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.Layer;
+import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import weka.core.Instances;
+import weka.core.stemmers.SnowballStemmer;
+import weka.core.stopwords.AbstractStopwords;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
@@ -25,6 +35,16 @@ import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMSE;
+import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
+import weka.dl4j.text.stopwords.Dl4jNull;
+import weka.dl4j.text.stopwords.Dl4jRainbow;
+import weka.dl4j.text.stopwords.Dl4jWordsFromFile;
+import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
+import weka.dl4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor;
+import weka.dl4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor;
+import weka.dl4j.text.tokenization.tokenizer.preprocessor.StemmingPreprocessor;
+import weka.dl4j.text.tokenization.tokenizerfactory.CharacterNGramTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizerfactory.TweetNLPTokenizerFactory;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
@@ -225,6 +245,81 @@ public class RnnSequenceClassifierTest {
     TestUtil.holdout(clf, data, 33);
   }
 
+  @Test
+  public void testConfigRotation() throws Exception {
+    Map<String, String> failedConfigs = new HashMap<>();
+
+    tii = new TextEmbeddingInstanceIterator();
+    tii.setWordVectorLocation(modelSlim);
+    data = DatasetLoader.loadAnger();
+
+    // Reduce datasize
+    RemovePercentage rp = new RemovePercentage();
+    rp.setPercentage(98);
+    rp.setInputFormat(data);
+    data = Filter.useFilter(data, rp);
+
+    RnnOutputLayer out = new RnnOutputLayer();
+    out.setLossFn(new LossMSE());
+    out.setActivationFunction(new ActivationIdentity());
+
+    final Dl4jWordsFromFile wff = new Dl4jWordsFromFile();
+    wff.setStopwords(new File("src/test/resources/stopwords/english.txt"));
+    // Iterate stopwords
+    for (Dl4jAbstractStopwords sw : new Dl4jAbstractStopwords[]{new Dl4jRainbow(), new Dl4jNull(),
+        wff}){
+      tii.setStopwords(sw);
+
+      final StemmingPreprocessor spp = new StemmingPreprocessor();
+      spp.setStemmer(new SnowballStemmer());
+      // Iterate TokenPreProcess
+      for(TokenPreProcess tpp : new TokenPreProcess[]{
+          new CommonPreprocessor(),
+          new EndingPreProcessor(),
+          new LowCasePreProcessor(),
+          spp}){
+        tii.setTokenPreProcess(tpp);
+
+        // Iterate tokenizer faktory
+        for(TokenizerFactory tf : new TokenizerFactory[]{
+            new DefaultTokenizerFactory(),
+            new CharacterNGramTokenizerFactory(),
+            new TweetNLPTokenizerFactory(),
+        }){
+          tii.setTokenizerFactory(tf);
+
+          // Create clean classifier
+          clf = new RnnSequenceClassifier();
+          clf.setNumEpochs(1);
+          clf.setLayers(new Layer[]{out});
+          clf.setInstanceIterator(tii);
+          clf.settBPTTforwardLength(3);
+          clf.settBPTTbackwardLength(3);
+
+          String conf = "\n - TokenPreProcess: "+tpp.getClass().getSimpleName()+
+                  "\n - TokenizerFactory: "+ tf.getClass().getSimpleName()+
+                  "\n - StopWords: " + sw.getClass().getSimpleName();
+          log.info(conf);
+          try{
+            clf.buildClassifier(data);
+          } catch (Exception e){
+            failedConfigs.put(conf, e.toString());
+          }
+        }
+      }
+    }
+
+    // Check if anything failed
+    if (!failedConfigs.isEmpty()){
+      failedConfigs.forEach((s, s2) -> {
+        log.error("Config failed:");
+        log.error(s);
+        log.error("Exception:");
+        log.error(s2);
+      });
+      Assert.fail();
+    }
+  }
 
 
 //  @Test
