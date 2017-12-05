@@ -40,7 +40,7 @@ public class Dl4jMlpArffTest {
   private long startTime;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     // Init mlp clf
     clf = new Dl4jMlpClassifier();
     clf.setSeed(TestUtil.SEED);
@@ -53,7 +53,7 @@ public class Dl4jMlpArffTest {
   }
 
   @After
-  public void after() throws IOException {
+  public void after() {
     double time = (System.currentTimeMillis() - startTime) / 1000.0;
     logger.info("Testmethod: " + name.getMethodName());
     logger.info("Time: " + time + "s");
@@ -94,7 +94,7 @@ public class Dl4jMlpArffTest {
 
     clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
     TestUtil.holdout(clf, data);
   }
 

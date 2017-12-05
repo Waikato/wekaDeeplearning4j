@@ -89,7 +89,7 @@ public class RnnSequenceClassifierTest {
   }
 
   @Before
-  public void before() throws Exception {
+  public void before() {
 
     // Init mlp clf
     clf = new RnnSequenceClassifier();
@@ -118,7 +118,7 @@ public class RnnSequenceClassifierTest {
   }
 
   @After
-  public void after() throws IOException {
+  public void after() {
     double time = (System.currentTimeMillis() - startTime) / 1000.0;
     log.info("Testmethod: " + name.getMethodName());
     log.info("Time: " + time + "s");
@@ -146,7 +146,7 @@ public class RnnSequenceClassifierTest {
     nnc.setLearningRate(0.02);
 
     // Config classifier
-    clf.setLayers(new Layer[] {lstm1, rnnOut});
+    clf.setLayers(lstm1, rnnOut);
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
@@ -185,7 +185,7 @@ public class RnnSequenceClassifierTest {
 
     tii.setTruncateLength(80);
     // Config classifier
-    clf.setLayers(new Layer[] {lstm1, rnnOut});
+    clf.setLayers(lstm1, rnnOut);
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
@@ -230,7 +230,7 @@ public class RnnSequenceClassifierTest {
 
 
     // Config classifier
-    clf.setLayers(new Layer[] {lstm1, rnnOut});
+    clf.setLayers(lstm1, rnnOut);
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
@@ -292,7 +292,7 @@ public class RnnSequenceClassifierTest {
           // Create clean classifier
           clf = new RnnSequenceClassifier();
           clf.setNumEpochs(1);
-          clf.setLayers(new Layer[]{out});
+          clf.setLayers(out);
           clf.setInstanceIterator(tii);
           clf.settBPTTforwardLength(3);
           clf.settBPTTbackwardLength(3);
