@@ -12,11 +12,11 @@ import weka.dl4j.iterators.dataset.TextFilesEmbeddingDataSetIterator;
  * Converts the given Instances object into a DataSet and then constructs and returns a
  * TextEmbeddingInstanceIterator.
  *
- * <p>Assumes the instance object is of the following structure:
+ * <p>Assumes the instance object has the following two attributes:
  *
  * <ul>
- *   <li>Attribute 0: path to text file
- *   <li>Attribute 1: class
+ *   <li>Path to text file
+ *   <li>Class
  * </ul>
  *
  * @author Steven Lang
@@ -45,7 +45,8 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
     if (!getTextsLocation().isDirectory()) {
       throw new InvalidInputDataException("Directory not valid: " + getTextsLocation());
     }
-    if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
+    if (!((data.attribute(0).isString() && data.classIndex() == 1)
+          || (data.attribute(1).isString() && data.classIndex() == 0))) {
       throw new InvalidInputDataException(
           "An ARFF is required with a string attribute and a class attribute");
     }

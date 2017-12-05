@@ -53,11 +53,11 @@ import weka.gui.ProgrammaticProperty;
  * Converts the given Instances object into a DataSet and then constructs and returns a
  * TextEmbeddingInstanceIterator.
  *
- * <p>Assumes the instance object is of the following structure:
+ * <p>Assumes the instance with the following attributes:
  *
  * <ul>
- *   <li>Attribute 0: text (e.g. a elementwise document)
- *   <li>Attribute 1: class
+ *   <li>Text (e.g. a elementwise document)
+ *   <li>Class
  * </ul>
  *
  * @author Steven Lang
@@ -88,12 +88,10 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   @Override
   public void validate(Instances data) throws InvalidInputDataException {
-    if (!data.attribute(0).isString()) {
-      throw new InvalidInputDataException("The first attribute has to be the document.");
-    }
-    if (data.classIndex() != 1) {
+    if (!((data.attribute(0).isString() && data.classIndex() == 1)
+        || (data.attribute(1).isString() && data.classIndex() == 0))) {
       throw new InvalidInputDataException(
-          "The class index must be 1. Class in the given data: " + data.classIndex());
+          "An ARFF is required with a string attribute and a class attribute");
     }
     if (data.numAttributes() != 2) {
       throw new InvalidInputDataException(
