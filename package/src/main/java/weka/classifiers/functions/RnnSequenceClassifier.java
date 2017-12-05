@@ -296,7 +296,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
   public String globalInfo() {
     return "Classification and regression with recurrent neural network using DeepLearning4J.\n"
-        + "Evaluations after each epoch are written to the log file.\n\n"
         + "Iterator usage\n"
         + "- TextEmbeddingInstanceIterator: ARFF files containing the document as lines\n"
         + "- TextFilesEmbeddingInstanceIterator: ARFF files containing meta-data linking to actual document files\n"
