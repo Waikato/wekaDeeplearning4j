@@ -214,7 +214,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   public String globalInfo() {
     return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n"
-        + "Evaluations after each epoch are written to the log file.\n\n"
         + "Iterator usage\n"
         + "- DefaultInstanceIterator: Simple ARFF files without spatial interpretation\n"
         + "- ConvolutionalInstanceIterator: ARFF files with spatial interpretation\n"
