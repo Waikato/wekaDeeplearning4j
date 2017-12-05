@@ -81,9 +81,12 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     List<String> reviews = new ArrayList<>(num);
     List<Double> lbls = new ArrayList<>(num);
 
+    int classIndex = data.classIndex();
+    int documentIndex = 1 - classIndex;
+
     for (int i = 0; i < num && cursor < totalExamples(); i++) {
-      final String document = data.get(cursor).stringValue(0);
-      final double label = data.get(cursor).value(1);
+      final String document = data.get(cursor).stringValue(documentIndex);
+      final double label = data.get(cursor).value(classIndex);
       reviews.add(document);
       lbls.add(label);
       cursor++;
