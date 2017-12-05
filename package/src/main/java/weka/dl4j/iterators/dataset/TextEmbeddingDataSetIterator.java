@@ -104,7 +104,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     }
 
     // If longest review exceeds 'truncateLength': only take the first 'truncateLength' words
-    if (maxLength > truncateLength) maxLength = truncateLength;
+    if (maxLength > truncateLength || maxLength == 0) maxLength = truncateLength;
 
     // Create data for training
     // Here: we have reviews.size() examples of varying lengths
