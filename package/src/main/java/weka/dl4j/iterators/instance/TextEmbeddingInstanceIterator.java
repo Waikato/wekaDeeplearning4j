@@ -20,9 +20,18 @@
  */
 package weka.dl4j.iterators.instance;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.zip.GZIPInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -30,6 +39,7 @@ import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
@@ -54,7 +64,7 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
   protected File wordVectorLocation = new File(System.getProperty("user.dir"));
 
   /** Loaded word vectors */
-  protected transient WordVectors wordVectors;
+  public transient WordVectors wordVectors;
 
   /** Truncation length (maximum number of tokens per document) */
   protected int truncateLength = 100;
@@ -90,8 +100,7 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextEmbeddingDataSetIterator(
-        data, wordVectors, batchSize, truncateLength);
+    return new TextEmbeddingDataSetIterator(data, wordVectors, batchSize, truncateLength);
   }
 
   @OptionMetadata(
@@ -105,9 +114,14 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
     return wordVectorLocation;
   }
 
+  /**
+   * Set the word vector location and try to initialize it
+   *
+   * @param file Word vector location
+   */
   public void setWordVectorLocation(File file) {
-    this.wordVectorLocation = file;
-    if (file != null && !file.equals(wordVectorLocation)){
+    if (file != null && !file.equals(wordVectorLocation)) {
+      this.wordVectorLocation = file;
       initWordVectors();
     }
   }
@@ -115,7 +129,142 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
   /** Initialize the word vectors from the given file */
   protected void initWordVectors() {
     log.debug("Loading word vector model");
-    wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+
+    // Check if file is CSV
+    if (wordVectorLocation.getAbsolutePath().endsWith(".csv")) {
+      // Try loading plain CSV
+      boolean success = loadEmbeddingFromCSV(wordVectorLocation);
+      if (!success) {
+        throw new RuntimeException("Could not load the word vector file.");
+      }
+    } else if (wordVectorLocation.getAbsolutePath().endsWith(".csv.gz")) {
+      // If the file is gzipped, try the dl4j gzipped format
+      try {
+        wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+      } catch (RuntimeException re) {
+        // Dl4j format not found, continue with decompression by hand
+        try {
+          GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(wordVectorLocation));
+          File tmpFile =
+              Paths.get(System.getProperty("java.io.tmpdir"), "wordmodel-tmp.csv").toFile();
+          tmpFile.delete();
+          FileOutputStream fos = new FileOutputStream(tmpFile);
+          int length;
+          byte[] buffer = new byte[1024];
+          while ((length = gzis.read(buffer)) > 0) {
+            fos.write(buffer, 0, length);
+          }
+          fos.close();
+          gzis.close();
+
+          // Try loading decompressed CSV file
+          boolean success = loadEmbeddingFromCSV(tmpFile);
+          if (!success) {
+            throw new RuntimeException("Could not load the word vector file.");
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    } else {
+      // If no file extension was caught before, try loading as is
+      wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+    }
+  }
+
+  /**
+   * Try to load the embedding from a CSV file. This iterates over different separators.
+   *
+   * @param f CSV file
+   * @return True if loading was successful
+   */
+  private boolean loadEmbeddingFromCSV(File f) {
+    // Try different separators
+    for (String sep : new String[] {" ", ";", ",", "\t", "\\w", ":"}) {
+      boolean success = loadEmbeddingFromCSV(sep, f);
+      if (success) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Try to load the embedding from a CSV file.
+   *
+   * @param separator Separator for CSV interpretation
+   * @param file CSV file
+   * @return
+   */
+  private boolean loadEmbeddingFromCSV(String separator, File file) {
+    try {
+      File augmentedCSVFile = Paths.get(file.getAbsolutePath() + ".aug").toFile();
+      augmentedCSVFile.delete();
+      BufferedReader br = new BufferedReader(new FileReader(file));
+      BufferedWriter bw = new BufferedWriter(new FileWriter(augmentedCSVFile));
+      String line;
+      // Replace separator with whitespace in each line for dl4j parsing
+      while ((line = br.readLine()) != null) {
+        if (!line.contains(separator)) return false; // Continue to the next separator
+        bw.write(line.replaceAll(separator, " "));
+        bw.newLine();
+      }
+      br.close();
+      bw.close();
+
+      // First try to load it as is
+      try {
+        wordVectors = WordVectorSerializer.loadStaticModel(augmentedCSVFile);
+        if (wordVectors.vocab().words().size() != FileUtils.readLines(augmentedCSVFile).size()) {
+          throw new Exception("Something went wrong"); // Continue in catch clause
+        }
+        augmentedCSVFile.delete();
+        return true;
+      } catch (Exception e) {
+        // Failed: this might be due to DL4J expecting the word at pos [0] and the CSV file having
+        // the word at the last position
+
+        // Try to put the last token to the first position and reload the model
+        File augmentedCSVFileSwitched = Paths.get(file.getAbsolutePath() + ".aug2").toFile();
+        augmentedCSVFileSwitched.delete();
+        br = new BufferedReader(new FileReader(augmentedCSVFile));
+        bw = new BufferedWriter(new FileWriter(augmentedCSVFileSwitched));
+
+        // Replace separator with whitespace in each line for dl4j parsing
+        while ((line = br.readLine()) != null) {
+          String[] parts = line.split(" ");
+          // Join the parts, starting with the last one
+          StringBuilder sb = new StringBuilder();
+          sb.append(parts[parts.length - 1]);
+          for (int i = 0; i < parts.length - 1; i++) {
+            if (i < parts.length - 2) {
+              sb.append(" ");
+            }
+            sb.append(parts[i]);
+          }
+          bw.write(sb.toString());
+          bw.newLine();
+        }
+        br.close();
+        bw.close();
+
+        try {
+          wordVectors = WordVectorSerializer.loadStaticModel(augmentedCSVFileSwitched);
+          // Success
+          return true;
+        } catch (Exception ex) {
+          return false;
+        } finally {
+          augmentedCSVFile.delete();
+          augmentedCSVFileSwitched.delete();
+        }
+      } finally {
+        augmentedCSVFile.delete();
+      }
+    } catch (IOException e) {
+      // Not successful
+      return false;
+    }
   }
 
   @OptionMetadata(
@@ -131,6 +280,16 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   public void setTruncateLength(int truncateLength) {
     this.truncateLength = truncateLength;
+  }
+
+  @ProgrammaticProperty
+  public WordVectors getWordVectors() {
+    return wordVectors;
+  }
+
+  @ProgrammaticProperty
+  public void setWordVectors(WordVectors wordVectors) {
+    this.wordVectors = wordVectors;
   }
 
   public String globalInfo() {
