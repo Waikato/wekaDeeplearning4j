@@ -1188,10 +1188,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   @Override
   public String toString() {
-
-    if (replaceMissingFilter != null) {
-      return model.getConfiguration().toYaml();
-    }
+      if (model.getConfiguration() != null) {
+        return model.getConfiguration().toYaml();
+      }
     return null;
   }
 
