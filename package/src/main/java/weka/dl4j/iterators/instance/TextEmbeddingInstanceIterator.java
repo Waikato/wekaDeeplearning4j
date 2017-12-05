@@ -35,12 +35,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
+import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
 import weka.core.converters.CSVSaver;
 import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
+import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
+import weka.dl4j.text.stopwords.Dl4jRainbow;
+import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
+import weka.dl4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import weka.gui.ProgrammaticProperty;
 
 /**
@@ -64,6 +70,15 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   /** Word vector file location */
   protected File wordVectorLocation = new File(System.getProperty("user.dir"));
+
+  /** Token pre processor */
+  protected TokenPreProcess tokenPreProcess = new CommonPreprocessor();
+
+  /** Tokenizer factory */
+  protected TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
+
+  /** Stop words */
+  protected Dl4jAbstractStopwords stopwords = new Dl4jRainbow();
 
   /** Loaded word vectors */
   public transient WordVectors wordVectors;
@@ -102,31 +117,9 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextEmbeddingDataSetIterator(data, wordVectors, batchSize, truncateLength);
+    return new TextEmbeddingDataSetIterator(data, wordVectors, tokenizerFactory, tokenPreProcess, stopwords, batchSize, truncateLength);
   }
 
-  @OptionMetadata(
-    displayName = "location of word vectors",
-    description = "The word vectors location.",
-    commandLineParamName = "wordVectorLocation",
-    commandLineParamSynopsis = "-wordVectorLocation <string>",
-    displayOrder = 2
-  )
-  public File getWordVectorLocation() {
-    return wordVectorLocation;
-  }
-
-  /**
-   * Set the word vector location and try to initialize it
-   *
-   * @param file Word vector location
-   */
-  public void setWordVectorLocation(File file) {
-    if (file != null && !file.equals(wordVectorLocation)) {
-      this.wordVectorLocation = file;
-      initWordVectors();
-    }
-  }
 
   /** Initialize the word vectors from the given file */
   protected void initWordVectors() {
@@ -312,6 +305,78 @@ public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
 
   public void setTruncateLength(int truncateLength) {
     this.truncateLength = truncateLength;
+  }
+
+
+  @OptionMetadata(
+      displayName = "location of word vectors",
+      description = "The word vectors location.",
+      commandLineParamName = "wordVectorLocation",
+      commandLineParamSynopsis = "-wordVectorLocation <string>",
+      displayOrder = 3
+  )
+  public File getWordVectorLocation() {
+    return wordVectorLocation;
+  }
+
+  /**
+   * Set the word vector location and try to initialize it
+   *
+   * @param file Word vector location
+   */
+  public void setWordVectorLocation(File file) {
+    if (file != null && !file.equals(wordVectorLocation)) {
+      this.wordVectorLocation = file;
+      initWordVectors();
+    }
+  }
+
+  @OptionMetadata(
+      displayName = "token pre processor",
+      description = "The token pre processor.",
+      commandLineParamName = "tokenPreProcessor",
+      commandLineParamSynopsis = "-tokenPreProcessor <string>",
+      displayOrder = 4
+  )
+
+  public TokenPreProcess getTokenPreProcess() {
+    return tokenPreProcess;
+  }
+
+  public void setTokenPreProcess(
+      TokenPreProcess tokenPreProcess) {
+    this.tokenPreProcess = tokenPreProcess;
+  }
+
+  @OptionMetadata(
+      displayName = "tokenizer factory",
+      description = "The tokenizer factory.",
+      commandLineParamName = "tokenizerFactory",
+      commandLineParamSynopsis = "-tokenizerFactory <string>",
+      displayOrder = 5
+  )
+  public TokenizerFactory getTokenizerFactory() {
+    return tokenizerFactory;
+  }
+
+  public void setTokenizerFactory(
+      TokenizerFactory tokenizerFactory) {
+    this.tokenizerFactory = tokenizerFactory;
+  }
+
+  @OptionMetadata(
+      displayName = "stop words",
+      description = "The stop words to use.",
+      commandLineParamName = "stopWords",
+      commandLineParamSynopsis = "-stopWords <string>",
+      displayOrder = 5
+  )
+  public Dl4jAbstractStopwords getStopwords() {
+    return stopwords;
+  }
+
+  public void setStopwords(Dl4jAbstractStopwords stopwords) {
+    this.stopwords = stopwords;
   }
 
   @ProgrammaticProperty

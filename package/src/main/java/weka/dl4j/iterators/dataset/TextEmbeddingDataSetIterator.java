@@ -9,8 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -20,6 +19,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.core.Instances;
+import weka.core.stopwords.AbstractStopwords;
 
 /**
  * A DataSetIterator implementation that reads text documents from an arff file and translates each
@@ -35,6 +35,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   private final int batchSize;
   private final int vectorSize;
   private final int truncateLength;
+  protected AbstractStopwords stopWords;
 
   protected int cursor = 0;
   protected final Instances data;
@@ -43,11 +44,14 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   /**
    * @param data Instances with documents and labels
    * @param wordVectors WordVectors object
+   * @param tokenFact Tokenizer factory
+   * @param tpp Token pre processor
+   * @param stopWords Stop word object
    * @param batchSize Size of each minibatch for training
    * @param truncateLength If reviews exceed
    */
   public TextEmbeddingDataSetIterator(
-      Instances data, WordVectors wordVectors, int batchSize, int truncateLength)
+      Instances data, WordVectors wordVectors, TokenizerFactory tokenFact, TokenPreProcess tpp, AbstractStopwords stopWords, int batchSize, int truncateLength)
       throws IOException {
     this.batchSize = batchSize;
     this.vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
@@ -57,8 +61,9 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     this.wordVectors = wordVectors;
     this.truncateLength = truncateLength;
 
-    tokenizerFactory = new DefaultTokenizerFactory();
-    tokenizerFactory.setTokenPreProcessor(new CommonPreprocessor());
+    this.tokenizerFactory = tokenFact;
+    this.tokenizerFactory.setTokenPreProcessor(tpp);
+    this.stopWords = stopWords;
   }
 
   @Override
@@ -92,7 +97,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
       List<String> tokens = tokenizerFactory.create(s).getTokens();
       List<String> tokensFiltered = new ArrayList<>();
       for (String t : tokens) {
-        if (wordVectors.hasWord(t)) tokensFiltered.add(t);
+        if (wordVectors.hasWord(t) && !stopWords.isStopword(t)) tokensFiltered.add(t);
       }
       allTokens.add(tokensFiltered);
       maxLength = Math.max(maxLength, tokensFiltered.size());
