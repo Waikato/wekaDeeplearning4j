@@ -1172,7 +1172,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   /**
-   * Get the {@link MultiLayerNetwork} model
+   * Get the {@link ComputationGraph} model
    *
    * @return MultiLayerNetwork instance
    */
@@ -1190,7 +1190,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       if (model.getConfiguration() != null) {
         return model.getConfiguration().toYaml();
       }
-    return null;
+    return "";
   }
 
   /**
