@@ -89,24 +89,24 @@ public class EpochListener extends IterationListener implements TrainingListener
         }
 
         // Add loss
-        s += String.format(" Loss:           %9f\n", model.score());
+        s += String.format(" Loss:           %9f" + System.lineSeparator(), model.score());
 
         // Add Dl4j metrics
         if (isClassification) {
           final String stats =
-              Arrays.stream(cEval.stats().split("\n"))
+              Arrays.stream(cEval.stats().split(System.lineSeparator()))
                   .filter(line -> !line.contains("# of classes")) // Remove # classes line
                   .filter(line -> !line.contains("===")) // Remove separators
                   .filter(line -> !line.contains("Examples labeled as")) // Remove confusion matrix
                   .filter(line -> !line.trim().isEmpty()) // Remove empty lines
-                  .collect(Collectors.joining("\n")); // Join to original format
-          s += stats;
+                  .collect(Collectors.joining(System.lineSeparator())); // Join to original format
+          s += stats + System.lineSeparator();
         } else {
-          s += rEval.stats();
+          s += rEval.stats() + System.lineSeparator();
         }
       }
     } catch (UnsupportedOperationException e) {
-      return "Set is too small and does not contain all labels.";
+      return "Set is too small and does not contain all labels." + System.lineSeparator();
     } catch (Exception e) {
       log.error("Evaluation after epoch failed. Error: ", e);
       return "Not available";
