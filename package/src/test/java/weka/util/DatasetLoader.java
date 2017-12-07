@@ -1,6 +1,11 @@
 package weka.util;
 
+import java.io.IOException;
+import java.net.URL;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import weka.core.Instances;
+import weka.core.converters.CSVLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 
 import java.io.File;
@@ -11,6 +16,7 @@ import java.io.FileReader;
  *
  * @author Steven Lang
  */
+@Slf4j
 public class DatasetLoader {
 
   /** Number of classes in the iris dataset */
@@ -114,6 +120,36 @@ public class DatasetLoader {
   }
 
   /**
+   * Load the ReutersCorn train arff file (minimal)
+   *
+   * @return ReutersCorn train instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadReutersMinimal() throws Exception {
+    return loadArff("src/test/resources/nominal/ReutersCorn-train-minimal.arff");
+  }
+
+  /**
+   * Load the ReutersCorn train arff file (full)
+   *
+   * @return ReutersCorn train instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadReutersFull() throws Exception {
+    return loadArff("src/test/resources/nominal/ReutersCorn-train-full.arff");
+  }
+
+  /**
+   * Load the imdb review dataset
+   *
+   * @return imdb review instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadImdb() throws Exception {
+    return loadArff("src/test/resources/nominal/imdb.arff");
+  }
+
+  /**
    * Load the mnist minimal arff file
    *
    * @return Mnist minimal arff data as Instances
@@ -144,14 +180,56 @@ public class DatasetLoader {
   }
 
   /**
-   * Load the mnist minimal meta arff file
+   * Load the anger arff file
    *
-   * @return Mnist minimal meta data as Instances
+   * @return Anger data
+   * @throws Exception IO error.
+   */
+  public static Instances loadAnger() throws Exception {
+    return loadArff("src/test/resources/numeric/anger.arff");
+  }
+
+  /**
+   * Load an arbitrary arff file
+   *
+   * @return Instances
    * @throws Exception IO error.
    */
   public static Instances loadArff(String path) throws Exception {
     Instances data = new Instances(new FileReader(path));
     data.setClassIndex(data.numAttributes() - 1);
     return data;
+  }
+  /**
+   * Load the mnist minimal meta arff file
+   *
+   * @return Mnist minimal meta data as Instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadCSV(String path) throws Exception {
+    CSVLoader csv = new CSVLoader();
+    csv.setSource(new File(path));
+    Instances data = csv.getDataSet();
+    data.setClassIndex(data.numAttributes() - 1);
+    return data;
+  }
+
+  /**
+   * Download the google news vectors.
+   *
+   * @return File with news vectors model
+   * @throws IOException Could not download the model
+   */
+  public static File loadGoogleNewsVectors() throws IOException {
+    String url = "https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz";
+    final File file = new File("src/test/resources/GoogleNews-vectors-negative300-SLIM.bin.gz");
+
+    if (!file.exists()) {
+      log.info("Downloading GoogleNews-vectors-negative300-SLIM.bin.gz ...");
+      FileUtils.copyURLToFile(new URL(url), file);
+      log.info("Finished download");
+    }
+
+    return file;
   }
 }

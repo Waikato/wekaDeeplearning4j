@@ -22,11 +22,13 @@ package weka.dl4j.iterators.instance;
 
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
+import weka.core.InvalidInputDataException;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.OptionMetadata;
 
 /**
  * An abstract iterator that wraps DataSetIterators around Weka {@link Instances}.
@@ -42,15 +44,6 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
 
   /** The batch size for the mini batches */
   protected int batchSize = 1;
-
-  /**
-   * Get the number of predictor attributes for this iterator.
-   *
-   * @param data the dataset to compute the number of attributes from
-   * @return the number of attributes
-   * @throws Exception if the number of attributes cannot be computed successfully
-   */
-  public abstract int getNumAttributes(Instances data) throws Exception;
 
   /**
    * Returns the actual iterator.
@@ -82,6 +75,13 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
    *
    * @return the batch size
    */
+  @OptionMetadata(
+      displayName = "size of mini batch",
+      description = "The mini batch size to use in the iterator (default = 1).",
+      commandLineParamName = "bs",
+      commandLineParamSynopsis = "-bs <int>",
+      displayOrder = 1
+  )
   public int getTrainBatchSize() {
     return batchSize;
   }
@@ -94,6 +94,15 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
   public void setTrainBatchSize(int trainBatchSize) {
     batchSize = trainBatchSize;
   }
+
+
+  /**
+   * Validates the input dataset
+   *
+   * @param data the input dataset
+   * @throws InvalidInputDataException if validation is unsuccessful
+   */
+  public abstract void validate(Instances data) throws InvalidInputDataException;
 
   /**
    * Returns an enumeration describing the available options.

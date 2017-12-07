@@ -50,7 +50,7 @@ public class LayerTest {
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {pool, outputLayer});
+    clf.setLayers(pool, outputLayer);
 
     clf.setNumEpochs(1);
     clf.buildClassifier(data);
@@ -68,7 +68,7 @@ public class LayerTest {
   public void testOutputLayer() throws Exception {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     OutputLayer out = new OutputLayer();
-    clf.setLayers(new Layer[] {out});
+    clf.setLayers(out);
     Instances data = DatasetLoader.loadDiabetes();
 
     clf.setNumEpochs(1);
@@ -108,7 +108,7 @@ public class LayerTest {
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {dl, bn, outputLayer});
+    clf.setLayers(dl, bn, outputLayer);
 
     clf.setNumEpochs(1);
     clf.buildClassifier(data);
@@ -148,7 +148,7 @@ public class LayerTest {
 
     clf.setNumEpochs(1);
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {convLayer, outputLayer});
+    clf.setLayers(convLayer, outputLayer);
 
     clf.buildClassifier(data);
     double[][] res = clf.distributionsForInstances(data);

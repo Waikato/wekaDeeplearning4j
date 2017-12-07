@@ -64,6 +64,8 @@ public class OutputLayer extends org.deeplearning4j.nn.conf.layers.OutputLayer
     setL1(Double.NaN);
     setL2(Double.NaN);
     setRho(Double.NaN);
+    setGradientNormalization(null);
+    setGradientNormalizationThreshold(Double.NaN);
   }
 
   /**

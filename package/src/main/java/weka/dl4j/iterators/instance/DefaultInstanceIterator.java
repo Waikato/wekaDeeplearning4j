@@ -24,6 +24,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
+import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 
@@ -40,31 +41,13 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
   /** The ID used to serialize this class */
   private static final long serialVersionUID = 1316260988724548474L;
 
-  public int getTrainBatchSize() {
-    return batchSize;
-  }
-
-  @OptionMetadata(
-    displayName = "size of mini batch",
-    description = "The mini batch size to use in the iterator (default = 1).",
-    commandLineParamName = "bs",
-    commandLineParamSynopsis = "-bs <int>",
-    displayOrder = 1
-  )
-  public void setTrainBatchSize(int trainBatchSize) {
-    batchSize = trainBatchSize;
-  }
-
-  /**
-   * Returns the number of predictor attributes for this dataset.
-   *
-   * @param data the dataset to compute the number of attributes from
-   * @return the number of attributes in the Instances object minus one
-   */
   @Override
-  public int getNumAttributes(Instances data) {
-    return data.numAttributes() - 1;
+  public void validate(Instances data) throws InvalidInputDataException {
+    if (data.classIndex() < 0){
+      throw new InvalidInputDataException("Class index not set.");
+    }
   }
+
 
   /**
    * Returns the actual iterator.
@@ -75,8 +58,9 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
    * @return the DataSetIterator
    */
   @Override
-  public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize) {
-
+  public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize)
+      throws InvalidInputDataException {
+    validate(data);
     // Convert Instances to DataSet
     DataSet dataset = Utils.instancesToDataSet(data);
     return new DefaultDataSetIterator(dataset, batchSize);

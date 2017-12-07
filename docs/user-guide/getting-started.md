@@ -180,4 +180,4 @@ clf.setEarlyStopping(new EarlyStopping(5, 10))
 
 The GUI provides a simple and intuitive interface to configure the early stopping parameters:
 
-![GUI](img/early-stopping.png)
+![GUI](../img/early-stopping.png)

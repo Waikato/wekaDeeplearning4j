@@ -1,6 +1,15 @@
 package weka.dl4j.listener;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
@@ -8,15 +17,9 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.OptionMetadata;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A listener that prints the model score every epoch. Inspired by ScoreIterationListener written by
@@ -37,6 +40,9 @@ public class EpochListener extends IterationListener implements TrainingListener
   /** Log to this file if set */
   private transient PrintWriter logFile;
 
+  /** Enable intermediate evaluations */
+  private boolean enableIntermediateEvaluations = true;
+
   @Override
   public void onEpochEnd(Model model) {
     currentEpoch++;
@@ -47,10 +53,12 @@ public class EpochListener extends IterationListener implements TrainingListener
     }
 
     String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
-    s += "Train:      " + evaluateDataSetIterator(model, trainIterator);
 
-    if (validationIterator != null) {
-      s += "Validation: " + evaluateDataSetIterator(model, validationIterator);
+    if (enableIntermediateEvaluations) {
+      s += "Train Set:      \n" + evaluateDataSetIterator(model, trainIterator);
+      if (validationIterator != null) {
+        s += "Validation Set: \n" + evaluateDataSetIterator(model, validationIterator);
+      }
     }
 
     log(s);
@@ -64,36 +72,44 @@ public class EpochListener extends IterationListener implements TrainingListener
       if (model instanceof ComputationGraph) {
         ComputationGraph net = (ComputationGraph) model;
 
-        double scoreSum = 0;
-        int iterations = 0;
         Evaluation cEval = new Evaluation(numClasses);
-        RegressionEvaluation rEval = new RegressionEvaluation(1);
+        RegressionEvaluation rEval = new RegressionEvaluation(numClasses);
         while (iterator.hasNext()) {
-          // TODO: figure out which batch size is feasible for inference
-          final int batch = iterator.batch() * 8;
-          DataSet next = iterator.next(batch);
-          scoreSum += net.score(next);
-          iterations++;
+          DataSet next;
+          // AsyncDataSetIterator and CachingDataSetIterator do not support next(num)
+          if (iterator instanceof AsyncDataSetIterator
+              || iterator instanceof CachingDataSetIterator) {
+            next = iterator.next();
+          } else {
+            // TODO: figure out which batch size is feasible for inference
+            final int batch = iterator.batch() * 8;
+            next = iterator.next(batch);
+          }
           INDArray output =
               net.outputSingle(next.getFeatureMatrix()); // get the networks prediction
-          if (isClassification) cEval.eval(next.getLabels(), output);
-          else rEval.eval(next.getLabels(), output);
+          if (isClassification) cEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          else rEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
         }
 
-        double score = 0;
-        if (iterations != 0) {
-          score = scoreSum / iterations;
-        }
+        // Add loss
+        s += String.format(" Loss:           %9f" + System.lineSeparator(), model.score());
+
+        // Add Dl4j metrics
         if (isClassification) {
-          s += String.format("Accuracy: %4.2f%%", cEval.accuracy() * 100);
+          final String stats =
+              Arrays.stream(cEval.stats().split(System.lineSeparator()))
+                  .filter(line -> !line.contains("# of classes")) // Remove # classes line
+                  .filter(line -> !line.contains("===")) // Remove separators
+                  .filter(line -> !line.contains("Examples labeled as")) // Remove confusion matrix
+                  .filter(line -> !line.trim().isEmpty()) // Remove empty lines
+                  .collect(Collectors.joining(System.lineSeparator())); // Join to original format
+          s += stats + System.lineSeparator();
         } else {
-          s += String.format("Avg R2: %4.2f", rEval.averagecorrelationR2());
-          s += String.format(", Avg RMSE: %4.2f", rEval.averagerootMeanSquaredError());
+          s += rEval.stats() + System.lineSeparator();
         }
-        s += String.format(", Loss: %9f\n", score);
       }
     } catch (UnsupportedOperationException e) {
-      return "Validation set is too small and does not contain all labels.";
+      return "Set is too small and does not contain all labels." + System.lineSeparator();
     } catch (Exception e) {
       log.error("Evaluation after epoch failed. Error: ", e);
       return "Not available";
@@ -118,7 +134,7 @@ public class EpochListener extends IterationListener implements TrainingListener
   public void log(String msg) {
     log.info(msg);
     if (logFile != null) {
-      logFile.write(msg + "\n");
+      logFile.write(msg + System.lineSeparator());
       logFile.flush();
     }
   }
@@ -159,6 +175,21 @@ public class EpochListener extends IterationListener implements TrainingListener
     } else {
       this.n = evaluateEveryNEpochs;
     }
+  }
+
+  @OptionMetadata(
+    displayName = "enable intermediate evaluations",
+    description = "Enable intermediate evaluations (default = true).",
+    commandLineParamName = "eval",
+    commandLineParamSynopsis = "-eval <boolean>",
+    displayOrder = 0
+  )
+  public boolean isEnableIntermediateEvaluations() {
+    return enableIntermediateEvaluations;
+  }
+
+  public void setEnableIntermediateEvaluations(boolean enableIntermediateEvaluations) {
+    this.enableIntermediateEvaluations = enableIntermediateEvaluations;
   }
 
   /**

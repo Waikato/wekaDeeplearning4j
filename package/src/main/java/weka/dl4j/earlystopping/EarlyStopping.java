@@ -1,6 +1,7 @@
 package weka.dl4j.earlystopping;
 
 import lombok.extern.slf4j.Slf4j;
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -91,9 +92,14 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
       // Iterate batches
       while (valDataSetIterator.hasNext()) {
-        // TODO: figure out which batch size is feasible for inference
-        final int batch = valDataSetIterator.batch() * 8;
-        DataSet next = valDataSetIterator.next(batch);
+        DataSet next;
+        if (valDataSetIterator instanceof AsyncDataSetIterator){
+          next = valDataSetIterator.next();
+        } else {
+          // TODO: figure out which batch size is feasible for inference
+          final int batch = valDataSetIterator.batch() * 8;
+          next = valDataSetIterator.next(batch);
+        }
         scoreSum += model.score(next);
         iterations++;
       }
@@ -157,6 +163,14 @@ public class EarlyStopping implements OptionHandler, Serializable {
       throw new RuntimeException("Validation split percentage must be in 0 < p < 100.");
     }
     this.validationSetPercentage = p;
+  }
+
+  /**
+   * Get the validation dataset iterator
+   * @return DataSetIterator for the validation set
+   */
+  public DataSetIterator getValDataSetIterator() {
+    return valDataSetIterator;
   }
 
   /**
