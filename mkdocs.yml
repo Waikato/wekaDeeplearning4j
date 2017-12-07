@@ -14,4 +14,5 @@ pages:
     - Examples:
         - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
         - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
+        - 'Classifying the IMDB Dataset': 'examples/classifying-imdb.md'
     - Troubleshooting: troubleshooting.md
