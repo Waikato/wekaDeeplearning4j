@@ -16,7 +16,8 @@ The following Neural Network Layers are available to build sophisticated archite
 - **DenseLayer**: all units are connected to all units of its parent layer
 - **SubsamplingLayer**: subsample from groups of units of the parent layer by different strategies (average, maximum, etc.)
 - **BatchNormalization**: applies the common batch normalization strategy on the activations of the parent layer
-- **OutputLayer**: generates `N` outputs based on a given activation function
+- **LSTM**: uses long short term memory approach
+- **OutputLayer**: generates classification / regression outputs
 
-Further configurations can be found in the [Getting Started](getting-started.md) and the [Examples](examples) sections.
+Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)

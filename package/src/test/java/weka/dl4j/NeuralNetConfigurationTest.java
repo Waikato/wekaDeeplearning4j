@@ -1,5 +1,9 @@
 package weka.dl4j;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -65,7 +69,7 @@ public class NeuralNetConfigurationTest {
     idiMnist.setTrainBatchSize(DEFAULT_BATCHSIZE);
     startTime = System.currentTimeMillis();
     clf.setInstanceIterator(idiMnist);
-    //        TestUtil.enableUIServer(clf);
+    //        TestUtil.enableUiServer(clf);
   }
 
   @After
@@ -122,6 +126,11 @@ public class NeuralNetConfigurationTest {
       nnc.setUseRegularization(true);
       nnc.setUpdater(u);
 
+      final GradientNormalization clipWiseGN = GradientNormalization.ClipElementWiseAbsoluteValue;
+      nnc.setGradientNormalization(clipWiseGN);
+      final double gnT1 = 100.0;
+      nnc.setGradientNormalizationThreshold(gnT1);
+
       nnc.setL1(l1);
       nnc.setL2(l2);
 
@@ -133,19 +142,29 @@ public class NeuralNetConfigurationTest {
       clf.setNeuralNetConfiguration(nnc);
       clf.initializeClassifier(dataMnist); // creates the model internally
 
-      for (Layer l : layers) {
-        IUpdater u2 = ((BaseLayer) l).getIUpdater();
-        double l11 = ((BaseLayer) l).getL1();
-        double l21 = ((BaseLayer) l).getL2();
-        WeightInit weightInit1 = ((BaseLayer) l).getWeightInit();
-        double learningRate = ((BaseLayer) l).getLearningRate();
+      // Get configured layers
+      final List<Layer> confLayers = Arrays.stream(clf.getModel().getLayers())
+          .map(l -> l.conf().getLayer()).collect(Collectors.toList());
+      for (Layer l : confLayers) {
+        final BaseLayer bl = (BaseLayer) l;
+        IUpdater u2 = bl.getIUpdater();
+        double l11 = bl.getL1();
+        double l21 = bl.getL2();
+        WeightInit weightInit1 = bl.getWeightInit();
+        double learningRate = bl.getLearningRate();
         if (!(u instanceof AdaDelta)) { // AdaDelta does not have any learning rate
           Assert.assertEquals(lr, learningRate, 10e-6);
         }
+
+        final GradientNormalization gn = bl.getGradientNormalization();
+        final double gnt = bl.getGradientNormalizationThreshold();
+
         Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
         Assert.assertEquals(l1, l11, 10e-6);
         Assert.assertEquals(l2, l21, 10e-6);
         Assert.assertEquals(weightInit, weightInit1);
+        Assert.assertEquals(gnT1, gnt, 10e-5);
+        Assert.assertEquals(clipWiseGN, gn);
       }
     }
   }

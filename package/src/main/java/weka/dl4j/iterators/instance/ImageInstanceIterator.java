@@ -28,6 +28,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.Instances;
+import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 
@@ -58,21 +59,6 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements C
 
   /** The location of the folder containing the images */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
-
-  public int getTrainBatchSize() {
-    return batchSize;
-  }
-
-  @OptionMetadata(
-    displayName = "size of mini batch",
-    description = "The mini batch size to use in the iterator (default = 1).",
-    commandLineParamName = "bs",
-    commandLineParamSynopsis = "-bs <int>",
-    displayOrder = 0
-  )
-  public void setTrainBatchSize(int trainBatchSize) {
-    batchSize = trainBatchSize;
-  }
 
   @OptionMetadata(
     displayName = "directory of images",
@@ -138,29 +124,19 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements C
    * Validates the input dataset
    *
    * @param data the input dataset
-   * @throws Exception if validation is unsuccessful
+   * @throws InvalidInputDataException if validation is unsuccessful
    */
-  public void validate(Instances data) throws Exception {
+  public void validate(Instances data) throws InvalidInputDataException {
 
     if (!getImagesLocation().isDirectory()) {
-      throw new FileNotFoundException("Directory not valid: " + getImagesLocation());
+      throw new InvalidInputDataException("Directory not valid: " + getImagesLocation());
     }
     if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
-      throw new InvalidObjectException(
+      throw new InvalidInputDataException(
           "An ARFF is required with a string attribute and a class attribute");
     }
   }
 
-  /**
-   * This just returns the number of channels.
-   *
-   * @param data the dataset to compute the number of attributes from
-   * @return the number of channels
-   */
-  @Override
-  public int getNumAttributes(Instances data) {
-    return getNumChannels();
-  }
 
   /**
    * Returns the image recorder.

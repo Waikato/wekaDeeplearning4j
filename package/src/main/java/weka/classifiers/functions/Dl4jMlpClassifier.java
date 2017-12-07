@@ -20,9 +20,24 @@
  */
 package weka.classifiers.functions;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
+import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
@@ -38,17 +53,36 @@ import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.dataset.api.iterator.cache.DataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.rules.ZeroR;
-import weka.core.*;
+import weka.core.BatchPredictor;
+import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
+import weka.core.CapabilitiesHandler;
+import weka.core.EmptyIteratorException;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.InvalidValidationPercentageException;
+import weka.core.MissingOutputLayerException;
+import weka.core.OptionMetadata;
+import weka.core.SelectedTag;
+import weka.core.Tag;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.WekaException;
+import weka.core.WekaPackageManager;
+import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.*;
+import weka.dl4j.iterators.instance.AbstractInstanceIterator;
+import weka.dl4j.iterators.instance.Convolutional;
+import weka.dl4j.iterators.instance.DefaultInstanceIterator;
+import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
@@ -64,11 +98,6 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
-
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -111,7 +140,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected long modelSize;
   /** The file that log information will be written to. */
   protected File logFile =
-      new File(Paths.get(WekaPackageManager.getPackageHome().getAbsolutePath(), "network.log").toString());
+      new File(Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
   /** The layers of the network. */
   protected Layer[] layers = new Layer[] {new OutputLayer()};
   /** The configuration of the network. */
@@ -124,12 +153,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected int numEpochsPerformed;
   /** The dataset trainIterator. */
   protected transient DataSetIterator trainIterator;
-  /** The dataset validationIterator. */
-  protected transient DataSetIterator valIterator;
   /** The training instances (set to null when done() is called). */
   protected Instances trainData;
-  /** The validation instances (set to null when done() is called). */
-  protected Instances valData;
   /** The instance iterator to use. */
   protected AbstractInstanceIterator instanceIterator = new DefaultInstanceIterator();
   /** Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used) */
@@ -144,6 +169,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected CacheMode cacheMode = CacheMode.NONE;
   /** Training listener list */
   private IterationListener iterationListener = new EpochListener();
+
+  /** Default constructor fixing log file if WEKA_HOME variable is not set. */
+  public Dl4jMlpClassifier() {
+    Nd4j.getMemoryManager().setAutoGcWindow(10000);
+  }
 
   /**
    * The main method for running this class.
@@ -184,7 +214,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   public String globalInfo() {
     return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n"
-        + "Evaluations after each epoch are written to the log file.\n\n"
         + "Iterator usage\n"
         + "- DefaultInstanceIterator: Simple ARFF files without spatial interpretation\n"
         + "- ConvolutionalInstanceIterator: ARFF files with spatial interpretation\n"
@@ -203,21 +232,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // attributes
     if (getInstanceIterator() instanceof ImageInstanceIterator) {
-      result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+      result.enable(Capability.STRING_ATTRIBUTES);
     } else {
-      result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
-      result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
-      result.enable(Capabilities.Capability.DATE_ATTRIBUTES);
-      result.enable(Capabilities.Capability.MISSING_VALUES);
-      result.enableDependency(
-          Capabilities.Capability.STRING_ATTRIBUTES); // User might switch to ImageDSI in GUI
+      result.enable(Capability.NOMINAL_ATTRIBUTES);
+      result.enable(Capability.NUMERIC_ATTRIBUTES);
+      result.enable(Capability.DATE_ATTRIBUTES);
+      result.enable(Capability.MISSING_VALUES);
+      result.enableDependency(Capability.STRING_ATTRIBUTES); // User might switch to ImageDSI in GUI
     }
 
     // class
-    result.enable(Capabilities.Capability.NOMINAL_CLASS);
-    result.enable(Capabilities.Capability.NUMERIC_CLASS);
-    result.enable(Capabilities.Capability.DATE_CLASS);
-    result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+    result.enable(Capability.NOMINAL_CLASS);
+    result.enable(Capability.NUMERIC_CLASS);
+    result.enable(Capability.DATE_CLASS);
+    result.enable(Capability.MISSING_CLASS_VALUES);
 
     return result;
   }
@@ -326,14 +354,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     commandLineParamSynopsis = "-layer <string>",
     displayOrder = 2
   )
-  public void setLayers(Layer[] layers) {
+  public void setLayers(Layer... layers) {
     validateLayers(layers);
 
     // If something changed, set zoomodel to CustomNet
     if (!Arrays.deepEquals(layers, this.layers)) {
       setCustomNet();
     }
-    layers = fixDuplicateLayerNames(layers);
+    fixDuplicateLayerNames(layers);
     this.layers = layers;
   }
 
@@ -342,11 +370,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param layers New set of layers
    */
-  private void validateLayers(Layer[] layers) {
+  protected void validateLayers(Layer[] layers) {
     // Check if the layers contain convolution/subsampling
     Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
-    final boolean containsConvLayer =
-        layerSet.stream().filter(this::isNDLayer).collect(Collectors.toSet()).size() > 0;
+    final boolean containsConvLayer = layerSet.stream().allMatch(this::isNDLayer);
 
     final boolean isConvItertor = getInstanceIterator() instanceof Convolutional;
     if (containsConvLayer && !isConvItertor) {
@@ -375,9 +402,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Check if layer names are duplicate. If so, correct them by appending indices
    *
    * @param layers Array of network layer
-   * @return Array of network layer with corrected names
    */
-  private Layer[] fixDuplicateLayerNames(Layer[] layers) {
+  protected void fixDuplicateLayerNames(Layer[] layers) {
     Set<String> names = Arrays.stream(layers).map(Layer::getLayerName).collect(Collectors.toSet());
 
     for (String name : names) {
@@ -397,7 +423,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         duplicates.get(i).setLayerName(name + " " + (i + 1));
       }
     }
-    return layers;
   }
 
   public int getNumEpochs() {
@@ -475,7 +500,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     displayName = "attribute normalization",
     commandLineParamName = "normalization",
     commandLineParamSynopsis = "-normalization <int>",
-    displayOrder = 8
+    displayOrder = 12
   )
   public SelectedTag getFilterType() {
     return new SelectedTag(filterType, TAGS_FILTER);
@@ -497,7 +522,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     displayName = "queue size for asynchronous data transfer",
     commandLineParamName = "queueSize",
     commandLineParamSynopsis = "-queueSize <int>",
-    displayOrder = 9
+    displayOrder = 30
   )
   public void setQueueSize(int QueueSize) {
     queueSize = QueueSize;
@@ -511,6 +536,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   @Override
   public void buildClassifier(Instances data) throws Exception {
+    log.info("Building on {} training instances", data.numInstances());
 
     // Initialize classifier
     initializeClassifier(data);
@@ -559,25 +585,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Apply preprocessing
     data = preProcessInput(data);
+    data = initEarlyStopping(data);
 
-    // Split train/validation
-    double valSplit = earlyStopping.getValidationSetPercentage();
-    Instances trainData = null;
-    Instances valData = null;
-    if (useEarlyStopping()) {
-      Instances[] insts = splitTrainVal(data, valSplit);
-      trainData = insts[0];
-      valData = insts[1];
-      validateSplit(trainData, valData);
-    } else {
+    if (data != null) {
       trainData = data;
-    }
-
-    if (trainData == null) {
-      return;
     } else {
-      this.trainData = trainData;
-      this.valData = valData;
+      return;
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -593,10 +606,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       // Setup the datasetiterators (needs to be done after the model initialization)
       trainIterator = getDataSetIterator(this.trainData);
 
-      if (useEarlyStopping()) {
-        valIterator = getDataSetIterator(this.valData);
-      }
-
       // Print model architecture
       if (getDebug()) {
         log.info(model.conf().toYaml());
@@ -605,15 +614,38 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       // Set the iteration listener
       model.setListeners(getListener());
 
-      // Init early stopping
-      if (useEarlyStopping()) {
-        earlyStopping.init(valIterator);
-      }
-
       numEpochsPerformed = 0;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  /**
+   * Initialize early stopping with the given data
+   *
+   * @param data Data
+   * @return Augmented data - if early stopping applies, return train set without validation set
+   * @throws Exception
+   */
+  protected Instances initEarlyStopping(Instances data) throws Exception {
+    // Split train/validation
+    double valSplit = earlyStopping.getValidationSetPercentage();
+    Instances trainData;
+    Instances valData;
+    if (useEarlyStopping()) {
+      // Split in train and validation
+      Instances[] insts = splitTrainVal(data, valSplit);
+      trainData = insts[0];
+      valData = insts[1];
+      validateSplit(trainData, valData);
+      DataSetIterator valIterator = getDataSetIterator(valData, CacheMode.NONE);
+      earlyStopping.init(valIterator);
+    } else {
+      // Keep the full data
+      trainData = data;
+    }
+
+    return trainData;
   }
 
   private void validateSplit(Instances trainData, Instances valData) throws WekaException {
@@ -639,28 +671,43 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return DataSetIterator
    * @throws Exception
    */
-  private DataSetIterator getDataSetIterator(Instances data) throws Exception {
+  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm) throws Exception {
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
 
     // Use caching if set
-    switch (cacheMode){
-      case MEMORY:
-        it = new CachingDataSetIterator(it, new InMemoryDataSetCache());
+    switch (cm) {
+      case MEMORY: // Use memory as cache
+        final InMemoryDataSetCache memCache = new InMemoryDataSetCache();
+        it = new CachingDataSetIterator(it, memCache);
         break;
-      case FILESYSTEM:
-        it = new CachingDataSetIterator(it,
-            new InFileDataSetCache(System.getProperty("java.io.tmpdir")));
+      case FILESYSTEM: // use filesystem as cache
+        final String tmpDir = System.getProperty("java.io.tmpdir");
+        final File cacheDir = Paths.get(tmpDir, "dataset-cache").toFile();
+        cacheDir.delete(); // remove old existing cache
+        final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
+        it = new CachingDataSetIterator(it, fsCache);
         break;
     }
 
-    // Use async dataset iteration of queue size was set
+    // Use async dataset iteration if queue size was set
     if (queueSize > 0) {
       it = new AsyncDataSetIterator(it, queueSize);
-      if(!it.hasNext()){
-        throw new RuntimeException("AsyncDataSetIterator was empty.");
+      if (!it.hasNext()) {
+        throw new RuntimeException("AsyncDataSetIterator could not load any datasets.");
       }
     }
     return it;
+  }
+
+  /**
+   * Generates a DataSetIterator based on the given instances.
+   *
+   * @param data Input instances
+   * @return DataSetIterator
+   * @throws Exception
+   */
+  protected DataSetIterator getDataSetIterator(Instances data) throws Exception {
+    return getDataSetIterator(data, cacheMode);
   }
 
   /**
@@ -812,15 +859,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @throws Exception
    */
-  private void createModel() throws Exception {
-    final DataSetIterator it = getDataSetIterator(trainData);
-    final INDArray features;
-    if (it.hasNext()){
-      features = it.next().getFeatures();
-    } else {
-      throw new RuntimeException("Iterator was empty.");
-    }
-
+  protected void createModel() throws Exception {
+    final INDArray features = getFirstBatchFeatures(trainData);
     ComputationGraphConfiguration.GraphBuilder gb =
         netConfig
             .builder()
@@ -841,20 +881,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     // Collect layers
     for (Layer layer : layers) {
       String lName = layer.getLayerName();
-      gb.addLayer(lName, layer, currentInput);
+      gb.addLayer(lName, layer.clone(), currentInput);
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
     gb.setInputTypes(InputType.inferInputType(features));
-
-    // TODO: Fix input types for test cases where the classifier is reused
-    //    if (getInstanceIterator() instanceof Convolutional){
-    //      Convolutional conv = (Convolutional) getInstanceIterator();
-    //      layers[0].setNIn(InputType.convolutionalFlat(conv.getHeight(), conv.getWidth(),
-    // conv.getNumChannels()), true);
-    //    } else {
-    //      layers[0].setNIn(InputType.feedForward(trainData.numAttributes() - 1), true);
-    //    }
 
     ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
     ComputationGraph model = new ComputationGraph(conf);
@@ -863,20 +894,43 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   /**
+   * Get a peak at the features of the {@code iterator}'s first batch using the given instances.
+   *
+   * @return Features of the first batch
+   * @throws Exception
+   */
+  protected INDArray getFirstBatchFeatures(Instances data) throws Exception {
+    final DataSetIterator it = getDataSetIterator(data, CacheMode.NONE);
+    if (!it.hasNext()) {
+      throw new RuntimeException("Iterator was unexpectedly empty.");
+    }
+    final INDArray features = it.next().getFeatures();
+    it.reset();
+    return features;
+  }
+
+  /**
    * Get the iterationlistener
    *
    * @throws Exception
    */
-  private List<IterationListener> getListener() throws Exception {
+  protected List<IterationListener> getListener() throws Exception {
     int numSamples = trainData.numInstances();
     List<IterationListener> listeners = new ArrayList<>();
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
       int numEpochs = getNumEpochs();
-      ((weka.dl4j.listener.EpochListener) iterationListener)
-          .init(trainData.numClasses(), numEpochs, numSamples, trainIterator, valIterator);
-      ((weka.dl4j.listener.EpochListener) iterationListener).setLogFile(logFile);
+      ((EpochListener) iterationListener)
+          .init(
+              trainData.numClasses(),
+              numEpochs,
+              numSamples,
+              trainIterator,
+              earlyStopping.getValDataSetIterator());
+      ((EpochListener) iterationListener).setLogFile(logFile);
+      listeners.add(iterationListener);
+    } else {
       listeners.add(iterationListener);
     }
     return listeners;
@@ -889,11 +943,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       return false;
     }
 
+    // Check if trainIterator was reset properly
+    if (!trainIterator.hasNext()) {
+      throw new EmptyIteratorException(
+          "The iterator has no next elements " + "at the beginning of the epoch.");
+    }
+
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+      StopWatch sw = new StopWatch();
+      sw.start();
       model.fit(trainIterator);
       trainIterator.reset();
+      sw.stop();
+      log.info("Epoch {}/{} took {}", numEpochsPerformed, numEpochs, sw.toString());
       numEpochsPerformed++;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -929,7 +993,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   public void done() {
 
     trainData = null;
-    valData = null;
   }
 
   /**
@@ -972,9 +1035,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
               .map(l -> l.conf().getLayer())
               .collect(Collectors.toList())
               .toArray(new Layer[tmpCg.getLayers().length]);
-
-    } catch (UnsupportedOperationException e) {
-      log.error("Could not set layers from zoomodel.", e);
+    } catch (Exception e) {
+      if (!(zooModel instanceof CustomNet)) {
+        log.error("Could not set layers from zoomodel.", e);
+      }
     }
   }
 
@@ -987,10 +1051,25 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     description = "Set the iteration listener.",
     commandLineParamName = "iteration-listener",
     commandLineParamSynopsis = "-iteration-listener <string>",
-    displayOrder = 12
+    displayOrder = 9
   )
   public void setIterationListener(IterationListener l) {
     iterationListener = l;
+  }
+
+  public CacheMode getCacheMode() {
+    return cacheMode;
+  }
+
+  @OptionMetadata(
+    displayName = "set the cache mode",
+    description = "Set the cache mode.",
+    commandLineParamName = "cache-mode",
+    commandLineParamSynopsis = "-cache-mode <string>",
+    displayOrder = 13
+  )
+  public void setCacheMode(CacheMode cm) {
+    cacheMode = cm;
   }
 
   /**
@@ -1040,11 +1119,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     insts = applyFilters(insts);
 
     // Get predictions
-    final DataSetIterator it = getDataSetIterator(insts);
+    final DataSetIterator it = getDataSetIterator(insts, CacheMode.NONE);
     double[][] preds = new double[insts.numInstances()][insts.numClasses()];
 
     int offset = 0;
-    boolean next = true;
+    boolean next = it.hasNext();
 
     // Get predictions batch-wise
     while (next) {
@@ -1082,7 +1161,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return Filtered Instances
    * @throws Exception Filter could not be applied
    */
-  private Instances applyFilters(Instances insts) throws Exception {
+  protected Instances applyFilters(Instances insts) throws Exception {
     // Filter the instance
     insts = Filter.useFilter(insts, replaceMissingFilter);
     insts = Filter.useFilter(insts, nominalToBinaryFilter);
@@ -1093,7 +1172,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   /**
-   * Get the {@link MultiLayerNetwork} model
+   * Get the {@link ComputationGraph} model
    *
    * @return MultiLayerNetwork instance
    */
@@ -1108,11 +1187,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   @Override
   public String toString() {
-
-    if (replaceMissingFilter != null) {
-      return model.getConfiguration().toYaml();
-    }
-    return null;
+      if (model.getConfiguration() != null) {
+        return model.getConfiguration().toYaml();
+      }
+    return "";
   }
 
   /**
