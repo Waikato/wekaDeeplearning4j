@@ -68,12 +68,6 @@ public class Dl4jMlpArffTest {
   public void testMinimalMnistDenseArff() throws Exception {
     // Data
     Instances data = DatasetLoader.loadMiniMnistArff();
-    ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
-    cii.setNumChannels(1);
-    cii.setHeight(28);
-    cii.setWidth(28);
-    cii.setTrainBatchSize(TestUtil.DEFAULT_BATCHSIZE);
-    clf.setInstanceIterator(cii);
 
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(256);
@@ -90,7 +84,7 @@ public class Dl4jMlpArffTest {
     outputLayer.setLayerName("Output-layer");
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setLearningRate(0.001);
 
     clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
     clf.setNeuralNetConfiguration(nnc);
