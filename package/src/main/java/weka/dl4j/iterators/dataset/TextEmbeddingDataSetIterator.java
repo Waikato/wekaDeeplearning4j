@@ -18,6 +18,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stopwords.AbstractStopwords;
 
@@ -69,27 +70,29 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   @Override
   public DataSet next(int num) {
     if (cursor >= data.numInstances()) throw new NoSuchElementException();
-    try {
-      return nextDataSet(num);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    Instances copy = new Instances(data, num);
+    for (int i = 0; i < num && cursor < totalExamples(); i++) {
+      Instance inst = (Instance) data.get(cursor).copy();
+      inst.setDataset(copy);
+      copy.add(inst);
+      cursor++;
     }
+    return nextDataSet(copy);
   }
 
-  private DataSet nextDataSet(int num) throws IOException {
+  protected DataSet nextDataSet(Instances data) {
     // First: load reviews to String. Alternate positive and negative reviews
-    List<String> reviews = new ArrayList<>(num);
-    List<Double> lbls = new ArrayList<>(num);
+    List<String> reviews = new ArrayList<>(data.size());
+    List<Double> lbls = new ArrayList<>(data.size());
 
     int classIndex = data.classIndex();
     int documentIndex = 1 - classIndex;
 
-    for (int i = 0; i < num && cursor < totalExamples(); i++) {
-      final String document = data.get(cursor).stringValue(documentIndex);
-      final double label = data.get(cursor).value(classIndex);
+    for (Instance row : data) {
+      final String document = row.stringValue(documentIndex);
+      final double label = row.value(classIndex);
       reviews.add(document);
       lbls.add(label);
-      cursor++;
     }
 
     // Second: tokenize reviews and filter out unknown words
