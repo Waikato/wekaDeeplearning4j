@@ -66,14 +66,16 @@ public class TextEmbeddingInstanceIteratorTest {
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
         final int[] shapeFeats = next.getFeatures().shape();
         final int[] expShapeFeats = {bs, WORD_VEC_SIZE, tl};
-        IntStream.range(0, shapeFeats.length)
-            .forEach(i -> assertEquals(expShapeFeats[i], shapeFeats[i]));
+        assertEquals(expShapeFeats[0],shapeFeats[0]);
+        assertEquals(expShapeFeats[1],shapeFeats[1]);
+        assertTrue(expShapeFeats[2] >= shapeFeats[2]);
 
         // Check label shape, expect: (batchsize x numclasses x sequencelength)
         final int[] shapeLabels = next.getLabels().shape();
         final int[] expShapeLabels = {bs, data.numClasses(), tl};
-        IntStream.range(0, shapeLabels.length)
-            .forEach(i -> assertEquals(expShapeLabels[i], shapeLabels[i]));
+        assertEquals(expShapeLabels[0], shapeLabels[0]);
+        assertEquals(expShapeLabels[1], shapeLabels[1]);
+        assertTrue(expShapeLabels[2] >= shapeLabels[2]);
       }
     }
   }
