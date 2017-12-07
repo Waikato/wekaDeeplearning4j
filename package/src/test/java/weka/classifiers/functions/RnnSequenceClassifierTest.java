@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -99,7 +99,7 @@ public class RnnSequenceClassifierTest {
 
     clf.setInstanceIterator(tii);
     startTime = System.currentTimeMillis();
-//    setupUi();
+    //    setupUi();
   }
 
   private void setupUi() {
@@ -189,7 +189,7 @@ public class RnnSequenceClassifierTest {
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
-//    clf.setQueueSize(4);
+    //    clf.setQueueSize(4);
     clf.setNumEpochs(3);
     final EpochListener l = new EpochListener();
     l.setN(1);
@@ -199,8 +199,6 @@ public class RnnSequenceClassifierTest {
     data.randomize(new Random(42));
     TestUtil.holdout(clf, data, 33);
   }
-
-
 
   @Test
   public void testAngerMetaRegression() throws Exception {
@@ -227,7 +225,6 @@ public class RnnSequenceClassifierTest {
     tfii.setTrainBatchSize(64);
     tfii.setWordVectorLocation(modelSlim);
     clf.setInstanceIterator(tfii);
-
 
     // Config classifier
     clf.setLayers(lstm1, rnnOut);
@@ -267,26 +264,26 @@ public class RnnSequenceClassifierTest {
     final Dl4jWordsFromFile wff = new Dl4jWordsFromFile();
     wff.setStopwords(new File("src/test/resources/stopwords/english.txt"));
     // Iterate stopwords
-    for (Dl4jAbstractStopwords sw : new Dl4jAbstractStopwords[]{new Dl4jRainbow(), new Dl4jNull(),
-        wff}){
+    for (Dl4jAbstractStopwords sw :
+        new Dl4jAbstractStopwords[] {new Dl4jRainbow(), new Dl4jNull(), wff}) {
       tii.setStopwords(sw);
 
       final StemmingPreprocessor spp = new StemmingPreprocessor();
       spp.setStemmer(new SnowballStemmer());
       // Iterate TokenPreProcess
-      for(TokenPreProcess tpp : new TokenPreProcess[]{
-          new CommonPreprocessor(),
-          new EndingPreProcessor(),
-          new LowCasePreProcessor(),
-          spp}){
+      for (TokenPreProcess tpp :
+          new TokenPreProcess[] {
+            new CommonPreprocessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
+          }) {
         tii.setTokenPreProcess(tpp);
 
         // Iterate tokenizer faktory
-        for(TokenizerFactory tf : new TokenizerFactory[]{
-            new DefaultTokenizerFactory(),
-            new CharacterNGramTokenizerFactory(),
-            new TweetNLPTokenizerFactory(),
-        }){
+        for (TokenizerFactory tf :
+            new TokenizerFactory[] {
+              new DefaultTokenizerFactory(),
+              new CharacterNGramTokenizerFactory(),
+              new TweetNLPTokenizerFactory(),
+            }) {
           tii.setTokenizerFactory(tf);
 
           // Create clean classifier
@@ -297,13 +294,17 @@ public class RnnSequenceClassifierTest {
           clf.settBPTTforwardLength(3);
           clf.settBPTTbackwardLength(3);
 
-          String conf = "\n - TokenPreProcess: "+tpp.getClass().getSimpleName()+
-                  "\n - TokenizerFactory: "+ tf.getClass().getSimpleName()+
-                  "\n - StopWords: " + sw.getClass().getSimpleName();
+          String conf =
+              "\n - TokenPreProcess: "
+                  + tpp.getClass().getSimpleName()
+                  + "\n - TokenizerFactory: "
+                  + tf.getClass().getSimpleName()
+                  + "\n - StopWords: "
+                  + sw.getClass().getSimpleName();
           log.info(conf);
-          try{
+          try {
             clf.buildClassifier(data);
-          } catch (Exception e){
+          } catch (Exception e) {
             failedConfigs.put(conf, e.toString());
           }
         }
@@ -311,14 +312,16 @@ public class RnnSequenceClassifierTest {
     }
 
     // Check if anything failed
-    if (!failedConfigs.isEmpty()){
-      failedConfigs.forEach((s, s2) -> {
-        log.error("Config failed:");
-        log.error(s);
-        log.error("Exception:");
-        log.error(s2);
-      });
-      Assert.fail();
+    if (!failedConfigs.isEmpty()) {
+
+      final String err =
+          failedConfigs
+              .keySet()
+              .stream()
+              .map(s -> "Config failed: " + s + "\nException: " + failedConfigs.get(s))
+              .collect(Collectors.joining("\n"));
+
+      Assert.fail("Some of the configs failed:\n" + err);
     }
   }
 
@@ -333,99 +336,102 @@ public class RnnSequenceClassifierTest {
 
     // Create reversed attribute list
     ArrayList<Attribute> attsReversed = new ArrayList<>();
-    for (int i = data.numAttributes() - 1; i >= 0; i--){
+    for (int i = data.numAttributes() - 1; i >= 0; i--) {
       attsReversed.add(data.attribute(i));
     }
 
     // Create copy with class at pos 0 and text at pos 1
-    Instances copy = new Instances("reversed", attsReversed,data.numInstances());
-    data.forEach(d -> {
-      Instance inst = new DenseInstance(2);
-      inst.setDataset(copy);
-      inst.setValue(0, d.classValue());
-      inst.setValue(1, d.stringValue(0));
-      copy.add(inst);
-    });
+    Instances copy = new Instances("reversed", attsReversed, data.numInstances());
+    data.forEach(
+        d -> {
+          Instance inst = new DenseInstance(2);
+          inst.setDataset(copy);
+          inst.setValue(0, d.classValue());
+          inst.setValue(1, d.stringValue(0));
+          copy.add(inst);
+        });
 
     copy.setClassIndex(0);
 
     TestUtil.holdout(clf, copy);
   }
 
-
-//  @Test
-//  public void testImdbDl4j() throws Exception {
-//
-//    int vectorSize = 300; // Size of the word vectors. 300 in the Google News model
-//
-//    tii = new TextEmbeddingInstanceIterator();
-//    tii.setTruncateLength(truncateLength);
-//    tii.setWordVectorLocation(modelSlim);
-//    final int bs = batchSize;
-//    tii.setTrainBatchSize(bs);
-//
-//    final Instances[] insts = TestUtil.splitTrainTest(data, 50);
-//    Instances trainData = insts[0];
-//    Instances testData = insts[1];
-//
-//    final int seed = 42;
-//    DataSetIterator trainIter = tii.getDataSetIterator(trainData, seed, bs);
-//    DataSetIterator testIter = tii.getDataSetIterator(testData, seed, bs);
-//
-//    final int queueSize = 4;
-//    trainIter = new AsyncDataSetIterator(trainIter, queueSize);
-//    testIter = new AsyncDataSetIterator(testIter, queueSize);
-//
-//    // Download and extract data
-//    Nd4j.getMemoryManager().togglePeriodicGc(false); // https://deeplearning4j.org/workspaces
-//
-//    // Set up network configuration
-//    final int n = 256;
-//    MultiLayerConfiguration conf =
-//        new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
-//            .updater(
-//                Updater
-//                    .ADAM) // To configure: .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
-//            .regularization(true)
-//            .l2(1e-5)
-//            .weightInit(WeightInit.XAVIER)
-//            .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-//            .gradientNormalizationThreshold(1.0)
-//            .learningRate(2e-2)
-//            .seed(seed)
-//            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
-//            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE) // https://deeplearning4j.org/workspaces
-//            .list()
-//            .layer(
-//                0, new LSTM.Builder().nIn(vectorSize).nOut(n).activation(Activation.TANH).build())
-//            .layer(
-//                1,
-//                new org.deeplearning4j.nn.conf.layers.RnnOutputLayer.Builder()
-//                    .activation(Activation.SOFTMAX)
-//                    .lossFunction(LossFunctions.LossFunction.MCXENT)
-//                    .nIn(n)
-//                    .nOut(2)
-//                    .build())
-//            .pretrain(false)
-//            .backprop(true)
-//            .build();
-//
-//    MultiLayerNetwork net = new MultiLayerNetwork(conf);
-//    net.init();
-//    net.setListeners(new StatsListener(fss));
-//
-//    log.info("Starting training");
-//    StopWatch sw = new StopWatch();
-//    for (int i = 0; i < epochs; i++) {
-//      sw.start();
-//      net.fit(trainIter);
-//      sw.stop();
-//      trainIter.reset();
-//      log.info("Epoch " + i + " complete, took {} . Starting evaluation:", sw.toString());
-//      sw.reset();
-//      // Run evaluation. This is on 25k reviews, so can take some time
-//      Evaluation evaluation = net.evaluate(testIter);
-//      log.info(evaluation.stats());
-//    }
-//  }
+  //  @Test
+  //  public void testImdbDl4j() throws Exception {
+  //
+  //    int vectorSize = 300; // Size of the word vectors. 300 in the Google News model
+  //
+  //    tii = new TextEmbeddingInstanceIterator();
+  //    tii.setTruncateLength(truncateLength);
+  //    tii.setWordVectorLocation(modelSlim);
+  //    final int bs = batchSize;
+  //    tii.setTrainBatchSize(bs);
+  //
+  //    final Instances[] insts = TestUtil.splitTrainTest(data, 50);
+  //    Instances trainData = insts[0];
+  //    Instances testData = insts[1];
+  //
+  //    final int seed = 42;
+  //    DataSetIterator trainIter = tii.getDataSetIterator(trainData, seed, bs);
+  //    DataSetIterator testIter = tii.getDataSetIterator(testData, seed, bs);
+  //
+  //    final int queueSize = 4;
+  //    trainIter = new AsyncDataSetIterator(trainIter, queueSize);
+  //    testIter = new AsyncDataSetIterator(testIter, queueSize);
+  //
+  //    // Download and extract data
+  //    Nd4j.getMemoryManager().togglePeriodicGc(false); // https://deeplearning4j.org/workspaces
+  //
+  //    // Set up network configuration
+  //    final int n = 256;
+  //    MultiLayerConfiguration conf =
+  //        new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
+  //            .updater(
+  //                Updater
+  //                    .ADAM) // To configure:
+  // .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
+  //            .regularization(true)
+  //            .l2(1e-5)
+  //            .weightInit(WeightInit.XAVIER)
+  //            .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+  //            .gradientNormalizationThreshold(1.0)
+  //            .learningRate(2e-2)
+  //            .seed(seed)
+  //            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
+  //            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE) //
+  // https://deeplearning4j.org/workspaces
+  //            .list()
+  //            .layer(
+  //                0, new
+  // LSTM.Builder().nIn(vectorSize).nOut(n).activation(Activation.TANH).build())
+  //            .layer(
+  //                1,
+  //                new org.deeplearning4j.nn.conf.layers.RnnOutputLayer.Builder()
+  //                    .activation(Activation.SOFTMAX)
+  //                    .lossFunction(LossFunctions.LossFunction.MCXENT)
+  //                    .nIn(n)
+  //                    .nOut(2)
+  //                    .build())
+  //            .pretrain(false)
+  //            .backprop(true)
+  //            .build();
+  //
+  //    MultiLayerNetwork net = new MultiLayerNetwork(conf);
+  //    net.init();
+  //    net.setListeners(new StatsListener(fss));
+  //
+  //    log.info("Starting training");
+  //    StopWatch sw = new StopWatch();
+  //    for (int i = 0; i < epochs; i++) {
+  //      sw.start();
+  //      net.fit(trainIter);
+  //      sw.stop();
+  //      trainIter.reset();
+  //      log.info("Epoch " + i + " complete, took {} . Starting evaluation:", sw.toString());
+  //      sw.reset();
+  //      // Run evaluation. This is on 25k reviews, so can take some time
+  //      Evaluation evaluation = net.evaluate(testIter);
+  //      log.info(evaluation.stats());
+  //    }
+  //  }
 }
