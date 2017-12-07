@@ -17,6 +17,7 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.OptionMetadata;
 
@@ -75,7 +76,9 @@ public class EpochListener extends IterationListener implements TrainingListener
         RegressionEvaluation rEval = new RegressionEvaluation(numClasses);
         while (iterator.hasNext()) {
           DataSet next;
-          if (iterator instanceof AsyncDataSetIterator) {
+          // AsyncDataSetIterator and CachingDataSetIterator do not support next(num)
+          if (iterator instanceof AsyncDataSetIterator
+              || iterator instanceof CachingDataSetIterator) {
             next = iterator.next();
           } else {
             // TODO: figure out which batch size is feasible for inference
