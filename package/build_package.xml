@@ -329,6 +329,7 @@
         <include name="src/**/*.cost"/>
         <include name="src/**/*.arff"/>
         <include name="src/**/*.matrix"/>
+        <exclude name="src/test/**/*"/>
       </fileset>
     </copy>
 
