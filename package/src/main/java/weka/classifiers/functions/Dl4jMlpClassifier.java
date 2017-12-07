@@ -500,7 +500,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     displayName = "attribute normalization",
     commandLineParamName = "normalization",
     commandLineParamSynopsis = "-normalization <int>",
-    displayOrder = 8
+    displayOrder = 12
   )
   public SelectedTag getFilterType() {
     return new SelectedTag(filterType, TAGS_FILTER);
@@ -522,7 +522,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     displayName = "queue size for asynchronous data transfer",
     commandLineParamName = "queueSize",
     commandLineParamSynopsis = "-queueSize <int>",
-    displayOrder = 9
+    displayOrder = 30
   )
   public void setQueueSize(int QueueSize) {
     queueSize = QueueSize;
@@ -1051,7 +1051,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     description = "Set the iteration listener.",
     commandLineParamName = "iteration-listener",
     commandLineParamSynopsis = "-iteration-listener <string>",
-    displayOrder = 12
+    displayOrder = 9
   )
   public void setIterationListener(IterationListener l) {
     iterationListener = l;
