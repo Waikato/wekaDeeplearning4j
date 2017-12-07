@@ -11,6 +11,8 @@ import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.nd4j.linalg.dataset.DataSet;
+import weka.core.DenseInstance;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stopwords.AbstractStopwords;
 
@@ -56,22 +58,29 @@ public class TextFilesEmbeddingDataSetIterator extends TextEmbeddingDataSetItera
 
   @Override
   public DataSet next(int num) {
+    Instances copy = new Instances(data, num);
+
+    final int clsIndex = data.classIndex();
+
     for (int i = cursor; i < cursor + num && i < totalExamples(); i++) {
-      final String pathname = data.get(i).stringValue(0);
+      final Instance row = data.get(i);
+
+      final String pathname = row.stringValue(1 - clsIndex);
       try {
-        if (!alreadyLoaded.contains(i)) {
-          String content =
-              FileUtils.readFileToString(
-                  Paths.get(textsLocation.getAbsolutePath(), pathname).toFile());
-          data.get(i).setValue(0, content);
-          alreadyLoaded.add(i);
-        }
+        String content =
+            FileUtils.readFileToString(
+                Paths.get(textsLocation.getAbsolutePath(), pathname).toFile());
+        Instance newRow = new DenseInstance(2);
+        newRow.setDataset(copy);
+        newRow.setClassValue(row.classValue());
+        newRow.setValue(1 - clsIndex, content);
+        copy.add(newRow);
       } catch (IOException e) {
         final String s = "Could not read content of file \"" + pathname + "\"";
         throw new RuntimeException(s, e);
       }
     }
-
-    return super.next(num);
+    cursor+=num;
+    return super.nextDataSet(copy);
   }
 }
