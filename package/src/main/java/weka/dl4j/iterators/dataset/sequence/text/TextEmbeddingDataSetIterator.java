@@ -1,4 +1,4 @@
-package weka.dl4j.iterators.dataset;
+package weka.dl4j.iterators.dataset.sequence.text;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -26,7 +26,8 @@ import weka.core.MissingOutputLayerException;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
-import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
 
 /**
  * A classifier that can handle sequences.
@@ -43,11 +44,12 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   private int tBPTTbackwardLength = 25;
   /** Truncated backpropagation through time forward length */
   private int tBPTTforwardLength = 25;
+  /** Instance iterator */
+  private AbstractSequenceInstanceIterator instanceIterator = new TextEmbeddingInstanceIterator();
 
   public RnnSequenceClassifier() {
     super();
     layers = new Layer[] {new weka.dl4j.layers.RnnOutputLayer()};
-    instanceIterator = new TextEmbeddingInstanceIterator();
   }
 
   /**
@@ -272,6 +274,21 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
   public void settBPTTforwardLength(int tBPTTforwardLength) {
     this.tBPTTforwardLength = tBPTTforwardLength;
+  }
+
+  @OptionMetadata(
+      description = "The instance trainIterator to use.",
+      displayName = "instance iterator",
+      commandLineParamName = "iterator",
+      commandLineParamSynopsis = "-iterator <string>",
+      displayOrder = 6
+  )
+  public AbstractSequenceInstanceIterator getInstanceIterator() {
+    return instanceIterator;
+  }
+
+  public void setInstanceIterator(AbstractSequenceInstanceIterator iterator) {
+    instanceIterator = iterator;
   }
 
   /**

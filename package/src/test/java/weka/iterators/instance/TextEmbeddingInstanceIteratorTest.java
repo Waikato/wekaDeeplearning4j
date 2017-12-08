@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
-import weka.dl4j.iterators.instance.TextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
