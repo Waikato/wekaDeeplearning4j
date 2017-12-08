@@ -18,7 +18,7 @@
  *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  *
  */
-package weka.dl4j.iterators.instance;
+package weka.dl4j.iterators.instance.sequence.text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,7 +42,8 @@ import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
 import weka.core.converters.CSVSaver;
-import weka.dl4j.iterators.dataset.TextEmbeddingDataSetIterator;
+import weka.dl4j.iterators.dataset.sequence.text.TextEmbeddingDataSetIterator;
+import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
 import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
 import weka.dl4j.text.stopwords.Dl4jRainbow;
 import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
@@ -63,7 +64,7 @@ import weka.gui.ProgrammaticProperty;
  * @author Steven Lang
  */
 @Slf4j
-public class TextEmbeddingInstanceIterator extends AbstractInstanceIterator {
+public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceIterator {
 
   /** The ID used to serialize this class */
   private static final long serialVersionUID = 1316260988724548474L;

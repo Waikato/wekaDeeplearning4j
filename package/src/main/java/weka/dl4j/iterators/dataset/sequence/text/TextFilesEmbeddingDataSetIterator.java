@@ -1,10 +1,8 @@
-package weka.dl4j.iterators.dataset;
+package weka.dl4j.iterators.dataset.sequence.text;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
@@ -28,8 +26,6 @@ public class TextFilesEmbeddingDataSetIterator extends TextEmbeddingDataSetItera
   private static final long serialVersionUID = 2569158554412509023L;
   /** Location of the text files */
   private File textsLocation;
-  /** Collect already loaded documents */
-  private Set<Integer> alreadyLoaded;
 
   /**
    * @param data Instances with documents and labels
@@ -53,7 +49,6 @@ public class TextFilesEmbeddingDataSetIterator extends TextEmbeddingDataSetItera
       throws IOException {
     super(data, wordVectors, tokenFact, tpp, stopWords, batchSize, truncateLength);
     this.textsLocation = textsLocation;
-    this.alreadyLoaded = new HashSet<>();
   }
 
   @Override

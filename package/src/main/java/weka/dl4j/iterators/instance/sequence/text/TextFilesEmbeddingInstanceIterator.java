@@ -1,4 +1,4 @@
-package weka.dl4j.iterators.instance;
+package weka.dl4j.iterators.instance.sequence.text;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
-import weka.dl4j.iterators.dataset.TextFilesEmbeddingDataSetIterator;
+import weka.dl4j.iterators.dataset.sequence.text.TextFilesEmbeddingDataSetIterator;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
