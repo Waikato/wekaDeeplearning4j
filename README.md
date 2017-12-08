@@ -56,8 +56,7 @@ Simply run the `build.sh` script. This assumes:
 * GNU sed
 * Ant
 * Maven
-* WEKA's `weka.jar` file resides somewhere in your Java classpath. The latest and greatest WEKA installation is highly recommended; you
-  can get the .jar of the nightly snapshot [here](http://www.cs.waikato.ac.nz/~ml/weka/snapshots/developer-branch.zip).
+* Weka
 
 ```
 Usage: build.sh
