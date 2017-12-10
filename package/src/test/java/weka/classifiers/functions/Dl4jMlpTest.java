@@ -1,5 +1,14 @@
 package weka.classifiers.functions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
@@ -10,7 +19,13 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.*;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.MissingOutputLayerException;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.WrongIteratorException;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
@@ -18,18 +33,16 @@ import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.*;
+import weka.dl4j.layers.BatchNormalization;
+import weka.dl4j.layers.ConvolutionLayer;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.dl4j.zoo.LeNet;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
-
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
@@ -295,27 +308,6 @@ public class Dl4jMlpTest {
     clf2.buildClassifier(dataMnist);
   }
 
-  /**
-   * Test UnsupportedAttributeTypeException
-   * //TODO: Fix
-   * @throws Exception
-   */
-  @Test(expected = UnsupportedAttributeTypeException.class)
-  public void testWrongArffFormat() throws Exception {
-    Attribute att1 = new Attribute("1"); // numeric
-    Attribute att2 = new Attribute("2", Arrays.asList("1", "2")); // string
-    ArrayList<Attribute> atts = new ArrayList<>();
-    atts.add(att1);
-    atts.add(att2);
-    Instances inst = new Instances("", atts, 10);
-    Instance ins = new DenseInstance(2);
-    ins.setDataset(inst);
-    inst.setClassIndex(0);
-    ins.setValue(0, 10);
-    ins.setValue(1, "1");
-    inst.add(ins);
-    clf.initializeClassifier(inst);
-  }
 
   /**
    * Test no outputlayer
@@ -349,7 +341,7 @@ public class Dl4jMlpTest {
 
     OutputLayer ol = new OutputLayer();
 
-    Layer[] ls = new Layer[]{dl1, ol};
+    Layer[] ls = new Layer[] {dl1, ol};
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT);
