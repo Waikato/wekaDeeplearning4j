@@ -70,7 +70,7 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
   private static final long serialVersionUID = 1316260988724548474L;
 
   /** Word vector file location */
-  protected File wordVectorLocation = new File(System.getProperty("user.dir"));
+  protected File wordVectorLocation = new File(System.getProperty("user.home"));
 
   /** Token pre processor */
   protected TokenPreProcess tokenPreProcess = new CommonPreprocessor();
@@ -116,12 +116,18 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextEmbeddingDataSetIterator(data, wordVectors, tokenizerFactory, tokenPreProcess, stopwords, batchSize, truncateLength);
+    return new TextEmbeddingDataSetIterator(
+        data, wordVectors, tokenizerFactory, tokenPreProcess, stopwords, batchSize, truncateLength);
   }
 
-
   /** Initialize the word vectors from the given file */
-  protected void initWordVectors() {
+  public void initWordVectors() {
+
+    if(wordVectors != null){
+      log.debug("Word vectors already loaded, skipping initialization.");
+      return;
+    }
+
     log.debug("Loading word vector model");
 
     final String path = wordVectorLocation.getAbsolutePath();
@@ -135,37 +141,41 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
         throw new RuntimeException("Could not load the word vector file.");
       }
     } else if (pathLower.endsWith(".csv.gz")) {
-      // If the file is gzipped, try the dl4j gzipped format
-      try {
-        wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
-      } catch (RuntimeException re) {
-        // Dl4j format not found, continue with decompression by hand
-        try {
-          GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(wordVectorLocation));
-          File tmpFile =
-              Paths.get(System.getProperty("java.io.tmpdir"), "wordmodel-tmp.csv").toFile();
-          tmpFile.delete();
-          FileOutputStream fos = new FileOutputStream(tmpFile);
-          int length;
-          byte[] buffer = new byte[1024];
-          while ((length = gzis.read(buffer)) > 0) {
-            fos.write(buffer, 0, length);
-          }
-          fos.close();
-          gzis.close();
-
-          // Try loading decompressed CSV file
-          boolean success = loadEmbeddingFromCSV(tmpFile);
-          if (!success) {
-            throw new RuntimeException("Could not load the word vector file.");
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
+      loadGZipped();
     } else {
       // If no file extension was caught before, try loading as is
       wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+    }
+  }
+
+  /** Load wordVectors from a gzipped csv file */
+  private void loadGZipped() {
+    try {
+      wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
+    } catch (RuntimeException re) {
+      // Dl4j format not found, continue with decompression by hand
+      try {
+        GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(wordVectorLocation));
+        File tmpFile =
+            Paths.get(System.getProperty("java.io.tmpdir"), "wordmodel-tmp.csv").toFile();
+        tmpFile.delete();
+        FileOutputStream fos = new FileOutputStream(tmpFile);
+        int length;
+        byte[] buffer = new byte[1024];
+        while ((length = gzis.read(buffer)) > 0) {
+          fos.write(buffer, 0, length);
+        }
+        fos.close();
+        gzis.close();
+
+        // Try loading decompressed CSV file
+        boolean success = loadEmbeddingFromCSV(tmpFile);
+        if (!success) {
+          throw new RuntimeException("Could not load the word vector file.");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
   }
 
@@ -306,16 +316,21 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
     this.truncateLength = truncateLength;
   }
 
-
   @OptionMetadata(
-      displayName = "location of word vectors",
-      description = "The word vectors location.",
-      commandLineParamName = "wordVectorLocation",
-      commandLineParamSynopsis = "-wordVectorLocation <string>",
-      displayOrder = 3
+    displayName = "location of word vectors",
+    description = "The word vectors location.",
+    commandLineParamName = "wordVectorLocation",
+    commandLineParamSynopsis = "-wordVectorLocation <string>",
+    displayOrder = 3
   )
   public File getWordVectorLocation() {
     return wordVectorLocation;
+  }
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    initWordVectors();
   }
 
   /**
@@ -324,51 +339,45 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
    * @param file Word vector location
    */
   public void setWordVectorLocation(File file) {
-    if (file != null && !file.equals(wordVectorLocation)) {
-      this.wordVectorLocation = file;
-      initWordVectors();
-    }
+    this.wordVectorLocation = file;
   }
 
   @OptionMetadata(
-      displayName = "token pre processor",
-      description = "The token pre processor.",
-      commandLineParamName = "tokenPreProcessor",
-      commandLineParamSynopsis = "-tokenPreProcessor <string>",
-      displayOrder = 4
+    displayName = "token pre processor",
+    description = "The token pre processor.",
+    commandLineParamName = "tokenPreProcessor",
+    commandLineParamSynopsis = "-tokenPreProcessor <string>",
+    displayOrder = 4
   )
-
   public TokenPreProcess getTokenPreProcess() {
     return tokenPreProcess;
   }
 
-  public void setTokenPreProcess(
-      TokenPreProcess tokenPreProcess) {
+  public void setTokenPreProcess(TokenPreProcess tokenPreProcess) {
     this.tokenPreProcess = tokenPreProcess;
   }
 
   @OptionMetadata(
-      displayName = "tokenizer factory",
-      description = "The tokenizer factory.",
-      commandLineParamName = "tokenizerFactory",
-      commandLineParamSynopsis = "-tokenizerFactory <string>",
-      displayOrder = 5
+    displayName = "tokenizer factory",
+    description = "The tokenizer factory.",
+    commandLineParamName = "tokenizerFactory",
+    commandLineParamSynopsis = "-tokenizerFactory <string>",
+    displayOrder = 5
   )
   public TokenizerFactory getTokenizerFactory() {
     return tokenizerFactory;
   }
 
-  public void setTokenizerFactory(
-      TokenizerFactory tokenizerFactory) {
+  public void setTokenizerFactory(TokenizerFactory tokenizerFactory) {
     this.tokenizerFactory = tokenizerFactory;
   }
 
   @OptionMetadata(
-      displayName = "stop words",
-      description = "The stop words to use.",
-      commandLineParamName = "stopWords",
-      commandLineParamSynopsis = "-stopWords <string>",
-      displayOrder = 5
+    displayName = "stop words",
+    description = "The stop words to use.",
+    commandLineParamName = "stopWords",
+    commandLineParamSynopsis = "-stopWords <string>",
+    displayOrder = 5
   )
   public Dl4jAbstractStopwords getStopwords() {
     return stopwords;
@@ -380,6 +389,7 @@ public class TextEmbeddingInstanceIterator extends AbstractSequenceInstanceItera
 
   @ProgrammaticProperty
   public WordVectors getWordVectors() {
+    initWordVectors();
     return wordVectors;
   }
 
