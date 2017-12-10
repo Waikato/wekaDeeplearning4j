@@ -17,6 +17,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
+import weka.core.TestInstances;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
@@ -196,5 +197,28 @@ public class TestUtil {
   public static void startUiServer(FileStatsStorage statsStorage) {
     UIServer uiServer = UIServer.getInstance();
     uiServer.attach(statsStorage);
+  }
+
+  /** Creates a test dataset */
+  public static Instances makeTestDataset(int seed, int numInstances,
+      int numNominal, int numNumeric, int numString, int numDate,
+      int numRelational, int numClasses, int classType, int classIndex,
+      boolean multiInstance) throws Exception {
+
+    TestInstances testset = new TestInstances();
+    testset.setSeed(seed);
+    testset.setNumInstances(numInstances);
+    testset.setNumNominal(numNominal);
+    testset.setNumNumeric(numNumeric);
+    testset.setNumString(numString);
+    testset.setNumDate(numDate);
+    testset.setNumRelational(numRelational);
+    testset.setNumClasses(numClasses);
+    testset.setClassType(classType);
+    testset.setClassIndex(classIndex);
+    testset.setNumClasses(numClasses);
+    testset.setMultiInstance(multiInstance);
+
+    return testset.generate();
   }
 }
