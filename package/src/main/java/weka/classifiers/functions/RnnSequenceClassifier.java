@@ -28,6 +28,8 @@ import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
 import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
+import weka.dl4j.zoo.ZooModel;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * A classifier that can handle sequences.
@@ -278,6 +280,20 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
   public void setInstanceIterator(AbstractSequenceInstanceIterator iterator) {
     instanceIterator = iterator;
+  }
+
+  @Override
+  @Deprecated
+  @ProgrammaticProperty
+  public ZooModel getZooModel() {
+    throw new UnsupportedOperationException("Zoo models not available for RnnSequenceClassifier");
+  }
+
+  @Override
+  @Deprecated
+  @ProgrammaticProperty
+  public void setZooModel(ZooModel zooModel) {
+    throw new UnsupportedOperationException("Zoo models not available for RnnSequenceClassifier");
   }
 
   /**
