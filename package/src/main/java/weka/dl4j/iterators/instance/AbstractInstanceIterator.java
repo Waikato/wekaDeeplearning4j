@@ -95,6 +95,12 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
     batchSize = trainBatchSize;
   }
 
+  /**
+   * Initialize the iterator
+   */
+  public void initialize(){
+    // Do nothing by default
+  }
 
   /**
    * Validates the input dataset

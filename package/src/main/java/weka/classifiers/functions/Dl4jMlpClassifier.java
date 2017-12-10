@@ -603,6 +603,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       } else {
         createModel();
       }
+      // Initialize iterator
+      instanceIterator.initialize();
+
+
       // Setup the datasetiterators (needs to be done after the model initialization)
       trainIterator = getDataSetIterator(this.trainData);
 
@@ -613,6 +617,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
       // Set the iteration listener
       model.setListeners(getListener());
+
 
       numEpochsPerformed = 0;
     } finally {
@@ -1187,10 +1192,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   @Override
   public String toString() {
-      if (model.getConfiguration() != null) {
-        return model.getConfiguration().toYaml();
-      }
-    return "";
+    if (model == null || model.getConfiguration() == null){
+      return "";
+    }
+
+    return model.getConfiguration().toYaml();
   }
 
   /**

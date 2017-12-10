@@ -44,8 +44,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   private int tBPTTbackwardLength = 25;
   /** Truncated backpropagation through time forward length */
   private int tBPTTforwardLength = 25;
-  /** Instance iterator */
-  private AbstractSequenceInstanceIterator instanceIterator = new TextEmbeddingInstanceIterator();
 
   public RnnSequenceClassifier() {
     super();
@@ -80,6 +78,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
       data = initEarlyStopping(data);
       this.trainData = data;
+
+      instanceIterator.initialize();
 
       createModel();
 
@@ -274,17 +274,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
   public void settBPTTforwardLength(int tBPTTforwardLength) {
     this.tBPTTforwardLength = tBPTTforwardLength;
-  }
-
-  @OptionMetadata(
-      description = "The instance trainIterator to use.",
-      displayName = "instance iterator",
-      commandLineParamName = "iterator",
-      commandLineParamSynopsis = "-iterator <string>",
-      displayOrder = 6
-  )
-  public AbstractSequenceInstanceIterator getInstanceIterator() {
-    return instanceIterator;
   }
 
   public void setInstanceIterator(AbstractSequenceInstanceIterator iterator) {
