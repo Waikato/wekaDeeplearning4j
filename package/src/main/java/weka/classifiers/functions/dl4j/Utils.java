@@ -62,14 +62,16 @@ public class Utils {
         if (index < insts.classIndex()) {
           independent[index] = value;
         } else if (index > insts.classIndex()) {
+          // Shift by -1, since the class is left out from the feature matrix and put into a separate
+          // outcomes matrix
           independent[index - 1] = value;
-          logger.error("This should not happen. Class values may be overwritten.");
         }
       }
-      // TODO: Fix for multitarget datasets
+
       // Set class values
       if (insts.numClasses() > 1) { // Classification
-        dependent[(int) current.classValue()] = 1.0;
+        final int oneHotIdx = (int) current.classValue();
+        dependent[oneHotIdx] = 1.0;
       } else { // Regression (currently only single class)
         dependent[0] = current.classValue();
       }
