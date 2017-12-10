@@ -286,14 +286,14 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   @Deprecated
   @ProgrammaticProperty
   public ZooModel getZooModel() {
-    throw new UnsupportedOperationException("Zoo models not available for RnnSequenceClassifier");
+    throw new UnsupportedOperationException("Zoo models are not available for RnnSequenceClassifier");
   }
 
   @Override
   @Deprecated
   @ProgrammaticProperty
   public void setZooModel(ZooModel zooModel) {
-    throw new UnsupportedOperationException("Zoo models not available for RnnSequenceClassifier");
+    throw new UnsupportedOperationException("Zoo models are not available for RnnSequenceClassifier");
   }
 
   /**
