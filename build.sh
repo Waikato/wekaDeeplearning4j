@@ -37,8 +37,8 @@ if test -t 1; then
 fi
 
 # Project version (TODO: Fix for non GNU grep versions)
-version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta))?)(?=")' package/build_package.xml`
-if echo ${version} | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta))?$"; then
+version=`grep -Po 'name="version" value="\K([0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta)\.[0-9]+)?)(?=")' package/build_package.xml`
+if echo ${version} | grep -Eq "^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta)\.[0-9+])?$"; then
     echo -e "${ep}Building version: ${version}"
 else
     echo -e "${ep}Error finding version. Unknown version: ${version}"
