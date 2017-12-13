@@ -9,6 +9,7 @@ import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.AbstractLSTM;
 import org.deeplearning4j.nn.conf.layers.EmbeddingLayer;
+import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
@@ -167,7 +168,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   private boolean isSequenceCompatibleLayer(Layer layer) {
     return layer instanceof EmbeddingLayer
         || layer instanceof AbstractLSTM
-        || layer instanceof RnnOutputLayer;
+        || layer instanceof RnnOutputLayer
+        || layer instanceof GlobalPoolingLayer;
   }
 
   /**
