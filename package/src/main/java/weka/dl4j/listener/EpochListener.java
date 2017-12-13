@@ -19,6 +19,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.OptionMetadata;
 
 /**
@@ -55,16 +56,24 @@ public class EpochListener extends IterationListener implements TrainingListener
     String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
 
     if (enableIntermediateEvaluations) {
-      s += "Train Set:      \n" + evaluateDataSetIterator(model, trainIterator);
+      s += "Train Set:      \n" + evaluateDataSetIterator(model, trainIterator, true);
       if (validationIterator != null) {
-        s += "Validation Set: \n" + evaluateDataSetIterator(model, validationIterator);
+        s += "Validation Set: \n" + evaluateDataSetIterator(model, validationIterator, false);
       }
     }
 
     log(s);
   }
 
-  private String evaluateDataSetIterator(Model model, DataSetIterator iterator) {
+  /**
+   * Evaluate an iterator on a given model
+   *
+   * @param model Model which is to be evaluated
+   * @param iterator Iterator yielding datasets
+   * @param train Whether this is a training or validation iterator
+   * @return Evaluation string for logging
+   */
+  private String evaluateDataSetIterator(Model model, DataSetIterator iterator, boolean train) {
     iterator.reset();
     String s = "";
     try {
@@ -91,8 +100,15 @@ public class EpochListener extends IterationListener implements TrainingListener
           else rEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
         }
 
-        // Add loss
-        s += String.format(" Loss:           %9f" + System.lineSeparator(), model.score());
+        // Add loss (denoted as score in dl4j)
+        final double score;
+        if (train) {
+          score = net.score();
+        } else {
+          score = Utils.computeScore(net, iterator);
+        }
+
+        s += String.format(" Loss:           %9f" + System.lineSeparator(), score);
 
         // Add Dl4j metrics
         if (isClassification) {

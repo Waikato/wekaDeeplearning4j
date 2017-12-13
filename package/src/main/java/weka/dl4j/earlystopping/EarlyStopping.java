@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -87,28 +89,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
         return true;
       }
 
-      double scoreSum = 0;
-      int iterations = 0;
-
-      // Iterate batches
-      while (valDataSetIterator.hasNext()) {
-        DataSet next;
-        if (valDataSetIterator instanceof AsyncDataSetIterator){
-          next = valDataSetIterator.next();
-        } else {
-          // TODO: figure out which batch size is feasible for inference
-          final int batch = valDataSetIterator.batch() * 8;
-          next = valDataSetIterator.next(batch);
-        }
-        scoreSum += model.score(next);
-        iterations++;
-      }
-
-      // Get average score
-      double score = 0;
-      if (iterations != 0) {
-        score = scoreSum / iterations;
-      }
+      double score = Utils.computeScore(model, valDataSetIterator);
       if (score < lastBestScore) {
         resetEpochCounter();
         lastBestScore = score;
@@ -125,6 +106,8 @@ public class EarlyStopping implements OptionHandler, Serializable {
       valDataSetIterator.reset();
     }
   }
+
+
 
   public int getMaxEpochsNoImprovement() {
     return maxEpochsNoImprovement;
