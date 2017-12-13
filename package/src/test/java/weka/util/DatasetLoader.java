@@ -2,8 +2,12 @@ package weka.util;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -232,4 +236,32 @@ public class DatasetLoader {
 
     return file;
   }
+
+  public static File loadAngerFilesDir() {
+    return new File("src/test/resources/numeric/anger-texts");
+  }
+
+  public static Instances loadAngerMeta() throws Exception {
+    return DatasetLoader.loadArff("src/test/resources/numeric/anger.meta.arff");
+  }
+
+  public static Instances loadAngerMetaClassification() throws Exception {
+    final Instances data = DatasetLoader
+        .loadArff("src/test/resources/numeric/anger.meta.arff");
+    ArrayList<Attribute> atts = new ArrayList<>();
+    atts.add(data.attribute(0));
+    Attribute cls = new Attribute("cls", Arrays.asList("0","1"));
+    atts.add(cls);
+    Instances dataDiscretized = new Instances("anger-classification", atts ,data.numInstances());
+    dataDiscretized.setClassIndex(1);
+    for (Instance datum : data) {
+      Instance cpy = (Instance) datum.copy();
+      cpy.setDataset(dataDiscretized);
+      cpy.setValue(0, datum.stringValue(0));
+      cpy.setValue(1, datum.classValue() > 0.5 ? "1" : "0");
+      dataDiscretized.add(cpy);
+    }
+    return dataDiscretized;
+  }
+
 }
