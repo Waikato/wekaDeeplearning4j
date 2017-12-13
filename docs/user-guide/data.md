@@ -78,8 +78,8 @@ Available parameters:
 - `numChannels`: Depth of the image (e.g.: RGB images have a depth of 3, whereas Greyscale images have a depth of 1)
 - `imagesLocation`: The absolute path to the location of the images listed in the meta-data ARFF file
 
-## TextEmbeddingInstanceIterator
-If you are going to process text data, it is usually necessary to project the documents into an embedding space. This means, each token (e.g. a word) is mapped with the help of an embedding into a certain feature space. That is, each document will then contain a series of vectors, where each vector represents a token in the embedding space. The `TextEmbeddingInstanceIterator` accepts datasets containing a document and a class as shown below:
+## Cnn/RnnTextEmbeddingInstanceIterator
+If you are going to process text data, it is usually necessary to project the documents into an embedding space. This means, each token (e.g. a word) is mapped with the help of an embedding into a certain feature space. That is, each document will then contain a series of vectors, where each vector represents a token in the embedding space. The `Cnn/RnnTextEmbeddingInstanceIterator` accepts datasets containing a document and a class as shown below:
 ```
 @RELATION 'imdb-reviews'
 
@@ -100,8 +100,8 @@ Available parameters:
 - `truncateLength`: Maximum number of words per document
 
 
-## TextFilesEmbeddingInstanceIterator
-This iterator extends the `TextEmbeddingInstanceIterator` and allows the use of distributed documents that are not collected in a single ARFF file. Similar to the `ImageInstanceIterator`, this iterator is applicable to an ARFF file containing the meta data, such as:
+## Cnn/RnnTextFilesEmbeddingInstanceIterator
+This iterator extends the `Cnn/RnnTextEmbeddingInstanceIterator` and allows the use of distributed documents that are not collected in a single ARFF file. Similar to the `ImageInstanceIterator`, this iterator is applicable to an ARFF file containing the meta data, such as:
 ```
 @RELATION 'imdb-reviews'
 
@@ -132,4 +132,4 @@ The iterators allow to choose between three modes of caching:
 - `MEMORY`: cache the generated mini batches in memory
 - `FILESYSTEM`: cache the generated mini batches in the filesystem (in your system's temporary directory)
 
-The cache will be built up in the first epoch. For further epochs, the batches do not need to be recomputed but are read from the cache. This might help if the batch generation is computation intensive.
+The cache will be built up in the first epoch. For further epochs, the batches do not need to be recomputed but are read from the cache. This might help if the batch generation is computational intensive.

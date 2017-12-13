@@ -19,7 +19,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.sequence.text.CnnTextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 

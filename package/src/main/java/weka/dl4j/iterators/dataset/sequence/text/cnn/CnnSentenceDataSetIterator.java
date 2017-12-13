@@ -1,4 +1,4 @@
-package weka.dl4j.iterators.dataset.sequence.text;
+package weka.dl4j.iterators.dataset.sequence.text.cnn;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -18,7 +18,7 @@
  *    Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  *
  */
-package weka.dl4j.iterators.instance.sequence.text;
+package weka.dl4j.iterators.instance.sequence.text.rnn;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +26,12 @@ import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
-import weka.dl4j.iterators.dataset.sequence.text.TextEmbeddingDataSetIterator;
+import weka.dl4j.iterators.dataset.sequence.text.rnn.RnnTextEmbeddingDataSetIterator;
+import weka.dl4j.iterators.instance.sequence.text.AbstractTextEmbeddingIterator;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
- * TextEmbeddingInstanceIterator.
+ * RnnTextEmbeddingInstanceIterator.
  *
  * <p>Assumes the instance with the following attributes:
  *
@@ -42,7 +43,7 @@ import weka.dl4j.iterators.dataset.sequence.text.TextEmbeddingDataSetIterator;
  * @author Steven Lang
  */
 @Slf4j
-public class TextEmbeddingInstanceIterator extends AbstractTextEmbeddingIterator {
+public class RnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingIterator {
 
   /** The ID used to serialize this class */
   private static final long serialVersionUID = 1316260988724548474L;
@@ -77,7 +78,7 @@ public class TextEmbeddingInstanceIterator extends AbstractTextEmbeddingIterator
     validate(data);
     initWordVectors();
     final LabeledSentenceProvider prov = getSentenceProvider(data);
-    return new TextEmbeddingDataSetIterator(
+    return new RnnTextEmbeddingDataSetIterator(
         data,
         wordVectors,
         tokenizerFactory,
