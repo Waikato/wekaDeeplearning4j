@@ -1,6 +1,5 @@
 package weka.dl4j.iterators.dataset.sequence.text;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -18,7 +18,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import weka.core.Instance;
+import org.nd4j.linalg.primitives.Pair;
 import weka.core.Instances;
 import weka.core.stopwords.AbstractStopwords;
 
@@ -41,6 +41,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
   protected int cursor = 0;
   protected final Instances data;
   private final TokenizerFactory tokenizerFactory;
+  private LabeledSentenceProvider sentenceProvider;
 
   /**
    * @param data Instances with documents and labels
@@ -52,8 +53,14 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
    * @param truncateLength If reviews exceed
    */
   public TextEmbeddingDataSetIterator(
-      Instances data, WordVectors wordVectors, TokenizerFactory tokenFact, TokenPreProcess tpp, AbstractStopwords stopWords, int batchSize, int truncateLength)
-      throws IOException {
+      Instances data,
+      WordVectors wordVectors,
+      TokenizerFactory tokenFact,
+      TokenPreProcess tpp,
+      AbstractStopwords stopWords,
+      LabeledSentenceProvider sentenceProvider,
+      int batchSize,
+      int truncateLength) {
     this.batchSize = batchSize;
     this.vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
 
@@ -65,38 +72,35 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     this.tokenizerFactory = tokenFact;
     this.tokenizerFactory.setTokenPreProcessor(tpp);
     this.stopWords = stopWords;
+    this.sentenceProvider = sentenceProvider;
   }
 
   @Override
   public DataSet next(int num) {
-    if (cursor >= data.numInstances()) throw new NoSuchElementException();
-    Instances copy = new Instances(data, num);
-    for (int i = 0; i < num && cursor < totalExamples(); i++) {
-      Instance inst = (Instance) data.get(cursor).copy();
-      inst.setDataset(copy);
-      copy.add(inst);
-      cursor++;
+
+    if (sentenceProvider == null) {
+      throw new UnsupportedOperationException("Cannot do next/hasNext without a sentence provider");
     }
-    return nextDataSet(copy);
-  }
+    if (!hasNext()) {
+      throw new NoSuchElementException("No next element");
+    }
 
-  protected DataSet nextDataSet(Instances data) {
     // First: load reviews to String. Alternate positive and negative reviews
-    List<String> reviews = new ArrayList<>(data.size());
-    List<Double> lbls = new ArrayList<>(data.size());
+    List<String> reviews = new ArrayList<>(num);
+    List<Double> lbls = new ArrayList<>(num);
 
-    int classIndex = data.classIndex();
-    int documentIndex = 1 - classIndex;
 
-    for (Instance row : data) {
-      final String document = row.stringValue(documentIndex);
-      final double label = row.value(classIndex);
-      reviews.add(document);
-      lbls.add(label);
+    for (int i = 0; i < num && sentenceProvider.hasNext(); i++) {
+      final Pair<String, String> next = sentenceProvider.nextSentence();
+      reviews.add(next.getFirst());
+      lbls.add(Double.valueOf(next.getSecond()));
     }
 
     // Second: tokenize reviews and filter out unknown words
     final int numDocuments = reviews.size();
+    if (numDocuments == 0){
+      System.out.println();
+    }
     List<List<String>> allTokens = new ArrayList<>(numDocuments);
     int maxLength = 0;
     for (String s : reviews) {
@@ -179,7 +183,11 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
     }
 
     // Cache the dataset
-    return new DataSet(features, labels, featuresMask, labelsMask);
+    final DataSet ds = new DataSet(features, labels, featuresMask, labelsMask);
+
+    // Move cursor
+    cursor += ds.numExamples();
+    return ds;
   }
 
   @Override
@@ -199,6 +207,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
 
   @Override
   public void reset() {
+    sentenceProvider.reset();
     cursor = 0;
   }
 

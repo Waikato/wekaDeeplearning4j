@@ -2,11 +2,17 @@ package weka.dl4j.iterators.instance.sequence.text;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
-import weka.dl4j.iterators.dataset.sequence.text.TextFilesEmbeddingDataSetIterator;
+import weka.dl4j.iterators.dataset.sequence.text.TextEmbeddingDataSetIterator;
+import weka.dl4j.iterators.provider.FileLabeledSentenceProvider;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
@@ -31,7 +37,31 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
       throws InvalidInputDataException, IOException {
     validate(data);
     initWordVectors();
-    return new TextFilesEmbeddingDataSetIterator(data, wordVectors, tokenizerFactory, tokenPreProcess, stopwords, batchSize, truncateLength, textsLocation);
+    final LabeledSentenceProvider sentenceProvider = getSentenceProvider(data);
+    return new TextEmbeddingDataSetIterator(
+        data,
+        wordVectors,
+        tokenizerFactory,
+        tokenPreProcess,
+        stopwords,
+        sentenceProvider,
+        batchSize,
+        truncateLength);
+  }
+
+  @Override
+  public LabeledSentenceProvider getSentenceProvider(Instances data) {
+    List<File> files = new ArrayList<>();
+    List<String> labels = new ArrayList<>();
+    final int clsIdx = data.classIndex();
+    for (Instance inst : data) {
+      labels.add(String.valueOf(inst.value(clsIdx)));
+      final String path = inst.stringValue(1 - clsIdx);
+      final File file = Paths.get(textsLocation.getAbsolutePath(), path).toFile();
+      files.add(file);
+    }
+
+    return new FileLabeledSentenceProvider(files, labels, data.numClasses());
   }
 
   /**
@@ -46,7 +76,7 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
       throw new InvalidInputDataException("Directory not valid: " + getTextsLocation());
     }
     if (!((data.attribute(0).isString() && data.classIndex() == 1)
-          || (data.attribute(1).isString() && data.classIndex() == 0))) {
+        || (data.attribute(1).isString() && data.classIndex() == 0))) {
       throw new InvalidInputDataException(
           "An ARFF is required with a string attribute and a class attribute");
     }

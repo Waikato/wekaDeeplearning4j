@@ -112,6 +112,8 @@ public class TextEmbeddingInstanceIteratorTest {
         log.info("");
       }
       teii.setWordVectorLocation(f);
+
+      teii.initialize();
       final Collection ws = teii.getWordVectors().vocab().words();
       assertTrue(ws.containsAll(words) && words.containsAll(ws));
     }
