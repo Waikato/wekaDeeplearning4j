@@ -57,7 +57,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-@Slf4j()
+@Slf4j
 public class RnnSequenceClassifierTest {
 
   /** Current name */
@@ -220,7 +220,7 @@ public class RnnSequenceClassifierTest {
     nnc.setLearningRate(0.02);
 
     final TextFilesEmbeddingInstanceIterator tfii = new TextFilesEmbeddingInstanceIterator();
-    tfii.setTextsLocation(new File("src/test/resources/numeric/anger-texts"));
+    tfii.setTextsLocation(DatasetLoader.loadAngerFilesDir());
     tfii.setTruncateLength(80);
     tfii.setTrainBatchSize(64);
     tfii.setWordVectorLocation(modelSlim);
@@ -237,7 +237,7 @@ public class RnnSequenceClassifierTest {
     l.setN(1);
     clf.setIterationListener(l);
     clf.setEarlyStopping(new EarlyStopping(5, 10));
-    data = DatasetLoader.loadArff("src/test/resources/numeric/anger.meta.arff");
+    data = DatasetLoader.loadAngerMeta();
     // Randomize data
     data.randomize(new Random(42));
     TestUtil.holdout(clf, data, 33);

@@ -47,7 +47,7 @@ public class TestUtil {
    * @param p Split percentage
    * @throws Exception
    */
-  public static void holdout(Dl4jMlpClassifier clf, Instances data, double p) throws Exception {
+  public static void holdout(Classifier clf, Instances data, double p) throws Exception {
     Instances[] split = splitTrainTest(data, p);
 
     Instances train = split[0];
@@ -100,7 +100,7 @@ public class TestUtil {
    * @param data Full datase
    * @throws Exception
    */
-  public static void holdout(Dl4jMlpClassifier clf, Instances data) throws Exception {
+  public static void holdout(Classifier clf, Instances data) throws Exception {
     holdout(clf, data, 33);
   }
 
