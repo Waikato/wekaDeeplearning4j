@@ -1,4 +1,4 @@
-package weka.dl4j.iterators.dataset.sequence.text;
+package weka.dl4j.iterators.dataset.sequence.text.rnn;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import weka.core.stopwords.AbstractStopwords;
  * @author Steven Lang
  */
 @Slf4j
-public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializable {
+public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Serializable {
 
   private static final long serialVersionUID = 1682821361704251554L;
   private final WordVectors wordVectors;
@@ -52,7 +52,7 @@ public class TextEmbeddingDataSetIterator implements DataSetIterator, Serializab
    * @param batchSize Size of each minibatch for training
    * @param truncateLength If reviews exceed
    */
-  public TextEmbeddingDataSetIterator(
+  public RnnTextEmbeddingDataSetIterator(
       Instances data,
       WordVectors wordVectors,
       TokenizerFactory tokenFact,

@@ -81,7 +81,7 @@ import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.sequence.text.CnnTextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.iterators.instance.Convolutional;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;

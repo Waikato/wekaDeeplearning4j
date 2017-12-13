@@ -1,53 +1,25 @@
-package weka.dl4j.iterators.instance.sequence.text;
+package weka.dl4j.iterators.instance.sequence.text.cnn;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.OptionMetadata;
-import weka.dl4j.iterators.dataset.sequence.text.TextEmbeddingDataSetIterator;
 import weka.dl4j.iterators.provider.FileLabeledSentenceProvider;
 
 /**
- * Converts the given Instances object into a DataSet and then constructs and returns a
- * TextEmbeddingInstanceIterator.
- *
- * <p>Assumes the instance object has the following two attributes:
- *
- * <ul>
- *   <li>Path to text file
- *   <li>Class
- * </ul>
+ * Iterator that constructs datasets from text data given as a set of files.
  *
  * @author Steven Lang
  */
-public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIterator {
+public class CnnTextFilesEmbeddingInstanceIterator extends CnnTextEmbeddingInstanceIterator {
 
-  private static final long serialVersionUID = -1065956690877737854L;
+  private static final long serialVersionUID = 3417451906101970927L;
   private File textsLocation = new File(System.getProperty("user.dir"));
-
-  @Override
-  public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize)
-      throws InvalidInputDataException, IOException {
-    validate(data);
-    initWordVectors();
-    final LabeledSentenceProvider sentenceProvider = getSentenceProvider(data);
-    return new TextEmbeddingDataSetIterator(
-        data,
-        wordVectors,
-        tokenizerFactory,
-        tokenPreProcess,
-        stopwords,
-        sentenceProvider,
-        batchSize,
-        truncateLength);
-  }
 
   @Override
   public LabeledSentenceProvider getSentenceProvider(Instances data) {
@@ -64,21 +36,11 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
     return new FileLabeledSentenceProvider(files, labels, data.numClasses());
   }
 
-  /**
-   * Validates the input dataset
-   *
-   * @param data the input dataset
-   * @throws InvalidInputDataException if validation is unsuccessful
-   */
+  @Override
   public void validate(Instances data) throws InvalidInputDataException {
-
+    super.validate(data);
     if (!getTextsLocation().isDirectory()) {
       throw new InvalidInputDataException("Directory not valid: " + getTextsLocation());
-    }
-    if (!((data.attribute(0).isString() && data.classIndex() == 1)
-        || (data.attribute(1).isString() && data.classIndex() == 0))) {
-      throw new InvalidInputDataException(
-          "An ARFF is required with a string attribute and a class attribute");
     }
   }
 
@@ -103,4 +65,6 @@ public class TextFilesEmbeddingInstanceIterator extends TextEmbeddingInstanceIte
         + "processed by the tokenization, stopwords, token-preprocessing and afterwards mapped into "
         + "an embedding space with the given word-vector model.";
   }
+
+
 }

@@ -30,8 +30,8 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
-import weka.dl4j.iterators.instance.sequence.text.TextFilesEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextFilesEmbeddingInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
 import weka.dl4j.listener.EpochListener;
@@ -73,7 +73,7 @@ public class RnnSequenceClassifierTest {
   private static final int epochs = 2;
   private static final int truncateLength = 10;
 
-  private static TextEmbeddingInstanceIterator tii;
+  private static RnnTextEmbeddingInstanceIterator tii;
   private long startTime;
 
   private FileStatsStorage fss;
@@ -82,7 +82,7 @@ public class RnnSequenceClassifierTest {
   @BeforeClass
   public static void init() throws IOException {
     modelSlim = DatasetLoader.loadGoogleNewsVectors();
-    tii = new TextEmbeddingInstanceIterator();
+    tii = new RnnTextEmbeddingInstanceIterator();
     tii.setWordVectorLocation(modelSlim);
     tii.setTruncateLength(truncateLength);
     tii.setTrainBatchSize(batchSize);
@@ -219,7 +219,7 @@ public class RnnSequenceClassifierTest {
     nnc.setGradientNormalizationThreshold(1.0);
     nnc.setLearningRate(0.02);
 
-    final TextFilesEmbeddingInstanceIterator tfii = new TextFilesEmbeddingInstanceIterator();
+    final RnnTextFilesEmbeddingInstanceIterator tfii = new RnnTextFilesEmbeddingInstanceIterator();
     tfii.setTextsLocation(DatasetLoader.loadAngerFilesDir());
     tfii.setTruncateLength(80);
     tfii.setTrainBatchSize(64);
@@ -247,7 +247,7 @@ public class RnnSequenceClassifierTest {
   public void testConfigRotation() throws Exception {
     Map<String, String> failedConfigs = new HashMap<>();
 
-    tii = new TextEmbeddingInstanceIterator();
+    tii = new RnnTextEmbeddingInstanceIterator();
     tii.setWordVectorLocation(modelSlim);
     data = DatasetLoader.loadAnger();
 
@@ -361,7 +361,7 @@ public class RnnSequenceClassifierTest {
   //
   //    int vectorSize = 300; // Size of the word vectors. 300 in the Google News model
   //
-  //    tii = new TextEmbeddingInstanceIterator();
+  //    tii = new RnnTextEmbeddingInstanceIterator();
   //    tii.setTruncateLength(truncateLength);
   //    tii.setWordVectorLocation(modelSlim);
   //    final int bs = batchSize;

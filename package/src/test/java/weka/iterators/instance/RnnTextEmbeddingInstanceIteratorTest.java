@@ -15,25 +15,25 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
-import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
 /**
- * JUnit tests for the {@link TextEmbeddingInstanceIterator}
+ * JUnit tests for the {@link RnnTextEmbeddingInstanceIterator}
  *
  * @author Steven Lang
  */
 @Slf4j
-public class TextEmbeddingInstanceIteratorTest {
+public class RnnTextEmbeddingInstanceIteratorTest {
   /** ImageInstanceIterator object */
-  private TextEmbeddingInstanceIterator tii;
+  private RnnTextEmbeddingInstanceIterator tii;
   /** WordVec size */
   private static final int WORD_VEC_SIZE = 300;
   /** Initialize iterator */
   @Before
   public void init() {
-    this.tii = new TextEmbeddingInstanceIterator();
+    this.tii = new RnnTextEmbeddingInstanceIterator();
     final String modelPath = "/home/slang/Downloads/GoogleNews-vectors-negative300-SLIM.bin.gz";
     this.tii.setWordVectorLocation(new File(modelPath));
     this.tii.setTrainBatchSize(10);
@@ -107,7 +107,7 @@ public class TextEmbeddingInstanceIteratorTest {
 
     for (File f : embeddings) {
       log.info("Testing embedding {}", f.getAbsolutePath());
-      TextEmbeddingInstanceIterator teii = new TextEmbeddingInstanceIterator();
+      RnnTextEmbeddingInstanceIterator teii = new RnnTextEmbeddingInstanceIterator();
       if (f.getAbsolutePath().contains("arff")) {
         log.info("");
       }

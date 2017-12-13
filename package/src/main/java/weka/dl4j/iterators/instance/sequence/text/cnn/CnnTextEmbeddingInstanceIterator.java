@@ -1,15 +1,11 @@
-package weka.dl4j.iterators.instance.sequence.text;
+package weka.dl4j.iterators.instance.sequence.text.cnn;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
-import org.jetbrains.annotations.NotNull;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
-import weka.dl4j.iterators.dataset.sequence.text.CnnSentenceDataSetIterator;
-import weka.dl4j.iterators.provider.CollectionLabeledSentenceProvider;
+import weka.dl4j.iterators.dataset.sequence.text.cnn.CnnSentenceDataSetIterator;
+import weka.dl4j.iterators.instance.sequence.text.AbstractTextEmbeddingIterator;
 
 /**
  * Iterator that constructs datasets from text data for convolutional networks.

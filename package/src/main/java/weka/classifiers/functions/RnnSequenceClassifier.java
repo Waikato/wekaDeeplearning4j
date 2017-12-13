@@ -28,7 +28,6 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
 import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
-import weka.dl4j.iterators.instance.sequence.text.TextEmbeddingInstanceIterator;
 import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
 
@@ -321,8 +320,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   public String globalInfo() {
     return "Classification and regression with recurrent neural network using DeepLearning4J.\n"
         + "Iterator usage\n"
-        + "- TextEmbeddingInstanceIterator: ARFF files containing the document as lines\n"
-        + "- TextFilesEmbeddingInstanceIterator: ARFF files containing meta-data linking to actual document files\n"
+        + "- RnnTextEmbeddingInstanceIterator: ARFF files containing the document as lines\n"
+        + "- RnnTextFilesEmbeddingInstanceIterator: ARFF files containing meta-data linking to actual document files\n"
         + "(See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )";
   }
 
