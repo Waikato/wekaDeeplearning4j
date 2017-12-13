@@ -21,8 +21,12 @@
 
 package weka.classifiers.functions.dl4j;
 
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,5 +169,41 @@ public class Utils {
     result.putRow(0, Nd4j.create(independent));
 
     return result;
+  }
+
+  /**
+   * Compute the model score on a given iterator.
+   *
+   * @param model Model
+   * @param iter Iterator
+   * @return Model score on iterator data
+   */
+  public static double computeScore(ComputationGraph model, DataSetIterator iter) {
+    double scoreSum = 0;
+    int numBatches = 0;
+
+    // Iterate batches
+    iter.reset();
+    while (iter.hasNext()) {
+      DataSet next;
+      if (iter instanceof AsyncDataSetIterator
+          || iter instanceof CachingDataSetIterator) {
+        next = iter.next();
+      } else {
+        // TODO: figure out which batch size is feasible for inference
+        final int batch = iter.batch() * 8;
+        next = iter.next(batch);
+      }
+      scoreSum += model.score(next);
+      numBatches++;
+    }
+
+    // Get average score
+    double score = 0;
+    if (numBatches != 0) {
+      score = scoreSum / numBatches;
+    }
+    iter.reset();
+    return score;
   }
 }
