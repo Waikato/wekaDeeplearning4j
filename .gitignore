@@ -142,3 +142,6 @@ coverage-report/
 
 # Vector models
 *.bin.gz
+
+# Testing class
+/package/src/main/java/weka/Main.java
