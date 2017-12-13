@@ -64,7 +64,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
 
   @OptionMetadata(
     displayName = "layer name",
-    description = "The name of the layer (default = Convolutional Layer).",
+    description = "The name of the layer (default = Subsampling Layer).",
     commandLineParamName = "name",
     commandLineParamSynopsis = "-name <string>",
     displayOrder = 0
