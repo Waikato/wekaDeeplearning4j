@@ -11,12 +11,11 @@ cd /tmp/zips
 
 sumfile="/tmp/zips/sums.sha256"
 echo "### SHA256 sums" >> ${sumfile}
-echo "| sha256sum | file |" >> ${sumfile}
-echo "| --- | --- |" >> ${sumfile}
 for f in *.zip;
 do	
 	sum=$(sha256sum ${f} | cut -d" " -f1)
-	echo "| ${f} | ${sum} |" >> /tmp/zips/sums.sha256
+	echo " - ${f}" >> ${sumfile}
+	echo "		\`${sum}\`" >> ${sumfile}
 done
 cd ${old}
 
