@@ -42,12 +42,14 @@ import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
+import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
+import org.deeplearning4j.nn.conf.ConvolutionMode;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
+import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -66,12 +68,12 @@ import weka.core.CapabilitiesHandler;
 import weka.core.EmptyIteratorException;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.InvalidNetworkArchitectureException;
 import weka.core.InvalidValidationPercentageException;
 import weka.core.MissingOutputLayerException;
 import weka.core.OptionMetadata;
 import weka.core.SelectedTag;
 import weka.core.Tag;
-import weka.core.UnsupportedAttributeTypeException;
 import weka.core.WekaException;
 import weka.core.WekaPackageManager;
 import weka.core.WrongIteratorException;
@@ -79,6 +81,7 @@ import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.iterators.instance.Convolutional;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -166,11 +169,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /** Coefficient x1 used for normalizing the class */
   protected double x1 = 1.0;
   /** Caching mode to use for loading data */
-  protected CacheMode cacheMode = CacheMode.NONE;
+  protected CacheMode cacheMode = CacheMode.MEMORY;
   /** Training listener list */
   private IterationListener iterationListener = new EpochListener();
 
-  /** Default constructor fixing log file if WEKA_HOME variable is not set. */
+  /** Default constructor */
   public Dl4jMlpClassifier() {
     Nd4j.getMemoryManager().setAutoGcWindow(10000);
   }
@@ -231,7 +234,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     result.disableAll();
 
     // attributes
-    if (getInstanceIterator() instanceof ImageInstanceIterator) {
+    if (getInstanceIterator() instanceof ImageInstanceIterator
+        || getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
       result.enable(Capability.STRING_ATTRIBUTES);
     } else {
       result.enable(Capability.NOMINAL_ATTRIBUTES);
@@ -355,8 +359,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     displayOrder = 2
   )
   public void setLayers(Layer... layers) {
-    validateLayers(layers);
-
     // If something changed, set zoomodel to CustomNet
     if (!Arrays.deepEquals(layers, this.layers)) {
       setCustomNet();
@@ -370,18 +372,39 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param layers New set of layers
    */
-  protected void validateLayers(Layer[] layers) {
+  protected void validateLayers(Layer[] layers) throws InvalidNetworkArchitectureException {
     // Check if the layers contain convolution/subsampling
     Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
     final boolean containsConvLayer = layerSet.stream().allMatch(this::isNDLayer);
 
     final boolean isConvItertor = getInstanceIterator() instanceof Convolutional;
     if (containsConvLayer && !isConvItertor) {
-      throw new RuntimeException(
+      throw new InvalidNetworkArchitectureException(
           "A convolution/subsampling layer was set using "
               + "the wrong instance iterator. Please select either "
               + "ImageInstanceIterator for image files or "
               + "ConvolutionInstanceIterator for ARFF files.");
+    }
+
+    // Check if conv layers have ConvolutionMode.Same for CnnTextEmbeddingInstanceIterator
+    if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator){
+      for (Layer l : layerSet){
+        if (l instanceof ConvolutionLayer) {
+          final ConvolutionLayer conv = (ConvolutionLayer) l;
+          boolean correctMode = conv.getConvolutionMode().equals(ConvolutionMode.Same);
+          if (!correctMode){
+            throw new RuntimeException(
+                "CnnText iterators require ConvolutionMode.Same for all ConvolutionLayer. Layer "
+                    + conv.getLayerName() + " has ConvolutionMode: " + conv.getConvolutionMode()
+            );
+          }
+        }
+      }
+
+      // Check that layers start with convolution
+      if (layers.length > 0 && !(layers[0] instanceof ConvolutionLayer)){
+        throw new InvalidNetworkArchitectureException("CnnText iterator requires ConvolutionLayer.");
+      }
     }
   }
 
@@ -561,17 +584,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   public void initializeClassifier(Instances data) throws Exception {
 
     // Can classifier handle the data?
-    try {
-      getCapabilities().testWithFail(data);
-    } catch (UnsupportedAttributeTypeException uate) {
-      if (data.numAttributes() == 2 && data.attribute(0).isString()) {
-        throw new UnsupportedAttributeTypeException(
-            "It seems like you have chosen an ARFF file containing the "
-                + "image paths without setting an ImageInstanceIterator");
-      } else {
-        throw uate;
-      }
-    }
+    getCapabilities().testWithFail(data);
 
     // Check basic network structure
     if (layers.length == 0) {
@@ -582,6 +595,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     if (!(lastLayer instanceof BaseOutputLayer)) {
       throw new MissingOutputLayerException("Last layer in network must be an output layer!");
     }
+
+    // Check if layers are valid
+    validateLayers(layers);
 
     // Apply preprocessing
     data = preProcessInput(data);
@@ -643,7 +659,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       trainData = insts[0];
       valData = insts[1];
       validateSplit(trainData, valData);
-      DataSetIterator valIterator = getDataSetIterator(valData, CacheMode.NONE);
+      DataSetIterator valIterator = getDataSetIterator(valData, cacheMode, "val");
       earlyStopping.init(valIterator);
     } else {
       // Keep the full data
@@ -653,6 +669,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     return trainData;
   }
 
+  /**
+   * Validate a data split of train and validation data
+   *
+   * @param trainData Training data
+   * @param valData Validation data
+   * @throws WekaException Invalid validation split
+   */
   private void validateSplit(Instances trainData, Instances valData) throws WekaException {
     if (earlyStopping.getValidationSetPercentage() < 10e-8) {
       // Use no validation set at all
@@ -673,10 +696,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Generates a DataSetIterator based on the given instances.
    *
    * @param data Input instances
-   * @return DataSetIterator
+   * @param cm Cache mode for the datasets
+   * @param cacheDirSuffix suffix for the cache directory
+   * @return DataSetIterator Iterator over dataset objects
    * @throws Exception
    */
-  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm) throws Exception {
+  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm, String cacheDirSuffix) throws Exception {
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
 
     // Use caching if set
@@ -687,7 +712,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         break;
       case FILESYSTEM: // use filesystem as cache
         final String tmpDir = System.getProperty("java.io.tmpdir");
-        final File cacheDir = Paths.get(tmpDir, "dataset-cache").toFile();
+        final String suffix = cacheDirSuffix.isEmpty() ? "" : "-" + cacheDirSuffix;
+        final File cacheDir = Paths.get(tmpDir, "dataset-cache" + suffix).toFile();
         cacheDir.delete(); // remove old existing cache
         final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
         it = new CachingDataSetIterator(it, fsCache);
@@ -702,6 +728,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       }
     }
     return it;
+  }
+
+  /**
+   * Generates a DataSetIterator based on the given instances.
+   *
+   * @param data Input instances
+   * @param cm Cache mode for the datasets
+   * @return DataSetIterator Iterator over dataset objects
+   * @throws Exception
+   */
+  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm) throws Exception {
+    return getDataSetIterator(data, cm, "");
   }
 
   /**
@@ -881,6 +919,25 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       ((BaseOutputLayer) lastLayer).setNOut(nOut);
     }
 
+    if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator){
+      makeCnnTextLayerSetup(gb);
+    } else {
+      makeDefaultLayerSetup(gb);
+    }
+
+    gb.setInputTypes(InputType.inferInputType(features));
+    ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
+    ComputationGraph model = new ComputationGraph(conf);
+    model.init();
+    this.model = model;
+  }
+
+  /**
+   * Default layer setup: Create sequential layer network defined by the order of the layer list
+   *
+   * @param gb GraphBuilder object
+   */
+  private void makeDefaultLayerSetup(GraphBuilder gb) {
     String currentInput = "input";
     gb.addInputs(currentInput);
     // Collect layers
@@ -890,12 +947,50 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
-    gb.setInputTypes(InputType.inferInputType(features));
+  }
 
-    ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
-    ComputationGraph model = new ComputationGraph(conf);
-    model.init();
-    this.model = model;
+  /**
+   * CnnText layer setup: Collect CNN layers and merge them in a {@link MergeVertex}.
+   *
+   * @param gb GraphBuilder object
+   */
+  private void makeCnnTextLayerSetup(GraphBuilder gb) {
+    String currentInput = "input";
+    gb.addInputs(currentInput);
+
+    // Collect all convolution layers defined until the first non conv layer
+    List<ConvolutionLayer> convLayers = new ArrayList<>();
+    int idx = 0;
+    for (Layer l : layers) {
+      if (l instanceof ConvolutionLayer){
+        final ConvolutionLayer convLayer = (ConvolutionLayer) l;
+        convLayers.add(convLayer);
+        gb.addLayer(convLayer.getLayerName(), convLayer.clone(), currentInput);
+        idx++;
+      } else {
+        break;
+      }
+    }
+
+    // Collect names
+    final String[] names = convLayers.stream()
+        .map(ConvolutionLayer::getLayerName)
+        .toArray(String[]::new);
+
+    // Add merge vertex
+    if (names.length > 0){
+      final String mergeVertexName = "merge";
+      gb.addVertex(mergeVertexName, new MergeVertex(), names);
+      currentInput = mergeVertexName;
+    }
+
+    // Collect layers
+    for (/*use idx from above*/;idx < layers.length; idx++) {
+      String lName = layers[idx].getLayerName();
+      gb.addLayer(lName, layers[idx].clone(), currentInput);
+      currentInput = lName;
+    }
+    gb.setOutputs(currentInput);
   }
 
   /**
