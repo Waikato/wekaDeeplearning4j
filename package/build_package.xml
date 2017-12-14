@@ -10,7 +10,7 @@
   -->
 
   <!-- set global properties for this build -->
-  <property name="version" value="1.4.0-beta.2" />
+  <property name="version" value="1.4.0-beta.3" />
   <property name="src" value="src/main/java"/>
   <property name="src-test" value="src/test/java"/>
   <property name="lib" value="lib" />
