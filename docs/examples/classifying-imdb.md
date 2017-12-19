@@ -7,7 +7,7 @@ As of [ai.stanford.edu](http://ai.stanford.edu/~amaas/data/sentiment/):
 
 The full IMDB dataset in the ARFF format can be found [here](https://github.com/Waikato/wekaDeeplearning4j/blob/develop/package/src/test/resources/nominal/imdb.arff).
 
-## Java
+## Java RNN
 The following code builds a network consisting of an LSTM layer and an RnnOutputLayer, loading imdb reviews and mapping them into a sequence of vectors in the embedding space that is defined by the Google News model. Furthermore, gradient clipping at a value of 1.0 is applied to prevent the network from exploding gradients.
 
 ```java
@@ -62,3 +62,48 @@ data.setClassIndex(1);
 clf.buildClassifier(data);
 ```
 
+## Java CNN
+Below is an example building a CNN with two `ConvolutionLayer` that are automatically merged as described [here](../user-guide/nlp.md#using-convolutional-neural-networks) afterwards. 
+```java
+
+// Embedding vector size
+int vectorSize = 300;
+int batchSize = 64;
+
+// Initialize iterator
+CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
+cnnTextIter.setTrainBatchSize(batchSize);
+cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+clf.setInstanceIterator(cnnTextIter);
+
+
+// Define the layers
+ConvolutionLayer conv1 = new ConvolutionLayer();
+conv1.setKernelSize(new int[] {4, vectorSize});
+conv1.setNOut(10);
+conv1.setStride(new int[] {1, vectorSize});
+conv1.setConvolutionMode(ConvolutionMode.Same);
+conv1.setActivationFn(new ActivationReLU());
+
+ConvolutionLayer conv2 = new ConvolutionLayer();
+conv2.setKernelSize(new int[] {3, vectorSize});
+conv2.setNOut(10);
+conv2.setStride(new int[] {1, vectorSize});
+conv2.setConvolutionMode(ConvolutionMode.Same);
+conv2.setActivationFn(new ActivationReLU());
+
+GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+
+OutputLayer out = new OutputLayer();
+
+
+// Config classifier
+clf.setLayers(conv1, conv2, gpl, out);
+
+// Get data
+Instances data = new Instances(new FileReader("src/test/resources/nominal/imdb.arff"));
+data.setClassIndex(1);
+
+// Build model
+clf.buildClassifier(data);
+```
