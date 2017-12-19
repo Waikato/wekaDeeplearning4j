@@ -27,7 +27,7 @@ import weka.core.MissingOutputLayerException;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
-import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
+import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
 
@@ -279,22 +279,18 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     this.tBPTTforwardLength = tBPTTforwardLength;
   }
 
-  public void setInstanceIterator(AbstractSequenceInstanceIterator iterator) {
-    instanceIterator = iterator;
-  }
-
   @Override
   @Deprecated
   @ProgrammaticProperty
   public ZooModel getZooModel() {
-    throw new UnsupportedOperationException("Zoo models are not available for RnnSequenceClassifier");
+    return new CustomNet();
   }
 
   @Override
   @Deprecated
   @ProgrammaticProperty
   public void setZooModel(ZooModel zooModel) {
-    throw new UnsupportedOperationException("Zoo models are not available for RnnSequenceClassifier");
+    // Do nothing
   }
 
   /**
