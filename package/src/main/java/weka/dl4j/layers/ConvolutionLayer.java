@@ -144,7 +144,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 
   @OptionMetadata(
     displayName = "number of columns in kernel",
-    description = "The number of columns in the kernel (default = 5).",
+    description = "The number of rows in the kernel (default = 5).",
     commandLineParamName = "kernelSizeX",
     commandLineParamSynopsis = "-kernelSizeX <int>",
     displayOrder = 4
@@ -159,7 +159,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 
   @OptionMetadata(
     displayName = "number of rows in kernel",
-    description = "The number of rows in the kernel (default = 5).",
+    description = "The number of columns in the kernel (default = 5).",
     commandLineParamName = "kernelSizeY",
     commandLineParamSynopsis = "-kernelSizeY <int>",
     displayOrder = 5
@@ -183,7 +183,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 
   @OptionMetadata(
     displayName = "number of columns in stride",
-    description = "The number of columns in the stride (default = 1).",
+    description = "The number of rows in the stride (default = 1).",
     commandLineParamName = "strideX",
     commandLineParamSynopsis = "-strideX <int>",
     displayOrder = 6
@@ -198,7 +198,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
 
   @OptionMetadata(
     displayName = "number of rows in stride",
-    description = "The number of rows in the stride (default = 1).",
+    description = "The number of columns in the stride (default = 1).",
     commandLineParamName = "strideY",
     commandLineParamSynopsis = "-strideY <int>",
     displayOrder = 7
