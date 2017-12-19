@@ -82,9 +82,6 @@ public class CnnTextFilesEmbeddingInstanceIteratorTest {
       Instance inst = data.get(i);
 
       int label = Integer.parseInt(inst.stringValue(data.classIndex()));
-      if (label == 0){
-        System.out.println();
-      }
       final DataSet next = it.next();
       int itLabel = next.getLabels().argMax().getInt(0);
       Assert.assertEquals(label, itLabel);
@@ -152,8 +149,7 @@ public class CnnTextFilesEmbeddingInstanceIteratorTest {
   public void testBatches() throws Exception {
 
     // Data
-    Instances data = makeData();
-    data.setClassIndex(data.numAttributes() - 1);
+    final Instances data = DatasetLoader.loadAngerMeta();
 
     final int seed = 1;
     for (int batchSize : new int[] {1, 2, 5, 10}) {
