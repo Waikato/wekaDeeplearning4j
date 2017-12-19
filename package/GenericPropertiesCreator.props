@@ -15,13 +15,8 @@ org.nd4j.linalg.lossfunctions.ILossFunction =\
 
 weka.dl4j.iterators.instance.AbstractInstanceIterator =\
  weka.dl4j.iterators.instance,\
- weka.dl4j.iterators.instance.sequence,\
- weka.dl4j.iterators.instance.sequence.text
-
-
-weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator =\
- weka.dl4j.iterators.instance.sequence,\
- weka.dl4j.iterators.instance.sequence.text
+ weka.dl4j.iterators.instance.sequence.text.cnn,\
+ weka.dl4j.iterators.instance.sequence.text.rnn
 
 org.nd4j.linalg.activations.IActivation =\
  weka.dl4j.activations
