@@ -78,6 +78,8 @@ clf.setInstanceIterator(cnnTextIter);
 
 
 // Define the layers
+// All N convolutional layers will be merged into a single
+// output of depth N (simulates multiple inputs)
 ConvolutionLayer conv1 = new ConvolutionLayer();
 conv1.setKernelSize(new int[] {4, vectorSize});
 conv1.setNOut(10);
