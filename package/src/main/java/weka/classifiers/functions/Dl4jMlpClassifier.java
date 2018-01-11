@@ -115,6 +115,8 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 public class Dl4jMlpClassifier extends RandomizableClassifier
     implements BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
+  /** The ID used for serializing this class. */
+  private static final long serialVersionUID = -6363254116597574265L;
   /** filter: Normalize training data */
   public static final int FILTER_NORMALIZE = 0;
   /** filter: Standardize training data */
@@ -127,8 +129,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     new Tag(FILTER_STANDARDIZE, "Standardize training data"),
     new Tag(FILTER_NONE, "No normalization/standardization"),
   };
-  /** The ID used for serializing this class. */
-  protected static final long serialVersionUID = -6363254116597574265L;
   /** Filter used to replace missing values. */
   protected ReplaceMissingValues replaceMissingFilter;
   /** Filter used to normalize or standardize the data. */
@@ -173,7 +173,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /** Caching mode to use for loading data */
   protected CacheMode cacheMode = CacheMode.MEMORY;
   /** Training listener list */
-  private IterationListener iterationListener = new EpochListener();
+  protected IterationListener iterationListener = new EpochListener();
 
   /** Default constructor */
   public Dl4jMlpClassifier() {
@@ -262,7 +262,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param oos the object output stream
    * @throws IOException
    */
-  private void writeObject(ObjectOutputStream oos) throws IOException {
+  protected void writeObject(ObjectOutputStream oos) throws IOException {
 
     // figure out size of the written network
     CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
@@ -287,7 +287,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @throws ClassNotFoundException
    * @throws IOException
    */
-  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+  protected void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
@@ -416,7 +416,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param layer Layer to check
    * @return True if layer is convolutional/subsampling
    */
-  private boolean isNDLayer(Layer layer) {
+  protected boolean isNDLayer(Layer layer) {
     return layer instanceof ConvolutionLayer
         || layer instanceof SubsamplingLayer
         || layer instanceof org.deeplearning4j.nn.conf.layers.ConvolutionLayer
@@ -499,7 +499,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   /** Reset zoomodel to CustomNet */
-  private void setCustomNet() {
+  protected void setCustomNet() {
     if (useZooModel()) {
       zooModel = new CustomNet();
     }
@@ -678,7 +678,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param valData Validation data
    * @throws WekaException Invalid validation split
    */
-  private void validateSplit(Instances trainData, Instances valData) throws WekaException {
+  protected void validateSplit(Instances trainData, Instances valData) throws WekaException {
     if (earlyStopping.getValidationSetPercentage() < 10e-8) {
       // Use no validation set at all
       return;
@@ -762,7 +762,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return Preprocessed instances
    * @throws Exception Preprocessing failed
    */
-  private Instances preProcessInput(Instances data) throws Exception {
+  protected Instances preProcessInput(Instances data) throws Exception {
     // Remove instances with missing class and check that instances and
     // predictor attributes remain.
     data = new Instances(data);
@@ -813,7 +813,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return Transformed data
    * @throws Exception Filter can not be initialized
    */
-  private Instances initFilters(Instances data) throws Exception {
+  protected Instances initFilters(Instances data) throws Exception {
     // Replace missing values
     replaceMissingFilter = new ReplaceMissingValues();
     replaceMissingFilter.setInputFormat(data);
@@ -850,7 +850,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @throws WekaException Either the .init operation on the current zooModel was not supported or
    *     the data shape does not fit the chosen zooModel
    */
-  private void createZooModel() throws WekaException {
+  protected void createZooModel() throws WekaException {
     final AbstractInstanceIterator it = getInstanceIterator();
     final boolean isImageIterator = it instanceof ImageInstanceIterator;
 
@@ -886,7 +886,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
   }
 
-  private boolean initZooModel(int numClasses, long seed, int[][] newShape) {
+  protected boolean initZooModel(int numClasses, long seed, int[][] newShape) {
     try {
       model = zooModel.init(numClasses, seed, newShape);
       return true;
@@ -939,7 +939,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param gb GraphBuilder object
    */
-  private void makeDefaultLayerSetup(GraphBuilder gb) {
+  protected void makeDefaultLayerSetup(GraphBuilder gb) {
     String currentInput = "input";
     gb.addInputs(currentInput);
     // Collect layers
@@ -956,7 +956,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param gb GraphBuilder object
    */
-  private void makeCnnTextLayerSetup(GraphBuilder gb)
+  protected void makeCnnTextLayerSetup(GraphBuilder gb)
       throws InvalidNetworkArchitectureException, InvalidLayerConfigurationException {
     String currentInput = "input";
     gb.addInputs(currentInput);
@@ -978,7 +978,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Check if next layer is GlobalPooling
     if (idx < layers.length
-        && layers[idx] instanceof org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer){
+        && !(layers[idx] instanceof org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer)){
         throw new InvalidNetworkArchitectureException("For a CNN text setup, the list of convolution"
             + " layers must be followed by a GlobalPoolingLayer.");
     }
@@ -1359,7 +1359,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @return True if zoomodel is not CustomNet
    */
-  private boolean useZooModel() {
+  protected boolean useZooModel() {
     return !(zooModel instanceof CustomNet);
   }
 }

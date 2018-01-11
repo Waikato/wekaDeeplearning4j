@@ -43,9 +43,9 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   private static final long serialVersionUID = 5643486590174837865L;
 
   /** Truncated backpropagation through time backward length */
-  private int tBPTTbackwardLength = 25;
+  protected int tBPTTbackwardLength = 25;
   /** Truncated backpropagation through time forward length */
-  private int tBPTTforwardLength = 25;
+  protected int tBPTTforwardLength = 25;
 
   public RnnSequenceClassifier() {
     super();
@@ -164,7 +164,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
    * @param layer Layers to check
    * @return True if compatible
    */
-  private boolean isSequenceCompatibleLayer(Layer layer) {
+  protected boolean isSequenceCompatibleLayer(Layer layer) {
     return layer instanceof EmbeddingLayer
         || layer instanceof AbstractLSTM
         || layer instanceof RnnOutputLayer
