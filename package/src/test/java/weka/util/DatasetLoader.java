@@ -1,6 +1,15 @@
 package weka.util;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.converters.CSVLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 
 import java.io.File;
@@ -11,6 +20,7 @@ import java.io.FileReader;
  *
  * @author Steven Lang
  */
+@Slf4j
 public class DatasetLoader {
 
   /** Number of classes in the iris dataset */
@@ -114,6 +124,36 @@ public class DatasetLoader {
   }
 
   /**
+   * Load the ReutersCorn train arff file (minimal)
+   *
+   * @return ReutersCorn train instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadReutersMinimal() throws Exception {
+    return loadArff("src/test/resources/nominal/ReutersCorn-train-minimal.arff");
+  }
+
+  /**
+   * Load the ReutersCorn train arff file (full)
+   *
+   * @return ReutersCorn train instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadReutersFull() throws Exception {
+    return loadArff("src/test/resources/nominal/ReutersCorn-train-full.arff");
+  }
+
+  /**
+   * Load the imdb review dataset
+   *
+   * @return imdb review instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadImdb() throws Exception {
+    return loadArff("src/test/resources/nominal/imdb.arff");
+  }
+
+  /**
    * Load the mnist minimal arff file
    *
    * @return Mnist minimal arff data as Instances
@@ -144,9 +184,19 @@ public class DatasetLoader {
   }
 
   /**
-   * Load the mnist minimal meta arff file
+   * Load the anger arff file
    *
-   * @return Mnist minimal meta data as Instances
+   * @return Anger data
+   * @throws Exception IO error.
+   */
+  public static Instances loadAnger() throws Exception {
+    return loadArff("src/test/resources/numeric/anger.arff");
+  }
+
+  /**
+   * Load an arbitrary arff file
+   *
+   * @return Instances
    * @throws Exception IO error.
    */
   public static Instances loadArff(String path) throws Exception {
@@ -154,4 +204,64 @@ public class DatasetLoader {
     data.setClassIndex(data.numAttributes() - 1);
     return data;
   }
+  /**
+   * Load the mnist minimal meta arff file
+   *
+   * @return Mnist minimal meta data as Instances
+   * @throws Exception IO error.
+   */
+  public static Instances loadCSV(String path) throws Exception {
+    CSVLoader csv = new CSVLoader();
+    csv.setSource(new File(path));
+    Instances data = csv.getDataSet();
+    data.setClassIndex(data.numAttributes() - 1);
+    return data;
+  }
+
+  /**
+   * Download the google news vectors.
+   *
+   * @return File with news vectors model
+   * @throws IOException Could not download the model
+   */
+  public static File loadGoogleNewsVectors() throws IOException {
+    String url = "https://github.com/eyaler/word2vec-slim/raw/master/GoogleNews-vectors-negative300-SLIM.bin.gz";
+    final File file = new File("src/test/resources/GoogleNews-vectors-negative300-SLIM.bin.gz");
+
+    if (!file.exists()) {
+      log.info("Downloading GoogleNews-vectors-negative300-SLIM.bin.gz ...");
+      FileUtils.copyURLToFile(new URL(url), file);
+      log.info("Finished download");
+    }
+
+    return file;
+  }
+
+  public static File loadAngerFilesDir() {
+    return new File("src/test/resources/numeric/anger-texts");
+  }
+
+  public static Instances loadAngerMeta() throws Exception {
+    return DatasetLoader.loadArff("src/test/resources/numeric/anger.meta.arff");
+  }
+
+  public static Instances loadAngerMetaClassification() throws Exception {
+    final Instances data = DatasetLoader
+        .loadArff("src/test/resources/numeric/anger.meta.arff");
+    ArrayList<Attribute> atts = new ArrayList<>();
+    atts.add(data.attribute(0));
+    Attribute cls = new Attribute("cls", Arrays.asList("0","1"));
+    atts.add(cls);
+    Instances dataDiscretized = new Instances("anger-classification", atts ,data.numInstances());
+    dataDiscretized.setClassIndex(1);
+    for (Instance datum : data) {
+      Instance cpy = (Instance) datum.copy();
+      cpy.setDataset(dataDiscretized);
+      cpy.setValue(0, datum.stringValue(0));
+      cpy.setValue(1, datum.classValue() > 0.5 ? "1" : "0");
+      dataDiscretized.add(cpy);
+    }
+    return dataDiscretized;
+  }
+
 }

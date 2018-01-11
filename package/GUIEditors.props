@@ -16,6 +16,8 @@ org.nd4j.linalg.lossfunctions.ILossFunction=weka.gui.GenericObjectEditor
 
 weka.dl4j.iterators.instance.AbstractInstanceIterator=weka.gui.GenericObjectEditor
 
+weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator=weka.gui.GenericObjectEditor
+
 org.nd4j.linalg.activations.IActivation=weka.gui.GenericObjectEditor
 
 weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor

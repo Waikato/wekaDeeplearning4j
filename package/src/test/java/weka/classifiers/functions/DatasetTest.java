@@ -43,7 +43,7 @@ public class DatasetTest {
   private long startTime;
 
   @Before
-  public void before() throws Exception {
+  public void before() {
     // Init mlp clf
     clf = new Dl4jMlpClassifier();
     clf.setSeed(SEED);
@@ -56,7 +56,7 @@ public class DatasetTest {
   }
 
   @After
-  public void after() throws IOException {
+  public void after() {
     double time = (System.currentTimeMillis() - startTime) / 1000.0;
     logger.info("Testmethod: " + name.getMethodName());
     logger.info("Time: " + time + "s");
@@ -111,7 +111,7 @@ public class DatasetTest {
 
     clf.setNumEpochs(DEFAULT_NUM_EPOCHS);
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, outputLayer});
+    clf.setLayers(denseLayer, outputLayer);
 
     clf.buildClassifier(data);
     clf.distributionsForInstances(data);

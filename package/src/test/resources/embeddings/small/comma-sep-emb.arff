@@ -1,0 +1,12 @@
+@relation test
+
+@attribute word String
+@attribute v0 REAL
+@attribute v1 REAL
+@attribute v2 REAL
+@attribute v3 REAL
+
+@data
+snowball,1,2,3,4
+christmas,4,5,6,7
+tree,3,4,5,6
