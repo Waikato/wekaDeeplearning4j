@@ -1,6 +1,17 @@
 package weka.classifiers.functions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.ConvolutionMode;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.After;
@@ -10,26 +21,35 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.*;
+import weka.core.Instances;
+import weka.core.InvalidNetworkArchitectureException;
+import weka.core.MissingOutputLayerException;
+import weka.core.WrongIteratorException;
+import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.*;
+import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextFilesEmbeddingInstanceIterator;
+import weka.dl4j.layers.BatchNormalization;
+import weka.dl4j.layers.ConvolutionLayer;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.GlobalPoolingLayer;
+import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.dl4j.lossfunctions.LossMSE;
 import weka.dl4j.zoo.LeNet;
+import weka.filters.Filter;
+import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
-
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
@@ -73,7 +93,7 @@ public class Dl4jMlpTest {
   }
 
   @After
-  public void after() throws IOException {
+  public void after() {
 
     //        logger.info("Press anything to close");
     //        Scanner sc = new Scanner(System.in);
@@ -171,7 +191,7 @@ public class Dl4jMlpTest {
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
     clf.setIterationListener(new EpochListener());
     TestUtil.holdout(clf, dataMnist);
   }
@@ -197,7 +217,7 @@ public class Dl4jMlpTest {
     dl.setNOut(10);
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {dl, cl, ol});
+    clf.setLayers(dl, cl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -221,7 +241,7 @@ public class Dl4jMlpTest {
     cl.setStride(new int[] {1, 1});
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.setLayers(cl, dl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -246,7 +266,7 @@ public class Dl4jMlpTest {
     cl.setStride(new int[] {1, 1});
 
     OutputLayer ol = new OutputLayer();
-    clf.setLayers(new Layer[] {cl, dl, ol});
+    clf.setLayers(cl, dl, ol);
     clf.buildClassifier(dataIris);
   }
 
@@ -280,7 +300,7 @@ public class Dl4jMlpTest {
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
-    clf.setLayers(new Layer[] {denseLayer, denseLayer2, outputLayer});
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
     clf.setIterationListener(new EpochListener());
 
     File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
@@ -296,35 +316,13 @@ public class Dl4jMlpTest {
   }
 
   /**
-   * Test UnsupportedAttributeTypeException
-   * //TODO: Fix
-   * @throws Exception
-   */
-  @Test(expected = UnsupportedAttributeTypeException.class)
-  public void testWrongArffFormat() throws Exception {
-    Attribute att1 = new Attribute("1"); // numeric
-    Attribute att2 = new Attribute("2", Arrays.asList("1", "2")); // string
-    ArrayList<Attribute> atts = new ArrayList<>();
-    atts.add(att1);
-    atts.add(att2);
-    Instances inst = new Instances("", atts, 10);
-    Instance ins = new DenseInstance(2);
-    ins.setDataset(inst);
-    inst.setClassIndex(0);
-    ins.setValue(0, 10);
-    ins.setValue(1, "1");
-    inst.add(ins);
-    clf.initializeClassifier(inst);
-  }
-
-  /**
    * Test no outputlayer
    *
    * @throws MissingOutputLayerException
    */
   @Test(expected = MissingOutputLayerException.class)
   public void testLastLayerNoOutputLayer() throws Exception {
-    clf.setLayers(new Layer[] {new DenseLayer()});
+    clf.setLayers(new DenseLayer());
     clf.initializeClassifier(dataIris);
   }
 
@@ -349,18 +347,257 @@ public class Dl4jMlpTest {
 
     OutputLayer ol = new OutputLayer();
 
-    Layer[] ls = new Layer[]{dl1, ol};
+    Layer[] ls = new Layer[] {dl1, ol};
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT);
     nnc.setSeed(TestUtil.SEED);
     clf.setNeuralNetConfiguration(nnc);
 
-    clf.setNumEpochs(5);
+    clf.setNumEpochs(3);
     clf.setLayers(ls);
     final EarlyStopping config = new EarlyStopping(0, 0);
     clf.setEarlyStopping(config);
     TestUtil.crossValidate(clf, DatasetLoader.loadGlass());
+  }
 
+  @Test
+  public void testTextCnnClassification() throws Exception {
+    CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(128);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    clf.setInstanceIterator(cnnTextIter);
+
+    cnnTextIter.initialize();
+    final WordVectors wordVectors = cnnTextIter.getWordVectors();
+    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
+
+    ConvolutionLayer conv1 = new ConvolutionLayer();
+    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setNOut(10);
+    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setConvolutionMode(ConvolutionMode.Same);
+    conv1.setDropOut(0.2);
+    conv1.setActivationFn(new ActivationReLU());
+
+    BatchNormalization bn1 = new BatchNormalization();
+
+    ConvolutionLayer conv2 = new ConvolutionLayer();
+    conv2.setKernelSize(new int[] {3, vectorSize});
+    conv2.setNOut(10);
+    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setConvolutionMode(ConvolutionMode.Same);
+    conv2.setDropOut(0.2);
+    conv2.setActivationFn(new ActivationReLU());
+
+    BatchNormalization bn2 = new BatchNormalization();
+
+    ConvolutionLayer conv3 = new ConvolutionLayer();
+    conv3.setKernelSize(new int[] {2, vectorSize});
+    conv3.setNOut(10);
+    conv3.setStride(new int[] {1, vectorSize});
+    conv3.setConvolutionMode(ConvolutionMode.Same);
+    conv3.setDropOut(0.2);
+    conv3.setActivationFn(new ActivationReLU());
+
+    BatchNormalization bn3 = new BatchNormalization();
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+    gpl.setDropOut(0.33);
+
+    OutputLayer out = new OutputLayer();
+
+    //    clf.setLayers(conv1, bn1, conv2, bn2, conv3, bn3, gpl, out);
+    clf.setLayers(conv1, conv2, conv3, gpl, out);
+    //    clf.setNumEpochs(50);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final EpochListener l = new EpochListener();
+    l.setN(1);
+    clf.setIterationListener(l);
+
+    clf.setEarlyStopping(new EarlyStopping(10, 15));
+    clf.setDebug(true);
+
+    // NNC
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setLearningRate(0.01);
+    nnc.setUseRegularization(true);
+    nnc.setL2(1e-3);
+    clf.setNeuralNetConfiguration(nnc);
+
+    // Data
+    final Instances data = DatasetLoader.loadImdb();
+    data.randomize(new Random(42));
+    RemovePercentage rp = new RemovePercentage();
+    rp.setInputFormat(data);
+    rp.setPercentage(98);
+    final Instances dataFiltered = Filter.useFilter(data, rp);
+
+    TestUtil.holdout(clf, dataFiltered);
+  }
+
+  @Test
+  public void testTextCnnRegression() throws Exception {
+    CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(64);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    clf.setInstanceIterator(cnnTextIter);
+
+    cnnTextIter.initialize();
+    final WordVectors wordVectors = cnnTextIter.getWordVectors();
+    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
+
+    ConvolutionLayer conv1 = new ConvolutionLayer();
+    conv1.setKernelSize(new int[] {3, vectorSize});
+    conv1.setNOut(10);
+    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setConvolutionMode(ConvolutionMode.Same);
+
+    ConvolutionLayer conv2 = new ConvolutionLayer();
+    conv2.setKernelSize(new int[] {2, vectorSize});
+    conv2.setNOut(10);
+    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setConvolutionMode(ConvolutionMode.Same);
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+
+    OutputLayer out = new OutputLayer();
+    out.setLossFn(new LossMSE());
+    out.setActivationFn(new ActivationIdentity());
+
+    clf.setLayers(conv1, conv2, gpl, out);
+    //    clf.setNumEpochs(200);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final EpochListener l = new EpochListener();
+    l.setN(20);
+    clf.setIterationListener(l);
+    clf.setDebug(true);
+    clf.setEarlyStopping(new EarlyStopping(0, 10));
+    final Instances data = DatasetLoader.loadAnger();
+
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setLearningRate(0.01);
+    nnc.setUseRegularization(true);
+    nnc.setL2(0.00001);
+    clf.setNeuralNetConfiguration(nnc);
+    TestUtil.holdout(clf, data);
+  }
+
+  @Test
+  public void testTextCnnTextFilesRegression() throws Exception {
+    CnnTextFilesEmbeddingInstanceIterator cnnTextIter = new CnnTextFilesEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(64);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    cnnTextIter.setTextsLocation(DatasetLoader.loadAngerFilesDir());
+    clf.setInstanceIterator(cnnTextIter);
+
+    cnnTextIter.initialize();
+    final WordVectors wordVectors = cnnTextIter.getWordVectors();
+    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
+
+    ConvolutionLayer conv1 = new ConvolutionLayer();
+    conv1.setKernelSize(new int[] {3, vectorSize});
+    conv1.setNOut(10);
+    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setConvolutionMode(ConvolutionMode.Same);
+
+    ConvolutionLayer conv2 = new ConvolutionLayer();
+    conv2.setKernelSize(new int[] {2, vectorSize});
+    conv2.setNOut(10);
+    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setConvolutionMode(ConvolutionMode.Same);
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+
+    OutputLayer out = new OutputLayer();
+    out.setLossFn(new LossMSE());
+    out.setActivationFn(new ActivationIdentity());
+
+    clf.setLayers(conv1, conv2, gpl, out);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final Instances data = DatasetLoader.loadAngerMeta();
+    TestUtil.holdout(clf, data);
+  }
+
+  @Test
+  public void testTextCnnTextFilesClassification() throws Exception {
+    CnnTextFilesEmbeddingInstanceIterator cnnTextIter = new CnnTextFilesEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(64);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    cnnTextIter.setTextsLocation(DatasetLoader.loadAngerFilesDir());
+    clf.setInstanceIterator(cnnTextIter);
+
+    cnnTextIter.initialize();
+    final WordVectors wordVectors = cnnTextIter.getWordVectors();
+    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
+
+    ConvolutionLayer conv1 = new ConvolutionLayer();
+    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setNOut(10);
+    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setConvolutionMode(ConvolutionMode.Same);
+    conv1.setDropOut(0.2);
+    conv1.setActivationFn(new ActivationReLU());
+
+    ConvolutionLayer conv2 = new ConvolutionLayer();
+    conv2.setKernelSize(new int[] {3, vectorSize});
+    conv2.setNOut(10);
+    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setConvolutionMode(ConvolutionMode.Same);
+    conv2.setDropOut(0.2);
+    conv2.setActivationFn(new ActivationReLU());
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+    gpl.setDropOut(0.33);
+
+    OutputLayer out = new OutputLayer();
+
+    clf.setLayers(conv1, conv2, gpl, out);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final Instances data = DatasetLoader.loadAngerMetaClassification();
+    TestUtil.holdout(clf, data);
+  }
+
+  @Test(expected = InvalidNetworkArchitectureException.class)
+  public void testTextCnnTextSingleOutputLayer() throws Exception {
+    CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(64);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    clf.setInstanceIterator(cnnTextIter);
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+    OutputLayer out = new OutputLayer();
+
+    clf.setLayers(gpl, out);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final Instances data = DatasetLoader.loadAnger();
+    TestUtil.holdout(clf, data);
+  }
+
+  @Test
+  public void testTextCnnTextSingleConv() throws Exception {
+    CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
+    cnnTextIter.setTrainBatchSize(64);
+    cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
+    clf.setInstanceIterator(cnnTextIter);
+
+//    final WordVectors wordVectors = cnnTextIter.getWordVectors();
+//    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
+    int vectorSize = 300;
+    ConvolutionLayer conv1 = new ConvolutionLayer();
+    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setNOut(10);
+    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setConvolutionMode(ConvolutionMode.Same);
+    conv1.setDropOut(0.2);
+    conv1.setActivationFn(new ActivationReLU());
+
+    GlobalPoolingLayer gpl = new GlobalPoolingLayer();
+    OutputLayer out = new OutputLayer();
+
+    clf.setLayers(conv1, gpl, out);
+    clf.setCacheMode(CacheMode.MEMORY);
+    final Instances data = DatasetLoader.loadAnger();
+    TestUtil.holdout(clf, data);
   }
 }

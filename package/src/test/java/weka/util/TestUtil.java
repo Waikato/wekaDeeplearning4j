@@ -4,17 +4,24 @@ package weka.util;
 // import org.deeplearning4j.ui.stats.StatsListener;
 // import org.deeplearning4j.ui.storage.FileStatsStorage;
 
+import java.io.File;
+import java.util.Random;
+import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.FileStatsStorage;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
+import weka.core.TestInstances;
+import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
-
-import java.util.Random;
 
 /**
  * Utility class for evaluating classifier in JUnit tests
@@ -33,6 +40,60 @@ public class TestUtil {
   private static final Logger logger = LoggerFactory.getLogger(TestUtil.class);
 
   /**
+   * Perform simple holdout with a given percentage
+   *
+   * @param clf Classifier
+   * @param data Full dataset
+   * @param p Split percentage
+   * @throws Exception
+   */
+  public static void holdout(Classifier clf, Instances data, double p) throws Exception {
+    Instances[] split = splitTrainTest(data, p);
+
+    Instances train = split[0];
+    Instances test = split[1];
+
+    clf.buildClassifier(train);
+    Evaluation trainEval = new Evaluation(train);
+    trainEval.evaluateModel(clf, train);
+    logger.info("Weka Train Evaluation:");
+    logger.info(trainEval.toSummaryString());
+    if (!data.classAttribute().isNumeric()) {
+      logger.info(trainEval.toMatrixString());
+    }
+
+    Evaluation testEval = new Evaluation(train);
+    logger.info("Weka Test Evaluation:");
+    testEval.evaluateModel(clf, test);
+    logger.info(testEval.toSummaryString());
+    if (!data.classAttribute().isNumeric()) {
+      logger.info(testEval.toMatrixString());
+    }
+  }
+  /**
+   * Perform simple holdout with a given percentage
+   *
+   * @param clf Classifier
+   * @param data Full dataset
+   * @param p Split percentage
+   * @throws Exception
+   */
+  public static void holdout(
+      Dl4jMlpClassifier clf, Instances data, double p, AbstractInstanceIterator aii)
+      throws Exception {
+
+    holdout(clf, data, p);
+    Instances[] split = splitTrainTest(data, p);
+
+    Instances test = split[1];
+    final DataSetIterator testIter = aii.getDataSetIterator(test, 42);
+    final ComputationGraph model = clf.getModel();
+    logger.info("DL4J Evaluation: ");
+    org.deeplearning4j.eval.Evaluation evaluation = model.evaluate(testIter);
+    logger.info(evaluation.stats());
+  }
+
+  /**
    * Perform simple holdout (2/3, 1/3 split)
    *
    * @param clf Classifier
@@ -40,33 +101,7 @@ public class TestUtil {
    * @throws Exception
    */
   public static void holdout(Classifier clf, Instances data) throws Exception {
-    Instances[] split = splitTrainTest(data);
-
-    Instances train = split[0];
-    Instances test = split[1];
-
-    clf.buildClassifier(train);
-    Evaluation trainEval = new Evaluation(train);
-    logger.info("Train evaluation:");
-    trainEval.evaluateModel(clf, train);
-    logger.info(trainEval.toSummaryString());
-    if (!data.classAttribute().isNumeric()) {
-      logger.info(trainEval.toMatrixString());
-    }
-
-    logger.info("Test evaluation:");
-    Evaluation testEval = new Evaluation(train);
-    testEval.evaluateModel(clf, test);
-    logger.info(testEval.toSummaryString());
-    if (!data.classAttribute().isNumeric()) {
-      logger.info(testEval.toMatrixString());
-    }
-    //        if (testEval.pctCorrect() < testEval.pctIncorrect() * 2) {
-    //            Assert.fail("Too many incorrect predictions. " + "Correct% = " +
-    // testEval.pctCorrect() + "" +
-    //                    ", Incorrect% = " + testEval.pctIncorrect());
-    //
-    //        }
+    holdout(clf, data, 33);
   }
 
   /**
@@ -83,7 +118,7 @@ public class TestUtil {
   }
 
   /**
-   * Split the dataset into p% traind an (100-p)% test set
+   * Split the dataset into p% traind an (100-p)% testImdb set
    *
    * @param data Input data
    * @param p train percentage
@@ -112,7 +147,7 @@ public class TestUtil {
   }
 
   /**
-   * Split the dataset into 67% traind an 33% test set
+   * Split the dataset into 67% traind an 33% testImdb set
    *
    * @param data Input data
    * @return Array of instances: (0) Train, (1) Test
@@ -138,27 +173,52 @@ public class TestUtil {
     return res;
   }
 
-  //
-  //    /**
-  //     * Enables the UIServer at http://localhost:9000/train
-  //     *
-  //     * @param clf Dl4jMlpClassifier instance
-  //     */
-  //    public static void enableUIServer(Dl4jMlpClassifier clf) {
-  //        //Initialize the user interface backend
-  //        UIServer uiServer = UIServer.getInstance();
-  //
-  //        //Configure where the network information (gradients, score vs. time etc) is to be
-  // stored. Here: store in memory.
-  //        File f = new File("/tmp/out.bin");
-  //        f.delete();
-  //        StatsStorage statsStorage = new FileStatsStorage(f);
-  //
-  //        //Attach the StatsStorage instance to the UI: this allows the contents of the
-  // StatsStorage to be visualized
-  //        uiServer.attach(statsStorage);
-  //
-  //        //Then add the StatsListener to collect this information from the network, as it trains
-  //        clf.addTrainingListener(new StatsListener(statsStorage));
-  //    }
+
+
+  /**
+   * Enables the UIServer at http://localhost:9000/train
+   *
+   * @param clf Dl4jMlpClassifier instance
+   */
+  public static void enableUiServer(Dl4jMlpClassifier clf) {
+    // Configure where the network information (gradients, score vs. time etc) is to be
+    //   stored. Here: store in memory.
+    final String tmpfile = "/tmp/out.bin";
+    File f = new File(tmpfile);
+    FileStatsStorage fss = new FileStatsStorage(f);
+    startUiServer(fss);
+    addStatsListener(clf, fss);
+  }
+
+  public static void addStatsListener(Dl4jMlpClassifier clf, FileStatsStorage statsStorage) {
+    clf.setIterationListener(new StatsListener(statsStorage));
+  }
+
+  public static void startUiServer(FileStatsStorage statsStorage) {
+    UIServer uiServer = UIServer.getInstance();
+    uiServer.attach(statsStorage);
+  }
+
+  /** Creates a test dataset */
+  public static Instances makeTestDataset(int seed, int numInstances,
+      int numNominal, int numNumeric, int numString, int numDate,
+      int numRelational, int numClasses, int classType, int classIndex,
+      boolean multiInstance) throws Exception {
+
+    TestInstances testset = new TestInstances();
+    testset.setSeed(seed);
+    testset.setNumInstances(numInstances);
+    testset.setNumNominal(numNominal);
+    testset.setNumNumeric(numNumeric);
+    testset.setNumString(numString);
+    testset.setNumDate(numDate);
+    testset.setNumRelational(numRelational);
+    testset.setNumClasses(numClasses);
+    testset.setClassType(classType);
+    testset.setClassIndex(classIndex);
+    testset.setNumClasses(numClasses);
+    testset.setMultiInstance(multiInstance);
+
+    return testset.generate();
+  }
 }

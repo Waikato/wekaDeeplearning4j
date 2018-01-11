@@ -21,8 +21,12 @@
 
 package weka.classifiers.functions.dl4j;
 
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,14 +66,16 @@ public class Utils {
         if (index < insts.classIndex()) {
           independent[index] = value;
         } else if (index > insts.classIndex()) {
+          // Shift by -1, since the class is left out from the feature matrix and put into a separate
+          // outcomes matrix
           independent[index - 1] = value;
-          logger.error("This should not happen. Class values may be overwritten.");
         }
       }
-      // TODO: Fix for multitarget datasets
+
       // Set class values
       if (insts.numClasses() > 1) { // Classification
-        dependent[(int) current.classValue()] = 1.0;
+        final int oneHotIdx = (int) current.classValue();
+        dependent[oneHotIdx] = 1.0;
       } else { // Regression (currently only single class)
         dependent[0] = current.classValue();
       }
@@ -163,5 +169,41 @@ public class Utils {
     result.putRow(0, Nd4j.create(independent));
 
     return result;
+  }
+
+  /**
+   * Compute the model score on a given iterator.
+   *
+   * @param model Model
+   * @param iter Iterator
+   * @return Model score on iterator data
+   */
+  public static double computeScore(ComputationGraph model, DataSetIterator iter) {
+    double scoreSum = 0;
+    int numBatches = 0;
+
+    // Iterate batches
+    iter.reset();
+    while (iter.hasNext()) {
+      DataSet next;
+      if (iter instanceof AsyncDataSetIterator
+          || iter instanceof CachingDataSetIterator) {
+        next = iter.next();
+      } else {
+        // TODO: figure out which batch size is feasible for inference
+        final int batch = iter.batch() * 8;
+        next = iter.next(batch);
+      }
+      scoreSum += model.score(next);
+      numBatches++;
+    }
+
+    // Get average score
+    double score = 0;
+    if (numBatches != 0) {
+      score = scoreSum / numBatches;
+    }
+    iter.reset();
+    return score;
   }
 }

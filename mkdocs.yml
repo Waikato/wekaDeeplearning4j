@@ -6,10 +6,13 @@ pages:
     - Home: index.md
     - Installation: install.md
 
-    - Getting Started: getting-started.md
+
     - User Guide:
+        - 'Getting Started': 'user-guide/getting-started.md'
         - 'Loading Data': 'user-guide/data.md'
+        - 'Natural Language Processing': 'user-guide/nlp.md'
     - Examples:
         - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
         - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
+        - 'Classifying the IMDB Dataset': 'examples/classifying-imdb.md'
     - Troubleshooting: troubleshooting.md

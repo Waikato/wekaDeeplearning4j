@@ -62,6 +62,8 @@ public class BatchNormalization extends org.deeplearning4j.nn.conf.layers.BatchN
     setL1(Double.NaN);
     setL2(Double.NaN);
     setRho(Double.NaN);
+    setGradientNormalization(null);
+    setGradientNormalizationThreshold(Double.NaN);
   }
 
   /**

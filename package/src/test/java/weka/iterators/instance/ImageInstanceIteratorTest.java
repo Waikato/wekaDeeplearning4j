@@ -9,6 +9,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.InvalidInputDataException;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.util.DatasetLoader;
 
@@ -62,7 +63,7 @@ public class ImageInstanceIteratorTest {
    *
    * @throws Exception Could not load mnist meta data
    */
-  @Test(expected = FileNotFoundException.class)
+  @Test(expected = InvalidInputDataException.class)
   public void testValidateInvalidLocation() throws Exception {
     final Instances metaData = DatasetLoader.loadMiniMnistMeta();
     final String invalidPath = "foo/bar/baz";
@@ -75,7 +76,7 @@ public class ImageInstanceIteratorTest {
    *
    * @throws Exception Could not load mnist meta data
    */
-  @Test(expected = InvalidObjectException.class)
+  @Test(expected = InvalidInputDataException.class)
   public void testValidateInvalidInstances() throws Exception {
     ArrayList<Attribute> invalidAttributes = new ArrayList<>();
     final Attribute f = new Attribute("file");

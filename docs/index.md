@@ -4,9 +4,6 @@ WekaDeeplearning4J is a deep learning package for the [Weka](https://www.cs.waik
 
 The source code for this package is available on [GitHub](https://github.com/Waikato/wekaDeeplearning4j). The java-doc can be found [here](https://waikato.github.io/wekaDeeplearning4j/doc/).
 
-
-**This documentation is still work in progress.**
-
 ## Functionality
 All functionality of this package is accessible via the Weka GUI, the commandline and programmatically in Java.
 
@@ -16,7 +13,9 @@ The following Neural Network Layers are available to build sophisticated archite
 - **DenseLayer**: all units are connected to all units of its parent layer
 - **SubsamplingLayer**: subsample from groups of units of the parent layer by different strategies (average, maximum, etc.)
 - **BatchNormalization**: applies the common batch normalization strategy on the activations of the parent layer
-- **OutputLayer**: generates `N` outputs based on a given activation function
+- **LSTM**: uses long short term memory approach
+- **GlobalPoolingLayer**: apply pooling over time for RNNs and pooling for CNNs applied on sequences
+- **OutputLayer**: generates classification / regression outputs
 
-Further configurations can be found in the [Getting Started](getting-started.md) and the [Examples](examples) sections.
+Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)
