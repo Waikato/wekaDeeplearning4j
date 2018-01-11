@@ -68,6 +68,7 @@ import weka.core.CapabilitiesHandler;
 import weka.core.EmptyIteratorException;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.InvalidLayerConfigurationException;
 import weka.core.InvalidNetworkArchitectureException;
 import weka.core.InvalidValidationPercentageException;
 import weka.core.MissingOutputLayerException;
@@ -87,6 +88,7 @@ import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
+import weka.dl4j.layers.GlobalPoolingLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
@@ -954,7 +956,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param gb GraphBuilder object
    */
-  private void makeCnnTextLayerSetup(GraphBuilder gb) {
+  private void makeCnnTextLayerSetup(GraphBuilder gb)
+      throws InvalidNetworkArchitectureException, InvalidLayerConfigurationException {
     String currentInput = "input";
     gb.addInputs(currentInput);
 
@@ -964,12 +967,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     for (Layer l : layers) {
       if (l instanceof ConvolutionLayer){
         final ConvolutionLayer convLayer = (ConvolutionLayer) l;
+        validateCnnLayer(convLayer);
         convLayers.add(convLayer);
         gb.addLayer(convLayer.getLayerName(), convLayer.clone(), currentInput);
         idx++;
       } else {
         break;
       }
+    }
+
+    // Check if next layer is GlobalPooling
+    if (idx < layers.length
+        && layers[idx] instanceof org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer){
+        throw new InvalidNetworkArchitectureException("For a CNN text setup, the list of convolution"
+            + " layers must be followed by a GlobalPoolingLayer.");
     }
 
     // Collect names
@@ -991,6 +1002,55 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
+  }
+
+  /**
+   * Validate CNN layers when using {@link CnnTextEmbeddingInstanceIterator}.
+   * @param cl Convolution Layer
+   * @throws InvalidLayerConfigurationException Invalid configuration
+   */
+  protected void validateCnnLayer(ConvolutionLayer cl)
+      throws InvalidLayerConfigurationException {
+    final AbstractInstanceIterator iter = getInstanceIterator();
+    if (iter instanceof CnnTextEmbeddingInstanceIterator){
+      CnnTextEmbeddingInstanceIterator cnnIter = (CnnTextEmbeddingInstanceIterator) iter;
+      final int vectorSize = cnnIter.getWordVectors().getWordVector(cnnIter.getWordVectors().vocab().wordAtIndex(0)).length;
+
+      final int truncateLength = cnnIter.getTruncateLength();
+
+      if (truncateLength < cl.getKernelSizeX()){
+        throw new InvalidLayerConfigurationException(
+            "Kernel row size must be smaller than truncation length. Truncation length was " + truncateLength + ". Kernel row size was " + cl.getKernelSizeX(), cl
+        );
+      }
+      if (truncateLength < cl.getStrideX()){
+        throw new InvalidLayerConfigurationException(
+            "Stride row size must be smaller than truncation length. Truncation length was " + truncateLength + ". Stride row size was " + cl.getStrideX(), cl
+        );
+      }
+
+      if (vectorSize % cl.getKernelSizeY() != 0){
+        throw new InvalidLayerConfigurationException(
+            "Wordvector size ("+vectorSize+") must be divisible by kernel column size ("
+                + cl.getKernelSizeY() + ").", cl
+        );
+      }
+
+      if (vectorSize % cl.getStrideY() != 0){
+        throw new InvalidLayerConfigurationException(
+            "Wordvector size ("+vectorSize+") must be divisible by stride column size ("
+                + cl.getStrideY() + ").", cl
+        );
+      }
+
+
+      if (!cl.getConvolutionMode().equals(ConvolutionMode.Same)){
+        throw new InvalidLayerConfigurationException(
+            "ConvolutionMode must be ConvolutionMode.Same for ConvolutionLayers in CNN text "
+                + "architectures.", cl
+        );
+      }
+    }
   }
 
   /**
