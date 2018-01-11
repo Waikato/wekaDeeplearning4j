@@ -143,7 +143,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of columns in kernel",
+    displayName = "number of rows in kernel",
     description = "The number of rows in the kernel (default = 5).",
     commandLineParamName = "kernelSizeX",
     commandLineParamSynopsis = "-kernelSizeX <int>",
@@ -158,7 +158,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of rows in kernel",
+    displayName = "number of columns in kernel",
     description = "The number of columns in the kernel (default = 5).",
     commandLineParamName = "kernelSizeY",
     commandLineParamSynopsis = "-kernelSizeY <int>",
@@ -182,7 +182,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of columns in stride",
+    displayName = "number of rows in stride",
     description = "The number of rows in the stride (default = 1).",
     commandLineParamName = "strideX",
     commandLineParamSynopsis = "-strideX <int>",
@@ -197,7 +197,7 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of rows in stride",
+    displayName = "number of columns in stride",
     description = "The number of columns in the stride (default = 1).",
     commandLineParamName = "strideY",
     commandLineParamSynopsis = "-strideY <int>",
@@ -221,8 +221,8 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of columns in padding",
-    description = "The number of columns in the padding (default = 0).",
+    displayName = "number of rows in padding",
+    description = "The number of rows in the padding (default = 0).",
     commandLineParamName = "paddingX",
     commandLineParamSynopsis = "-paddingX <int>",
     displayOrder = 8
@@ -236,8 +236,8 @@ public class ConvolutionLayer extends org.deeplearning4j.nn.conf.layers.Convolut
   }
 
   @OptionMetadata(
-    displayName = "number of rows in padding",
-    description = "The number of rows in the padding (default = 0).",
+    displayName = "number of columns in padding",
+    description = "The number of columns in the padding (default = 0).",
     commandLineParamName = "paddingY",
     commandLineParamSynopsis = "-paddingY <int>",
     displayOrder = 9
