@@ -138,8 +138,8 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
   }
 
   @OptionMetadata(
-    displayName = "number of rows in kernel",
-    description = "The number of rows in the kernel (default = 5).",
+    displayName = "number of columns in kernel",
+    description = "The number of columns in the kernel (default = 5).",
     commandLineParamName = "kernelSizeY",
     commandLineParamSynopsis = "-kernelSizeY <int>",
     displayOrder = 5
@@ -162,8 +162,8 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
   }
 
   @OptionMetadata(
-    displayName = "number of columns in stride",
-    description = "The number of columns in the stride (default = 1).",
+    displayName = "number of rows in stride",
+    description = "The number of rows in the stride (default = 1).",
     commandLineParamName = "strideX",
     commandLineParamSynopsis = "-strideX <int>",
     displayOrder = 6
@@ -177,8 +177,8 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
   }
 
   @OptionMetadata(
-    displayName = "number of rows in stride",
-    description = "The number of rows in the stride (default = 1).",
+    displayName = "number of columns in stride",
+    description = "The number of columns in the stride (default = 1).",
     commandLineParamName = "strideY",
     commandLineParamSynopsis = "-strideY <int>",
     displayOrder = 7
@@ -201,8 +201,8 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
   }
 
   @OptionMetadata(
-    displayName = "number of columns in padding",
-    description = "The number of columns in the padding (default = 0).",
+    displayName = "number of rows in padding",
+    description = "The number of rows in the padding (default = 0).",
     commandLineParamName = "paddingX",
     commandLineParamSynopsis = "-paddingX <int>",
     displayOrder = 8
@@ -216,8 +216,8 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
   }
 
   @OptionMetadata(
-    displayName = "number of rows in padding",
-    description = "The number of rows in the padding (default = 0).",
+    displayName = "number of columns in padding",
+    description = "The number of columns in the padding (default = 0).",
     commandLineParamName = "paddingY",
     commandLineParamSynopsis = "-paddingY <int>",
     displayOrder = 9
