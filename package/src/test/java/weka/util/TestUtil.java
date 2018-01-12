@@ -173,8 +173,6 @@ public class TestUtil {
     return res;
   }
 
-
-
   /**
    * Enables the UIServer at http://localhost:9000/train
    *
@@ -200,10 +198,19 @@ public class TestUtil {
   }
 
   /** Creates a test dataset */
-  public static Instances makeTestDataset(int seed, int numInstances,
-      int numNominal, int numNumeric, int numString, int numDate,
-      int numRelational, int numClasses, int classType, int classIndex,
-      boolean multiInstance) throws Exception {
+  public static Instances makeTestDataset(
+      int seed,
+      int numInstances,
+      int numNominal,
+      int numNumeric,
+      int numString,
+      int numDate,
+      int numRelational,
+      int numClasses,
+      int classType,
+      int classIndex,
+      boolean multiInstance)
+      throws Exception {
 
     TestInstances testset = new TestInstances();
     testset.setSeed(seed);
@@ -218,6 +225,47 @@ public class TestUtil {
     testset.setClassIndex(classIndex);
     testset.setNumClasses(numClasses);
     testset.setMultiInstance(multiInstance);
+    if (numRelational > 0) {
+      testset.setNumRelationalNominal(2);
+      testset.setNumRelationalString(2);
+      testset.setNumRelationalNumeric(2);
+      testset.setNumInstancesRelational(75);
+    }
+
+    return testset.generate();
+  }
+  /** Creates a relational test dataset */
+  public static Instances makeTestDatasetRelational(
+      int seed,
+      int numInstances,
+      int numClasses,
+      int classType,
+      int classIndex,
+      int numRelationalNominal,
+      int numRelationalString,
+      int numRelationalNumeric,
+      int numInstancesRelational)
+      throws Exception {
+
+    TestInstances testset = new TestInstances();
+    testset.setSeed(seed);
+    testset.setNumInstances(numInstances);
+    testset.setNumClasses(numClasses);
+    testset.setClassType(classType);
+    testset.setClassIndex(classIndex);
+    testset.setNumClasses(numClasses);
+    testset.setMultiInstance(false);
+
+    testset.setNumNominal(0);
+    testset.setNumNumeric(0);
+    testset.setNumString(0);
+    testset.setNumDate(0);
+    testset.setNumRelational(1);
+
+    testset.setNumRelationalNominal(numRelationalNominal);
+    testset.setNumRelationalString(numRelationalString);
+    testset.setNumRelationalNumeric(numRelationalNumeric);
+    testset.setNumInstancesRelational(numInstancesRelational);
 
     return testset.generate();
   }
