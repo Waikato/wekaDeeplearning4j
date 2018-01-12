@@ -264,4 +264,11 @@ public class DatasetLoader {
     return dataDiscretized;
   }
 
+  public static Instances loadRelationalNumericClass() throws Exception {
+    return DatasetLoader.loadArff("src/test/resources/relational/relational-data-numeric-class.arff");
+  }
+  public static Instances loadRelationalNominalClass() throws Exception {
+    return DatasetLoader.loadArff("src/test/resources/relational/relational-data-nominal-class.arff");
+  }
+
 }
