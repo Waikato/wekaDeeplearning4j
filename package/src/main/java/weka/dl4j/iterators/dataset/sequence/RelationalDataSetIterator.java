@@ -108,7 +108,7 @@ public class RelationalDataSetIterator implements DataSetIterator {
         // Get as double array
         final double[] doubles = currInstances.get(j).toDoubleArray();
         final INDArray indArray = Nd4j.create(doubles);
-        currDataND.putColumn(j, indArray); // Todo: is putColumn correct?
+        currDataND.putColumn(j, indArray);
       }
 
       features.put(new INDArrayIndex[] {point(i), all(), interval(0, lastIdx)}, currDataND);

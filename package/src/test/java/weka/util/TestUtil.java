@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.TestInstances;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
@@ -267,6 +268,19 @@ public class TestUtil {
     testset.setNumRelationalNumeric(numRelationalNumeric);
     testset.setNumInstancesRelational(numInstancesRelational);
 
-    return testset.generate();
+    final Instances generated = testset.generate();
+
+    // Remove random instances
+    Random rand = new Random(42);
+    for (Instance datum : generated) {
+      final Instances rel = datum.relationalValue(0);
+      RemovePercentage rp = new RemovePercentage();
+      rp.setInputFormat(rel);
+      rp.setPercentage(rand.nextDouble()*100);
+      final Instances rel2 = Filter.useFilter(rel, rp);
+      final int i = generated.attribute(0).addRelation(rel2);
+      datum.setValue(0, i);
+    }
+    return generated;
   }
 }

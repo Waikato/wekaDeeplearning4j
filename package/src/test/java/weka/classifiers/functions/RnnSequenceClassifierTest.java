@@ -30,6 +30,7 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
 import weka.dl4j.earlystopping.EarlyStopping;
+import weka.dl4j.iterators.instance.sequence.RelationalInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextFilesEmbeddingInstanceIterator;
 import weka.dl4j.layers.LSTM;
@@ -240,6 +241,48 @@ public class RnnSequenceClassifierTest {
     data = DatasetLoader.loadAngerMeta();
     // Randomize data
     data.randomize(new Random(42));
+    TestUtil.holdout(clf, data, 33);
+  }
+  @Test
+  public void testRelationalDataset() throws Exception {
+    data = TestUtil
+        .makeTestDatasetRelational(TestUtil.SEED, 1000, 2, Attribute.NOMINAL, 1, 2, 2, 2, 100);
+    data.setClassIndex(data.numAttributes() - 1);
+
+    // Define layers
+    LSTM lstm1 = new LSTM();
+    lstm1.setNOut(32);
+    lstm1.setActivationFunction(new ActivationTanH());
+
+    RnnOutputLayer rnnOut = new RnnOutputLayer();
+    rnnOut.setLossFn(new LossMSE());
+    rnnOut.setActivationFunction(new ActivationIdentity());
+
+    // Network config
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setL2(1e-5);
+    nnc.setUseRegularization(true);
+    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+    nnc.setGradientNormalizationThreshold(1.0);
+    nnc.setLearningRate(0.02);
+
+    final RelationalInstanceIterator rii = new RelationalInstanceIterator();
+    rii.setTruncateLength(80);
+    rii.setTrainBatchSize(64);
+    rii.setRelationalAttributeIndex(0);
+    clf.setInstanceIterator(rii);
+
+    // Config classifier
+    clf.setLayers(lstm1, rnnOut);
+    clf.setNeuralNetConfiguration(nnc);
+    clf.settBPTTbackwardLength(20);
+    clf.settBPTTforwardLength(20);
+    clf.setNumEpochs(3);
+
+    final EpochListener l = new EpochListener();
+    l.setN(1);
+    clf.setIterationListener(l);
+    clf.setEarlyStopping(new EarlyStopping(5, 10));
     TestUtil.holdout(clf, data, 33);
   }
 
