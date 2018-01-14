@@ -43,6 +43,18 @@ public class RelationalInstanceIteratorTest {
   private static final int SEED = 42;
   /** Iterator object */
   private RelationalInstanceIterator rii;
+  private static Instances data;
+
+  // Init test dataset
+  static {
+    try {
+      data = TestUtil
+          .makeTestDatasetRelational(SEED, 20, 2, Attribute.NOMINAL, 1, 2, 2, 2, 100);
+      data.setClassIndex(data.numAttributes() - 1);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
   /** Initialize iterator */
   @Before
@@ -59,40 +71,11 @@ public class RelationalInstanceIteratorTest {
   @Test
   public void testValidateValidData() throws Exception {
     // Test valid setup
-    final Instances data = TestUtil.makeTestDataset(
-        SEED,
-        100,
-        0,
-        0,
-        0,
-        0,
-        1,
-        2,
-        Attribute.NOMINAL,
-        1,
-        false
-    );
     this.rii.validate(data);
   }
 
   @Test
   public void testOutputFormat() throws Exception {
-    final Instances data = TestUtil.makeTestDataset(
-        SEED,
-        100,
-        0,
-        0,
-        0,
-        0,
-        1,
-        2,
-        Attribute.NOMINAL,
-        1,
-        false
-    );
-
-
-
     for (int tl : Arrays.asList(10, 50, 200)) {
       rii.setTruncateLength(tl);
       for (int bs : Arrays.asList(1, 4, 8, 16)) {
@@ -126,23 +109,6 @@ public class RelationalInstanceIteratorTest {
    */
   @Test
   public void testBatches() throws Exception {
-
-    // Data
-    final Instances data = TestUtil.makeTestDataset(
-        SEED,
-        100,
-        0,
-        0,
-        0,
-        0,
-        1,
-        2,
-        Attribute.NOMINAL,
-        1,
-        false
-    );
-    data.setClassIndex(data.numAttributes() - 1);
-
     final int seed = 1;
     for (int batchSize : new int[] {1, 2, 5, 10}) {
       final int actual = countIterations(data, rii, seed, batchSize);
