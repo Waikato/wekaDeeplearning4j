@@ -20,6 +20,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.Classifier;
 import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
 import weka.core.CapabilitiesHandler;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -303,6 +304,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     result.disableAll();
 
     result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+    result.enable(Capability.RELATIONAL_ATTRIBUTES);
 
     // class
     result.enable(Capabilities.Capability.NOMINAL_CLASS);
