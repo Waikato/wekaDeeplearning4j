@@ -34,7 +34,7 @@ Changes=Update api to dl4j 0.9.1
 PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/wekaDeeplearning4j-GPU-{VERSION}-{PLATFORM}-x86_64.zip
 
 # URL for further information
-URL=https://github.com/Waikato/wekaDeeplearning4j
+URL=https://deeplearning.cms.waikato.ac.nz/
 
 # Dependencies
 Depends=weka (>=3.8.0)
