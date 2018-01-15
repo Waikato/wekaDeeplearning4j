@@ -6,7 +6,7 @@
 
     <groupId>nz.ac.waikato.cms.weka</groupId>
     <artifactId>wekaDeeplearning4j</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.1-SNAPSHOT</version>
     <name>wekaDeeplearning4j</name>
     <description>Deep learning for WEKA</description>
     <packaging>jar</packaging>
