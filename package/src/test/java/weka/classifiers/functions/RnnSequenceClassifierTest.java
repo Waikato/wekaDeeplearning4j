@@ -17,6 +17,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -59,6 +60,7 @@ import weka.util.TestUtil;
  * @author Steven Lang
  */
 @Slf4j
+@Ignore
 public class RnnSequenceClassifierTest {
 
   /** Current name */
