@@ -21,6 +21,7 @@
 
 package weka.dl4j.iterators.instance;
 
+import java.util.Enumeration;
 import org.datavec.api.split.CollectionInputSplit;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
@@ -29,6 +30,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
+import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 
@@ -186,5 +188,35 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements C
   public String globalInfo() {
     return "Instance iterator that reads images based on the meta-data "
         + "given in the ARFF file.";
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+  }
+
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }

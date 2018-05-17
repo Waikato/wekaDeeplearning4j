@@ -5,12 +5,10 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
-import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.AbstractLSTM;
 import org.deeplearning4j.nn.conf.layers.EmbeddingLayer;
 import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -28,6 +26,7 @@ import weka.core.MissingOutputLayerException;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
+import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
@@ -71,7 +70,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     }
 
     final Layer lastLayer = layers[layers.length - 1];
-    if (!(lastLayer instanceof RnnOutputLayer)) {
+    if (!(lastLayer.getBackend() instanceof RnnOutputLayer)) {
       throw new MissingOutputLayerException("Last layer in network must be an output layer!");
     }
 
@@ -112,8 +111,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
         netConfig
             .builder()
             .seed(getSeed())
-            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE)
-            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
             .graphBuilder()
             .backpropType(BackpropType.TruncatedBPTT)
             .tBPTTBackwardLength(tBPTTbackwardLength)
@@ -122,8 +119,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     // Set ouput size
     final Layer lastLayer = layers[layers.length - 1];
     final int nOut = trainData.numClasses();
-    if (lastLayer instanceof RnnOutputLayer) {
-      ((RnnOutputLayer) lastLayer).setNOut(nOut);
+    if (lastLayer.getBackend() instanceof RnnOutputLayer) {
+      ((weka.dl4j.layers.RnnOutputLayer) lastLayer).setNOut(nOut);
     }
 
     String currentInput = "input";
@@ -131,7 +128,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     // Collect layers
     for (Layer layer : layers) {
       String lName = layer.getLayerName();
-      gb.addLayer(lName, layer, currentInput);
+      gb.addLayer(lName, layer.getBackend().clone(), currentInput);
       currentInput = lName;
     }
     gb.setOutputs(currentInput);
@@ -166,10 +163,10 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
    * @return True if compatible
    */
   protected boolean isSequenceCompatibleLayer(Layer layer) {
-    return layer instanceof EmbeddingLayer
-        || layer instanceof AbstractLSTM
-        || layer instanceof RnnOutputLayer
-        || layer instanceof GlobalPoolingLayer;
+    return layer.getBackend() instanceof EmbeddingLayer
+        || layer.getBackend() instanceof AbstractLSTM
+        || layer.getBackend() instanceof RnnOutputLayer
+        || layer.getBackend() instanceof GlobalPoolingLayer;
   }
 
   /**
@@ -209,7 +206,12 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       final DataSet ds = it.next();
       final INDArray features = ds.getFeatureMatrix();
       final INDArray labelsMask = ds.getLabelsMaskArray();
-      INDArray lastTimeStepIndices = Nd4j.argMax(labelsMask, 1);
+      INDArray lastTimeStepIndices;
+      if (labelsMask != null){
+        lastTimeStepIndices = Nd4j.argMax(labelsMask, 1);
+      } else {
+        lastTimeStepIndices = Nd4j.zeros(features.size(0), 1);
+      }
       INDArray predBatch = model.outputSingle(features);
       int currentBatchSize = predBatch.size(0);
       for (int i = 0; i < currentBatchSize; i++) {
@@ -225,13 +227,12 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       }
 
       offset += currentBatchSize; // add batchsize as offset
-      boolean hasInstancesLeft = offset < insts.numInstances();
-      next = it.hasNext() || hasInstancesLeft;
+      boolean iteratorHasInstancesLeft = offset < insts.numInstances();
+      next = it.hasNext() || iteratorHasInstancesLeft;
     }
 
     // Fix classes
     for (int i = 0; i < preds.length; i++) {
-      // only normalise if we're dealing with classification
       if (preds[i].length > 1) {
         weka.core.Utils.normalize(preds[i]);
       } else {
@@ -302,7 +303,6 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   public Capabilities getCapabilities() {
     Capabilities result = super.getCapabilities();
     result.disableAll();
-
     result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
     result.enable(Capability.RELATIONAL_ATTRIBUTES);
 

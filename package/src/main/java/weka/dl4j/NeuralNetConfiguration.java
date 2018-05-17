@@ -3,18 +3,22 @@ package weka.dl4j;
 import java.io.Serializable;
 import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.deeplearning4j.nn.conf.LearningRatePolicy;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder;
-import org.deeplearning4j.nn.conf.distribution.Distribution;
-import org.deeplearning4j.nn.conf.stepfunctions.StepFunction;
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.nd4j.linalg.learning.config.IUpdater;
-import org.nd4j.linalg.learning.config.Sgd;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.distribution.Disabled;
+import weka.dl4j.distribution.Distribution;
+import weka.dl4j.dropout.AbstractDropout;
+import weka.dl4j.updater.Adam;
+import weka.dl4j.updater.Sgd;
+import weka.dl4j.updater.Updater;
+import weka.dl4j.weightnoise.AbstractWeightNoise;
 import weka.gui.ProgrammaticProperty;
 
 /**
@@ -26,42 +30,35 @@ import weka.gui.ProgrammaticProperty;
  * @author Eibe Frank
  */
 @EqualsAndHashCode
+@ToString
 public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   private static final long serialVersionUID = -4384295102884151216L;
 
   protected WeightInit weightInit = WeightInit.XAVIER;
   protected double biasInit = 0.0;
-  protected Distribution dist = null;
-  protected double learningRate = 1e-1;
-  protected double biasLearningRate = Double.NaN;
+  protected Distribution dist = new Disabled();
   protected double l1 = Double.NaN;
   protected double l2 = Double.NaN;
-  protected double l1Bias = Double.NaN;
-  protected double l2Bias = Double.NaN;
-  protected double dropOut = 0;
-  protected IUpdater iUpdater = new Sgd();
-  protected double leakyreluAlpha = 0.01;
+  protected AbstractDropout dropout = new weka.dl4j.dropout.Disabled();
+  protected Updater updater = new Sgd();
+  protected Updater biasUpdater = new Sgd();
   protected boolean miniBatch = true;
   protected long seed = 0;
-  protected boolean useRegularization = false;
   protected OptimizationAlgorithm optimizationAlgo =
       OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
-  protected StepFunction stepFunction = null;
   protected boolean useDropConnect = false;
+  protected AbstractWeightNoise weightNoise = new weka.dl4j.weightnoise.Disabled();
   protected boolean minimize = true;
-  protected LearningRatePolicy learningRatePolicy = LearningRatePolicy.None;
-  protected double lrPolicyDecayRate = Double.NaN;
-  protected double lrPolicySteps = Double.NaN;
-  protected double lrPolicyPower = Double.NaN;
   protected boolean pretrain = false;
   protected GradientNormalization gradientNormalization = GradientNormalization.None;
   protected double gradientNormalizationThreshold = 1.0;
+  protected WorkspaceMode inferenceWorkspaceMode = Preferences.WORKSPACE_MODE;
+  protected WorkspaceMode trainingWorkspaceMode = Preferences.WORKSPACE_MODE;
 
   /** Constructor that provides default values for the settings. */
   public NeuralNetConfiguration() {
-    setLearningRate(0.1);
-    setUpdater(new weka.dl4j.updater.Adam());
+    setUpdater(new Adam());
     setWeightInit(WeightInit.XAVIER);
   }
 
@@ -72,48 +69,33 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
    */
   public org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder builder() {
     Builder builder = new Builder();
+
+    // Set dist to null if Disabled was chosen as dl4j backend defaults to null
+    if (dist instanceof weka.dl4j.distribution.Disabled) {
+      dist = null;
+    }
+
     builder
         .l1(l1)
         .l2(l2)
-        .leakyreluAlpha(leakyreluAlpha)
-        .learningRate(learningRate)
-        .learningRateDecayPolicy(learningRatePolicy)
-        .lrPolicyDecayRate(lrPolicyDecayRate)
-        .lrPolicyPower(lrPolicyPower)
-        .lrPolicySteps(lrPolicySteps)
         .optimizationAlgo(optimizationAlgo)
         .seed(seed)
-        .stepFunction(stepFunction)
-        .updater(iUpdater)
         .weightInit(weightInit)
-        .dist(dist)
+        .dist(dist.getBackend())
         .biasInit(biasInit)
-        .biasLearningRate(biasLearningRate)
+        .updater(updater.getBackend())
+        .biasUpdater(biasUpdater.getBackend())
+        .dropOut(dropout.getBackend())
         .miniBatch(miniBatch)
         .minimize(minimize)
-        .useDropConnect(useDropConnect)
+        .weightNoise(weightNoise.getBackend())
         .gradientNormalization(gradientNormalization)
         .gradientNormalizationThreshold(gradientNormalizationThreshold)
-        .iterations(1);
+        .inferenceWorkspaceMode(inferenceWorkspaceMode)
+        .trainingWorkspaceMode(trainingWorkspaceMode);
 
-    builder.setUseRegularization(useRegularization);
     builder.setPretrain(pretrain);
     return builder;
-  }
-
-  @OptionMetadata(
-    displayName = "leaky relu alpha",
-    description = "The parameter for the leaky relu (default = 0.1).",
-    commandLineParamName = "leakyreluAlpha",
-    commandLineParamSynopsis = "-leakyreluAlpha <double>",
-    displayOrder = 0
-  )
-  public double getLeakyreluAlpha() {
-    return leakyreluAlpha;
-  }
-
-  public void setLeakyreluAlpha(double a) {
-    leakyreluAlpha = a;
   }
 
   @OptionMetadata(
@@ -135,66 +117,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "learning rate policy",
-    description = "The learning rate policy (default = None).",
-    commandLineParamName = "learningRatePolicy",
-    commandLineParamSynopsis = "-learningRatePolicy <string>",
-    displayOrder = 2
-  )
-  public LearningRatePolicy getLearningRatePolicy() {
-    return learningRatePolicy;
-  }
-
-  public void setLearningRatePolicy(LearningRatePolicy p) {
-    learningRatePolicy = p;
-  }
-
-  @OptionMetadata(
-    displayName = "learning rate policy decay rate",
-    description = "The learning rate policy decay rate (default = NaN).",
-    commandLineParamName = "lrPolicyDecayRate",
-    commandLineParamSynopsis = "-lrPolicyDecayRate <double>",
-    displayOrder = 3
-  )
-  public double getLrPolicyDecayRate() {
-    return lrPolicyDecayRate;
-  }
-
-  public void setLrPolicyDecayRate(double r) {
-    lrPolicyDecayRate = r;
-  }
-
-  @OptionMetadata(
-    displayName = "learning rate policy power",
-    description = "The learning rate policy power (default = NaN).",
-    commandLineParamName = "lrPolicyPower",
-    commandLineParamSynopsis = "-lrPolicyPower <double>",
-    displayOrder = 4
-  )
-  public double getLrPolicyPower() {
-    return lrPolicyPower;
-  }
-
-  public void setLrPolicyPower(double r) {
-    lrPolicyPower = r;
-  }
-
-  @OptionMetadata(
-    displayName = "learning rate policy steps",
-    description = "The learning rate policy steps (default = NaN).",
-    commandLineParamName = "lrPolicySteps",
-    commandLineParamSynopsis = "-lrPolicySteps <double>",
-    displayOrder = 5
-  )
-  public double getLrPolicySteps() {
-    return lrPolicySteps;
-  }
-
-  public void setLrPolicySteps(double r) {
-    lrPolicySteps = r;
-  }
-
-  @OptionMetadata(
     displayName = "whether to minimize objective",
     description = "Whether to minimize objective.",
     commandLineParamIsFlag = true,
@@ -211,95 +133,63 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "whether to use drop connect",
-    description = "Whether to use drop connect.",
-    commandLineParamIsFlag = true,
-    commandLineParamName = "useDropConnect",
-    commandLineParamSynopsis = "-useDropConnect",
-    displayOrder = 8
-  )
-  public boolean isUseDropConnect() {
-    return useDropConnect;
-  }
-
-  public void setUseDropConnect(boolean b) {
-    useDropConnect = b;
-  }
-
-  @OptionMetadata(
-    displayName = "whether to use regularization",
-    description = "Whether to use regularization.",
-    commandLineParamIsFlag = true,
-    commandLineParamName = "useRegularization",
-    commandLineParamSynopsis = "-useRegularization",
-    displayOrder = 9
-  )
-  public boolean isUseRegularization() {
-    return useRegularization;
-  }
-
-  public void setUseRegularization(boolean b) {
-    useRegularization = b;
-  }
-
-  @OptionMetadata(
-    displayName = "step function",
-    description = "The step function to use (default = default).",
-    commandLineParamName = "stepFunction",
-    commandLineParamSynopsis = "-stepFunction <string>",
-    displayOrder = 11
-  )
-  public StepFunction getStepFunction() {
-    return stepFunction;
-  }
-
-  public void setStepFunction(StepFunction f) {
-    stepFunction = f;
-  }
-
-  @OptionMetadata(
     displayName = "updater",
     description = "The updater to use (default = SGD).",
     commandLineParamName = "updater",
     commandLineParamSynopsis = "-updater <string>",
     displayOrder = 12
   )
-  public IUpdater getUpdater() {
-    return iUpdater;
+  public Updater getUpdater() {
+    return updater;
   }
 
-  public void setUpdater(IUpdater updater) {
-    iUpdater = updater;
-  }
-
-  @OptionMetadata(
-    displayName = "learningrate",
-    description = "The learningrate to use (default = 0.1).",
-    commandLineParamName = "learningRate",
-    commandLineParamSynopsis = "-learningRate <double>",
-    displayOrder = 13
-  )
-  public double getLearningRate() {
-    return learningRate;
-  }
-
-  public void setLearningRate(double lr) {
-    learningRate = lr;
+  public void setUpdater(Updater updater) {
+    this.updater = updater;
   }
 
   @OptionMetadata(
-    displayName = "bias learning rate",
-    description = "The bias learning rate (default = learningRate).",
-    commandLineParamName = "biasLearningRate",
-    commandLineParamSynopsis = "-biasLearningRate <double>",
-    displayOrder = 14
+    displayName = "dropout",
+    description = "The dropout method to use (default = Dropout(0.0).",
+    commandLineParamName = "dropout",
+    commandLineParamSynopsis = "-dropout <Dropout>",
+    displayOrder = 25
   )
-  public double getBiasLearningRate() {
-    return this.biasLearningRate;
+  public AbstractDropout getDropout() {
+    return dropout;
   }
 
-  public void setBiasLearningRate(double biasLearningRate) {
-    this.biasLearningRate = biasLearningRate;
+  public void setDropout(AbstractDropout dropout) {
+    this.dropout = dropout;
+  }
+
+  @OptionMetadata(
+    displayName = "weightNoise",
+    description = "The weight noise method to use (default = None).",
+    commandLineParamName = "weightNoise",
+    commandLineParamSynopsis = "-weightNoise <WeightNoise>",
+    displayOrder = 26
+  )
+  public AbstractWeightNoise getWeightNoise() {
+    return weightNoise;
+  }
+
+  public void setWeightNoise(AbstractWeightNoise weightNoise) {
+    this.weightNoise = weightNoise;
+  }
+
+  @OptionMetadata(
+    displayName = "biasUpdater",
+    description = "The updater to use for the bias (default = SGD).",
+    commandLineParamName = "biasUpdater",
+    commandLineParamSynopsis = "-biasUpdater <string>",
+    displayOrder = 27
+  )
+  public Updater getBiasUpdater() {
+    return biasUpdater;
+  }
+
+  public void setBiasUpdater(Updater biasUpdater) {
+    this.biasUpdater = biasUpdater;
   }
 
   @OptionMetadata(
@@ -307,7 +197,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     description = "L1 regularization factor (default = 0.00).",
     commandLineParamName = "l1",
     commandLineParamSynopsis = "-l1 <double>",
-    displayOrder = 14
+    displayOrder = 13
   )
   public double getL1() {
     return l1;
@@ -384,11 +274,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     commandLineParamSynopsis = "-dist <specification>",
     displayOrder = 19
   )
-  public Distribution getDist() {
+  public Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> getDist() {
     return dist;
   }
 
-  public void setDist(Distribution dist) {
+  public void setDist(Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> dist) {
     this.dist = dist;
   }
 

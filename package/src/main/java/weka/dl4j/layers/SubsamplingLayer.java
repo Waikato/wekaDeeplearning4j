@@ -21,6 +21,7 @@
 package weka.dl4j.layers;
 
 import org.deeplearning4j.nn.conf.ConvolutionMode;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -35,7 +36,7 @@ import java.util.Enumeration;
  * @author Christopher Beckham
  * @author Eibe Frank
  */
-public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.SubsamplingLayer
+public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.SubsamplingLayer>
     implements OptionHandler, Serializable {
 
   /** The ID used to serialize this class. */
@@ -43,14 +44,20 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
 
   /** Constructor for setting some defaults. */
   public SubsamplingLayer() {
+    super();
     setLayerName("Subsampling layer");
     setConvolutionMode(ConvolutionMode.Truncate);
-    setKernelSize(new int[] {1, 1});
-    setStride(new int[] {2, 2});
+    setKernelSize(new int[] {2, 2});
+    setStride(new int[] {1, 1});
     setPadding(new int[] {0, 0});
     setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType.MAX);
     setEps(1e-8);
     setPnorm(1);
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.deeplearning4j.nn.conf.layers.SubsamplingLayer();
   }
 
   /**
@@ -62,35 +69,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     return "A subsampling layer from DeepLearning4J.";
   }
 
-  @OptionMetadata(
-    displayName = "layer name",
-    description = "The name of the layer (default = Subsampling Layer).",
-    commandLineParamName = "name",
-    commandLineParamSynopsis = "-name <string>",
-    displayOrder = 0
-  )
-  public String getLayerName() {
-    return this.layerName;
-  }
 
-  public void setLayerName(String layerName) {
-    this.layerName = layerName;
-  }
-
-  @OptionMetadata(
-    displayName = "convolution mode",
-    description = "The convolution mode (default = Truncate).",
-    commandLineParamName = "mode",
-    commandLineParamSynopsis = "-mode <string>",
-    displayOrder = 1
-  )
-  public ConvolutionMode getConvolutionMode() {
-    return this.convolutionMode;
-  }
-
-  public void setConvolutionMode(ConvolutionMode convolutionMode) {
-    this.convolutionMode = convolutionMode;
-  }
 
   @OptionMetadata(
     displayName = "eps",
@@ -100,11 +79,11 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     displayOrder = 2
   )
   public double getEps() {
-    return super.getEps();
+    return backend.getEps();
   }
 
   public void setEps(double e) {
-    super.setEps(e);
+    backend.setEps(e);
   }
 
   @OptionMetadata(
@@ -115,128 +94,149 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     displayOrder = 3
   )
   public int getPnorm() {
-    return super.getPnorm();
+    return backend.getPnorm();
   }
 
   public void setPnorm(int p) {
-    super.setPnorm(p);
+    backend.setPnorm(p);
+  }
+  @OptionMetadata(
+      displayName = "convolution mode",
+      description = "The convolution mode (default = Truncate).",
+      commandLineParamName = "mode",
+      commandLineParamSynopsis = "-mode <string>",
+      displayOrder = 2
+  )
+  public ConvolutionMode getConvolutionMode() {
+    return backend.getConvolutionMode();
   }
 
+  public void setConvolutionMode(ConvolutionMode convolutionMode) {
+    backend.setConvolutionMode(convolutionMode);
+  }
+
+
   @OptionMetadata(
-    displayName = "number of columns in kernel",
-    description = "The number of columns in the kernel (default = 5).",
-    commandLineParamName = "kernelSizeX",
-    commandLineParamSynopsis = "-kernelSizeX <int>",
-    displayOrder = 4
+      displayName = "number of rows in kernel",
+      description = "The number of rows in the kernel (default = 5).",
+      commandLineParamName = "kernelSizeX",
+      commandLineParamSynopsis = "-kernelSizeX <int>",
+      displayOrder = 4
   )
   public int getKernelSizeX() {
-    return this.kernelSize[0];
+    return backend.getKernelSize()[0];
   }
 
-  public void setKernelSizeX(int kernelSize) {
-    this.kernelSize[0] = kernelSize;
+  public void setKernelSizeX(int kernelSizeX) {
+    int[] kernelSize = new int[] {kernelSizeX, getKernelSizeY()};
+    backend.setKernelSize(kernelSize);
   }
 
   @OptionMetadata(
-    displayName = "number of columns in kernel",
-    description = "The number of columns in the kernel (default = 5).",
-    commandLineParamName = "kernelSizeY",
-    commandLineParamSynopsis = "-kernelSizeY <int>",
-    displayOrder = 5
+      displayName = "number of columns in kernel",
+      description = "The number of columns in the kernel (default = 5).",
+      commandLineParamName = "kernelSizeY",
+      commandLineParamSynopsis = "-kernelSizeY <int>",
+      displayOrder = 5
   )
   public int getKernelSizeY() {
-    return this.kernelSize[1];
+    return backend.getKernelSize()[1];
   }
 
-  public void setKernelSizeY(int kernelSize) {
-    this.kernelSize[1] = kernelSize;
+  public void setKernelSizeY(int kernelSizeY) {
+    int[] kernelSize = new int[] {getKernelSizeX(), kernelSizeY};
+    backend.setKernelSize(kernelSize);
   }
 
   @ProgrammaticProperty
   public int[] getKernelSize() {
-    return this.kernelSize;
+    return backend.getKernelSize();
   }
 
   public void setKernelSize(int[] kernelSize) {
-    this.kernelSize = kernelSize;
+    backend.setKernelSize(kernelSize);
   }
 
   @OptionMetadata(
-    displayName = "number of rows in stride",
-    description = "The number of rows in the stride (default = 1).",
-    commandLineParamName = "strideX",
-    commandLineParamSynopsis = "-strideX <int>",
-    displayOrder = 6
+      displayName = "number of rows in stride",
+      description = "The number of rows in the stride (default = 1).",
+      commandLineParamName = "strideX",
+      commandLineParamSynopsis = "-strideX <int>",
+      displayOrder = 6
   )
   public int getStrideX() {
-    return this.stride[0];
+    return backend.getStride()[0];
   }
 
-  public void setStrideX(int stride) {
-    this.stride[0] = stride;
-  }
-
-  @OptionMetadata(
-    displayName = "number of columns in stride",
-    description = "The number of columns in the stride (default = 1).",
-    commandLineParamName = "strideY",
-    commandLineParamSynopsis = "-strideY <int>",
-    displayOrder = 7
-  )
-  public int getStrideY() {
-    return this.stride[1];
-  }
-
-  public void setStrideY(int stride) {
-    this.stride[1] = stride;
+  public void setStrideX(int strideX) {
+    int[] stride = new int[] {strideX, getStrideY()};
+    backend.setStride(stride);
   }
 
   @ProgrammaticProperty
   public int[] getStride() {
-    return this.stride;
+    return backend.getStride();
   }
 
   public void setStride(int[] stride) {
-    this.stride = stride;
+    backend.setStride(stride);
   }
 
   @OptionMetadata(
-    displayName = "number of rows in padding",
-    description = "The number of rows in the padding (default = 0).",
-    commandLineParamName = "paddingX",
-    commandLineParamSynopsis = "-paddingX <int>",
-    displayOrder = 8
+      displayName = "number of columns in stride",
+      description = "The number of columns in the stride (default = 1).",
+      commandLineParamName = "strideY",
+      commandLineParamSynopsis = "-strideY <int>",
+      displayOrder = 7
+  )
+  public int getStrideY() {
+    return backend.getStride()[1];
+  }
+
+  public void setStrideY(int strideY) {
+    int[] stride = new int[] {getStrideX(), strideY};
+    backend.setStride(stride);
+  }
+
+  @OptionMetadata(
+      displayName = "number of rows in padding",
+      description = "The number of rows in the padding (default = 0).",
+      commandLineParamName = "paddingX",
+      commandLineParamSynopsis = "-paddingX <int>",
+      displayOrder = 8
   )
   public int getPaddingX() {
-    return this.padding[0];
+    return backend.getPadding()[0];
   }
 
   public void setPaddingX(int padding) {
-    this.padding[0] = padding;
-  }
-
-  @OptionMetadata(
-    displayName = "number of columns in padding",
-    description = "The number of columns in the padding (default = 0).",
-    commandLineParamName = "paddingY",
-    commandLineParamSynopsis = "-paddingY <int>",
-    displayOrder = 9
-  )
-  public int getPaddingY() {
-    return this.padding[1];
-  }
-
-  public void setPaddingY(int padding) {
-    this.padding[1] = padding;
+    int[] pad = new int[] {padding, getPaddingY()};
+    backend.setPadding(pad);
   }
 
   @ProgrammaticProperty
   public int[] getPadding() {
-    return this.padding;
+    return backend.getPadding();
   }
 
   public void setPadding(int[] padding) {
-    this.padding = padding;
+    backend.setPadding(padding);
+  }
+
+  @OptionMetadata(
+      displayName = "number of columns in padding",
+      description = "The number of columns in the padding (default = 0).",
+      commandLineParamName = "paddingY",
+      commandLineParamSynopsis = "-paddingY <int>",
+      displayOrder = 9
+  )
+  public int getPaddingY() {
+    return backend.getPadding()[1];
+  }
+
+  public void setPaddingY(int padding) {
+    int[] pad = new int[] {getPaddingX(), padding};
+    backend.setPadding(pad);
   }
 
   @OptionMetadata(
@@ -247,28 +247,12 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
     displayOrder = 10
   )
   public org.deeplearning4j.nn.conf.layers.PoolingType getPoolingType() {
-    return this.poolingType;
+    return backend.getPoolingType();
   }
 
   public void setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType poolingType) {
-    this.poolingType = poolingType;
+    backend.setPoolingType(poolingType);
   }
-
-  @OptionMetadata(
-    displayName = "dropout parameter",
-    description = "The dropout parameter (default = 0).",
-    commandLineParamName = "dropout",
-    commandLineParamSynopsis = "-dropout <double>",
-    displayOrder = 11
-  )
-  public double getDropOut() {
-    return this.dropOut;
-  }
-
-  public void setDropOut(double dropOut) {
-    this.dropOut = dropOut;
-  }
-
   /**
    * Returns an enumeration describing the available options.
    *
@@ -276,8 +260,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
    */
   @Override
   public Enumeration<Option> listOptions() {
-
-    return Option.listOptionsForClass(this.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**
@@ -287,8 +270,7 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
    */
   @Override
   public String[] getOptions() {
-
-    return Option.getOptions(this, this.getClass());
+    return Option.getOptionsForHierarchy(this, super.getClass());
   }
 
   /**
@@ -298,7 +280,6 @@ public class SubsamplingLayer extends org.deeplearning4j.nn.conf.layers.Subsampl
    * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
-
-    Option.setOptions(options, this, this.getClass());
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }

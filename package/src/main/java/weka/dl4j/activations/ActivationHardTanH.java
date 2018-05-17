@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("HardTanh")
-public class ActivationHardTanH extends org.nd4j.linalg.activations.impl.ActivationHardTanH
+public class ActivationHardTanH extends Activation<org.nd4j.linalg.activations.impl.ActivationHardTanH>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -8130830280796701805L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationHardTanH();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

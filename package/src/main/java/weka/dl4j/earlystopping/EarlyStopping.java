@@ -42,7 +42,6 @@ public class EarlyStopping implements OptionHandler, Serializable {
   private transient DataSetIterator valDataSetIterator;
 
   public EarlyStopping() {
-    // Dummy constructor
   }
 
   /**

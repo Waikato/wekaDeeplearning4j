@@ -34,13 +34,10 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("uniform")
-public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution.UniformDistribution
-    implements OptionHandler {
+public class UniformDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.UniformDistribution> implements OptionHandler {
 
-  /** Constructions normal distribution with lower limit -1 and upper limit 1. */
-  public UniformDistribution() {
-    super(-1.0, 1.0);
-  }
+
+  private static final long serialVersionUID = -822639410912329551L;
 
   @OptionMetadata(
     displayName = "lower limit",
@@ -50,11 +47,11 @@ public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution
     displayOrder = 1
   )
   public double getLower() {
-    return super.getLower();
+    return backend.getLower();
   }
 
   public void setLower(double mean) {
-    super.setLower(mean);
+    backend.setLower(mean);
   }
 
   @OptionMetadata(
@@ -65,11 +62,11 @@ public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution
     displayOrder = 2
   )
   public double getUpper() {
-    return super.getUpper();
+    return backend.getUpper();
   }
 
   public void setUpper(double std) {
-    super.setUpper(std);
+    backend.setUpper(std);
   }
 
   /**
@@ -103,5 +100,11 @@ public class UniformDistribution extends org.deeplearning4j.nn.conf.distribution
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    // Constructions normal distribution with lower limit -1 and upper limit 1
+    backend = new org.deeplearning4j.nn.conf.distribution.UniformDistribution(-1.0, 1.0);
   }
 }

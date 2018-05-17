@@ -2,7 +2,7 @@ package weka.classifiers.functions;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.layers.Layer;
 import org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
@@ -21,7 +21,7 @@ public class RnnSequenceClassifierAbstractTest extends AbstractClassifierTest {
     return new TestSuite(RnnSequenceClassifierAbstractTest.class);
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     junit.textui.TestRunner.run(suite());
   }
 
@@ -29,7 +29,7 @@ public class RnnSequenceClassifierAbstractTest extends AbstractClassifierTest {
   public Classifier getClassifier() {
     RnnSequenceClassifier rnn = new RnnSequenceClassifier();
     RnnOutputLayer ol = new RnnOutputLayer();
-    rnn.setLayers(new Layer[] {ol});
+    rnn.setLayers(ol);
     rnn.setNumEpochs(1);
     rnn.setEarlyStopping(new EarlyStopping(0, 0));
     return rnn;

@@ -21,11 +21,14 @@
 
 package weka.dl4j.activations;
 
+import static org.nd4j.linalg.activations.impl.ActivationLReLU.DEFAULT_ALPHA;
+
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.util.Enumeration;
+import weka.core.OptionMetadata;
 
 /**
  * A version of DeepLearning4j's ActivationELU that implements WEKA option handling.
@@ -33,8 +36,42 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("ELU")
-public class ActivationELU extends org.nd4j.linalg.activations.impl.ActivationELU
+public class ActivationELU extends Activation<org.nd4j.linalg.activations.impl.ActivationELU>
     implements OptionHandler {
+
+  private static final long serialVersionUID = -720206378421144717L;
+
+
+  protected double alpha = DEFAULT_ALPHA;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationELU();
+  }
+  @OptionMetadata(
+      displayName = "alpha",
+      description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
+      commandLineParamName = "alpha",
+      commandLineParamSynopsis = "-alpha <double>",
+      displayOrder = 1
+  )
+  public double getAlpha() {
+    return alpha;
+  }
+
+  public void setAlpha(double alpha) {
+    this.alpha = alpha;
+  }
+
+  @Override
+  public void setBackend(org.nd4j.linalg.activations.impl.ActivationELU newBackend) {
+    super.setBackend(newBackend);
+    this.alpha = newBackend.getAlpha();
+  }
+
+  @Override
+  public org.nd4j.linalg.activations.impl.ActivationELU getBackend() {
+    return new org.nd4j.linalg.activations.impl.ActivationELU(alpha);
+  }
 
   /**
    * Returns an enumeration describing the available options.

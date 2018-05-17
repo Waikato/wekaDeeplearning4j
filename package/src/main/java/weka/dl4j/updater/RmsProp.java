@@ -1,5 +1,10 @@
 package weka.dl4j.updater;
 
+import static org.nd4j.linalg.learning.config.RmsProp.DEFAULT_RMSPROP_EPSILON;
+import static org.nd4j.linalg.learning.config.RmsProp.DEFAULT_RMSPROP_RMSDECAY;
+
+import java.util.Enumeration;
+import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.gui.ProgrammaticProperty;
 
@@ -8,20 +13,8 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements Updater {
+public class RmsProp extends Updater<org.nd4j.linalg.learning.config.RmsProp> {
   private static final long serialVersionUID = 7400615175279701837L;
-
-  @ProgrammaticProperty
-  @Override
-  public double getLearningRate() {
-    return super.getLearningRate();
-  }
-
-  @ProgrammaticProperty
-  @Override
-  public void setLearningRate(double learningRate) {
-    super.setLearningRate(learningRate);
-  }
 
   @OptionMetadata(
     displayName = "rmsDecay",
@@ -30,14 +23,12 @@ public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements 
     commandLineParamSynopsis = "-rmsDecay <double>",
     displayOrder = 1
   )
-  @Override
   public double getRmsDecay() {
-    return super.getRmsDecay();
+    return backend.getRmsDecay();
   }
 
-  @Override
   public void setRmsDecay(double rmsDecay) {
-    super.setRmsDecay(rmsDecay);
+    backend.setRmsDecay(rmsDecay);
   }
 
   @OptionMetadata(
@@ -47,13 +38,46 @@ public class RmsProp extends org.nd4j.linalg.learning.config.RmsProp implements 
     commandLineParamSynopsis = "-epsilon <double>",
     displayOrder = 2
   )
-  @Override
   public double getEpsilon() {
-    return super.getEpsilon();
+    return backend.getEpsilon();
+  }
+
+  public void setEpsilon(double epsilon) {
+    backend.setEpsilon(epsilon);
   }
 
   @Override
-  public void setEpsilon(double epsilon) {
-    super.setEpsilon(epsilon);
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.learning.config.RmsProp();
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+  }
+
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }

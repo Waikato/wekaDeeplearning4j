@@ -1,9 +1,8 @@
 package weka.dl4j.activations;
 
-import org.deeplearning4j.nn.conf.layers.Layer;
+import java.util.Arrays;
+import org.junit.Assert;
 import org.junit.Test;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.activations.IActivation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.layers.DenseLayer;
@@ -22,23 +21,28 @@ public class ActivationTest {
    * @param act Activation function to test
    * @throws Exception Something went wrong.
    */
-  public static void runClf(IActivation act) throws Exception {
+  private static void runClf(Activation act) throws Exception {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     // Data
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(2);
     denseLayer.setLayerName("Dense-layer");
-    denseLayer.setActivationFn(act);
+    denseLayer.setActivationFunction(act);
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLayerName("Output-layer");
 
     clf.setNumEpochs(1);
     clf.setLayers(denseLayer, outputLayer);
 
     final Instances data = DatasetLoader.loadIris();
-    clf.buildClassifier(data);
+    try{
+      clf.buildClassifier(data);
+    } catch (Exception e){
+      Assert.fail(String.format("Failed for activiation <%s>. Exception was: %s. Stacktrace:%s\n", act.getClass().getSimpleName(), e.toString(),
+          Arrays.toString(e.getStackTrace())));
+    }
     clf.distributionsForInstances(data);
   }
 
@@ -49,8 +53,8 @@ public class ActivationTest {
    */
   @Test
   public void testActivations() throws Exception {
-    IActivation[] acts =
-        new IActivation[] {
+    Activation[] acts =
+        new Activation[] {
           new ActivationCube(),
           new ActivationELU(),
           new ActivationHardSigmoid(),
@@ -66,7 +70,7 @@ public class ActivationTest {
           new ActivationSoftSign(),
           new ActivationHardTanH()
         };
-    for (IActivation act : acts) {
+    for (Activation act : acts) {
       runClf(act);
     }
   }

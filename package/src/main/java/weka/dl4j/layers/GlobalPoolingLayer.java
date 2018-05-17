@@ -1,6 +1,8 @@
 package weka.dl4j.layers;
 
+import java.util.Enumeration;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
+import weka.core.Option;
 import weka.core.OptionMetadata;
 
 /**
@@ -8,14 +10,21 @@ import weka.core.OptionMetadata;
  *
  * @author Steven Lang
  */
-public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer {
+public class GlobalPoolingLayer extends
+    Layer<org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer> {
 
   private static final long serialVersionUID = 2882286002911860559L;
   /** Constructor for setting some defaults. */
   public GlobalPoolingLayer() {
+    super();
     setLayerName("GlobalPooling layer");
     setPoolingType(PoolingType.MAX);
     setPnorm(2);
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer();
   }
 
   @OptionMetadata(
@@ -25,14 +34,12 @@ public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.Global
     commandLineParamSynopsis = "-poolingType <string>",
     displayOrder = 10
   )
-  @Override
   public PoolingType getPoolingType() {
-    return super.getPoolingType();
+    return backend.getPoolingType();
   }
 
-  @Override
   public void setPoolingType(PoolingType poolingType) {
-    super.setPoolingType(poolingType);
+    backend.setPoolingType(poolingType);
   }
 
   @OptionMetadata(
@@ -42,14 +49,12 @@ public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.Global
     commandLineParamSynopsis = "-poolDimensions <int>",
     displayOrder = 4
   )
-  @Override
   public int[] getPoolingDimensions() {
-    return super.getPoolingDimensions();
+    return backend.getPoolingDimensions();
   }
 
-  @Override
   public void setPoolingDimensions(int[] poolingDimensions) {
-    super.setPoolingDimensions(poolingDimensions);
+    backend.setPoolingDimensions(poolingDimensions);
   }
 
   @OptionMetadata(
@@ -59,14 +64,12 @@ public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.Global
     commandLineParamSynopsis = "-pnorm <int>",
     displayOrder = 3
   )
-  @Override
   public int getPnorm() {
-    return super.getPnorm();
+    return backend.getPnorm();
   }
 
-  @Override
   public void setPnorm(int pnorm) {
-    super.setPnorm(pnorm);
+    backend.setPnorm(pnorm);
   }
 
   @OptionMetadata(
@@ -76,49 +79,14 @@ public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.Global
     commandLineParamSynopsis = "-collapseDimensions <boolean>",
     displayOrder = 11
   )
-  @Override
   public boolean isCollapseDimensions() {
-    return super.isCollapseDimensions();
+    return backend.isCollapseDimensions();
   }
 
-  @Override
   public void setCollapseDimensions(boolean collapseDimensions) {
-    super.setCollapseDimensions(collapseDimensions);
+    backend.setCollapseDimensions(collapseDimensions);
   }
 
-  @OptionMetadata(
-    displayName = "layer name",
-    description = "The name of the layer (default = GlobalPooling Layer).",
-    commandLineParamName = "name",
-    commandLineParamSynopsis = "-name <string>",
-    displayOrder = 0
-  )
-  @Override
-  public String getLayerName() {
-    return super.getLayerName();
-  }
-
-  @Override
-  public void setLayerName(String layerName) {
-    super.setLayerName(layerName);
-  }
-
-  @OptionMetadata(
-    displayName = "dropout parameter",
-    description = "The dropout parameter (default = 0).",
-    commandLineParamName = "dropout",
-    commandLineParamSynopsis = "-dropout <double>",
-    displayOrder = 11
-  )
-  @Override
-  public double getDropOut() {
-    return super.getDropOut();
-  }
-
-  @Override
-  public void setDropOut(double dropOut) {
-    super.setDropOut(dropOut);
-  }
 
   /**
    * Global info.
@@ -127,5 +95,35 @@ public class GlobalPoolingLayer extends org.deeplearning4j.nn.conf.layers.Global
    */
   public String globalInfo() {
     return "A global pooling layer from DeepLearning4J.";
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+  }
+
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }

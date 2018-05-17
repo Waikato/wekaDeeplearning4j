@@ -1,6 +1,8 @@
 package weka.classifiers.functions;
 
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.layers.Layer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -101,10 +103,10 @@ public class DatasetTest {
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(32);
     denseLayer.setLayerName("Dense-layer");
-    denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+    denseLayer.setActivationFunction(new ActivationReLU());
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLayerName("Output-layer");
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();

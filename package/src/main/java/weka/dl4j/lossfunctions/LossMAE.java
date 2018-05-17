@@ -35,6 +35,8 @@ import java.util.Enumeration;
 @JsonTypeName("MAE")
 public class LossMAE extends org.nd4j.linalg.lossfunctions.impl.LossMAE implements OptionHandler {
 
+  private static final long serialVersionUID = -243370347988854843L;
+
   /**
    * Returns an enumeration describing the available options.
    *

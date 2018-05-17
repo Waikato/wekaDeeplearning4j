@@ -21,11 +21,15 @@
 
 package weka.dl4j.activations;
 
+import static org.nd4j.linalg.activations.impl.ActivationRReLU.DEFAULT_L;
+import static org.nd4j.linalg.activations.impl.ActivationRReLU.DEFAULT_U;
+
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.util.Enumeration;
+import weka.core.OptionMetadata;
 
 /**
  * A version of DeepLearning4j's ActivationRReLU that implements WEKA option handling.
@@ -33,8 +37,53 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("RReLU")
-public class ActivationRReLU extends org.nd4j.linalg.activations.impl.ActivationRReLU
+public class ActivationRReLU extends Activation<org.nd4j.linalg.activations.impl.ActivationRReLU>
     implements OptionHandler {
+
+  private static final long serialVersionUID = -6995697781151991845L;
+
+  protected double lowerBound = DEFAULT_L;
+  protected double upperBound = DEFAULT_U;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationRReLU();
+  }
+  @OptionMetadata(
+      displayName = "lowerBound",
+      description = "The lower bound (default = " + DEFAULT_L + ").",
+      commandLineParamName = "lowerBound",
+      commandLineParamSynopsis = "-lowerBound <double>",
+      displayOrder = 1
+  )
+  public double getLowerBound() {
+    return lowerBound;
+  }
+
+  public void setLowerBound(double lowerBound) {
+    this.lowerBound = lowerBound;
+  }
+
+  @OptionMetadata(
+      displayName = "lowerBound",
+      description = "The lower bound (default = " + DEFAULT_U + ").",
+      commandLineParamName = "lowerBound",
+      commandLineParamSynopsis = "-lowerBound <double>",
+      displayOrder = 2
+  )
+  public double getUpperBound() {
+    return upperBound;
+  }
+
+  public void setUpperBound(double upperBound) {
+    this.upperBound = upperBound;
+  }
+
+  @Override
+  public void setBackend(org.nd4j.linalg.activations.impl.ActivationRReLU newBackend) {
+    super.setBackend(newBackend);
+    this.lowerBound = newBackend.getL();
+    this.upperBound = newBackend.getU();
+  }
 
   /**
    * Returns an enumeration describing the available options.

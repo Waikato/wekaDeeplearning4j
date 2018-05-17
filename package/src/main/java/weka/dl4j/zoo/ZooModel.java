@@ -13,6 +13,7 @@ import weka.core.OptionHandler;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.List;
+import weka.dl4j.Preferences;
 
 public interface ZooModel extends Serializable, OptionHandler {
   /**
@@ -36,8 +37,8 @@ public interface ZooModel extends Serializable, OptionHandler {
   default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape) {
     ComputationGraphConfiguration.GraphBuilder builder =
         new NeuralNetConfiguration.Builder()
-            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
-            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE)
+            .trainingWorkspaceMode(Preferences.WORKSPACE_MODE)
+            .inferenceWorkspaceMode(Preferences.WORKSPACE_MODE)
             .graphBuilder();
     List<NeuralNetConfiguration> confs = mlc.getConfs();
 
