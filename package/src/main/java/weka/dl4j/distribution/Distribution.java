@@ -2,6 +2,7 @@ package weka.dl4j.distribution;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import lombok.EqualsAndHashCode;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -9,6 +10,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
 
+@EqualsAndHashCode
 public abstract class Distribution<T extends org.deeplearning4j.nn.conf.distribution.Distribution>
     implements ApiWrapper<T>, OptionHandler, Serializable {
 
