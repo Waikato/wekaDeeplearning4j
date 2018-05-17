@@ -71,9 +71,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     Builder builder = new Builder();
 
     // Set dist to null if Disabled was chosen as dl4j backend defaults to null
-    if (dist instanceof weka.dl4j.distribution.Disabled) {
-      dist = null;
-    }
 
     builder
         .l1(l1)
