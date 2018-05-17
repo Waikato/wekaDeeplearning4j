@@ -1,6 +1,6 @@
-org.deeplearning4j.nn.conf.layers.Layer=weka.gui.GenericObjectEditor
+weka.dl4j.layers.Layer=weka.gui.GenericObjectEditor
 
-org.deeplearning4j.nn.conf.layers.Layer[]=weka.gui.GenericArrayEditor
+weka.dl4j.layers.Layer[]=weka.gui.GenericArrayEditor
 
 org.deeplearning4j.optimize.api.IterationListener=weka.gui.GenericObjectEditor
 
@@ -18,13 +18,22 @@ weka.dl4j.iterators.instance.AbstractInstanceIterator=weka.gui.GenericObjectEdit
 
 weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator=weka.gui.GenericObjectEditor
 
-org.nd4j.linalg.activations.IActivation=weka.gui.GenericObjectEditor
+weka.dl4j.activations.Activation=weka.gui.GenericObjectEditor
 
 weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor
 
 weka.dl4j.earlystopping.EarlyStopping=weka.gui.GenericObjectEditor
 
 org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor
+
+
+weka.dl4j.updater.Updater=weka.gui.GenericObjectEditor
+
+weka.dl4j.dropout.AbstractDropout=weka.gui.GenericObjectEditor
+
+weka.dl4j.schedules.Schedule=weka.gui.GenericObjectEditor
+
+weka.dl4j.weightnoise.AbstractWeightNoise=weka.gui.GenericObjectEditor
 
 
 ### NLP ###

@@ -1,5 +1,6 @@
 package weka.dl4j.listener;
 
+import org.deeplearning4j.nn.api.Model;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -15,9 +16,6 @@ public abstract class IterationListener
     implements org.deeplearning4j.optimize.api.IterationListener, OptionHandler {
   /** SerialVersionUID */
   private static final long serialVersionUID = 8106114790187499011L;
-
-  /** Flag if already invoked */
-  protected boolean invoked;
 
   /** Number of samples */
   protected int numSamples;
@@ -58,14 +56,7 @@ public abstract class IterationListener
   public abstract void log(String msg);
 
   @Override
-  public boolean invoked() {
-    return invoked;
-  }
-
-  @Override
-  public void invoke() {
-    this.invoked = true;
-  }
+  public void iterationDone(Model model, int iteration, int epoch) {}
 
   /**
    * Returns an enumeration describing the available options.

@@ -1,7 +1,9 @@
 package weka.dl4j.layers;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.Assert;
@@ -43,11 +45,11 @@ public class LayerTest {
     pool.setPoolingType(PoolingType.MAX);
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-    outputLayer.setWeightInit(WeightInit.XAVIER);
+    outputLayer.setActivationFunction(new ActivationSoftmax());
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setWeightInit(WeightInit.XAVIER);
 
     clf.setNeuralNetConfiguration(nnc);
     clf.setLayers(pool, outputLayer);
@@ -99,14 +101,12 @@ public class LayerTest {
     dl.setNOut(8);
 
     BatchNormalization bn = new BatchNormalization();
-
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-    outputLayer.setWeightInit(WeightInit.XAVIER);
+    outputLayer.setActivationFunction(new ActivationSoftmax());
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-
+    nnc.setWeightInit(WeightInit.XAVIER);
     clf.setNeuralNetConfiguration(nnc);
     clf.setLayers(dl, bn, outputLayer);
 
@@ -135,16 +135,14 @@ public class LayerTest {
 
     ConvolutionLayer convLayer = new ConvolutionLayer();
     convLayer.setKernelSize(new int[] {3, 3});
-    convLayer.setActivationFn(Activation.RELU.getActivationFunction());
-    convLayer.setWeightInit(WeightInit.XAVIER);
+    convLayer.setActivationFunction(new ActivationReLU());
     convLayer.setNOut(32);
-
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
-    outputLayer.setWeightInit(WeightInit.XAVIER);
+    outputLayer.setActivationFunction(new ActivationSoftmax());
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setWeightInit(WeightInit.XAVIER);
 
     clf.setNumEpochs(1);
     clf.setNeuralNetConfiguration(nnc);

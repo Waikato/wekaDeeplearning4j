@@ -1,6 +1,8 @@
 package weka.dl4j.zoo;
 
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.dl4j.Preferences;
 
 /**
  * A WEKA version of DeepLearning4j's LeNet ZooModel.
@@ -13,7 +15,7 @@ public class LeNet implements ZooModel {
   @Override
   public ComputationGraph init(int numLabels, long seed, int[][] shape) {
     org.deeplearning4j.zoo.model.LeNet net =
-        new org.deeplearning4j.zoo.model.LeNet(numLabels, seed, 1);
+        new org.deeplearning4j.zoo.model.LeNet(numLabels, seed,  Preferences.WORKSPACE_MODE);
     net.setInputShape(shape);
     org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
     return mlpToCG(conf, shape);

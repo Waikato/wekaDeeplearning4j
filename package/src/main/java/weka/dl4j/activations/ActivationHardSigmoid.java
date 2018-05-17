@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("HardSigmoid")
-public class ActivationHardSigmoid extends org.nd4j.linalg.activations.impl.ActivationHardSigmoid
+public class ActivationHardSigmoid extends Activation<org.nd4j.linalg.activations.impl.ActivationHardSigmoid>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -1571785817480969424L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationHardSigmoid();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

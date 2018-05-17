@@ -100,7 +100,7 @@ public class Utils {
   public static DataSet instancesToConvDataSet(
       Instances insts, int height, int width, int channels) {
     DataSet ds = instancesToDataSet(insts);
-    INDArray data = Nd4j.zeros(insts.numInstances(), channels, height, width);
+    INDArray data = Nd4j.zeros(insts.numInstances(), channels, width, height);
     ds.getFeatures();
 
     for (int i = 0; i < insts.numInstances(); i++) {

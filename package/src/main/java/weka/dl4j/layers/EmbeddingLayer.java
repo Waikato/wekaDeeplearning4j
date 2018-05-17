@@ -116,11 +116,11 @@
 //    displayOrder = 15
 //  )
 //  public double getDropOut() {
-//    return this.dropOut;
+//    return this.dropout;
 //  }
 //
-//  public void setDropOut(double dropOut) {
-//    this.dropOut = dropOut;
+//  public void setDropOut(double dropout) {
+//    this.dropout = dropout;
 //  }
 //
 //  @ProgrammaticProperty

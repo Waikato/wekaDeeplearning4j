@@ -49,7 +49,7 @@ To use convolutional neural networks in the case of a more sophisticated dataset
 ```
 it is necessary to set the iterator to `ConvolutionInstanceIterator`. 
 
-Available parameters:
+#### Available parameters:
 
 - `height`: Height of the images
 - `width`: Width of the images
@@ -71,7 +71,7 @@ img_28642_0.jpg,0
 ```
 This file informs the internals about the association between the image files and their labels. Additionally it is mandatory to set the iterator to `ImageInstanceIterator`. 
 
-Available parameters:
+#### Available parameters:
 
 - `height`: Height of the images
 - `width`: Width of the images
@@ -91,7 +91,7 @@ If you are going to process text data, it is usually necessary to project the do
 "I just saw Behind Bedroom Doors and this was the first ...",neg
 ...
 ```
-Available parameters:
+#### Available parameters:
 
 - `wordVectorLocation`: File which provides the iterator with a serialized word embedding
 - `stopWords`: Stopword strategy to filter unnecessary words
@@ -113,7 +113,7 @@ review_0.txt,pos
 review_1.txt,neg
 ...
 ```
-Available parameters:
+#### Available parameters:
 
 - `wordVectorLocation`: File which provides the iterator with a serialized word embedding
 - `stopWords`: Stopword strategy to filter unnecessary words
@@ -122,7 +122,35 @@ Available parameters:
 - `truncateLength`: Maximum number of words per document
 - `textsLocation`: The absolute path to the location of the text files listed in the meta data ARFF file
 
+## RelationalInstanceIterator
 
+The `RelationalInstanceIterator` is useful for ARFF datasets that make use of the `relational` attribute type such as in the following:
+
+```
+@relation musk1
+ 
+@attribute bag relational
+   @attribute f1 numeric
+   @attribute f2 numeric
+   @attribute f3 numeric
+   @attribute f4 numeric
+   @attribute f5 numeric
+   ...
+   @attribute f166 numeric
+@end bag
+@attribute class {0,1}
+ 
+@data
+"42,-198,-109,-75,-117,11,23,-88,-28,-27,...,48,-37,6,30\n42,-191,-142,-65,-117,55,49,-170,-45,5,...,48,-37,5,30\n...",1
+ ...
+```
+
+Each row in the dataset can be a multivariate sequence. Therefore, this format is useful for representing timeseries data. The `RnnSequenceClassifier` can thus use this iterator to perform classification and regression on multivariate sequences.
+
+#### Available parameters:
+
+- `truncateLength`: Maximum sequence lengthARFF file
+- `relationalAttributeIndex`: Index of the relational attribute in the given dataset
 
 # Caching
 

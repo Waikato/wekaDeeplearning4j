@@ -3,11 +3,13 @@ package weka.dl4j.iterators.instance.sequence.text.cnn;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
+import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.provider.FileLabeledSentenceProvider;
 
@@ -64,6 +66,36 @@ public class CnnTextFilesEmbeddingInstanceIterator extends CnnTextEmbeddingInsta
         + "Each document is then "
         + "processed by the tokenization, stopwords, token-preprocessing and afterwards mapped into "
         + "an embedding space with the given word-vector model.";
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+  }
+
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 
 

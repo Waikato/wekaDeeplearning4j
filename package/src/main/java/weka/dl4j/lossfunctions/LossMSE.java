@@ -33,7 +33,9 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("MSE")
-public class LossMSE extends org.nd4j.linalg.lossfunctions.impl.LossMSE implements OptionHandler {
+public class LossMSE extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMSE> implements OptionHandler {
+
+  private static final long serialVersionUID = 5195053337568658281L;
 
   /**
    * Returns an enumeration describing the available options.
@@ -66,5 +68,10 @@ public class LossMSE extends org.nd4j.linalg.lossfunctions.impl.LossMSE implemen
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.lossfunctions.impl.LossMSE();
   }
 }

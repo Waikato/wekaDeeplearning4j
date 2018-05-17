@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("Sigmoid")
-public class ActivationSigmoid extends org.nd4j.linalg.activations.impl.ActivationSigmoid
+public class ActivationSigmoid extends Activation<org.nd4j.linalg.activations.impl.ActivationSigmoid>
     implements OptionHandler {
 
+  private static final long serialVersionUID = 1082773128147974228L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationSigmoid();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

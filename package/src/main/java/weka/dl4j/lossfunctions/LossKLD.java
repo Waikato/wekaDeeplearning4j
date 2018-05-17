@@ -33,7 +33,9 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("KLD")
-public class LossKLD extends org.nd4j.linalg.lossfunctions.impl.LossKLD implements OptionHandler {
+public class LossKLD extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossKLD> implements OptionHandler {
+
+  private static final long serialVersionUID = -8491072830196216209L;
 
   /**
    * Returns an enumeration describing the available options.
@@ -66,5 +68,10 @@ public class LossKLD extends org.nd4j.linalg.lossfunctions.impl.LossKLD implemen
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.lossfunctions.impl.LossKLD();
   }
 }

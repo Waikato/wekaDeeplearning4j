@@ -33,7 +33,9 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("MAPE")
-public class LossMAPE extends org.nd4j.linalg.lossfunctions.impl.LossMAPE implements OptionHandler {
+public class LossMAPE extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMAPE> implements OptionHandler {
+
+  private static final long serialVersionUID = 2960939259960582030L;
 
   /**
    * Returns an enumeration describing the available options.
@@ -66,5 +68,10 @@ public class LossMAPE extends org.nd4j.linalg.lossfunctions.impl.LossMAPE implem
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.lossfunctions.impl.LossMAPE();
   }
 }

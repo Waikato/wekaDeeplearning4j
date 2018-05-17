@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("SoftSign")
-public class ActivationSoftSign extends org.nd4j.linalg.activations.impl.ActivationSoftSign
+public class ActivationSoftSign extends Activation<org.nd4j.linalg.activations.impl.ActivationSoftSign>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -5821512531537206337L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationSoftSign();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

@@ -12,7 +12,7 @@ import java.util.Random;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +30,7 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.dropout.Dropout;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
@@ -45,6 +46,7 @@ import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.dl4j.lossfunctions.LossMSE;
+import weka.dl4j.updater.Adam;
 import weka.dl4j.zoo.LeNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
@@ -145,13 +147,12 @@ public class Dl4jMlpTest {
     layers.add(poolLayer2);
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLossFn(new LossMCXENT());
     layers.add(outputLayer);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-    nnc.setUseRegularization(true);
 
     clf.setNeuralNetConfiguration(nnc);
     Layer[] ls = new Layer[layers.size()];
@@ -172,22 +173,18 @@ public class Dl4jMlpTest {
 
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(128);
-    denseLayer.setLayerName("Dense-layer");
-    denseLayer.setActivationFn(new ActivationReLU());
+    denseLayer.setActivationFunction(new ActivationReLU());
 
     DenseLayer denseLayer2 = new DenseLayer();
     denseLayer2.setNOut(32);
-    denseLayer2.setLayerName("Dense-layer");
-    denseLayer2.setActivationFn(new ActivationReLU());
+    denseLayer2.setActivationFunction(new ActivationReLU());
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLossFn(new LossMCXENT());
-    outputLayer.setLayerName("Output-layer");
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-    nnc.setPretrain(false);
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
@@ -282,15 +279,15 @@ public class Dl4jMlpTest {
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(8);
     denseLayer.setLayerName("Dense-layer");
-    denseLayer.setActivationFn(new ActivationReLU());
+    denseLayer.setActivationFunction(new ActivationReLU());
 
     DenseLayer denseLayer2 = new DenseLayer();
     denseLayer2.setNOut(4);
     denseLayer2.setLayerName("Dense-layer");
-    denseLayer2.setActivationFn(new ActivationReLU());
+    denseLayer2.setActivationFunction(new ActivationReLU());
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(new ActivationSoftmax());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLossFn(new LossMCXENT());
     outputLayer.setLayerName("Output-layer");
 
@@ -377,8 +374,7 @@ public class Dl4jMlpTest {
     conv1.setNOut(10);
     conv1.setStride(new int[] {1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
-    conv1.setDropOut(0.2);
-    conv1.setActivationFn(new ActivationReLU());
+    conv1.setActivationFunction(new ActivationReLU());
 
     BatchNormalization bn1 = new BatchNormalization();
 
@@ -387,8 +383,7 @@ public class Dl4jMlpTest {
     conv2.setNOut(10);
     conv2.setStride(new int[] {1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
-    conv2.setDropOut(0.2);
-    conv2.setActivationFn(new ActivationReLU());
+    conv2.setActivationFunction(new ActivationReLU());
 
     BatchNormalization bn2 = new BatchNormalization();
 
@@ -397,13 +392,11 @@ public class Dl4jMlpTest {
     conv3.setNOut(10);
     conv3.setStride(new int[] {1, vectorSize});
     conv3.setConvolutionMode(ConvolutionMode.Same);
-    conv3.setDropOut(0.2);
-    conv3.setActivationFn(new ActivationReLU());
+    conv3.setActivationFunction(new ActivationReLU());
 
     BatchNormalization bn3 = new BatchNormalization();
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
-    gpl.setDropOut(0.33);
 
     OutputLayer out = new OutputLayer();
 
@@ -420,9 +413,10 @@ public class Dl4jMlpTest {
 
     // NNC
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setLearningRate(0.01);
-    nnc.setUseRegularization(true);
     nnc.setL2(1e-3);
+    final Dropout dropout = new Dropout();
+    dropout.setP(0.2);
+    nnc.setDropout(dropout);
     clf.setNeuralNetConfiguration(nnc);
 
     // Data
@@ -463,7 +457,7 @@ public class Dl4jMlpTest {
 
     OutputLayer out = new OutputLayer();
     out.setLossFn(new LossMSE());
-    out.setActivationFn(new ActivationIdentity());
+    out.setActivationFunction(new ActivationIdentity());
 
     clf.setLayers(conv1, conv2, gpl, out);
     //    clf.setNumEpochs(200);
@@ -476,9 +470,11 @@ public class Dl4jMlpTest {
     final Instances data = DatasetLoader.loadAnger();
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setLearningRate(0.01);
-    nnc.setUseRegularization(true);
     nnc.setL2(0.00001);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.001);
+    nnc.setUpdater(opt);
+
     clf.setNeuralNetConfiguration(nnc);
     TestUtil.holdout(clf, data);
   }
@@ -511,7 +507,7 @@ public class Dl4jMlpTest {
 
     OutputLayer out = new OutputLayer();
     out.setLossFn(new LossMSE());
-    out.setActivationFn(new ActivationIdentity());
+    out.setActivationFunction(new ActivationIdentity());
 
     clf.setLayers(conv1, conv2, gpl, out);
     clf.setCacheMode(CacheMode.MEMORY);
@@ -536,21 +532,24 @@ public class Dl4jMlpTest {
     conv1.setNOut(10);
     conv1.setStride(new int[] {1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
-    conv1.setDropOut(0.2);
-    conv1.setActivationFn(new ActivationReLU());
+    conv1.setActivationFunction(new ActivationReLU());
 
     ConvolutionLayer conv2 = new ConvolutionLayer();
     conv2.setKernelSize(new int[] {3, vectorSize});
     conv2.setNOut(10);
     conv2.setStride(new int[] {1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
-    conv2.setDropOut(0.2);
-    conv2.setActivationFn(new ActivationReLU());
+    conv2.setActivationFunction(new ActivationReLU());
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
-    gpl.setDropOut(0.33);
 
     OutputLayer out = new OutputLayer();
+
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    Dropout d = new Dropout();
+    d.setP(0.2);
+    nnc.setDropout(d);
+    clf.setNeuralNetConfiguration(nnc);
 
     clf.setLayers(conv1, conv2, gpl, out);
     clf.setCacheMode(CacheMode.MEMORY);
@@ -589,8 +588,7 @@ public class Dl4jMlpTest {
     conv1.setNOut(10);
     conv1.setStride(new int[] {1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
-    conv1.setDropOut(0.2);
-    conv1.setActivationFn(new ActivationReLU());
+    conv1.setActivationFunction(new ActivationReLU());
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
     OutputLayer out = new OutputLayer();

@@ -34,13 +34,10 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("normal")
-public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.NormalDistribution
+public class NormalDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.NormalDistribution>
     implements OptionHandler {
 
-  /** Constructions normal distribution with mean 0 and unit variance. */
-  public NormalDistribution() {
-    super(1e-3, 1.0);
-  }
+  private static final long serialVersionUID = 1244534661808099971L;
 
   @OptionMetadata(
     displayName = "mean",
@@ -50,11 +47,11 @@ public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.
     displayOrder = 1
   )
   public double getMean() {
-    return super.getMean();
+    return backend.getMean();
   }
 
   public void setMean(double mean) {
-    super.setMean(mean);
+    backend.setMean(mean);
   }
 
   @OptionMetadata(
@@ -65,11 +62,11 @@ public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.
     displayOrder = 2
   )
   public double getStd() {
-    return super.getStd();
+    return backend.getStd();
   }
 
   public void setStd(double std) {
-    super.setStd(std);
+    backend.setStd(std);
   }
 
   /**
@@ -103,5 +100,11 @@ public class NormalDistribution extends org.deeplearning4j.nn.conf.distribution.
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    // Constructions normal distribution with mean 0 and unit variance
+    backend = new org.deeplearning4j.nn.conf.distribution.NormalDistribution(1e-3, 1.0);
   }
 }
