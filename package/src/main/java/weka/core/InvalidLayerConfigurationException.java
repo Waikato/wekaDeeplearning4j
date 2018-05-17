@@ -1,6 +1,6 @@
 package weka.core;
 
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.layers.Layer;
 
 /**
  * Exception raised when the the configuration is invalid.

@@ -1,5 +1,6 @@
 package weka.zoo;
 
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -8,6 +9,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.listener.EpochListener;
 import weka.dl4j.zoo.*;
 import weka.util.DatasetLoader;
 
@@ -25,45 +27,45 @@ public class ModelZooTest {
 
   @Test
   public void testLeNetMnist() throws Exception {
-    initModel(new LeNet());
+    buildModel(new LeNet());
   }
 
   @Test
   public void testAlexNetMnist() throws Exception {
-    initModel(new AlexNet());
+    buildModel(new AlexNet());
   }
 
   @Test
   public void testVGG16() throws Exception {
-    initModel(new VGG16());
+    buildModel(new VGG16());
   }
 
   @Test
   public void testVGG19() throws Exception {
-    initModel(new VGG19());
+    buildModel(new VGG19());
   }
 
-  @Test
-  public void testFaceNetNN4Small2() throws Exception {
-    initModel(new FaceNetNN4Small2());
-  }
+//  @Test
+//  public void testFaceNetNN4Small2() throws Exception {
+//    buildModel(new FaceNetNN4Small2());
+//  }
 
-  @Test
+//  @Test
   public void testGoogLeNet() throws Exception {
-    initModel(new GoogLeNet());
+    buildModel(new GoogLeNet());
   }
 
-  @Test
-  public void testInceptionResNetV1() throws Exception {
-    initModel(new InceptionResNetV1());
-  }
+//  @Test
+//  public void testInceptionResNetV1() throws Exception {
+//    buildModel(new InceptionResNetV1());
+//  }
 
-  @Test
-  public void testResNet50() throws Exception {
-    initModel(new ResNet50());
-  }
+//  @Test
+//  public void testResNet50() throws Exception {
+//    buildModel(new ResNet50());
+//  }
 
-  public void initModel(ZooModel model) throws Exception {
+  private void buildModel(ZooModel model) throws Exception {
     // CLF
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     clf.setSeed(1);
@@ -89,27 +91,14 @@ public class ModelZooTest {
     clf.setInstanceIterator(iterator);
     clf.setZooModel(model);
     clf.setNumEpochs(1);
+    final EpochListener epochListener = new EpochListener();
+    epochListener.setN(1);
+    clf.setIterationListener(epochListener);
     clf.setEarlyStopping(new EarlyStopping(5, 0));
     clf.initializeClassifier(shrinkedData);
+    clf.buildClassifier(shrinkedData);
   }
 
-  //    @Test
-  public void runLeNet() throws Exception {
-    // CLF
-    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-    clf.setSeed(1);
-
-    // Data
-    Instances data = DatasetLoader.loadMiniMnistMeta();
-
-    ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-    iterator.setTrainBatchSize(32);
-    clf.setInstanceIterator(iterator);
-    clf.setZooModel(new LeNet());
-    clf.setNumEpochs(10);
-    clf.setEarlyStopping(new EarlyStopping(5, 0));
-    clf.buildClassifier(data);
-  }
 
   /** Test CustomNet init */
   @Test(expected = UnsupportedOperationException.class)

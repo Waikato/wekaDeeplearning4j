@@ -1,7 +1,9 @@
 package weka.classifiers.functions;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.After;
 import org.junit.Before;
@@ -16,6 +18,8 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.dl4j.updater.Adam;
+import weka.dl4j.weightnoise.DropConnect;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
@@ -72,19 +76,22 @@ public class Dl4jMlpArffTest {
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(256);
     denseLayer.setLayerName("Dense-layer");
-    denseLayer.setActivationFn(Activation.RELU.getActivationFunction());
+    denseLayer.setActivationFunction(new ActivationReLU());
 
     DenseLayer denseLayer2 = new DenseLayer();
     denseLayer2.setNOut(128);
     denseLayer2.setLayerName("Dense-layer");
-    denseLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+    denseLayer.setActivationFunction(new ActivationReLU());
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLayerName("Output-layer");
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setLearningRate(0.001);
+    final double lr = 0.001;
+    Adam adam = new Adam();
+    adam.setLearningRate(lr);
+    nnc.setUpdater(adam);
 
     clf.setNumEpochs(TestUtil.DEFAULT_NUM_EPOCHS);
     clf.setNeuralNetConfiguration(nnc);
@@ -121,18 +128,18 @@ public class Dl4jMlpArffTest {
     layers.add(convLayer1);
 
     BatchNormalization bn1 = new BatchNormalization();
-    bn1.setActivationFunction(Activation.RELU.getActivationFunction());
+    bn1.setActivationFunction(new ActivationReLU());
     layers.add(bn1);
 
     ConvolutionLayer convLayer2 = new ConvolutionLayer();
     convLayer2.setKernelSize(threeByThree);
     convLayer2.setStride(oneByOne);
-    convLayer2.setActivationFn(Activation.RELU.getActivationFunction());
+    convLayer2.setActivationFunction(new ActivationReLU());
     convLayer2.setNOut(8);
     layers.add(convLayer2);
 
     BatchNormalization bn2 = new BatchNormalization();
-    bn2.setActivationFunction(Activation.RELU.getActivationFunction());
+    bn2.setActivationFunction(new ActivationReLU());
     layers.add(bn2);
 
     SubsamplingLayer poolLayer1 = new SubsamplingLayer();
@@ -147,7 +154,7 @@ public class Dl4jMlpArffTest {
     layers.add(convLayer3);
 
     BatchNormalization bn3 = new BatchNormalization();
-    bn3.setActivationFunction(Activation.RELU.getActivationFunction());
+    bn3.setActivationFunction(new ActivationReLU());
     layers.add(bn3);
 
     ConvolutionLayer convLayer4 = new ConvolutionLayer();
@@ -156,7 +163,7 @@ public class Dl4jMlpArffTest {
     layers.add(convLayer4);
 
     BatchNormalization bn4 = new BatchNormalization();
-    bn4.setActivationFunction(Activation.RELU.getActivationFunction());
+    bn4.setActivationFunction(new ActivationReLU());
     layers.add(bn4);
 
     SubsamplingLayer poolLayer2 = new SubsamplingLayer();
@@ -165,18 +172,17 @@ public class Dl4jMlpArffTest {
     layers.add(poolLayer2);
 
     BatchNormalization bn5 = new BatchNormalization();
-    bn5.setActivationFunction(Activation.RELU.getActivationFunction());
-    bn5.setDropOut(0.2);
+    bn5.setActivationFunction(new ActivationReLU());
+    DropConnect dc = new DropConnect();
     layers.add(bn5);
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFn(Activation.SOFTMAX.getActivationFunction());
+    outputLayer.setActivationFunction(new ActivationSoftmax());
     outputLayer.setLossFn(new LossMCXENT());
     layers.add(outputLayer);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-    nnc.setUseRegularization(true);
 
     clf.setNeuralNetConfiguration(nnc);
     Layer[] ls = new Layer[layers.size()];

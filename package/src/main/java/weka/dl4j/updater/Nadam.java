@@ -1,5 +1,11 @@
 package weka.dl4j.updater;
 
+import static org.nd4j.linalg.learning.config.Nadam.DEFAULT_NADAM_BETA1_MEAN_DECAY;
+import static org.nd4j.linalg.learning.config.Nadam.DEFAULT_NADAM_BETA2_VAR_DECAY;
+import static org.nd4j.linalg.learning.config.Nadam.DEFAULT_NADAM_EPSILON;
+
+import java.util.Enumeration;
+import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.gui.ProgrammaticProperty;
 
@@ -8,20 +14,8 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-public class Nadam extends org.nd4j.linalg.learning.config.Nadam implements Updater {
+public class Nadam extends Updater<org.nd4j.linalg.learning.config.Nadam> {
   private static final long serialVersionUID = 4997617718703358847L;
-
-  @ProgrammaticProperty
-  @Override
-  public double getLearningRate() {
-    return super.getLearningRate();
-  }
-
-  @ProgrammaticProperty
-  @Override
-  public void setLearningRate(double learningRate) {
-    super.setLearningRate(learningRate);
-  }
 
   @OptionMetadata(
     displayName = "beta1MeanDecay",
@@ -30,14 +24,14 @@ public class Nadam extends org.nd4j.linalg.learning.config.Nadam implements Upda
     commandLineParamSynopsis = "-beta1MeanDecay <double>",
     displayOrder = 1
   )
-  @Override
+  
   public double getBeta1() {
-    return super.getBeta1();
+    return backend.getBeta1();
   }
 
-  @Override
+  
   public void setBeta1(double beta1) {
-    super.setBeta1(beta1);
+    backend.setBeta1(beta1);
   }
 
   @OptionMetadata(
@@ -47,14 +41,14 @@ public class Nadam extends org.nd4j.linalg.learning.config.Nadam implements Upda
     commandLineParamSynopsis = "-beta2VarDecay <double>",
     displayOrder = 2
   )
-  @Override
+  
   public double getBeta2() {
-    return super.getBeta2();
+    return backend.getBeta2();
   }
 
-  @Override
+  
   public void setBeta2(double beta2) {
-    super.setBeta2(beta2);
+    backend.setBeta2(beta2);
   }
 
   @OptionMetadata(
@@ -64,13 +58,48 @@ public class Nadam extends org.nd4j.linalg.learning.config.Nadam implements Upda
     commandLineParamSynopsis = "-epsilon <double>",
     displayOrder = 3
   )
-  @Override
+  
   public double getEpsilon() {
-    return super.getEpsilon();
+    return backend.getEpsilon();
+  }
+
+  
+  public void setEpsilon(double epsilon) {
+    backend.setEpsilon(epsilon);
   }
 
   @Override
-  public void setEpsilon(double epsilon) {
-    super.setEpsilon(epsilon);
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.learning.config.Nadam();
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+  }
+
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }

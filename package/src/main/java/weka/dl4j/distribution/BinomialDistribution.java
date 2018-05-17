@@ -21,12 +21,11 @@
 
 package weka.dl4j.distribution;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's BinomialDistribution that implements WEKA option handling.
@@ -36,12 +35,12 @@ import java.util.Enumeration;
  */
 @JsonTypeName("binomial")
 public class BinomialDistribution
-    extends org.deeplearning4j.nn.conf.distribution.BinomialDistribution implements OptionHandler {
+    extends Distribution<org.deeplearning4j.nn.conf.distribution.BinomialDistribution>
+    implements OptionHandler {
 
-  /** Constructs binomial distribution with 1 trial and success probability 0.5. */
-  public BinomialDistribution() {
-    super(1, 0.5);
-  }
+  private static final long serialVersionUID = 4200787281772886115L;
+
+  protected int numberOfTrials = 1;
 
   @OptionMetadata(
     displayName = "probability of success",
@@ -51,11 +50,26 @@ public class BinomialDistribution
     displayOrder = 1
   )
   public double getProbabilityOfSuccess() {
-    return super.getProbabilityOfSuccess();
+    return backend.getProbabilityOfSuccess();
   }
 
   public void setProbabilityOfSuccess(double probabilityOfSuccess) {
-    super.setProbabilityOfSuccess(probabilityOfSuccess);
+    backend.setProbabilityOfSuccess(probabilityOfSuccess);
+  }
+
+  @OptionMetadata(
+    displayName = "number of trials",
+    description = "The number of trials (default = 1).",
+    commandLineParamName = "n",
+    commandLineParamSynopsis = "-n <int>",
+    displayOrder = 1
+  )
+  public double getNumberOfTrials() {
+    return backend.getNumberOfTrials();
+  }
+
+  public void setNumberOfTrials(int numberOfTrials) {
+    this.numberOfTrials = numberOfTrials;
   }
 
   /**
@@ -89,5 +103,16 @@ public class BinomialDistribution
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    // Constructs binomial distribution with 1 trial and success probability 0.5
+    backend = new org.deeplearning4j.nn.conf.distribution.BinomialDistribution(numberOfTrials, 0.5);
+  }
+
+  @Override
+  public org.deeplearning4j.nn.conf.distribution.BinomialDistribution getBackend() {
+    return new org.deeplearning4j.nn.conf.distribution.BinomialDistribution(numberOfTrials, backend.getProbabilityOfSuccess());
   }
 }

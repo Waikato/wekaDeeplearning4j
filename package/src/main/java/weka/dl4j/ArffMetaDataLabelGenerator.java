@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
  */
 public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
 
+  private static final long serialVersionUID = 5918725700616180163L;
+
   /** The logger used in this class. */
   protected final Logger log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
@@ -83,6 +85,11 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
   @Override
   public Writable getLabelForPath(URI uri) {
     return getLabelForPath(uri.getPath());
+  }
+
+  @Override
+  public boolean inferLabelClasses() {
+    return true;
   }
 
   /**

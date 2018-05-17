@@ -124,8 +124,7 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
    */
   @Override
   public Enumeration<Option> listOptions() {
-
-    return Option.listOptionsForClass(this.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**
@@ -135,19 +134,17 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
    */
   @Override
   public String[] getOptions() {
-
-    return Option.getOptions(this, this.getClass());
+    return Option.getOptionsForHierarchy(this, super.getClass());
   }
 
   /**
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
-
-    Option.setOptions(options, this, this.getClass());
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 
   public String globalInfo() {

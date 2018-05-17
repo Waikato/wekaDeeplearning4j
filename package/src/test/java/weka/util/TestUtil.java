@@ -7,9 +7,6 @@ package weka.util;
 import java.io.File;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.ui.api.UIServer;
-import org.deeplearning4j.ui.stats.StatsListener;
-import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +51,7 @@ public class TestUtil {
     Instances train = split[0];
     Instances test = split[1];
 
+    logger.info("Classifier: \n{}", clf.toString());
     clf.buildClassifier(train);
     Evaluation trainEval = new Evaluation(train);
     trainEval.evaluateModel(clf, train);
@@ -174,29 +172,29 @@ public class TestUtil {
     return res;
   }
 
-  /**
-   * Enables the UIServer at http://localhost:9000/train
-   *
-   * @param clf Dl4jMlpClassifier instance
-   */
-  public static void enableUiServer(Dl4jMlpClassifier clf) {
-    // Configure where the network information (gradients, score vs. time etc) is to be
-    //   stored. Here: store in memory.
-    final String tmpfile = "/tmp/out.bin";
-    File f = new File(tmpfile);
-    FileStatsStorage fss = new FileStatsStorage(f);
-    startUiServer(fss);
-    addStatsListener(clf, fss);
-  }
-
-  public static void addStatsListener(Dl4jMlpClassifier clf, FileStatsStorage statsStorage) {
-    clf.setIterationListener(new StatsListener(statsStorage));
-  }
-
-  public static void startUiServer(FileStatsStorage statsStorage) {
-    UIServer uiServer = UIServer.getInstance();
-    uiServer.attach(statsStorage);
-  }
+//  /**
+//   * Enables the UIServer at http://localhost:9000/train
+//   *
+//   * @param clf Dl4jMlpClassifier instance
+//   */
+//  public static void enableUiServer(Dl4jMlpClassifier clf) {
+//    // Configure where the network information (gradients, score vs. time etc) is to be
+//    //   stored. Here: store in memory.
+//    final String tmpfile = "/tmp/out.bin";
+//    File f = new File(tmpfile);
+//    FileStatsStorage fss = new FileStatsStorage(f);
+//    startUiServer(fss);
+//    addStatsListener(clf, fss);
+//  }
+//
+//  public static void addStatsListener(Dl4jMlpClassifier clf, FileStatsStorage statsStorage) {
+//    clf.setIterationListener(new StatsListener(statsStorage));
+//  }
+//
+//  public static void startUiServer(FileStatsStorage statsStorage) {
+//    UIServer uiServer = UIServer.getInstance();
+//    uiServer.attach(statsStorage);
+//  }
 
   /** Creates a test dataset */
   public static Instances makeTestDataset(

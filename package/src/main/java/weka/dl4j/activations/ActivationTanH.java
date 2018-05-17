@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("TanH")
-public class ActivationTanH extends org.nd4j.linalg.activations.impl.ActivationTanH
+public class ActivationTanH extends Activation<org.nd4j.linalg.activations.impl.ActivationTanH>
     implements OptionHandler {
 
+  private static final long serialVersionUID = 7596269333206507386L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationTanH();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

@@ -33,8 +33,15 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("Cube")
-public class ActivationCube extends org.nd4j.linalg.activations.impl.ActivationCube
+public class ActivationCube extends Activation<org.nd4j.linalg.activations.impl.ActivationCube>
     implements OptionHandler {
+
+  private static final long serialVersionUID = 8926934844799196541L;
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationCube();
+  }
 
   /**
    * Returns an enumeration describing the available options.
