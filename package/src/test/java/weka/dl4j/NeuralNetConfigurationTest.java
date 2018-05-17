@@ -1,29 +1,67 @@
 package weka.dl4j;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
-import org.nd4j.linalg.learning.config.IUpdater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
+import weka.dl4j.distribution.BinomialDistribution;
+import weka.dl4j.distribution.Distribution;
+import weka.dl4j.distribution.NormalDistribution;
+import weka.dl4j.distribution.UniformDistribution;
+import weka.dl4j.dropout.AbstractDropout;
+import weka.dl4j.dropout.AlphaDropout;
+import weka.dl4j.dropout.Dropout;
+import weka.dl4j.dropout.GaussianDropout;
+import weka.dl4j.dropout.GaussianNoise;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
-import weka.dl4j.updater.*;
+import weka.dl4j.layers.SubsamplingLayer;
+import weka.dl4j.schedules.ConstantSchedule;
+import weka.dl4j.stepfunctions.DefaultStepFunction;
+import weka.dl4j.stepfunctions.GradientStepFunction;
+import weka.dl4j.stepfunctions.NegativeDefaultStepFunction;
+import weka.dl4j.stepfunctions.NegativeGradientStepFunction;
+import weka.dl4j.updater.AdaDelta;
+import weka.dl4j.updater.AdaGrad;
+import weka.dl4j.updater.AdaMax;
+import weka.dl4j.updater.Adam;
+import weka.dl4j.updater.Nadam;
+import weka.dl4j.updater.Nesterovs;
+import weka.dl4j.updater.NoOp;
+import weka.dl4j.updater.RmsProp;
+import weka.dl4j.updater.Sgd;
+import weka.dl4j.updater.Updater;
+import weka.dl4j.weightnoise.AbstractWeightNoise;
+import weka.dl4j.weightnoise.DropConnect;
+import weka.dl4j.weightnoise.WeightNoise;
 import weka.util.DatasetLoader;
-
-import java.io.*;
-import java.nio.file.Paths;
 
 /**
  * JUnit tests for the NeuralNetConfiguration. Tests setting parameters and different
@@ -31,10 +69,8 @@ import java.nio.file.Paths;
  *
  * @author Steven Lang
  */
+@Slf4j
 public class NeuralNetConfigurationTest {
-
-  /** Logger instance */
-  private static final Logger logger = LoggerFactory.getLogger(NeuralNetConfigurationTest.class);
 
   /** Default number of epochs */
   private static final int DEFAULT_NUM_EPOCHS = 1;
@@ -54,6 +90,9 @@ public class NeuralNetConfigurationTest {
   private ImageInstanceIterator idiMnist;
   /** Start time for time measurement */
   private long startTime;
+
+  /** Fail message builder */
+  StringBuilder failMessage = new StringBuilder();
 
   @Before
   public void before() throws Exception {
@@ -75,120 +114,291 @@ public class NeuralNetConfigurationTest {
   @After
   public void after() throws IOException {
 
-    //        logger.info("Press anything to close");
+    //        log.info("Press anything to close");
     //        Scanner sc = new Scanner(System.in);
     //        sc.next();
     double time = (System.currentTimeMillis() - startTime) / 1000.0;
-    logger.info("Testmethod: " + name.getMethodName());
-    logger.info("Time: " + time + "s");
+    log.info("Testmethod: " + name.getMethodName());
+    log.info("Time: " + time + "s");
   }
 
-  /**
-   * Test
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testNNCParameters() throws Exception {
-    weka.dl4j.updater.Updater[] updater =
-        new weka.dl4j.updater.Updater[] {
-          new AdaDelta(),
-          new AdaGrad(),
-          new Adam(),
-          new AdaMax(),
-          new Nadam(),
-          new Nesterovs(),
-          new NoOp(),
-          new RmsProp(),
-          new Sgd()
-        };
-    for (weka.dl4j.updater.Updater u : updater) {
-      // Define some architecture including all currently available layers
-      ConvolutionLayer cl = new ConvolutionLayer();
-      cl.setNOut(10);
-      DenseLayer dl = new DenseLayer();
-      dl.setNOut(10);
-      BatchNormalization bn = new BatchNormalization();
-      OutputLayer ol = new OutputLayer();
-      Layer[] layers = {dl, bn, ol};
-      clf.setLayers(layers);
-
-      // Setup the configuration
-      NeuralNetConfiguration nnc;
-
-      double l1 = 0.001;
-      double l2 = 0.002;
-      double lr = 5.0;
-      WeightInit weightInit = WeightInit.UNIFORM;
-
-      nnc = new NeuralNetConfiguration();
-      nnc.setLearningRate(lr);
-      nnc.setUseRegularization(true);
-      nnc.setUpdater(u);
-
-      final GradientNormalization clipWiseGN = GradientNormalization.ClipElementWiseAbsoluteValue;
-      nnc.setGradientNormalization(clipWiseGN);
-      final double gnT1 = 100.0;
-      nnc.setGradientNormalizationThreshold(gnT1);
-
-      nnc.setL1(l1);
-      nnc.setL2(l2);
-
-      // Not working as of dl4j 0.9.1
-      //            nnc.setBiasL1(l1Bias);
-      //            nnc.setBiasL2(l2Bias);
-      nnc.setWeightInit(weightInit);
-
-      clf.setNeuralNetConfiguration(nnc);
-      clf.initializeClassifier(dataMnist); // creates the model internally
-
-      // Get configured layers
-      final List<Layer> confLayers = Arrays.stream(clf.getModel().getLayers())
-          .map(l -> l.conf().getLayer()).collect(Collectors.toList());
-      for (Layer l : confLayers) {
-        final BaseLayer bl = (BaseLayer) l;
-        IUpdater u2 = bl.getIUpdater();
-        double l11 = bl.getL1();
-        double l21 = bl.getL2();
-        WeightInit weightInit1 = bl.getWeightInit();
-        double learningRate = bl.getLearningRate();
-        if (!(u instanceof AdaDelta)) { // AdaDelta does not have any learning rate
-          Assert.assertEquals(lr, learningRate, 10e-6);
-        }
-
-        final GradientNormalization gn = bl.getGradientNormalization();
-        final double gnt = bl.getGradientNormalizationThreshold();
-
-        Assert.assertEquals(u.getClass().getSimpleName(), u2.getClass().getSimpleName());
-        Assert.assertEquals(l1, l11, 10e-6);
-        Assert.assertEquals(l2, l21, 10e-6);
-        Assert.assertEquals(weightInit, weightInit1);
-        Assert.assertEquals(gnT1, gnt, 10e-5);
-        Assert.assertEquals(clipWiseGN, gn);
-      }
+  @After
+  public void checkFailMessage() {
+    String fails = failMessage.toString();
+    if (fails.isEmpty()) {
+      return;
     }
+
+    String failMessage = "Failed Cases:\n" + fails;
+    fail(failMessage);
   }
+
 
   @Test
   public void testSerialization() throws IOException, ClassNotFoundException {
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setSeed(42);
-    nnc.builder()
-        .learningRate(5)
-        .weightInit(WeightInit.UNIFORM)
-        .biasLearningRate(5)
-        .l1(5)
-        .l2(5)
-        .updater(new AdaDelta())
-        .build();
+    nnc.setWeightInit(WeightInit.UNIFORM);
+    nnc.setL1(5);
+    nnc.setL2(5);
+    nnc.setUpdater(new AdaMax());
+    nnc.setBiasUpdater(new AdaMax());
+    nnc.setDropout(new Dropout());
+    nnc.setWeightNoise(new DropConnect());
+    nnc.setGradientNormalization(GradientNormalization.None);
+    nnc.setDist(new weka.dl4j.distribution.ConstantDistribution());
 
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
     final File output = Paths.get(System.getProperty("java.io.tmpdir"), "nnc.object").toFile();
     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output));
     oos.writeObject(nnc);
     oos.close();
     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output));
     NeuralNetConfiguration nnc2 = (NeuralNetConfiguration) ois.readObject();
-    Assert.assertEquals(nnc, nnc2);
+    assertEquals(nnc.dist, nnc2.dist);
+    assertEquals(nnc.dropout, nnc2.dropout);
+    assertEquals(nnc.updater, nnc2.updater);
+    assertEquals(nnc.biasUpdater, nnc2.biasUpdater);
+    assertEquals(nnc.weightNoise, nnc2.weightNoise);
+    assertEquals(nnc, nnc2);
     output.delete();
+  }
+
+  /**
+   * Get all available updaters and initialize them with non default parameters.
+   *
+   * @return List of Updater
+   */
+  public List<Updater> getAvailableUpdaterWithNonDefaultParameters() {
+    List<Updater> updaters = new ArrayList<>();
+    AdaDelta adaDelta = new AdaDelta();
+    adaDelta.setEpsilon(10);
+    adaDelta.setLearningRate(10);
+    adaDelta.setRho(10);
+    updaters.add(adaDelta);
+
+    AdaGrad adaGrad = new AdaGrad();
+    adaGrad.setEpsilon(10);
+    adaGrad.setLearningRate(10);
+    updaters.add(adaGrad);
+
+    Adam adam = new Adam();
+    adam.setLearningRate(10);
+    adam.setBeta1(10);
+    adam.setBeta2(10);
+    adam.setEpsilon(10);
+    updaters.add(adam);
+
+    AdaMax adaMax = new AdaMax();
+    adaMax.setBeta1(10);
+    adaMax.setBeta2(10);
+    adaMax.setEpsilon(10);
+    adaMax.setLearningRate(10);
+    updaters.add(adaMax);
+
+    Nadam nadam = new Nadam();
+    nadam.setBeta1(10);
+    nadam.setBeta2(10);
+    nadam.setEpsilon(10);
+    nadam.setLearningRate(10);
+    updaters.add(nadam);
+
+    Nesterovs nesterovs = new Nesterovs();
+    nesterovs.setMomentum(10);
+    nesterovs.setLearningRate(10);
+    updaters.add(nesterovs);
+
+    NoOp noOp = new NoOp();
+    updaters.add(noOp);
+
+    RmsProp rmsProp = new RmsProp();
+    rmsProp.setEpsilon(10);
+    rmsProp.setRmsDecay(10);
+    rmsProp.setLearningRate(10);
+    updaters.add(rmsProp);
+
+    Sgd sgd = new Sgd();
+    sgd.setLearningRate(10);
+    updaters.add(sgd);
+
+    return updaters;
+  }
+
+
+
+  @Test
+  public void testGradientNormalizationThreshold() throws Exception {
+    for (double gradientNormalizationThreshold : new double[] {0.0, 0.1, 1.0, 10}) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setGradientNormalizationThreshold(gradientNormalizationThreshold);
+      checkAppliedParameters(conf, gradientNormalizationThreshold, BaseLayer::getGradientNormalizationThreshold);
+    }
+  }
+
+  @Test
+  public void testGradientNormalization() throws Exception{
+    for (GradientNormalization gn : GradientNormalization.values()){
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setGradientNormalization(gn);
+      checkAppliedParameters(conf, gn, BaseLayer::getGradientNormalization);
+    }
+  }
+
+  @Test
+  public void testWeightNoise() throws Exception{
+    for (AbstractWeightNoise wn : new AbstractWeightNoise[]{
+        new DropConnect(),
+        new WeightNoise()
+    }){
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setWeightNoise(wn);
+      checkAppliedParameters(conf, wn, BaseLayer::getWeightNoise);
+    }
+  }
+
+
+  @Test
+  public void testOptimizationAlgo() throws Exception {
+    for (OptimizationAlgorithm optAlgo : OptimizationAlgorithm.values()){
+      // Skip deprecated optimization algorithms
+      if (optAlgo.equals(OptimizationAlgorithm.HESSIAN_FREE)){
+        continue;
+      }
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setOptimizationAlgo(optAlgo);
+      log.info(optAlgo.toString());
+      final Dl4jMlpClassifier clf = setupClf(conf);
+      final OptimizationAlgorithm actual = clf.getModel().conf().getOptimizationAlgo();
+      if(!actual.equals(optAlgo)){
+        failMessage.append(String.format("actual=%s,expected=%s", actual, optAlgo));
+      }
+    }
+  }
+
+  @Test
+  public void testBiasUpdater() throws Exception {
+    for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setBiasUpdater(updater);
+      checkAppliedParameters(conf, updater, BaseLayer::getBiasUpdater);
+    }
+  }
+  @Test
+  public void testUpdater() throws Exception {
+    for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setUpdater(updater);
+      checkAppliedParameters(conf, updater, BaseLayer::getIUpdater);
+    }
+  }
+
+  @Test
+  public void testWeightInit() throws Exception {
+    List<WeightInit> skipWeightInits = new ArrayList<>();
+    skipWeightInits.add(WeightInit.IDENTITY);
+    for (WeightInit wi : WeightInit.values()) {
+      if (skipWeightInits.contains(wi)) {
+        continue;
+      }
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setWeightInit(wi);
+      checkAppliedParameters(conf, wi, BaseLayer::getWeightInit);
+    }
+  }
+
+  @Test
+  public void testDropout() throws Exception {
+    for (AbstractDropout dropout :
+        new AbstractDropout[] {
+          new AlphaDropout(), new Dropout(), new GaussianDropout(), new GaussianNoise()
+        }) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setDropout(dropout);
+      checkAppliedParameters(conf, dropout, BaseLayer::getIDropout);
+    }
+  }
+
+  @Test
+  public void testL1() throws Exception {
+    for (double l1 : new double[] {0.0, 0.1, 1.0, 10}) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setL1(l1);
+      checkAppliedParameters(conf, l1, BaseLayer::getL1);
+    }
+  }
+
+  @Test
+  public void testL2() throws Exception {
+    for (double l2 : new double[] {0.0, 0.2, 2.0, 20}) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setL2(l2);
+      checkAppliedParameters(conf, l2, BaseLayer::getL2);
+    }
+  }
+
+  @Test
+  public void testBiasInit() throws Exception {
+    for (double biasInit : new double[] {0.0, 1.0, 10}) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setBiasInit(biasInit);
+      checkAppliedParameters(conf, biasInit, BaseLayer::getBiasInit);
+    }
+  }
+
+  @Test
+  public void testDistribution() throws Exception {
+    for (Distribution dist :
+        new Distribution[] {
+          new BinomialDistribution(), new NormalDistribution(), new UniformDistribution()
+        }) {
+      NeuralNetConfiguration conf = new NeuralNetConfiguration();
+      conf.setDist(dist);
+      conf.setWeightInit(WeightInit.DISTRIBUTION);
+      checkAppliedParameters(conf, dist, BaseLayer::getDist);
+    }
+  }
+
+  private void checkAppliedParameters(
+      NeuralNetConfiguration conf, Object expected, Function<BaseLayer, Object> getter)
+      throws Exception {
+    final List<BaseLayer> layers = getConfiguredLayers(conf);
+
+    for (BaseLayer layer : layers) {
+      final Object actual = getter.apply(layer);
+      if (expected instanceof ApiWrapper) {
+        expected = ((ApiWrapper) expected).getBackend();
+      }
+      if (!expected.equals(actual)) {
+        failMessage.append(
+            String.format("expected=%s, actual=%s, BaseLayer=%s\n", expected, actual, layer));
+      }
+    }
+  }
+
+  private List<BaseLayer> getConfiguredLayers(NeuralNetConfiguration conf) throws Exception {
+    Dl4jMlpClassifier clf = setupClf(conf);
+
+    return Arrays.stream(clf.getModel().getLayers())
+        .map(l -> (BaseLayer) l.conf().getLayer())
+        .collect(Collectors.toList());
+  }
+
+  private Dl4jMlpClassifier setupClf(NeuralNetConfiguration conf) throws Exception {
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    clf.setNeuralNetConfiguration(conf);
+
+    final ConvolutionLayer convolutionLayer = new ConvolutionLayer();
+    convolutionLayer.setNOut(2);
+    final DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(2);
+    final OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setNOut(2);
+    clf.setLayers(convolutionLayer, denseLayer, outputLayer);
+
+    final Instances data = DatasetLoader.loadMiniMnistMeta();
+    final ImageInstanceIterator iii = DatasetLoader.loadMiniMnistImageIterator();
+    clf.setInstanceIterator(iii);
+    clf.initializeClassifier(data);
+    return clf;
   }
 }

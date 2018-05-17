@@ -13,7 +13,6 @@ import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +46,7 @@ import weka.dl4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor;
 import weka.dl4j.text.tokenization.tokenizer.preprocessor.StemmingPreprocessor;
 import weka.dl4j.text.tokenization.tokenizerfactory.CharacterNGramTokenizerFactory;
 import weka.dl4j.text.tokenization.tokenizerfactory.TweetNLPTokenizerFactory;
+import weka.dl4j.updater.Adam;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
@@ -77,7 +77,7 @@ public class RnnSequenceClassifierTest {
   private static RnnTextEmbeddingInstanceIterator tii;
   private long startTime;
 
-  private FileStatsStorage fss;
+//  private FileStatsStorage fss;
 
   /** Initialize the text instance iterator */
   @BeforeClass
@@ -103,20 +103,20 @@ public class RnnSequenceClassifierTest {
     //    setupUi();
   }
 
-  private void setupUi() {
-    String dir = System.getenv("WEKA_HOME");
-    if (dir == null) {
-      dir = Paths.get(System.getenv("HOME"), "wekafiles").toAbsolutePath().toString();
-    }
-    final File dir1 = Paths.get(dir, "network-logs").toAbsolutePath().toFile();
-    dir1.mkdirs();
-    final String f =
-        Paths.get(dir1.toString(), name.getMethodName() + ".out").toAbsolutePath().toString();
-    final File f1 = new File(f);
-    f1.delete();
-    fss = new FileStatsStorage(f1);
-    TestUtil.startUiServer(fss);
-  }
+//  private void setupUi() {
+//    String dir = System.getenv("WEKA_HOME");
+//    if (dir == null) {
+//      dir = Paths.get(System.getenv("HOME"), "wekafiles").toAbsolutePath().toString();
+//    }
+//    final File dir1 = Paths.get(dir, "network-logs").toAbsolutePath().toFile();
+//    dir1.mkdirs();
+//    final String f =
+//        Paths.get(dir1.toString(), name.getMethodName() + ".out").toAbsolutePath().toString();
+//    final File f1 = new File(f);
+//    f1.delete();
+//    fss = new FileStatsStorage(f1);
+//    TestUtil.startUiServer(fss);
+//  }
 
   @After
   public void after() {
@@ -141,10 +141,11 @@ public class RnnSequenceClassifierTest {
     // Network config
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setL2(1e-5);
-    nnc.setUseRegularization(true);
     nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
     nnc.setGradientNormalizationThreshold(1.0);
-    nnc.setLearningRate(0.02);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
 
     // Config classifier
     clf.setLayers(lstm1, rnnOut);
@@ -162,14 +163,14 @@ public class RnnSequenceClassifierTest {
     rp.setInputFormat(data);
     data = Filter.useFilter(data, rp);
 
-    TestUtil.holdout(clf, data, 50, tii);
+    TestUtil.holdout(clf, data, 5, tii);
   }
 
   @Test
   public void testAngerRegression() throws Exception {
     // Define layers
     LSTM lstm1 = new LSTM();
-    lstm1.setNOut(32);
+    lstm1.setNOut(5);
     lstm1.setActivationFunction(new ActivationTanH());
 
     RnnOutputLayer rnnOut = new RnnOutputLayer();
@@ -179,26 +180,23 @@ public class RnnSequenceClassifierTest {
     // Network config
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setL2(1e-5);
-    nnc.setUseRegularization(true);
     nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
     nnc.setGradientNormalizationThreshold(1.0);
-    nnc.setLearningRate(0.02);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
 
-    tii.setTruncateLength(80);
     // Config classifier
     clf.setLayers(lstm1, rnnOut);
     clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(20);
-    clf.settBPTTforwardLength(20);
-    //    clf.setQueueSize(4);
-    clf.setNumEpochs(3);
-    final EpochListener l = new EpochListener();
-    l.setN(1);
-    clf.setIterationListener(l);
-    data = DatasetLoader.loadAnger();
+    clf.settBPTTbackwardLength(2);
+    clf.settBPTTforwardLength(2);
+    clf.setNumEpochs(1);
+
     // Randomize data
+    data = DatasetLoader.loadAnger();
     data.randomize(new Random(42));
-    TestUtil.holdout(clf, data, 33);
+    TestUtil.holdout(clf, data, 1);
   }
 
   @Test
@@ -215,10 +213,11 @@ public class RnnSequenceClassifierTest {
     // Network config
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setL2(1e-5);
-    nnc.setUseRegularization(true);
     nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
     nnc.setGradientNormalizationThreshold(1.0);
-    nnc.setLearningRate(0.02);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
 
     final RnnTextFilesEmbeddingInstanceIterator tfii = new RnnTextFilesEmbeddingInstanceIterator();
     tfii.setTextsLocation(DatasetLoader.loadAngerFilesDir());
@@ -232,16 +231,11 @@ public class RnnSequenceClassifierTest {
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
-    clf.setNumEpochs(3);
 
-    final EpochListener l = new EpochListener();
-    l.setN(1);
-    clf.setIterationListener(l);
-    clf.setEarlyStopping(new EarlyStopping(5, 10));
     data = DatasetLoader.loadAngerMeta();
     // Randomize data
     data.randomize(new Random(42));
-    TestUtil.holdout(clf, data, 33);
+    TestUtil.holdout(clf, data, 3);
   }
   @Test
   public void testRelationalDataset() throws Exception {
@@ -256,15 +250,15 @@ public class RnnSequenceClassifierTest {
 
     RnnOutputLayer rnnOut = new RnnOutputLayer();
     rnnOut.setLossFn(new LossMSE());
-    rnnOut.setActivationFunction(new ActivationIdentity());
 
     // Network config
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setL2(1e-5);
-    nnc.setUseRegularization(true);
     nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
     nnc.setGradientNormalizationThreshold(1.0);
-    nnc.setLearningRate(0.02);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
 
     final RelationalInstanceIterator rii = new RelationalInstanceIterator();
     rii.setTruncateLength(80);
@@ -277,13 +271,8 @@ public class RnnSequenceClassifierTest {
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(20);
     clf.settBPTTforwardLength(20);
-    clf.setNumEpochs(3);
 
-    final EpochListener l = new EpochListener();
-    l.setN(1);
-    clf.setIterationListener(l);
-    clf.setEarlyStopping(new EarlyStopping(5, 10));
-    TestUtil.holdout(clf, data, 33);
+    TestUtil.holdout(clf, data, 3);
   }
 
   @Test
@@ -374,7 +363,7 @@ public class RnnSequenceClassifierTest {
 
     RnnOutputLayer out = new RnnOutputLayer();
     out.setLossFn(new LossMSE());
-    out.setActivationFn(new ActivationIdentity());
+    out.setActivationFunction(new ActivationIdentity());
     clf.setLayers(out);
 
     // Create reversed attribute list
@@ -432,7 +421,7 @@ public class RnnSequenceClassifierTest {
   //            .updater(
   //                Updater
   //                    .ADAM) // To configure:
-  // .updater(Adam.builder().beta1(0.9).beta2(0.999).build())
+  // .updater(Adam.builder().beta1(0.9).beta2(0.999).getBackend())
   //            .regularization(true)
   //            .l2(1e-5)
   //            .weightInit(WeightInit.XAVIER)
@@ -446,7 +435,7 @@ public class RnnSequenceClassifierTest {
   //            .list()
   //            .layer(
   //                0, new
-  // LSTM.Builder().nIn(vectorSize).nOut(n).activation(Activation.TANH).build())
+  // LSTM.Builder().nIn(vectorSize).nOut(n).activation(Activation.TANH).getBackend())
   //            .layer(
   //                1,
   //                new org.deeplearning4j.nn.conf.layers.RnnOutputLayer.Builder()
@@ -454,10 +443,10 @@ public class RnnSequenceClassifierTest {
   //                    .lossFunction(LossFunctions.LossFunction.MCXENT)
   //                    .nIn(n)
   //                    .nOut(2)
-  //                    .build())
+  //                    .getBackend())
   //            .pretrain(false)
   //            .backprop(true)
-  //            .build();
+  //            .getBackend();
   //
   //    MultiLayerNetwork net = new MultiLayerNetwork(conf);
   //    net.init();

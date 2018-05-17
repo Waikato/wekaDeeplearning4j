@@ -42,7 +42,7 @@ public class EpochListener extends IterationListener implements TrainingListener
   private transient PrintWriter logFile;
 
   /** Enable intermediate evaluations */
-  private boolean enableIntermediateEvaluations = true;
+  private boolean isIntermediateEvaluationsEnabled = true;
 
   @Override
   public void onEpochEnd(Model model) {
@@ -55,7 +55,7 @@ public class EpochListener extends IterationListener implements TrainingListener
 
     String s = "Epoch [" + currentEpoch + "/" + numEpochs + "]\n";
 
-    if (enableIntermediateEvaluations) {
+    if (isIntermediateEvaluationsEnabled) {
       s += "Train Set:      \n" + evaluateDataSetIterator(model, trainIterator, true);
       if (validationIterator != null) {
         s += "Validation Set: \n" + evaluateDataSetIterator(model, validationIterator, false);
@@ -81,8 +81,8 @@ public class EpochListener extends IterationListener implements TrainingListener
       if (model instanceof ComputationGraph) {
         ComputationGraph net = (ComputationGraph) model;
 
-        Evaluation cEval = new Evaluation(numClasses);
-        RegressionEvaluation rEval = new RegressionEvaluation(numClasses);
+        Evaluation classificationEvaluation = new Evaluation(numClasses);
+        RegressionEvaluation regressionEvaluation = new RegressionEvaluation(numClasses);
         while (iterator.hasNext()) {
           DataSet next;
           // AsyncDataSetIterator and CachingDataSetIterator do not support next(num)
@@ -96,8 +96,8 @@ public class EpochListener extends IterationListener implements TrainingListener
           }
           INDArray output =
               net.outputSingle(next.getFeatureMatrix()); // get the networks prediction
-          if (isClassification) cEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
-          else rEval.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          if (isClassification) classificationEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          else regressionEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
         }
 
         // Add loss (denoted as score in dl4j)
@@ -113,15 +113,15 @@ public class EpochListener extends IterationListener implements TrainingListener
         // Add Dl4j metrics
         if (isClassification) {
           final String stats =
-              Arrays.stream(cEval.stats().split(System.lineSeparator()))
+              Arrays.stream(classificationEvaluation.stats().split(System.lineSeparator()))
                   .filter(line -> !line.contains("# of classes")) // Remove # classes line
                   .filter(line -> !line.contains("===")) // Remove separators
-                  .filter(line -> !line.contains("Examples labeled as")) // Remove confusion matrix
+                  .filter(line -> !line.contains("Predictions labeled as")) // Remove confusion matrix
                   .filter(line -> !line.trim().isEmpty()) // Remove empty lines
                   .collect(Collectors.joining(System.lineSeparator())); // Join to original format
           s += stats + System.lineSeparator();
         } else {
-          s += rEval.stats() + System.lineSeparator();
+          s += regressionEvaluation.stats() + System.lineSeparator();
         }
       }
     } catch (UnsupportedOperationException e) {
@@ -156,7 +156,7 @@ public class EpochListener extends IterationListener implements TrainingListener
   }
 
   @Override
-  public void iterationDone(Model model, int iteration) {}
+  public void iterationDone(Model model, int iteration, int epoch) {}
 
   @Override
   public void onEpochStart(Model model) {}
@@ -200,12 +200,12 @@ public class EpochListener extends IterationListener implements TrainingListener
     commandLineParamSynopsis = "-eval <boolean>",
     displayOrder = 0
   )
-  public boolean isEnableIntermediateEvaluations() {
-    return enableIntermediateEvaluations;
+  public boolean isIntermediateEvaluationsEnabled() {
+    return isIntermediateEvaluationsEnabled;
   }
 
-  public void setEnableIntermediateEvaluations(boolean enableIntermediateEvaluations) {
-    this.enableIntermediateEvaluations = enableIntermediateEvaluations;
+  public void setIntermediateEvaluationsEnabled(boolean intermediateEvaluationsEnabled) {
+    this.isIntermediateEvaluationsEnabled = intermediateEvaluationsEnabled;
   }
 
   /**

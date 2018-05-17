@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("ReLU")
-public class ActivationReLU extends org.nd4j.linalg.activations.impl.ActivationReLU
+public class ActivationReLU extends Activation<org.nd4j.linalg.activations.impl.ActivationReLU>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -705527390430410412L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationReLU();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

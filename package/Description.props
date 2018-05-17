@@ -3,7 +3,7 @@
 #
 
 # Package name (required)
-PackageName=wekaDeeplearning4j-CPU-{PLATFORM}
+PackageName=wekaDeeplearning4j{BUILD_SUFFIX}
 
 # Version (required)
 Version={VERSION}
@@ -17,7 +17,7 @@ Title=Weka wrappers for Deeplearning4j
 Category=Classification/Regression
 
 # Author (required)
-Author=Christopher Beckham, Eibe Frank, Mark Hall and Steven Lang
+Author=Christopher Beckham, Eibe Frank, Mark Hall, Steven Lang and Felipe Bravo
 
 # Maintainer (required)
 Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
@@ -27,25 +27,26 @@ License=GPL 3.0
 
 Description=Provides a wrapper classifier for feedforward networks, including convolutional networks, trained using the Deeplearning4j library. This package provides only CPU support. If you want to run the algorithms on GPU install the wekaDeeplearning4jGPU-dev package and make sure that you have set up CUDA correctly.
 
-Changes=Update api to dl4j 0.9.1
+Changes=Update Deeplearning4j API to dl4j 1.0.0
 
 # Package URL for obtaining the package archive (required)
-PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/wekaDeeplearning4j-CPU-{VERSION}-{PLATFORM}-x86_64.zip
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/{ZIP_NAME}
 
 # URL for further information
 URL=https://deeplearning.cms.waikato.ac.nz/
 
 # Dependencies
+#{PACKAGE_DEPENDENCIES}
 Depends=weka (>=3.8.0)
 
 # Package(s) that can't be installed alongside this one
 # - old wekaDeeplearning4j
 # - GPU version of this package (GPU-dev)
 # - other platforms inserted on build time
-Precludes=wekaDeeplearning4j, wekaDeeplearning4jCore, wekaDeeplearning4jCPU, wekaDeeplearning4jCPULibs, wekaDeeplearning4jGPU, wekaDeeplearning4jGPULibs, wekaDeeplearning4jGPU-dev, wekaDeeplearning4j-GPU-{PLATFORM}, {PRECLUDES}
+Precludes={PRECLUDES}
 
 # Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
-OSName={OSNAME}
+OSName={OS_NAME}
 
 # Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
 OSArch=64

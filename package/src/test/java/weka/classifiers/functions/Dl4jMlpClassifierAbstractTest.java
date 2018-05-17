@@ -2,7 +2,7 @@ package weka.classifiers.functions;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.dl4j.layers.Layer;
 import org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
@@ -30,8 +30,8 @@ public class Dl4jMlpClassifierAbstractTest extends AbstractClassifierTest {
     DenseLayer dl = new DenseLayer();
     dl.setNOut(2);
     OutputLayer ol = new OutputLayer();
-    ol.setLossFn(new LossSquaredHinge());
-    mlp.setLayers(new Layer[] {dl, ol});
+    ol.setLossFn(new weka.dl4j.lossfunctions.LossSquaredHinge());
+    mlp.setLayers(dl, ol);
     mlp.setNumEpochs(1);
     mlp.setEarlyStopping(new EarlyStopping(0, 0));
     return mlp;

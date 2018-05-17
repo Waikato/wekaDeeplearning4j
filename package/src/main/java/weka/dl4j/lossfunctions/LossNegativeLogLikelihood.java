@@ -34,7 +34,9 @@ import java.util.Enumeration;
  */
 @JsonTypeName("NegativeLogLikelihood")
 public class LossNegativeLogLikelihood
-    extends org.nd4j.linalg.lossfunctions.impl.LossNegativeLogLikelihood implements OptionHandler {
+    extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossNegativeLogLikelihood> implements OptionHandler {
+
+  private static final long serialVersionUID = 3210077897420167790L;
 
   /**
    * Returns an enumeration describing the available options.
@@ -67,5 +69,10 @@ public class LossNegativeLogLikelihood
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.lossfunctions.impl.LossNegativeLogLikelihood();
   }
 }

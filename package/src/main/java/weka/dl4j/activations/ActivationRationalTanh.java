@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("RationalTanh")
-public class ActivationRationalTanh extends org.nd4j.linalg.activations.impl.ActivationRationalTanh
+public class ActivationRationalTanh extends Activation<org.nd4j.linalg.activations.impl.ActivationRationalTanh>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -20670350590983508L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationRationalTanh();
+  }
   /**
    * Returns an enumeration describing the available options.
    *

@@ -33,9 +33,14 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("Softmax")
-public class ActivationSoftmax extends org.nd4j.linalg.activations.impl.ActivationSoftmax
+public class ActivationSoftmax extends Activation<org.nd4j.linalg.activations.impl.ActivationSoftmax>
     implements OptionHandler {
 
+  private static final long serialVersionUID = -1320311422396467738L;
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationSoftmax();
+  }
   /**
    * Returns an enumeration describing the available options.
    *
