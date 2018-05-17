@@ -28,8 +28,12 @@ import org.junit.rules.TestName;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.distribution.BinomialDistribution;
+import weka.dl4j.distribution.ConstantDistribution;
 import weka.dl4j.distribution.Distribution;
+import weka.dl4j.distribution.LogNormalDistribution;
 import weka.dl4j.distribution.NormalDistribution;
+import weka.dl4j.distribution.OrthogonalDistribution;
+import weka.dl4j.distribution.TruncatedNormalDistribution;
 import weka.dl4j.distribution.UniformDistribution;
 import weka.dl4j.dropout.AbstractDropout;
 import weka.dl4j.dropout.AlphaDropout;
@@ -37,17 +41,9 @@ import weka.dl4j.dropout.Dropout;
 import weka.dl4j.dropout.GaussianDropout;
 import weka.dl4j.dropout.GaussianNoise;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
-import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
-import weka.dl4j.layers.SubsamplingLayer;
-import weka.dl4j.schedules.ConstantSchedule;
-import weka.dl4j.stepfunctions.DefaultStepFunction;
-import weka.dl4j.stepfunctions.GradientStepFunction;
-import weka.dl4j.stepfunctions.NegativeDefaultStepFunction;
-import weka.dl4j.stepfunctions.NegativeGradientStepFunction;
 import weka.dl4j.updater.AdaDelta;
 import weka.dl4j.updater.AdaGrad;
 import weka.dl4j.updater.AdaMax;
@@ -132,7 +128,6 @@ public class NeuralNetConfigurationTest {
     String failMessage = "Failed Cases:\n" + fails;
     fail(failMessage);
   }
-
 
   @Test
   public void testSerialization() throws IOException, ClassNotFoundException {
@@ -224,20 +219,19 @@ public class NeuralNetConfigurationTest {
     return updaters;
   }
 
-
-
   @Test
   public void testGradientNormalizationThreshold() throws Exception {
     for (double gradientNormalizationThreshold : new double[] {0.0, 0.1, 1.0, 10}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setGradientNormalizationThreshold(gradientNormalizationThreshold);
-      checkAppliedParameters(conf, gradientNormalizationThreshold, BaseLayer::getGradientNormalizationThreshold);
+      checkAppliedParameters(
+          conf, gradientNormalizationThreshold, BaseLayer::getGradientNormalizationThreshold);
     }
   }
 
   @Test
-  public void testGradientNormalization() throws Exception{
-    for (GradientNormalization gn : GradientNormalization.values()){
+  public void testGradientNormalization() throws Exception {
+    for (GradientNormalization gn : GradientNormalization.values()) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setGradientNormalization(gn);
       checkAppliedParameters(conf, gn, BaseLayer::getGradientNormalization);
@@ -245,23 +239,20 @@ public class NeuralNetConfigurationTest {
   }
 
   @Test
-  public void testWeightNoise() throws Exception{
-    for (AbstractWeightNoise wn : new AbstractWeightNoise[]{
-        new DropConnect(),
-        new WeightNoise()
-    }){
+  public void testWeightNoise() throws Exception {
+    for (AbstractWeightNoise wn :
+        new AbstractWeightNoise[] {new DropConnect(), new WeightNoise()}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setWeightNoise(wn);
       checkAppliedParameters(conf, wn, BaseLayer::getWeightNoise);
     }
   }
 
-
   @Test
   public void testOptimizationAlgo() throws Exception {
-    for (OptimizationAlgorithm optAlgo : OptimizationAlgorithm.values()){
+    for (OptimizationAlgorithm optAlgo : OptimizationAlgorithm.values()) {
       // Skip deprecated optimization algorithms
-      if (optAlgo.equals(OptimizationAlgorithm.HESSIAN_FREE)){
+      if (optAlgo.equals(OptimizationAlgorithm.HESSIAN_FREE)) {
         continue;
       }
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
@@ -269,7 +260,7 @@ public class NeuralNetConfigurationTest {
       log.info(optAlgo.toString());
       final Dl4jMlpClassifier clf = setupClf(conf);
       final OptimizationAlgorithm actual = clf.getModel().conf().getOptimizationAlgo();
-      if(!actual.equals(optAlgo)){
+      if (!actual.equals(optAlgo)) {
         failMessage.append(String.format("actual=%s,expected=%s", actual, optAlgo));
       }
     }
@@ -283,6 +274,7 @@ public class NeuralNetConfigurationTest {
       checkAppliedParameters(conf, updater, BaseLayer::getBiasUpdater);
     }
   }
+
   @Test
   public void testUpdater() throws Exception {
     for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
@@ -349,7 +341,13 @@ public class NeuralNetConfigurationTest {
   public void testDistribution() throws Exception {
     for (Distribution dist :
         new Distribution[] {
-          new BinomialDistribution(), new NormalDistribution(), new UniformDistribution()
+          new ConstantDistribution(),
+          new LogNormalDistribution(),
+          new OrthogonalDistribution(),
+          new TruncatedNormalDistribution(),
+          new BinomialDistribution(),
+          new NormalDistribution(),
+          new UniformDistribution()
         }) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setDist(dist);

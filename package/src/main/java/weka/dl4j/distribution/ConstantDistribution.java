@@ -22,6 +22,7 @@
 package weka.dl4j.distribution;
 
 import java.util.Enumeration;
+import lombok.EqualsAndHashCode;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -33,6 +34,7 @@ import weka.core.OptionMetadata;
  * @author Eibe Frank
  */
 @JsonTypeName("constant")
+@EqualsAndHashCode(callSuper = true)
 public class ConstantDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.ConstantDistribution> implements OptionHandler {
 
 
