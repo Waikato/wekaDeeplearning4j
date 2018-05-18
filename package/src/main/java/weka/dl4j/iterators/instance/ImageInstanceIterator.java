@@ -35,8 +35,6 @@ import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InvalidObjectException;
 
 /**
  * An iterator that loads images.
@@ -45,7 +43,8 @@ import java.io.InvalidObjectException;
  * @author Eibe Frank
  * @author Steven Lang
  */
-public class ImageInstanceIterator extends AbstractInstanceIterator implements Convolutional {
+public class ImageInstanceIterator extends AbstractInstanceIterator implements
+    ConvolutionalIterator {
 
   /** The version ID used for serializing objects of this class */
   private static final long serialVersionUID = -3701309032945158130L;
