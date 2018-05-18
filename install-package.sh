@@ -80,7 +80,8 @@ java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${main_
 
 if [[ ! -z ${cuda_version} ]]; then
   cuda_zip_name=wekaDeeplearning4j-cuda-${cuda_version}-${version}-${platform}-x86_64.zip
-  java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${cuda_zip_name}
+  cd ..
+  ./cuda-scripts/install-cuda-libs.sh package/dist/$cuda_zip_name
 fi
 
 if [ $? -eq 0 ]; then
