@@ -54,31 +54,34 @@ public class StemmingPreprocessor
     return "This tokenizer preprocessor implements basic cleaning inherited from CommonPreprocessor + does stemming using a Weka Stemmer.\n";
   }
 
-  /* (non-Javadoc)
-   * @see weka.filters.Filter#listOptions()
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
-
-  /* (non-Javadoc)
-   * @see weka.filters.Filter#getOptions()
-   */
-  @Override
-  public String[] getOptions() {
-    return Option.getOptions(this, this.getClass());
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**
-   * Parses the options for this object.
+   * Gets the current settings of the Classifier.
    *
-   * @param options the options to use
-   * @throws Exception if setting of options fails
+   * @return an array of strings suitable for passing to setOptions
    */
   @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
   public void setOptions(String[] options) throws Exception {
-    Option.setOptions(options, this, this.getClass());
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 
   /* (non-Javadoc)

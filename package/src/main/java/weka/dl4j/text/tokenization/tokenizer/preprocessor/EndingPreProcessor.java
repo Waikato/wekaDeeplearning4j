@@ -48,27 +48,33 @@ public class EndingPreProcessor
     return "Gets rid of endings: ed,ing, ly, s, ..\n";
   }
 
-  /* (non-Javadoc)
-   * @see weka.core.OptionHandler#listOptions()
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClass(this.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
-  /* (non-Javadoc)
-   * @see weka.core.OptionHandler#getOptions()
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
    */
   @Override
   public String[] getOptions() {
-    return Option.getOptions(this, this.getClass());
+    return Option.getOptionsForHierarchy(this, super.getClass());
   }
 
-  /* (non-Javadoc)
-   * @see weka.core.OptionHandler#setOptions(java.lang.String[])
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
    */
-  @Override
   public void setOptions(String[] options) throws Exception {
-    Option.setOptions(options, this, this.getClass());
+    Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 }
