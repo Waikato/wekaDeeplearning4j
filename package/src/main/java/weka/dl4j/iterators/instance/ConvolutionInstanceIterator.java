@@ -41,7 +41,8 @@ import java.util.Enumeration;
  * @author Eibe Frank
  * @author Steven Lang
  */
-public class ConvolutionInstanceIterator extends DefaultInstanceIterator implements Convolutional {
+public class ConvolutionInstanceIterator extends DefaultInstanceIterator implements
+    ConvolutionalIterator {
 
   /** The version ID used for serializing objects of this class */
   private static final long serialVersionUID = -3101209034945158130L;
