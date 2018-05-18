@@ -5,7 +5,7 @@ package weka.dl4j.iterators.instance;
  *
  * @author Steven Lang
  */
-public interface Convolutional {
+public interface ConvolutionalIterator {
 
   int getHeight();
 
