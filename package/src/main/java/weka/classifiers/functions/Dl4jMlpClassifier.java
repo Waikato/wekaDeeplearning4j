@@ -79,7 +79,7 @@ import weka.dl4j.CacheMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.Convolutional;
+import weka.dl4j.iterators.instance.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
@@ -378,7 +378,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
     final boolean containsConvLayer = layerSet.stream().allMatch(this::isNDLayer);
 
-    final boolean isConvItertor = getInstanceIterator() instanceof Convolutional;
+    final boolean isConvItertor = getInstanceIterator() instanceof ConvolutionalIterator;
     if (containsConvLayer && !isConvItertor) {
       throw new InvalidNetworkArchitectureException(
           "A convolution/subsampling layer was set using "
@@ -1045,12 +1045,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
             cl);
       }
 
-      if (vectorSize % cl.getStrideY() != 0) {
+      if (vectorSize % cl.getStrideColumns() != 0) {
         throw new InvalidLayerConfigurationException(
             "Wordvector size ("
                 + vectorSize
                 + ") must be divisible by stride column size ("
-                + cl.getStrideY()
+                + cl.getStrideColumns()
                 + ").",
             cl);
       }

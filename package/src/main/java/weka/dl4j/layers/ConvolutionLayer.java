@@ -103,8 +103,8 @@ public class ConvolutionLayer
   @OptionMetadata(
     displayName = "number of rows in kernel",
     description = "The number of rows in the kernel (default = 5).",
-    commandLineParamName = "kernelSizeX",
-    commandLineParamSynopsis = "-kernelSizeX <int>",
+    commandLineParamName = "rows",
+    commandLineParamSynopsis = "-rows <int>",
     displayOrder = 4
   )
   public int getKernelSizeX() {
@@ -119,8 +119,8 @@ public class ConvolutionLayer
   @OptionMetadata(
     displayName = "number of columns in kernel",
     description = "The number of columns in the kernel (default = 5).",
-    commandLineParamName = "kernelSizeY",
-    commandLineParamSynopsis = "-kernelSizeY <int>",
+    commandLineParamName = "columns",
+    commandLineParamSynopsis = "-columns <int>",
     displayOrder = 5
   )
   public int getKernelSizeY() {
@@ -144,16 +144,16 @@ public class ConvolutionLayer
   @OptionMetadata(
     displayName = "number of rows in stride",
     description = "The number of rows in the stride (default = 1).",
-    commandLineParamName = "strideX",
-    commandLineParamSynopsis = "-strideX <int>",
+    commandLineParamName = "strideRows",
+    commandLineParamSynopsis = "-strideRows <int>",
     displayOrder = 6
   )
-  public int getStrideX() {
+  public int getStrideRows() {
     return backend.getStride()[0];
   }
 
-  public void setStrideX(int strideX) {
-    int[] stride = new int[] {strideX, getStrideY()};
+  public void setStrideRows(int rows) {
+    int[] stride = new int[] {rows, getStrideColumns()};
     backend.setStride(stride);
   }
 
@@ -169,32 +169,32 @@ public class ConvolutionLayer
   @OptionMetadata(
     displayName = "number of columns in stride",
     description = "The number of columns in the stride (default = 1).",
-    commandLineParamName = "strideY",
-    commandLineParamSynopsis = "-strideY <int>",
+    commandLineParamName = "strideColumns",
+    commandLineParamSynopsis = "-strideColumns <int>",
     displayOrder = 7
   )
-  public int getStrideY() {
+  public int getStrideColumns() {
     return backend.getStride()[1];
   }
 
-  public void setStrideY(int strideY) {
-    int[] stride = new int[] {getStrideX(), strideY};
+  public void setStrideColumns(int columns) {
+    int[] stride = new int[] {getStrideRows(), columns};
     backend.setStride(stride);
   }
 
   @OptionMetadata(
     displayName = "number of rows in padding",
     description = "The number of rows in the padding (default = 0).",
-    commandLineParamName = "paddingX",
-    commandLineParamSynopsis = "-paddingX <int>",
+    commandLineParamName = "paddingRows",
+    commandLineParamSynopsis = "-paddingRows <int>",
     displayOrder = 8
   )
-  public int getPaddingX() {
+  public int getPaddingRows() {
     return backend.getPadding()[0];
   }
 
-  public void setPaddingX(int padding) {
-    int[] pad = new int[] {padding, getPaddingY()};
+  public void setPaddingRows(int padding) {
+    int[] pad = new int[] {padding, getPaddingColumns()};
     backend.setPadding(pad);
   }
 
@@ -210,16 +210,16 @@ public class ConvolutionLayer
   @OptionMetadata(
     displayName = "number of columns in padding",
     description = "The number of columns in the padding (default = 0).",
-    commandLineParamName = "paddingY",
-    commandLineParamSynopsis = "-paddingY <int>",
+    commandLineParamName = "paddingColumns",
+    commandLineParamSynopsis = "-paddingColumns <int>",
     displayOrder = 9
   )
-  public int getPaddingY() {
+  public int getPaddingColumns() {
     return backend.getPadding()[1];
   }
 
-  public void setPaddingY(int padding) {
-    int[] pad = new int[] {getPaddingX(), padding};
+  public void setPaddingColumns(int padding) {
+    int[] pad = new int[] {getPaddingRows(), padding};
     backend.setPadding(pad);
   }
 
