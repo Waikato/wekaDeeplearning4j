@@ -159,7 +159,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
 
   @OptionMetadata(
       displayName = "number of rows in stride",
-      description = "The number of rows in the stride (default = 1).",
+      description = "The stride along the rows (default = 1).",
       commandLineParamName = "strideRows",
       commandLineParamSynopsis = "-strideRows <int>",
       displayOrder = 6
@@ -184,7 +184,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
 
   @OptionMetadata(
       displayName = "number of columns in stride",
-      description = "The number of columns in the stride (default = 1).",
+      description = "The stride along the columns (default = 1).",
       commandLineParamName = "strideColumns",
       commandLineParamSynopsis = "-strideColumns <int>",
       displayOrder = 7
