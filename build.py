@@ -11,6 +11,7 @@ from glob import glob
 
 CUDA_VERSIONS = ['8.0', '9.0', '9.1']
 PLATFORMS = ['linux', 'macosx', 'windows']
+PROGRESS = 0.0
 
 
 class bcolors:
@@ -24,17 +25,30 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py{bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
-
-
 def printout(out: str = ''):
+    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {PROGRESS*100:2.0f}%{bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
     for line in out.split('\n'):
         print(f'{ep}{line}')
 
 
 def printerr(out: str):
+    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
     for line in out.split('\n'):
         print(f'{ep}{bcolors.FAIL}{line}{bcolors.ENDC}')
+
+
+def update_progress():
+    global PROGRESS
+    steps = get_max_progress_steps()
+    PROGRESS = PROGRESS + (1.0 / steps)
+
+
+def get_max_progress_steps() -> int:
+    if opts.build_all:
+        # 1 main, 3x3 cuda, each three times in the build phase
+        return 3 * (1 + 9)
+    else:
+        return 3 * 1
 
 
 def parse_args() -> argparse.Namespace:
@@ -133,11 +147,13 @@ def edit_description_props(
 
 
 def build_main_package():
-    printout(f'Building main package for {bcolors.BOLD}CPU{bcolors.ENDC} (all platforms)')
+    printout(
+        f'Building main package for {bcolors.BOLD}CPU{bcolors.ENDC} (all platforms)')
     clean_dirs()
     printout('Pulling dependencies')
     cmd = 'mvn -q -Dmaven.javadoc.skip=true -DskipTests=true dependency:resolve process-sources'
     exec_cmd(cmd)
+    update_progress()
 
     os.makedirs(f'dist/{package_main_name}/lib', exist_ok=True)
 
@@ -157,6 +173,7 @@ def build_main_package():
 
     copy_files_with_exclusions(src='lib/', dst=f'dist/{package_main_name}/lib',
                                excludes=excludes)
+    update_progress()
 
     dst = f'dist/{package_main_name}/'
     shutil.copy2('Description.props', dst)
@@ -184,19 +201,23 @@ def build_main_package():
       -Dpackage_name="{package_main_name}" \
       -Dzip_name="{zip_name}"'
     exec_cmd(cmd)
+    update_progress()
 
     printout('Successfully finished building main package')
 
 
 def build_cuda_package(cuda_version: str, platform: str):
-    printout(f'Building package for {bcolors.BOLD}CUDA {cuda_version} ({platform}){bcolors.ENDC}')
+    printout(
+        f'Building package for {bcolors.BOLD}CUDA {cuda_version} ({platform}){bcolors.ENDC}')
     clean_dirs()
-    platform_exclude_1, platform_exclude_2 = get_inverted_platform_selection(platform)
+    platform_exclude_1, platform_exclude_2 = get_inverted_platform_selection(
+        platform)
     package_name = f'{basename}-cuda-{cuda_version}-{version}-{platform}'
 
     printout('Pulling dependencies')
     mvn_get_dependencies_cmd = f'mvn -q -Dmaven.javadoc.skip=true -DskipTests=true dependency:resolve process-sources -P cuda-{cuda_version}'
     exec_cmd(mvn_get_dependencies_cmd)
+    update_progress()
 
     os.makedirs(f'dist/{package_name}/lib/', exist_ok=True)
     src = 'lib/'
@@ -215,23 +236,17 @@ def build_cuda_package(cuda_version: str, platform: str):
                 "*win-i686*.jar"]
     includes = ['*cuda-*']
     copy_files_with_inclusions_and_exclusions(src, f'{dst}/lib',
-                                              includes=includes, excludes=excludes)
+                                              includes=includes,
+                                              excludes=excludes)
+    update_progress()
 
-    shutil.copy2('Description.props', dst)
-
-    build_suffix = f'-cuda-{cuda_version}-{platform}'
     zip_name = f'{basename}-cuda-{cuda_version}-{version}-{platform}-x86_64.zip'
-    precludes = 'TODO'
-
-    os_name = get_os_name(platform)
-    edit_description_props(package_name, build_suffix, zip_name, platform,
-                           os_name, precludes)
-
     printout(f'Building {zip_name} with ant')
     ant_build_pkg_cmd = f'ant -f build_package.xml make_package_cuda \
       -Dpackage_name="{package_name}" \
       -Dzip_name="{zip_name}"'
     exec_cmd(ant_build_pkg_cmd)
+    update_progress()
 
     printout(f'Successfully finished building CUDA {cuda_version} ({platform})')
 
@@ -242,7 +257,8 @@ def ensure_dir_ending(path: str):
     return path
 
 
-def copy_files_with_inclusions_and_exclusions(src: str, dst: str, excludes: Iterable,
+def copy_files_with_inclusions_and_exclusions(src: str, dst: str,
+    excludes: Iterable,
     includes: Iterable):
     src = ensure_dir_ending(src)
     dst = ensure_dir_ending(dst)
@@ -335,10 +351,10 @@ if __name__ == '__main__':
 
     # If opts.build_all flag is set, build all combinations between the cuda
     # versions and the platforms
-    printout('-'*60)
+    printout('-' * 60)
     if opts.build_all:
         for cuda_version in CUDA_VERSIONS:
             for platform in PLATFORMS:
                 build_cuda_package(cuda_version, platform)
-                printout('-'*60)
+                printout('-' * 60)
         sys.exit(0)
