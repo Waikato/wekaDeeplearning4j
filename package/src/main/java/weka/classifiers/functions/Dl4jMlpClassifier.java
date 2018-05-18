@@ -1026,12 +1026,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
                 + cl.getKernelSizeX(),
             cl);
       }
-      if (truncateLength < cl.getStrideX()) {
+      if (truncateLength < cl.getStrideRows()) {
         throw new InvalidLayerConfigurationException(
             "Stride row size must be smaller than truncation length. Truncation length was "
                 + truncateLength
                 + ". Stride row size was "
-                + cl.getStrideX(),
+                + cl.getStrideColumns(),
             cl);
       }
 
