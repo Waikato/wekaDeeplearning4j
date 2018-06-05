@@ -144,7 +144,7 @@ coverage-report/
 *.bin.gz
 
 # Testing class
-/package/src/main/java/weka/Main.java
+Main.java
 
 # build dir for make_zips.sh
 build/
