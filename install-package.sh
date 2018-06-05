@@ -5,8 +5,6 @@ set -e
 cuda_version=""
 version=$(cat version)
 
-cd package
-
 
 function show_usage {
     echo -e "Usage: build.sh"

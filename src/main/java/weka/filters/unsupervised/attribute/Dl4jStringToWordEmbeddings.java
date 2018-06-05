@@ -33,6 +33,7 @@ import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
 import weka.dl4j.text.stopwords.Dl4jNull;
 import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import weka.dl4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
 import java.io.IOException;
@@ -112,7 +113,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
    */
   @Override
   public void setOptions(String[] options) throws Exception {
-    Option.setOptions(options, this, this.getClass());
+    Option.setOptionsForHierarchy(options, this, Filter.class);
   }
 
   /* (non-Javadoc)

@@ -5,13 +5,13 @@ rm -r ${build_dir}
 mkdir ${build_dir}
 mkdir -p ${build_dir}/props
 function copy_files {
-	for f in package/dist/*/;
+	for f in dist/*/;
 	do 
 		ffixed=`cut -d'/' -f3 <(echo $f)`
 		mkdir ${build_dir}/props/$ffixed
-		cp package/dist/$ffixed/Description.props ${build_dir}/props/$ffixed/
+		cp dist/$ffixed/Description.props ${build_dir}/props/$ffixed/
 	done
-	cp package/dist/*.zip ${build_dir} 
+	cp dist/*.zip ${build_dir}
 }
 ./build.py -a
 copy_files

@@ -26,7 +26,7 @@ class bcolors:
 
 
 def printout(out: str = ''):
-    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {PROGRESS*100:2.0f}%{bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
+    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {PROGRESS*100:3.0f}%{bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
     for line in out.split('\n'):
         print(f'{ep}{line}')
 
@@ -332,10 +332,7 @@ if __name__ == '__main__':
     basename = 'wekaDeeplearning4j'
     version = get_version()
     package_main_name = f'{basename}-{version}'
-    package_dir = 'package'
 
-    # Setup
-    os.chdir(package_dir)
     exec_cmd('ant -f build_package.xml clean', exit_on_error=False)
     clean_dirs()
 

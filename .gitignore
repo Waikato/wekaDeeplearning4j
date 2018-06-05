@@ -148,3 +148,6 @@ coverage-report/
 
 # build dir for make_zips.sh
 build/
+
+# Python environments
+env/
