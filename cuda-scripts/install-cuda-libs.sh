@@ -14,6 +14,11 @@ zip_name="wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip"
 selected_download=$1
 
 
+if [[ ${cuda_version} != "8.0" && ${cuda_version} != "9.0"  && ${cuda_version} != "9.1" ]]; then
+  echo -e "Could not detect CUDA version. Is CUDA installed?"
+  exit 1
+fi
+
 if [[ -z "${WEKA_HOME}" ]]; then
   weka_home="${HOME}/wekafiles"
 else
@@ -43,3 +48,4 @@ unzip -q ${zip_name} -d out
 cp out/lib/* ${WEKA_HOME}/packages/wekaDeeplearning4j/lib/
 rm -r out
 echo -e "Successfully installed the CUDA libraries to the wekaDeeplearning4j package!"
+echo -e "To remove the CUDA libraries, run the 'uninstall-cuda-libs.sh' script."

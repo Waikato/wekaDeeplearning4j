@@ -10,8 +10,12 @@ $zip_name = "wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip
 $url = "https://github.com/Waikato/wekaDeeplearning4j/releases/download/v$version/$zip_name"
 $output = $( Join-Path $PSScriptRoot $zip_name )
 
-
-
+# Check if cuda_version could be detected
+if ($cuda_version != "8.0" -and $cuda_version != "9.0" -and $cuda_version != "9.1")
+{
+    Write-Output "Could not detect CUDA version. Is CUDA installed?"
+    exit
+}
 
 # Set weka_home
 if (-not(Test-Path env:WEKA_HOME))
@@ -60,3 +64,4 @@ $copy_to = [io.path]::combine($weka_home, "packages", "wekaDeeplearning4j", "lib
 Copy-Item -Path $copy_from -Destination $copy_to
 Remove-Item $out_dir -recurse
 Write-Output "Successfully installed the CUDA libraries to the wekaDeeplearning4j package!"
+Write-Output "To remove the CUDA libraries, run the 'uninstall-cuda-libs.sh' script."
