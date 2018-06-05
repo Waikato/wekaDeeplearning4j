@@ -27,7 +27,7 @@ public class ApiWrapperUtil {
         final Class<? extends V> backendClass = getBackendClass(cl);
 
         if (backendClass.equals(newBackend.getClass())) {
-          return instantiateBackend(newBackend, cl);
+          return createWrapperObject(newBackend, cl);
         }
       }
 
@@ -48,8 +48,8 @@ public class ApiWrapperUtil {
     }
   }
 
-  /** Instantiate the given backend class. */
-  private static <T extends ApiWrapper<V>, V> T instantiateBackend(
+  /** Instantiate the given wrapper object. */
+  private static <T extends ApiWrapper<V>, V> T createWrapperObject(
       V newBackend, Class<? extends T> cl) throws InstantiationException, IllegalAccessException {
     T obj = cl.newInstance();
     obj.setBackend(newBackend);
