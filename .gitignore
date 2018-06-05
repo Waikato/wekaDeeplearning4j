@@ -151,3 +151,6 @@ build/
 
 # Python environments
 env/
+
+# Ignore downloaded imdb dataset
+/src/test/resources/nominal/imdb.arff
