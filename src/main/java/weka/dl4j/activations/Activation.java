@@ -2,12 +2,16 @@ package weka.dl4j.activations;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.nd4j.linalg.activations.IActivation;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
 
+@EqualsAndHashCode
+@ToString
 public abstract class Activation<T extends IActivation>
     implements ApiWrapper<T>, OptionHandler, Serializable {
 

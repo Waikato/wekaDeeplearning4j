@@ -2,12 +2,16 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
 
+@EqualsAndHashCode
+@ToString
 public abstract class Layer<T extends org.deeplearning4j.nn.conf.layers.Layer>
     implements ApiWrapper<T>, OptionHandler, Serializable {
 
