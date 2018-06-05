@@ -6,13 +6,13 @@ org.deeplearning4j.optimize.api.IterationListener=weka.gui.GenericObjectEditor
 
 org.deeplearning4j.optimize.api.IterationListener[]=weka.gui.GenericArrayEditor
 
-org.deeplearning4j.nn.conf.distribution.Distribution=weka.gui.GenericObjectEditor
+weka.dl4j.distribution.Distribution=weka.gui.GenericObjectEditor
 
 org.deeplearning4j.nn.conf.stepfunctions.StepFunction=weka.gui.GenericObjectEditor
 
 weka.dl4j.NeuralNetConfiguration=weka.gui.GenericObjectEditor
 
-org.nd4j.linalg.lossfunctions.ILossFunction=weka.gui.GenericObjectEditor
+weka.dl4j.lossfunctions.LossFunction=weka.gui.GenericObjectEditor
 
 weka.dl4j.iterators.instance.AbstractInstanceIterator=weka.gui.GenericObjectEditor
 
@@ -23,9 +23,6 @@ weka.dl4j.activations.Activation=weka.gui.GenericObjectEditor
 weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor
 
 weka.dl4j.earlystopping.EarlyStopping=weka.gui.GenericObjectEditor
-
-org.nd4j.linalg.learning.config.IUpdater=weka.gui.GenericObjectEditor
-
 
 weka.dl4j.updater.Updater=weka.gui.GenericObjectEditor
 
