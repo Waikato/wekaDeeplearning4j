@@ -47,6 +47,8 @@ def get_max_progress_steps() -> int:
     if opts.build_all:
         # 1 main, 3x3 cuda, each three times in the build phase
         return 3 * (1 + 9)
+    elif opts.cuda_version:
+        return 6 * 1
     else:
         return 3 * 1
 
