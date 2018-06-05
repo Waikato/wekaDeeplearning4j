@@ -145,6 +145,13 @@
       <artifactId>nd4j-native-api</artifactId>
       <version>${nd4j.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.fracpete</groupId>
+      <artifactId>inetutils4j</artifactId>
+      <version>0.0.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <profiles>

@@ -1,11 +1,18 @@
 package weka.util;
 
+import com.github.fracpete.inetutils4j.api.Internet;
+import com.github.fracpete.inetutils4j.core.DefaultCapture;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -150,7 +157,52 @@ public class DatasetLoader {
    * @throws Exception IO error.
    */
   public static Instances loadImdb() throws Exception {
-    return loadArff("src/test/resources/nominal/imdb.arff");
+    String imdbResourcePath = "src/test/resources/nominal/imdb.arff";
+    File imdbFile = new File(imdbResourcePath);
+
+    // Check if file is already downloaded
+    if (!imdbFile.exists()){
+      String tmpDir = System.getProperty("java.io.tmpdir");
+
+      // Download file
+      String downloadURL = "https://cfhcable.dl.sourceforge.net/project/weka/datasets/text-datasets/imdb-sentiment-2011.arff.gz";
+      String gzipPath = Paths.get(tmpDir, "imdb.arff.gz").toString();
+      String data = Internet.download(
+          downloadURL,
+          gzipPath,
+          true,
+          new DefaultCapture());
+        log.info("Download finished");
+        gunzip(gzipPath, imdbResourcePath);
+    }
+    return loadArff(imdbResourcePath);
+  }
+
+  /**
+   * GZIP unzip from: https://www.mkyong.com/java/how-to-decompress-file-from-gzip-file/
+   */
+  public static void gunzip(String inputPath, String outputPath){
+
+    byte[] buffer = new byte[1024];
+
+    try{
+
+      GZIPInputStream gzis =
+          new GZIPInputStream(new FileInputStream(inputPath));
+
+      FileOutputStream out =
+          new FileOutputStream(outputPath);
+
+      int len;
+      while ((len = gzis.read(buffer)) > 0) {
+        out.write(buffer, 0, len);
+      }
+
+      gzis.close();
+      out.close();
+    }catch(IOException ex){
+      ex.printStackTrace();
+    }
   }
 
   /**
