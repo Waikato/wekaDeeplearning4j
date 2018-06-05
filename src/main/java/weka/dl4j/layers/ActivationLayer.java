@@ -22,6 +22,7 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import org.nd4j.linalg.activations.impl.ActivationReLU;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -107,5 +108,6 @@ public class ActivationLayer extends Layer<org.deeplearning4j.nn.conf.layers.Act
   @Override
   public void initializeBackend() {
     this.backend = new org.deeplearning4j.nn.conf.layers.ActivationLayer();
+    this.backend.setActivationFn(new ActivationReLU());
   }
 }
