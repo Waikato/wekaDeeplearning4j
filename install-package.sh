@@ -78,8 +78,7 @@ java -cp ${CLASSPATH} weka.core.WekaPackageManager -install-package dist/${main_
 
 if [[ ! -z ${cuda_version} ]]; then
   cuda_zip_name=wekaDeeplearning4j-cuda-${cuda_version}-${version}-${platform}-x86_64.zip
-  cd ..
-  ./cuda-scripts/install-cuda-libs.sh package/dist/$cuda_zip_name
+  ./cuda-scripts/install-cuda-libs.sh dist/${cuda_zip_name}
 fi
 
 if [ $? -eq 0 ]; then
@@ -87,5 +86,3 @@ if [ $? -eq 0 ]; then
 else
     echo -e "Installation failed"
 fi
-
-cd ..
