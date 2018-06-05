@@ -22,6 +22,7 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import org.deeplearning4j.nn.conf.dropout.Dropout;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -50,6 +51,7 @@ public class DropoutLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.la
   @Override
   public void initializeBackend() {
     backend= new org.deeplearning4j.nn.conf.layers.DropoutLayer();
+    backend.setIDropout(new Dropout(0.8));
   }
 
   @OptionMetadata(
