@@ -65,7 +65,7 @@ public class BinomialDistribution
     displayOrder = 1
   )
   public double getNumberOfTrials() {
-    return backend.getNumberOfTrials();
+    return numberOfTrials;
   }
 
   public void setNumberOfTrials(int numberOfTrials) {
