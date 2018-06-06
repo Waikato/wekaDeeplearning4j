@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.deeplearning4j.nn.conf.ConvolutionMode;
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,54 +15,54 @@ import org.junit.Test;
  */
 public class ConvolutionLayerTest extends AbstractFeedForwardLayerTest<ConvolutionLayer> {
 
-  @Before
+
   @Override
-  public void initialize() {
-    layer = new ConvolutionLayer();
+  public ConvolutionLayer getApiWrapper() {
+    return new  ConvolutionLayer();
   }
 
   @Test
   public void testConvolutionMode() {
     for (ConvolutionMode mode : ConvolutionMode.values()) {
-      initialize();
-      layer.setConvolutionMode(mode);
+      getApiWrapper();
+      wrapper.setConvolutionMode(mode);
 
-      assertEquals(mode, layer.getConvolutionMode());
+      assertEquals(mode, wrapper.getConvolutionMode());
     }
   }
 
   @Test
   public void testCudnnAlgoMode() {
     for (AlgoMode mode : AlgoMode.values()) {
-      initialize();
-      layer.setCudnnAlgoMode(mode);
+      getApiWrapper();
+      wrapper.setCudnnAlgoMode(mode);
 
-      assertEquals(mode, layer.getCudnnAlgoMode());
+      assertEquals(mode, wrapper.getCudnnAlgoMode());
     }
   }
 
   @Test
   public void testKernelSize(){
     int[] size = {20,20};
-    layer.setKernelSize(size);
+    wrapper.setKernelSize(size);
 
-    assertArrayEquals(size, layer.getKernelSize());
+    assertArrayEquals(size, wrapper.getKernelSize());
   }
 
   @Test
   public void testStrideSize(){
     int[] size = {20,20};
-    layer.setStride(size);
+    wrapper.setStride(size);
 
-    assertArrayEquals(size, layer.getStride());
+    assertArrayEquals(size, wrapper.getStride());
 
   }
   @Test
   public void testPaddingSize(){
     int[] size = {20,20};
-    layer.setPadding(size);
+    wrapper.setPadding(size);
 
-    assertArrayEquals(size, layer.getPadding());
+    assertArrayEquals(size, wrapper.getPadding());
 
   }
 

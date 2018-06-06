@@ -4,7 +4,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,71 +15,70 @@ import org.junit.Test;
  */
 public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
 
-  @Before
   @Override
-  public void initialize() {
-    layer = new SubsamplingLayer();
+  public SubsamplingLayer getApiWrapper() {
+    return new  SubsamplingLayer();
   }
 
   @Test
   public void testConvolutionMode() {
     for (ConvolutionMode mode : ConvolutionMode.values()) {
-      initialize();
-      layer.setConvolutionMode(mode);
+      getApiWrapper();
+      wrapper.setConvolutionMode(mode);
 
-      assertEquals(mode, layer.getConvolutionMode());
+      assertEquals(mode, wrapper.getConvolutionMode());
     }
   }
 
   @Test
   public void testPoolingType() {
     for (PoolingType type : PoolingType.values()){
-      layer.setPoolingType(type);
+      wrapper.setPoolingType(type);
 
-      assertEquals(type, layer.getPoolingType());
+      assertEquals(type, wrapper.getPoolingType());
     }
   }
 
   @Test
   public void testKernelSize(){
     int[] size = {20,20};
-    layer.setKernelSize(size);
+    wrapper.setKernelSize(size);
 
-    assertArrayEquals(size, layer.getKernelSize());
+    assertArrayEquals(size, wrapper.getKernelSize());
   }
 
   @Test
   public void testStrideSize(){
     int[] size = {20,20};
-    layer.setStride(size);
+    wrapper.setStride(size);
 
-    assertArrayEquals(size, layer.getStride());
+    assertArrayEquals(size, wrapper.getStride());
 
   }
   @Test
   public void testPaddingSize(){
     int[] size = {20,20};
-    layer.setPadding(size);
+    wrapper.setPadding(size);
 
-    assertArrayEquals(size, layer.getPadding());
+    assertArrayEquals(size, wrapper.getPadding());
 
   }
 
   @Test
   public void testPnorm(){
     int p = 123;
-    layer.setPnorm(p);
+    wrapper.setPnorm(p);
 
-    assertEquals(p, layer.getPnorm());
+    assertEquals(p, wrapper.getPnorm());
   }
 
 
   @Test
   public void testEps() {
     double eps = 123.456;
-    layer.setEps(eps);
+    wrapper.setEps(eps);
 
-    assertEquals(eps, layer.getEps(), PRECISION);
+    assertEquals(eps, wrapper.getEps(), PRECISION);
   }
 
 }

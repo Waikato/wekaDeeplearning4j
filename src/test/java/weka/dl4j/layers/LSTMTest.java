@@ -25,10 +25,10 @@ import weka.dl4j.activations.ActivationSoftmax;
  */
 public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM>{
 
-  @Before
+
   @Override
-  public void initialize(){
-    layer = new LSTM();
+  public LSTM getApiWrapper(){
+    return new  LSTM();
   }
 
   @Test
@@ -51,9 +51,9 @@ public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM>{
             new ActivationHardTanH()
         };
     for (Activation act : acts) {
-      layer.setGateActivationFn(act);
+      wrapper.setGateActivationFn(act);
 
-      assertEquals(act, layer.getGateActivationFn());
+      assertEquals(act, wrapper.getGateActivationFn());
     }
   }
 }

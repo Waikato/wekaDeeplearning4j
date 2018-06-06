@@ -13,17 +13,16 @@ import weka.dl4j.lossfunctions.LossBinaryXENT;
  */
 public class RnnOutputLayerTest extends AbstractFeedForwardLayerTest<RnnOutputLayer>{
 
-  @Before
   @Override
-  public void initialize(){
-    layer = new RnnOutputLayer();
+  public RnnOutputLayer getApiWrapper(){
+    return new  RnnOutputLayer();
   }
 
   @Test
   public void testLossFunction(){
     LossBinaryXENT loss = new LossBinaryXENT();
-    layer.setLossFn(loss);
+    wrapper.setLossFn(loss);
 
-    assertEquals(loss, layer.getLossFn());
+    assertEquals(loss, wrapper.getLossFn());
   }
 }

@@ -25,10 +25,10 @@ import weka.dl4j.activations.ActivationSoftmax;
  */
 public class GravesLSTMTest extends AbstractFeedForwardLayerTest<GravesLSTM>{
 
-  @Before
+
   @Override
-  public void initialize(){
-    layer = new GravesLSTM();
+  public GravesLSTM getApiWrapper(){
+    return new  GravesLSTM();
   }
 
   @Test
@@ -51,9 +51,9 @@ public class GravesLSTMTest extends AbstractFeedForwardLayerTest<GravesLSTM>{
             new ActivationHardTanH()
         };
     for (Activation act : acts) {
-      layer.setGateActivationFn(act);
+      wrapper.setGateActivationFn(act);
 
-      assertEquals(act, layer.getGateActivationFn());
+      assertEquals(act, wrapper.getGateActivationFn());
     }
   }
 }

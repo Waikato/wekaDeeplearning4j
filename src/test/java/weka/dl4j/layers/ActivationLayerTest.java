@@ -2,7 +2,6 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import weka.dl4j.activations.Activation;
@@ -26,10 +25,10 @@ import weka.dl4j.activations.ActivationSoftmax;
  */
 public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer>{
 
-  @Before
+
   @Override
-  public void initialize(){
-    layer = new ActivationLayer();
+  public ActivationLayer getApiWrapper(){
+    return new  ActivationLayer();
   }
 
   @Test
@@ -52,9 +51,9 @@ public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer>{
             new ActivationHardTanH()
         };
     for (Activation act : acts) {
-      layer.setActivationFunction(act);
+      wrapper.setActivationFunction(act);
 
-      assertEquals(act, layer.getActivationFunction());
+      assertEquals(act, wrapper.getActivationFunction());
     }
   }
 }
