@@ -15,12 +15,6 @@ public class Dropout extends AbstractDropout<org.deeplearning4j.nn.conf.dropout.
 
   private static final long serialVersionUID = 8473917398934823240L;
 
-  public Dropout() {
-    backend.setPSchedule(new ConstantScheduleImpl());
-  }
-
-
-
   /**
    * Get the learning rate schedule
    *
@@ -58,7 +52,8 @@ public class Dropout extends AbstractDropout<org.deeplearning4j.nn.conf.dropout.
 
   @Override
   public void initializeBackend() {
-    this.backend = new org.deeplearning4j.nn.conf.dropout.Dropout(0.5);
+    backend = new org.deeplearning4j.nn.conf.dropout.Dropout(0.5);
+    backend.setPSchedule(new ConstantScheduleImpl());
   }
 
   /**
