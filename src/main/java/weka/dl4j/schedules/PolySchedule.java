@@ -57,10 +57,10 @@ public class PolySchedule extends Schedule<org.nd4j.linalg.schedule.PolySchedule
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.PolySchedule newBackend) {
-    this.maxIter= backend.getMaxIter();
-    this.power = backend.getPower();
-    this.initialValue = backend.getInitialValue();
-    this.scheduleType = backend.getScheduleType();
+    this.maxIter= newBackend.getMaxIter();
+    this.power = newBackend.getPower();
+    this.initialValue = newBackend.getInitialValue();
+    this.scheduleType = newBackend.getScheduleType();
   }
 
   /**
