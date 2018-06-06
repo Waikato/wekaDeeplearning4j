@@ -22,10 +22,7 @@ public class GaussianNoise
 
   private static final long serialVersionUID = -294245467732026881L;
   private Schedule<? extends ISchedule> rateSchedule;
-
-
   private double stdDev;
-  private ISchedule stdDevSchedule;
 
   public double getStdDev() {
     return stdDev;
@@ -42,10 +39,6 @@ public class GaussianNoise
     this.stdDev = stdDev;
   }
 
-  public ISchedule getStdDevSchedule() {
-    return stdDevSchedule;
-  }
-
   @OptionMetadata(
       displayName = "schedule",
       description = "The standard deviation schedule (default = ConstantScheduleImpl).",
@@ -53,11 +46,6 @@ public class GaussianNoise
       commandLineParamSynopsis = "-schedule <Schedule>",
       displayOrder = 2
   )
-  public void setStdDevSchedule(ISchedule stdDevSchedule) {
-    this.stdDevSchedule = stdDevSchedule;
-  }
-
-
   public Schedule<? extends ISchedule> getRateSchedule() {
     return rateSchedule;
   }
