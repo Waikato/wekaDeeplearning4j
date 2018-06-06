@@ -2,10 +2,7 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.*;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import weka.dl4j.activations.Activation;
 import weka.dl4j.activations.ActivationReLU;
 
 /**
@@ -19,16 +16,16 @@ public abstract class AbstractFeedForwardLayerTest<T extends FeedForwardLayer> e
   @Test
   public void testActivation() {
     ActivationReLU relu = new ActivationReLU();
-    layer.setActivationFunction(relu);
+    wrapper.setActivationFunction(relu);
 
-    assertEquals(relu, layer.getActivationFunction());
+    assertEquals(relu, wrapper.getActivationFunction());
   }
 
   @Test
   public void testSetNumOut(){
     int nOut = 123;
-    layer.setNOut(nOut);
+    wrapper.setNOut(nOut);
 
-    assertEquals(nOut, layer.getNOut());
+    assertEquals(nOut, wrapper.getNOut());
   }
 }
