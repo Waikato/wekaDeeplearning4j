@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.deeplearning4j.nn.conf.distribution.ConstantDistribution;
-import org.deeplearning4j.nn.conf.distribution.Distribution;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import weka.dl4j.distribution.Distribution;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -25,18 +25,21 @@ public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
 
   @OptionMetadata(
     displayName = "distribution",
-    description = "The weight noise distribution (default = ConstantDistribution(1.0)).",
+    description = "The weight noise distribution (default = NormalDistribution(0,1)).",
     commandLineParamName = "distribution",
     commandLineParamSynopsis = "-distribution <Distribution>",
     displayOrder = 1
   )
-  public Distribution getDistribution() {
-    return backend.getDistribution();
+  public Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> getDistribution() {
+    return Distribution.create(backend.getDistribution());
   }
 
-  public void setDistribution(Distribution distribution) {
-    backend.setDistribution(distribution);
+  public void setDistribution(
+      Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> distribution) {
+    backend.setDistribution(distribution.getBackend());
   }
+
+
 
   @OptionMetadata(
     displayName = "applyToBias",
@@ -70,7 +73,7 @@ public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
 
   @Override
   public void initializeBackend() {
-    backend = new org.deeplearning4j.nn.conf.weightnoise.WeightNoise(new ConstantDistribution(1.0));
+    backend = new org.deeplearning4j.nn.conf.weightnoise.WeightNoise(new NormalDistribution(0, 1));
   }
 
   /**
