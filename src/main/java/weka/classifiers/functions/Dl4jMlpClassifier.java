@@ -26,18 +26,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
@@ -109,72 +118,147 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  * @author Eibe Frank
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class Dl4jMlpClassifier extends RandomizableClassifier
     implements BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
-  /** The ID used for serializing this class. */
+  /**
+   * The ID used for serializing this class.
+   */
   private static final long serialVersionUID = -6363254116597574265L;
-  /** filter: Normalize training data */
+  /**
+   * filter: Normalize training data
+   */
   public static final int FILTER_NORMALIZE = 0;
-  /** filter: Standardize training data */
+  /**
+   * filter: Standardize training data
+   */
   public static final int FILTER_STANDARDIZE = 1;
-  /** filter: No normalization/standardization */
+  /**
+   * filter: No normalization/standardization
+   */
   public static final int FILTER_NONE = 2;
-  /** The filter to apply to the training data */
+  /**
+   * The filter to apply to the training data
+   */
   public static final Tag[] TAGS_FILTER = {
-    new Tag(FILTER_NORMALIZE, "Normalize training data"),
-    new Tag(FILTER_STANDARDIZE, "Standardize training data"),
-    new Tag(FILTER_NONE, "No normalization/standardization"),
+      new Tag(FILTER_NORMALIZE, "Normalize training data"),
+      new Tag(FILTER_STANDARDIZE, "Standardize training data"),
+      new Tag(FILTER_NONE, "No normalization/standardization"),
   };
-  /** Filter used to replace missing values. */
+  /**
+   * Filter used to replace missing values.
+   */
   protected ReplaceMissingValues replaceMissingFilter;
-  /** Filter used to normalize or standardize the data. */
+  /**
+   * Filter used to normalize or standardize the data.
+   */
   protected Filter filter;
-  /** Filter used to convert nominal attributes to binary numeric attributes. */
+  /**
+   * Filter used to convert nominal attributes to binary numeric attributes.
+   */
   protected NominalToBinary nominalToBinaryFilter;
-  /** ZeroR classifier, just in case we don't actually have any data to train a network. */
+  /**
+   * ZeroR classifier, just in case we don't actually have any data to train a network.
+   */
   protected ZeroR zeroR;
-  /** The actual neural network model. */
+  /**
+   * The actual neural network model.
+   */
   protected transient ComputationGraph model;
-  /** The model zoo model. */
+  /**
+   * The model zoo model.
+   */
   protected ZooModel zooModel = new CustomNet();
-  /** The size of the serialized network model in bytes. */
+  /**
+   * The size of the serialized network model in bytes.
+   */
   protected long modelSize;
-  /** The file that log information will be written to. */
+  /**
+   * The file that log information will be written to.
+   */
   protected File logFile =
       new File(Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
-  /** The layers of the network. */
-  protected Layer[] layers = new Layer[] {new OutputLayer()};
-  /** The configuration of the network. */
+  /**
+   * The layers of the network.
+   */
+  protected Layer[] layers = new Layer[]{new OutputLayer()};
+  /**
+   * The configuration of the network.
+   */
   protected NeuralNetConfiguration netConfig = new NeuralNetConfiguration();
-  /** The configuration for early stopping. */
+  /**
+   * The configuration for early stopping.
+   */
   protected EarlyStopping earlyStopping = new EarlyStopping();
-  /** The number of epochs to perform. */
+  /**
+   * The number of epochs to perform.
+   */
   protected int numEpochs = 10;
-  /** The number of epochs that have been performed. */
+  /**
+   * The number of epochs that have been performed.
+   */
   protected int numEpochsPerformed;
-  /** The dataset trainIterator. */
+  /**
+   * The dataset trainIterator.
+   */
   protected transient DataSetIterator trainIterator;
-  /** The training instances (set to null when done() is called). */
+  /**
+   * The training instances (set to null when done() is called).
+   */
   protected Instances trainData;
-  /** The instance iterator to use. */
+  /**
+   * The instance iterator to use.
+   */
   protected AbstractInstanceIterator instanceIterator = new DefaultInstanceIterator();
-  /** Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used) */
+  /**
+   * Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used)
+   */
   protected int queueSize = 0;
-  /** Whether to normalize/standardize/neither */
+  /**
+   * Whether to normalize/standardize/neither
+   */
   protected int filterType = FILTER_STANDARDIZE;
-  /** Coefficient x0 used for normalizing the class */
+  /**
+   * Coefficient x0 used for normalizing the class
+   */
   protected double x0 = 0.0;
-  /** Coefficient x1 used for normalizing the class */
+  /**
+   * Coefficient x1 used for normalizing the class
+   */
   protected double x1 = 1.0;
-  /** Caching mode to use for loading data */
+  /**
+   * Caching mode to use for loading data
+   */
   protected CacheMode cacheMode = CacheMode.MEMORY;
-  /** Training listener list */
+  /**
+   * Training listener list
+   */
   protected IterationListener iterationListener = new EpochListener();
 
-  /** Default constructor */
-  public Dl4jMlpClassifier() {}
+  /**
+   * Default constructor
+   */
+  public Dl4jMlpClassifier() {
+    loadLoggerIfConfigMissing();
+  }
+
+  /**
+   * Load the log4j2.xml specified in the package sources if no configuration is currently set.
+   */
+  private static void loadLoggerIfConfigMissing(){
+    LoggerContext context = (LoggerContext) LogManager
+        .getContext(false);
+    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
+    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
+      // Use log4j2.xml shipped with the package ...
+      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
+      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
+          "log4j2.xml").toUri();
+      context.setConfigLocation(uri);
+      log.info("Logging configuration loaded from source: {}", uri.toString());
+    }
+  }
 
   /**
    * The main method for running this class.
@@ -213,7 +297,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     rp.setInvertSelection(true);
     Instances test = Filter.useFilter(data, rp);
 
-    return new Instances[] {train, test};
+    return new Instances[]{train, test};
   }
 
   public String globalInfo() {
@@ -259,7 +343,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Custom serialization method.
    *
    * @param oos the object output stream
-   * @throws IOException
    */
   protected void writeObject(ObjectOutputStream oos) throws IOException {
 
@@ -283,8 +366,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Custom deserialization method
    *
    * @param ois the object input stream
-   * @throws ClassNotFoundException
-   * @throws IOException
    */
   protected void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -336,13 +417,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param logFile the log file
    */
   @OptionMetadata(
-    displayName = "log file",
-    description =
-        "The name of the log file to write loss information to "
-            + "(default = $WEKA_HOME/network.log).",
-    commandLineParamName = "logFile",
-    commandLineParamSynopsis = "-logFile <string>",
-    displayOrder = 1
+      displayName = "log file",
+      description =
+          "The name of the log file to write loss information to "
+              + "(default = $WEKA_HOME/network.log).",
+      commandLineParamName = "logFile",
+      commandLineParamSynopsis = "-logFile <string>",
+      displayOrder = 1
   )
   public void setLogFile(File logFile) {
     this.logFile = logFile;
@@ -353,11 +434,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    displayName = "layer specification.",
-    description = "The specification of a layer. This option can be used multiple times.",
-    commandLineParamName = "layer",
-    commandLineParamSynopsis = "-layer <string>",
-    displayOrder = 2
+      displayName = "layer specification.",
+      description = "The specification of a layer. This option can be used multiple times.",
+      commandLineParamName = "layer",
+      commandLineParamSynopsis = "-layer <string>",
+      displayOrder = 2
   )
   public void setLayers(Layer... layers) {
     // If something changed, set zoomodel to CustomNet
@@ -453,22 +534,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    description = "The number of epochs to perform.",
-    displayName = "number of epochs",
-    commandLineParamName = "numEpochs",
-    commandLineParamSynopsis = "-numEpochs <int>",
-    displayOrder = 4
+      description = "The number of epochs to perform.",
+      displayName = "number of epochs",
+      commandLineParamName = "numEpochs",
+      commandLineParamSynopsis = "-numEpochs <int>",
+      displayOrder = 4
   )
   public void setNumEpochs(int numEpochs) {
     this.numEpochs = numEpochs;
   }
 
   @OptionMetadata(
-    description = "The instance trainIterator to use.",
-    displayName = "instance iterator",
-    commandLineParamName = "iterator",
-    commandLineParamSynopsis = "-iterator <string>",
-    displayOrder = 6
+      description = "The instance trainIterator to use.",
+      displayName = "instance iterator",
+      commandLineParamName = "iterator",
+      commandLineParamSynopsis = "-iterator <string>",
+      displayOrder = 6
   )
   public AbstractInstanceIterator getInstanceIterator() {
     return instanceIterator;
@@ -479,11 +560,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    description = "The neural network configuration to use.",
-    displayName = "network configuration",
-    commandLineParamName = "config",
-    commandLineParamSynopsis = "-config <string>",
-    displayOrder = 7
+      description = "The neural network configuration to use.",
+      displayName = "network configuration",
+      commandLineParamName = "config",
+      commandLineParamSynopsis = "-config <string>",
+      displayOrder = 7
   )
   public NeuralNetConfiguration getNeuralNetConfiguration() {
     return netConfig;
@@ -496,7 +577,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     netConfig = config;
   }
 
-  /** Reset zoomodel to CustomNet */
+  /**
+   * Reset zoomodel to CustomNet
+   */
   protected void setCustomNet() {
     if (useZooModel()) {
       zooModel = new CustomNet();
@@ -504,11 +587,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    description = "The early stopping configuration to use.",
-    displayName = "early stopping configuration",
-    commandLineParamName = "early-stopping",
-    commandLineParamSynopsis = "-early-stopping <string>",
-    displayOrder = 7
+      description = "The early stopping configuration to use.",
+      displayName = "early stopping configuration",
+      commandLineParamName = "early-stopping",
+      commandLineParamSynopsis = "-early-stopping <string>",
+      displayOrder = 7
   )
   public EarlyStopping getEarlyStopping() {
     return earlyStopping;
@@ -519,11 +602,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    description = "The type of normalization to perform.",
-    displayName = "attribute normalization",
-    commandLineParamName = "normalization",
-    commandLineParamSynopsis = "-normalization <int>",
-    displayOrder = 12
+      description = "The type of normalization to perform.",
+      displayName = "attribute normalization",
+      commandLineParamName = "normalization",
+      commandLineParamSynopsis = "-normalization <int>",
+      displayOrder = 12
   )
   public SelectedTag getFilterType() {
     return new SelectedTag(filterType, TAGS_FILTER);
@@ -540,12 +623,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    description =
-        "The queue size for asynchronous data transfer (default: 0, synchronous transfer).",
-    displayName = "queue size for asynchronous data transfer",
-    commandLineParamName = "queueSize",
-    commandLineParamSynopsis = "-queueSize <int>",
-    displayOrder = 30
+      description =
+          "The queue size for asynchronous data transfer (default: 0, synchronous transfer).",
+      displayName = "queue size for asynchronous data transfer",
+      commandLineParamName = "queueSize",
+      commandLineParamSynopsis = "-queueSize <int>",
+      displayOrder = 30
   )
   public void setQueueSize(int QueueSize) {
     queueSize = QueueSize;
@@ -648,7 +731,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param data Data
    * @return Augmented data - if early stopping applies, return train set without validation set
-   * @throws Exception
    */
   protected Instances initEarlyStopping(Instances data) throws Exception {
     // Split train/validation
@@ -701,7 +783,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param cm Cache mode for the datasets
    * @param cacheDirSuffix suffix for the cache directory
    * @return DataSetIterator Iterator over dataset objects
-   * @throws Exception
    */
   protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm, String cacheDirSuffix)
       throws Exception {
@@ -739,7 +820,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param data Input instances
    * @param cm Cache mode for the datasets
    * @return DataSetIterator Iterator over dataset objects
-   * @throws Exception
    */
   protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm) throws Exception {
     return getDataSetIterator(data, cm, "");
@@ -750,7 +830,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param data Input instances
    * @return DataSetIterator
-   * @throws Exception
    */
   protected DataSetIterator getDataSetIterator(Instances data) throws Exception {
     return getDataSetIterator(data, cacheMode);
@@ -829,12 +908,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     if (filterType == FILTER_STANDARDIZE) {
       filter = new Standardize();
-      filter.setOptions(new String[] {"-unset-class-temporarily"});
+      filter.setOptions(new String[]{"-unset-class-temporarily"});
       filter.setInputFormat(data);
       data = Filter.useFilter(data, filter);
     } else if (filterType == FILTER_NORMALIZE) {
       filter = new Normalize();
-      filter.setOptions(new String[] {"-unset-class-temporarily"});
+      filter.setOptions(new String[]{"-unset-class-temporarily"});
       filter.setInputFormat(data);
       data = Filter.useFilter(data, filter);
     } else {
@@ -849,7 +928,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @return ComputationGraph instance
    * @throws WekaException Either the .init operation on the current zooModel was not supported or
-   *     the data shape does not fit the chosen zooModel
+   * the data shape does not fit the chosen zooModel
    */
   protected void createZooModel() throws WekaException {
     final AbstractInstanceIterator it = getInstanceIterator();
@@ -869,8 +948,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     boolean initSuccessful = false;
     while (!initSuccessful) {
       // Increase width and height
-      int[] newShape = new int[] {channels, newHeight, newWidth};
-      int[][] shapeWrap = new int[][] {newShape};
+      int[] newShape = new int[]{channels, newHeight, newWidth};
+      int[][] shapeWrap = new int[][]{newShape};
       setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
       initSuccessful = initZooModel(trainData.numClasses(), getSeed(), shapeWrap);
 
@@ -902,8 +981,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   /**
    * Build the multilayer network defined by the networkconfiguration and the list of layers.
-   *
-   * @throws Exception
    */
   protected void createModel() throws Exception {
     final INDArray features = getFirstBatchFeatures(trainData);
@@ -992,7 +1069,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Collect layers
     for (
-    /*use idx from above*/ ; idx < layers.length; idx++) {
+      /*use idx from above*/ ; idx < layers.length; idx++) {
       String lName = layers[idx].getLayerName();
       gb.addLayer(lName, layers[idx].getBackend().clone(), currentInput);
       currentInput = lName;
@@ -1068,7 +1145,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Get a peak at the features of the {@code iterator}'s first batch using the given instances.
    *
    * @return Features of the first batch
-   * @throws Exception
    */
   protected INDArray getFirstBatchFeatures(Instances data) throws Exception {
     final DataSetIterator it = getDataSetIterator(data, CacheMode.NONE);
@@ -1082,8 +1158,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   /**
    * Get the iterationlistener
-   *
-   * @throws Exception
    */
   protected List<IterationListener> getListener() throws Exception {
     int numSamples = trainData.numInstances();
@@ -1107,7 +1181,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     return listeners;
   }
 
-  /** Perform another epoch. */
+  /**
+   * Perform another epoch.
+   */
   public boolean next() throws Exception {
 
     if (numEpochsPerformed >= getNumEpochs() || zeroR != null || trainData == null) {
@@ -1160,7 +1236,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     return 0 < p && p < 100;
   }
 
-  /** Clean up after learning. */
+  /**
+   * Clean up after learning.
+   */
   public void done() {
 
     trainData = null;
@@ -1181,11 +1259,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @param zooModel The predefined zooModel
    */
   @OptionMetadata(
-    displayName = "zooModel",
-    description = "The model-architecture to choose from the modelzoo " + "(default = no model).",
-    commandLineParamName = "zooModel",
-    commandLineParamSynopsis = "-zooModel <string>",
-    displayOrder = 11
+      displayName = "zooModel",
+      description = "The model-architecture to choose from the modelzoo " + "(default = no model).",
+      commandLineParamName = "zooModel",
+      commandLineParamSynopsis = "-zooModel <string>",
+      displayOrder = 11
   )
   public void setZooModel(ZooModel zooModel) {
     if (zooModel instanceof GoogLeNet) {
@@ -1218,11 +1296,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    displayName = "set the iteration listener",
-    description = "Set the iteration listener.",
-    commandLineParamName = "iteration-listener",
-    commandLineParamSynopsis = "-iteration-listener <string>",
-    displayOrder = 9
+      displayName = "set the iteration listener",
+      description = "Set the iteration listener.",
+      commandLineParamName = "iteration-listener",
+      commandLineParamSynopsis = "-iteration-listener <string>",
+      displayOrder = 9
   )
   public void setIterationListener(IterationListener l) {
     iterationListener = l;
@@ -1233,11 +1311,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   @OptionMetadata(
-    displayName = "set the cache mode",
-    description = "Set the cache mode.",
-    commandLineParamName = "cache-mode",
-    commandLineParamSynopsis = "-cache-mode <string>",
-    displayOrder = 13
+      displayName = "set the cache mode",
+      description = "Set the cache mode.",
+      commandLineParamName = "cache-mode",
+      commandLineParamSynopsis = "-cache-mode <string>",
+      displayOrder = 13
   )
   public void setCacheMode(CacheMode cm) {
     cacheMode = cm;
@@ -1259,7 +1337,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param inst the instance to get a prediction for
    * @return the class probability estimates (if the class is nominal) or the numeric prediction (if
-   *     it is numeric)
+   * it is numeric)
    * @throws Exception if something goes wrong at prediction time
    */
   @Override
@@ -1275,7 +1353,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param insts the instances to get predictions for
    * @return the class probability estimates (if the class is nominal) or the numeric predictions
-   *     (if it is numeric)
+   * (if it is numeric)
    * @throws Exception if something goes wrong at prediction time
    */
   @Override

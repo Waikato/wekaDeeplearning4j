@@ -22,7 +22,7 @@ package weka.dl4j.iterators.instance.sequence.text.rnn;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
@@ -44,7 +44,7 @@ import weka.dl4j.iterators.instance.sequence.text.AbstractTextEmbeddingIterator;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class RnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingIterator {
 
   /** The ID used to serialize this class */

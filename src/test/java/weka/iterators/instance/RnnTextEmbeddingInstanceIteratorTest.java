@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -24,7 +24,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class RnnTextEmbeddingInstanceIteratorTest {
   /** ImageInstanceIterator object */
   private RnnTextEmbeddingInstanceIterator tii;

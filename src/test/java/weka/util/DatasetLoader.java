@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import weka.core.Attribute;
@@ -27,7 +27,7 @@ import java.io.FileReader;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class DatasetLoader {
 
   /** Number of classes in the iris dataset */

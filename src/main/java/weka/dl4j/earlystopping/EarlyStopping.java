@@ -1,6 +1,6 @@
 package weka.dl4j.earlystopping;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.DataSet;
@@ -20,7 +20,7 @@ import java.util.Enumeration;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class EarlyStopping implements OptionHandler, Serializable {
 
   /** SerialVersionUID */
