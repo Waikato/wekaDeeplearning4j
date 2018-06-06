@@ -28,7 +28,7 @@ public abstract class Distribution<T extends org.deeplearning4j.nn.conf.distribu
    * @return API wrapped object
    */
   public static Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> create(
-      Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> newBackend) {
+      org.deeplearning4j.nn.conf.distribution.Distribution newBackend) {
     return ApiWrapperUtil.getImplementingWrapper(Distribution.class, newBackend, "weka.dl4j.distribution");
   }
 
