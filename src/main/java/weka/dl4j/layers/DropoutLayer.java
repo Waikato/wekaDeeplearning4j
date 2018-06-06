@@ -28,6 +28,7 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.dropout.AbstractDropout;
+import weka.dl4j.schedules.ConstantSchedule.ConstantScheduleImpl;
 
 /**
  * A version of DeepLearning4j's DropoutLayer that implements WEKA option handling.
@@ -51,12 +52,14 @@ public class DropoutLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.la
   @Override
   public void initializeBackend() {
     backend= new org.deeplearning4j.nn.conf.layers.DropoutLayer();
-    backend.setIDropout(new Dropout(0.8));
+    Dropout dropout = new Dropout(0.8);
+    dropout.setPSchedule(new ConstantScheduleImpl());
+    backend.setIDropout(dropout);
   }
 
   @OptionMetadata(
       displayName = "dropout",
-      description = "The dropout method to use (default = Dropout(0.0).",
+      description = "The dropout method to use (default = Dropout(0.0)).",
       commandLineParamName = "dropout",
       commandLineParamSynopsis = "-dropout <Dropout>",
       displayOrder = 25
