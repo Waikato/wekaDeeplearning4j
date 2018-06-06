@@ -19,7 +19,7 @@ import weka.gui.ProgrammaticProperty;
 public class MapSchedule extends Schedule<org.nd4j.linalg.schedule.MapSchedule> {
 
   private static final long serialVersionUID = 3282040498224686346L;
-  private Map<Integer, Double> values = Collections.singletonMap(0, 0.1);
+  private Map<Integer, Double> values;
 
   @Override
   @Deprecated
@@ -54,13 +54,14 @@ public class MapSchedule extends Schedule<org.nd4j.linalg.schedule.MapSchedule> 
 
   @Override
   public void initializeBackend() {
+    values = Collections.singletonMap(0, 0.1);
     backend = new org.nd4j.linalg.schedule.MapSchedule(scheduleType, values);
   }
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.MapSchedule newBackend) {
-    this.scheduleType = backend.getScheduleType();
-    this.values = backend.getValues();
+    this.scheduleType = newBackend.getScheduleType();
+    this.values = newBackend.getValues();
   }
 
   /**

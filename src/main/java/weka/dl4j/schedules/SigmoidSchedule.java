@@ -57,10 +57,10 @@ public class SigmoidSchedule extends Schedule<org.nd4j.linalg.schedule.SigmoidSc
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.SigmoidSchedule newBackend) {
-    this.stepSize = backend.getStepSize();
-    this.gamma = backend.getGamma();
-    this.initialValue = backend.getInitialValue();
-    this.scheduleType = backend.getScheduleType();
+    this.stepSize = newBackend.getStepSize();
+    this.gamma = newBackend.getGamma();
+    this.initialValue = newBackend.getInitialValue();
+    this.scheduleType = newBackend.getScheduleType();
   }
 
   /**

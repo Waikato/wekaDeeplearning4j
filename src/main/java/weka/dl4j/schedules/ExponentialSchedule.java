@@ -36,9 +36,9 @@ public class ExponentialSchedule extends Schedule<org.nd4j.linalg.schedule.Expon
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.ExponentialSchedule newBackend) {
-    this.gamma = backend.getGamma();
-    this.initialValue = backend.getInitialValue();
-    this.scheduleType = backend.getScheduleType();
+    this.gamma = newBackend.getGamma();
+    this.initialValue = newBackend.getInitialValue();
+    this.scheduleType = newBackend.getScheduleType();
   }
 
   @Override

@@ -83,6 +83,7 @@ public abstract class Schedule<T extends ISchedule>
 
   @Override
   public T getBackend() {
+    initializeBackend();
     return backend;
   }
 

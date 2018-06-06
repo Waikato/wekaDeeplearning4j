@@ -52,15 +52,15 @@ public class StepSchedule extends Schedule<org.nd4j.linalg.schedule.StepSchedule
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.StepSchedule newBackend) {
-    this.step = backend.getStep();
-    this.decayRate = backend.getDecayRate();
-    this.initialValue = backend.getInitialValue();
-    this.scheduleType = backend.getScheduleType();
+    this.step = newBackend.getStep();
+    this.decayRate = newBackend.getDecayRate();
+    this.initialValue = newBackend.getInitialValue();
+    this.scheduleType = newBackend.getScheduleType();
   }
 
   @Override
   public void initializeBackend() {
-    new org.nd4j.linalg.schedule.StepSchedule(
+    backend = new org.nd4j.linalg.schedule.StepSchedule(
         scheduleType, initialValue, decayRate, step);
   }
 
