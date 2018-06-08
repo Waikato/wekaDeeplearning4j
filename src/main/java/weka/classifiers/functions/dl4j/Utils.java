@@ -21,6 +21,9 @@
 
 package weka.classifiers.functions.dl4j;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -30,8 +33,11 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.WekaException;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -205,5 +211,42 @@ public class Utils {
     }
     iter.reset();
     return score;
+  }
+
+  /**
+   * Convert an arbitrary NDArray to Weka instances
+   * @param ndArray Input array
+   * @return Instances object
+   * @throws WekaException Invalid input
+   */
+  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
+    int batchsize = ndArray.size(0);
+    int[] shape = ndArray.shape();
+    int dims = shape.length;
+    if (dims < 2){
+      throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
+          + "but was " + Arrays.toString(shape));
+    }
+
+    int prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
+    prod = prod/ batchsize;
+
+    ArrayList<Attribute> atts = new ArrayList<>();
+    for (int i = 0; i < prod; i++) {
+      atts.add(new Attribute("transformedAttribute" + i));
+    }
+    Instances instances = new Instances("Transformed", atts, batchsize);
+    for (int i = 0; i < batchsize; i++) {
+      INDArray row = ndArray.getRow(i);
+      INDArray flattenedRow = Nd4j.toFlattened(row);
+      Instance inst = new DenseInstance(atts.size());
+      for (int j = 0; j < flattenedRow.size(1); j++) {
+        inst.setValue(j, flattenedRow.getDouble(j));
+      }
+      inst.setDataset(instances);
+      instances.add(inst);
+    }
+
+    return instances;
   }
 }

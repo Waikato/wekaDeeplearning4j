@@ -31,9 +31,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,12 +60,15 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
 import weka.core.BatchPredictor;
 import weka.core.Capabilities;
@@ -165,7 +168,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * The actual neural network model.
    */
-  protected transient ComputationGraph model;
+  protected ComputationGraph model;
   /**
    * The model zoo model.
    */
@@ -1458,5 +1461,31 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   protected boolean useZooModel() {
     return !(zooModel instanceof CustomNet);
+  }
+
+  /**
+   * Returns the activations at a certain
+   * @param layerName Layer name to get the activations from
+   * @return Activations in form of instances
+   */
+  public Instances getActivationsAtLayer(String layerName, Instances input) throws Exception {
+    DataSetIterator iter = getDataSetIterator(input);
+    iter.reset();
+    DataSet next;
+    INDArray acts = null;
+    while (iter.hasNext()){
+      next = iter.next();
+      INDArray features = next.getFeatures();
+      int layerIdx = model.getLayer(layerName).getIndex();
+      Map<String, INDArray> activations = model.feedForward(features, layerIdx, false);
+      INDArray activationAtLayer = activations.get(layerName);
+
+      if (acts == null){
+        acts = activationAtLayer;
+      } else {
+        acts = Nd4j.concat(0, acts, activationAtLayer);
+      }
+    }
+    return Utils.ndArrayToInstances(acts);
   }
 }
