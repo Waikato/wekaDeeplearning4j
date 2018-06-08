@@ -8,13 +8,15 @@ from collections import Iterable
 from datetime import datetime
 from distutils.dir_util import copy_tree
 from glob import glob
+from typing import List
 
 CUDA_VERSIONS = ['8.0', '9.0', '9.1']
 PLATFORMS = ['linux', 'macosx', 'windows']
 PROGRESS = 0.0
 
 
-class bcolors:
+class Colors:
+    """Shell color codes"""
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -26,15 +28,15 @@ class bcolors:
 
 
 def printout(out: str = ''):
-    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {PROGRESS*100:3.0f}%{bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
+    ep = f'{Colors.BOLD}[{Colors.OKGREEN}build.py {PROGRESS*100:3.0f}%{Colors.ENDC}{Colors.BOLD}]{Colors.ENDC} '
     for line in out.split('\n'):
         print(f'{ep}{line}')
 
 
 def printerr(out: str):
-    ep = f'{bcolors.BOLD}[{bcolors.OKGREEN}build.py {bcolors.ENDC}{bcolors.BOLD}]{bcolors.ENDC} '
+    ep = f'{Colors.BOLD}[{Colors.OKGREEN}build.py {Colors.ENDC}{Colors.BOLD}]{Colors.ENDC} '
     for line in out.split('\n'):
-        print(f'{ep}{bcolors.FAIL}{line}{bcolors.ENDC}')
+        print(f'{ep}{Colors.FAIL}{line}{Colors.ENDC}')
 
 
 def update_progress():
@@ -50,7 +52,7 @@ def get_max_progress_steps() -> int:
     elif opts.cuda_version:
         return 6 * 1
     else:
-        return 3 * 1
+        return 4 * 1
 
 
 def parse_args() -> argparse.Namespace:
@@ -65,7 +67,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_platform():
+def get_platform() -> str:
     out = exec_cmd('uname -s')
 
     if 'Linux' in out:
@@ -78,15 +80,15 @@ def get_platform():
         return f'UNKNOWN:{out}'
 
 
-def get_os_name(platform: str):
+def get_os_name(platform: str) -> str:
     return dict(linux='Linux', macosx='Mac', windows='Windows').get(platform)
 
 
-def get_version():
+def get_version() -> str:
     return get_file_content('version').replace('\n', '')
 
 
-def get_file_content(path: str):
+def get_file_content(path: str) -> List[str]:
     with open(path) as f:
         lines = '\n'.join(f.readlines())
         return lines
@@ -105,7 +107,9 @@ def exec_cmd(cmd: str, print_output=False, exit_on_error=True) -> str:
     output, error = p.communicate()
 
     if error:
-        printerr(error.decode('utf-8'))
+        if print_output or exit_on_error:
+            printerr(error.decode('utf-8'))
+
         if exit_on_error:
             sys.exit(1)
 
@@ -150,7 +154,7 @@ def edit_description_props(
 
 def build_main_package():
     printout(
-        f'Building main package for {bcolors.BOLD}CPU{bcolors.ENDC} (all platforms)')
+        f'Building main package for {Colors.BOLD}CPU{Colors.ENDC} (all platforms)')
     clean_dirs()
     printout('Pulling dependencies')
     cmd = 'mvn -q -Dmaven.javadoc.skip=true -DskipTests=true dependency:resolve process-sources'
@@ -210,7 +214,7 @@ def build_main_package():
 
 def build_cuda_package(cuda_version: str, platform: str):
     printout(
-        f'Building package for {bcolors.BOLD}CUDA {cuda_version} ({platform}){bcolors.ENDC}')
+        f'Building package for {Colors.BOLD}CUDA {cuda_version} ({platform}){Colors.ENDC}')
     clean_dirs()
     platform_exclude_1, platform_exclude_2 = get_inverted_platform_selection(
         platform)
@@ -253,7 +257,7 @@ def build_cuda_package(cuda_version: str, platform: str):
     printout(f'Successfully finished building CUDA {cuda_version} ({platform})')
 
 
-def ensure_dir_ending(path: str):
+def ensure_dir_ending(path: str) -> str:
     if not path.endswith('/'):
         path += '/'
     return path
@@ -313,7 +317,7 @@ def copy_files_with_exclusions(src: str, dst: str, excludes: Iterable):
         shutil.copy2(file, dst)
 
 
-def get_inverted_platform_selection(platform: str):
+def get_inverted_platform_selection(platform: str) -> List[str]:
     platforms = ['linux', 'windows', 'macosx']
     platforms.remove(platform.lower())
     return platforms
@@ -321,10 +325,33 @@ def get_inverted_platform_selection(platform: str):
 
 def print_opts(opts: argparse.Namespace):
     dct = vars(opts)
-    printout(f'{bcolors.BOLD}{bcolors.UNDERLINE}Parameters:{bcolors.ENDC}')
+    printout(f'{Colors.BOLD}{Colors.UNDERLINE}Parameters:{Colors.ENDC}')
     for k in dct:
         printout(f'     {k:<20} = {dct[k]}')
     printout()
+
+
+def install_main_package():
+    user_home = os.environ['HOME']
+    weka_home = os.environ.get('WEKA_HOME', f'{user_home}/wekafiles')
+    weka_jar = f'{weka_home}/weka.jar'
+    if not os.path.isfile(weka_jar):
+        printerr(f'{weka_home} did not cointain a weka jar')
+
+    # Install via packagemanager
+    exec_cmd(f'rm -r {weka_home}/packages/wekaDeeplearning4j',
+             print_output=False,
+             exit_on_error=False)
+
+    main_zip = f'wekaDeeplearning4j-{version}.zip'
+
+    printout('Installing package')
+    exec_cmd(
+        f'java -cp {weka_jar} weka.core.WekaPackageManager -install-package dist/{main_zip}',
+        print_output=False,
+        exit_on_error=False)
+    update_progress()
+    printout('Installation successful')
 
 
 if __name__ == '__main__':
@@ -350,10 +377,13 @@ if __name__ == '__main__':
 
     # If opts.build_all flag is set, build all combinations between the cuda
     # versions and the platforms
-    printout('-' * 60)
+    separator = '-' * 60
+    printout(separator)
     if opts.build_all:
         for cuda_version in CUDA_VERSIONS:
             for platform in PLATFORMS:
                 build_cuda_package(cuda_version, platform)
-                printout('-' * 60)
+                printout(separator)
         sys.exit(0)
+    else:
+        install_main_package()
