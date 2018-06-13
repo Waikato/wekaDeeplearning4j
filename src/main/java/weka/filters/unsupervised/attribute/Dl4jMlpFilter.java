@@ -15,6 +15,12 @@ import weka.core.WekaPackageManager;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
+/**
+ * Weka filter that uses a neural network trained via {@link Dl4jMlpClassifier} as feature
+ * transformation.
+ *
+ * @author Steven Lang
+ */
 public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
 
   private static final long serialVersionUID = 2125146603305868223L;
