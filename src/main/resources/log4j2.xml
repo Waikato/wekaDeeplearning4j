@@ -9,7 +9,7 @@
   </Appenders>
   <Loggers>
     <!--Remove spam logs from ND4J-->
-    <Logger name="org.nd4j" level="WARN"/>
+    <Logger name="org.nd4j" level="INFO"/>
     <Logger name="org.deeplearning4j" level="WARN"/>
     <Logger name="org.reflections" level="ERROR"/>
 
