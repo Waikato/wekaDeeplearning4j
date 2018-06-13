@@ -168,7 +168,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * The actual neural network model.
    */
-  protected ComputationGraph model;
+  protected transient ComputationGraph model;
   /**
    * The model zoo model.
    */
@@ -185,7 +185,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * The layers of the network.
    */
-  protected Layer[] layers = new Layer[]{new OutputLayer()};
+  protected transient Layer[] layers = new Layer[]{new OutputLayer()};
   /**
    * The configuration of the network.
    */
@@ -347,8 +347,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param oos the object output stream
    */
-  protected void writeObject(ObjectOutputStream oos) throws IOException {
-
+  private void writeObject(ObjectOutputStream oos) throws IOException {
     // figure out size of the written network
     CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
     if (replaceMissingFilter != null) {
@@ -370,7 +369,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param ois the object input stream
    */
-  protected void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
@@ -399,6 +398,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         }
         bos.flush();
         model = ModelSerializer.restoreComputationGraph(tmpFile, false);
+
+        layers = Arrays
+            .stream(model.getLayers())
+            .map(l -> Layer.create(l.conf().getLayer()))
+            .toArray(Layer[]::new);
+        System.out.println();
       }
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -1207,8 +1212,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       model.fit(trainIterator);
       trainIterator.reset();
       sw.stop();
-      log.info("Epoch [{}/{}] took {}", numEpochsPerformed, numEpochs, sw.toString());
       numEpochsPerformed++;
+      log.info("Epoch [{}/{}] took {}", numEpochsPerformed, numEpochs, sw.toString());
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
@@ -1486,6 +1491,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         acts = Nd4j.concat(0, acts, activationAtLayer);
       }
     }
-    return Utils.ndArrayToInstances(acts);
+
+    if (acts == null){
+      return new Instances(input, 0);
+    } else {
+      return Utils.ndArrayToInstances(acts);
+    }
   }
 }
