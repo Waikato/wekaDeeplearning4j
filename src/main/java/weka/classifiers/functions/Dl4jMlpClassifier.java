@@ -240,6 +240,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected IterationListener iterationListener = new EpochListener();
 
   /**
+   * Flag indicating if initialization is finished.
+   */
+  protected boolean isInitializationFinished = false;
+
+  /**
    * Default constructor
    */
   public Dl4jMlpClassifier() {
@@ -350,7 +355,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   private void writeObject(ObjectOutputStream oos) throws IOException {
     // figure out size of the written network
     CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
-    if (replaceMissingFilter != null) {
+    if (isInitializationFinished) {
       ModelSerializer.writeModel(model, cos, false);
     }
     modelSize = cos.getByteCount();
@@ -359,7 +364,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     oos.defaultWriteObject();
 
     // actually write the network
-    if (replaceMissingFilter != null) {
+    if (isInitializationFinished) {
       ModelSerializer.writeModel(model, oos, false);
     }
   }
@@ -377,7 +382,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       ois.defaultReadObject();
 
       // restore the network model
-      if (replaceMissingFilter != null) {
+      if (isInitializationFinished) {
         File tmpFile = File.createTempFile("restore", "multiLayer");
         tmpFile.deleteOnExit();
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmpFile));
@@ -404,10 +409,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
             .map(l -> Layer.create(l.conf().getLayer()))
             .toArray(Layer[]::new);
         System.out.println();
+      } else {
+        layers = new Layer[] {createOutputLayer()};
       }
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  /**
+   * Generate the, for this model type, typical output layer.
+   * @return New OutputLayer object
+   */
+  protected Layer<? extends BaseOutputLayer> createOutputLayer(){
+    return new OutputLayer();
   }
 
   /**
@@ -729,6 +744,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       model.setListeners(getListener());
 
       numEpochsPerformed = 0;
+
+      isInitializationFinished = true;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }

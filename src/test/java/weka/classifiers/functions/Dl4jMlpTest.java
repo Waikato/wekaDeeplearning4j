@@ -302,13 +302,13 @@ public class Dl4jMlpTest {
 
     File out = Paths.get(System.getProperty("java.io.tmpdir"), "out.object").toFile();
     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(out));
+    clf.initializeClassifier(dataMnist);
     oos.writeObject(clf);
 
     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(out));
     Dl4jMlpClassifier clf2 = (Dl4jMlpClassifier) ois.readObject();
 
     clf2.setNumEpochs(1);
-    clf2.initializeClassifier(dataMnist);
     clf2.buildClassifier(dataMnist);
   }
 

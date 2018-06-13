@@ -7,6 +7,7 @@ import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.AbstractLSTM;
+import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.EmbeddingLayer;
 import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
@@ -293,6 +294,14 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   @ProgrammaticProperty
   public void setZooModel(ZooModel zooModel) {
     // Do nothing
+  }
+
+  /**
+   * Generate the, for this model type, typical output layer.
+   * @return New OutputLayer object
+   */
+  protected Layer<? extends BaseOutputLayer> createOutputLayer(){
+    return new weka.dl4j.layers.RnnOutputLayer();
   }
 
   /**
