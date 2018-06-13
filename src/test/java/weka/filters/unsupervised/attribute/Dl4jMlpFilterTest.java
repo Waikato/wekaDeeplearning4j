@@ -75,12 +75,12 @@ public class Dl4jMlpFilterTest {
     clf.setNumEpochs(1);
 
     ConvolutionLayer cl1 = new ConvolutionLayer();
-    cl1.setNOut(32);
+    cl1.setNOut(4);
 
     SubsamplingLayer ssl = new SubsamplingLayer();
 
     ConvolutionLayer cl2 = new ConvolutionLayer();
-    cl2.setNOut(16);
+    cl2.setNOut(2);
 
     OutputLayer ol = new OutputLayer();
     Layer[] layers = {cl1, ssl, cl2, ol};
