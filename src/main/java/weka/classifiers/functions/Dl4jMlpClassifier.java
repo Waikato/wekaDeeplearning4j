@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +37,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
@@ -57,7 +53,7 @@ import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.api.TrainingListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -104,7 +100,6 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.GoogLeNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
@@ -237,7 +232,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * Training listener list
    */
-  protected IterationListener iterationListener = new EpochListener();
+  protected TrainingListener iterationListener = new EpochListener();
 
   /**
    * Flag indicating if initialization is finished.
@@ -974,9 +969,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     while (!initSuccessful) {
       // Increase width and height
       int[] newShape = new int[]{channels, newHeight, newWidth};
-      int[][] shapeWrap = new int[][]{newShape};
       setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
-      initSuccessful = initZooModel(trainData.numClasses(), getSeed(), shapeWrap);
+      initSuccessful = initZooModel(trainData.numClasses(), getSeed(), newShape);
 
       newWidth *= 1.2;
       newHeight *= 1.2;
@@ -991,7 +985,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
   }
 
-  protected boolean initZooModel(int numClasses, long seed, int[][] newShape) {
+  protected boolean initZooModel(int numClasses, long seed, int[] newShape) {
     try {
       model = zooModel.init(numClasses, seed, newShape);
       return true;
@@ -1184,9 +1178,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * Get the iterationlistener
    */
-  protected List<IterationListener> getListener() throws Exception {
+  protected List<TrainingListener> getListener() throws Exception {
     int numSamples = trainData.numInstances();
-    List<IterationListener> listeners = new ArrayList<>();
+    List<TrainingListener> listeners = new ArrayList<>();
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
@@ -1291,18 +1285,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       displayOrder = 11
   )
   public void setZooModel(ZooModel zooModel) {
-    if (zooModel instanceof GoogLeNet) {
-      throw new RuntimeException(
-          "The zoomodel you have selected is currently"
-              + " not supported! Please select another one.");
-    }
-
     this.zooModel = zooModel;
 
     try {
       // Try to parse the layers so the user can change them afterwards
       final int dummyNumLabels = 2;
-      ComputationGraph tmpCg = zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape());
+      ComputationGraph tmpCg = zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0]);
       tmpCg.init();
       layers =
           Arrays.stream(tmpCg.getLayers())
@@ -1316,7 +1304,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
   }
 
-  public IterationListener getIterationListener() {
+  public TrainingListener getIterationListener() {
     return iterationListener;
   }
 
@@ -1327,7 +1315,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       commandLineParamSynopsis = "-iteration-listener <string>",
       displayOrder = 9
   )
-  public void setIterationListener(IterationListener l) {
+  public void setIterationListener(TrainingListener l) {
     iterationListener = l;
   }
 
@@ -1498,7 +1486,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     while (iter.hasNext()){
       next = iter.next();
       INDArray features = next.getFeatures();
-      int layerIdx = model.getLayer(layerName).getIndex();
+      int layerIdx = model.getLayer(layerName).getIndex() - 1;
       Map<String, INDArray> activations = model.feedForward(features, layerIdx, false);
       INDArray activationAtLayer = activations.get(layerName);
 
