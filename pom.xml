@@ -13,8 +13,8 @@
 
   <!--Properties-->
   <properties>
-    <nd4j.version>1.0.0-alpha</nd4j.version>
-    <dl4j.version>1.0.0-alpha</dl4j.version>
+    <nd4j.version>1.0.0-beta</nd4j.version>
+    <dl4j.version>1.0.0-beta</dl4j.version>
     <weka.version>3.8.1</weka.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -161,6 +161,11 @@
       <artifactId>inetutils4j</artifactId>
       <version>0.0.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
     </dependency>
   </dependencies>
 
