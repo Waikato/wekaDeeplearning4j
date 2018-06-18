@@ -14,7 +14,6 @@ import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.optimize.api.TrainingListener;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
@@ -29,7 +28,7 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 @Log4j2
-public class EpochListener extends IterationListener implements TrainingListener {
+public class EpochListener extends TrainingListener {
   private static final long serialVersionUID = -8852994767947925554L;
 
   /** Epoch counter */
