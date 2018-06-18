@@ -10,7 +10,7 @@ public class CustomNet implements ZooModel {
   private static final long serialVersionUID = 7131900848379752732L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[][] shape)
+  public ComputationGraph init(int numLabels, long seed, int[] shape)
       throws UnsupportedOperationException {
     throw new UnsupportedOperationException(
         "This model cannot be initialized as a MultiLayerNetwork.");

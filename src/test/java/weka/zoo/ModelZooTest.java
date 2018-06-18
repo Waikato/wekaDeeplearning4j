@@ -2,6 +2,7 @@ package weka.zoo;
 
 import java.util.Arrays;
 import lombok.extern.log4j.Log4j2;
+import weka.dl4j.zoo.ResNet50;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
@@ -45,25 +46,10 @@ public class ModelZooTest {
     buildModel(new VGG19());
   }
 
-//  @Test
-//  public void testFaceNetNN4Small2() throws Exception {
-//    buildModel(new FaceNetNN4Small2());
-//  }
-
-//  @Test
-  public void testGoogLeNet() throws Exception {
-    buildModel(new GoogLeNet());
+  @Test
+  public void testResNet50() throws Exception {
+    buildModel(new ResNet50());
   }
-
-//  @Test
-//  public void testInceptionResNetV1() throws Exception {
-//    buildModel(new InceptionResNetV1());
-//  }
-
-//  @Test
-//  public void testResNet50() throws Exception {
-//    buildModel(new ResNet50());
-//  }
 
   private void buildModel(ZooModel model) throws Exception {
     // CLF

@@ -3,7 +3,6 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
@@ -21,10 +20,11 @@ public interface ZooModel extends Serializable, OptionHandler {
    *
    * @param numLabels Number of labels to adjust the output
    * @param seed Seed
+   * @param shape
    * @return MultiLayerNetwork of the specified ZooModel
    * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
    */
-  ComputationGraph init(int numLabels, long seed, int[][] shape)
+  ComputationGraph init(int numLabels, long seed, int[] shape)
       throws UnsupportedOperationException;
 
   /**
@@ -34,7 +34,7 @@ public interface ZooModel extends Serializable, OptionHandler {
    * @param shape Inputshape
    * @return ComputationGraph based on the configuration in the MLC
    */
-  default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[][] shape) {
+  default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[] shape) {
     ComputationGraphConfiguration.GraphBuilder builder =
         new NeuralNetConfiguration.Builder()
             .trainingWorkspaceMode(Preferences.WORKSPACE_MODE)
@@ -58,7 +58,7 @@ public interface ZooModel extends Serializable, OptionHandler {
     builder.setOutputs(currentInput);
 
     // Configure inputs
-    builder.setInputTypes(InputType.convolutional(shape[0][1], shape[0][2], shape[0][0]));
+    builder.setInputTypes(InputType.convolutional(shape[1], shape[2], shape[0]));
 
     // Build
     ComputationGraphConfiguration cgc = builder.build();

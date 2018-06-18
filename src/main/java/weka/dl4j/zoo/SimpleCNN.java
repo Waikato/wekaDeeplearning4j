@@ -1,6 +1,6 @@
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.conf.WorkspaceMode;
+import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.dl4j.Preferences;
 
@@ -13,16 +13,19 @@ public class SimpleCNN implements ZooModel {
   private static final long serialVersionUID = 4217466716595669736L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[][] shape) {
-    org.deeplearning4j.zoo.model.SimpleCNN net =
-        new org.deeplearning4j.zoo.model.SimpleCNN(numLabels, seed,  Preferences.WORKSPACE_MODE);
-    net.setInputShape(shape);
+  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
+        .cacheMode(CacheMode.NONE)
+        .workspaceMode(Preferences.WORKSPACE_MODE)
+        .inputShape(shape)
+        .numClasses(numLabels)
+        .build();
     org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
     return mlpToCG(conf, shape);
   }
 
   @Override
   public int[][] getShape() {
-    return new org.deeplearning4j.zoo.model.SimpleCNN().metaData().getInputShape();
+    return org.deeplearning4j.zoo.model.SimpleCNN.builder().build().metaData().getInputShape();
   }
 }
