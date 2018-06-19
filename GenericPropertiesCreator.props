@@ -37,8 +37,8 @@ weka.dl4j.dropout.AbstractDropout =\
 weka.dl4j.schedules.Schedule =\
  weka.dl4j.schedules
 
-weka.dl4j.schedules.Schedule.ScheduleType =\
- weka.dl4j.schedules
+org.nd4j.linalg.schedule.ScheduleType =\
+ org.nd4j.linalg.schedule
 
 weka.dl4j.weightnoise.AbstractWeightNoise =\
  weka.dl4j.weightnoise
