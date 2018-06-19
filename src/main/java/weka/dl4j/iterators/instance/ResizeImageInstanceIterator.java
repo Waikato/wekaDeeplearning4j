@@ -59,7 +59,7 @@ public class ResizeImageInstanceIterator extends ImageInstanceIterator {
         new ArffMetaDataLabelGenerator(data, getImagesLocation().toString());
     ResizeImageTransform rit = new ResizeImageTransform(width, height);
     ImageRecordReader reader =
-        new ImageRecordReader(height, width, getNumChannels(), labelGenerator, rit);
+        new ImageRecordReader(getHeight(), getWidth(), getNumChannels(), labelGenerator, rit);
     CollectionInputSplit cis = new CollectionInputSplit(labelGenerator.getPathURIs());
     reader.initialize(cis);
     return reader;

@@ -950,7 +950,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @throws WekaException Either the .init operation on the current zooModel was not supported or
    * the data shape does not fit the chosen zooModel
    */
-  protected void createZooModel() throws WekaException {
+  protected void createZooModel() throws Exception {
     final AbstractInstanceIterator it = getInstanceIterator();
     final boolean isImageIterator = it instanceof ImageInstanceIterator;
 
@@ -985,8 +985,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
   }
 
-  protected boolean initZooModel(int numClasses, long seed, int[] newShape) {
+  protected boolean initZooModel(int numClasses, long seed, int[] newShape) throws Exception {
     try {
+      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape);
+      // Make a dummy feed forward pass to check if the model dimensions fit at each layer
+      Instances dummyData = new Instances(trainData);
+      for (int i = 0; i < instanceIterator.getTrainBatchSize(); i++) {
+        dummyData.add(trainData.get(i));
+      }
+      tmpModel.init();
+      DataSetIterator iter = getDataSetIterator(dummyData);
+      tmpModel.feedForward(iter.next().getFeatures(), false);
+
+      // No Exception thrown -> set model to this zoo model and return true
       model = zooModel.init(numClasses, seed, newShape);
       return true;
     } catch (UnsupportedOperationException e) {

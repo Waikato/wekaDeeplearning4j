@@ -81,7 +81,6 @@ public class ModelZooTest {
     epochListener.setN(1);
     clf.setIterationListener(epochListener);
     clf.setEarlyStopping(new EarlyStopping(5, 0));
-    clf.initializeClassifier(shrinkedData);
     clf.buildClassifier(shrinkedData);
   }
 
