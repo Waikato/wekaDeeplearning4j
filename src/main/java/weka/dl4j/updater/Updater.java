@@ -39,6 +39,9 @@ public abstract class Updater<T extends IUpdater>
 
   public Updater() {
     initializeBackend();
+    if (learningRateSchedule instanceof ConstantSchedule){
+      learningRateSchedule.setInitialValue(getLearningRate());
+    }
   }
 
   @ProgrammaticProperty
@@ -75,10 +78,7 @@ public abstract class Updater<T extends IUpdater>
   public void setLearningRate(double learningRate) {
     this.learningRate = learningRate;
     if (hasLearningRate()) {
-      // Check if schedule is constant
-      if (learningRateSchedule instanceof ConstantSchedule) {
-        ((ConstantSchedule) learningRateSchedule).setValue(learningRate);
-      }
+      learningRateSchedule.setInitialValue(learningRate);
       this.backend.setLrAndSchedule(learningRate, this.learningRateSchedule.getBackend());
     }
   }
@@ -107,9 +107,7 @@ public abstract class Updater<T extends IUpdater>
   public void setLearningRateSchedule(Schedule<? extends ISchedule> learningRateSchedule) {
     this.learningRateSchedule = learningRateSchedule;
     if (hasLearningRate()) {
-      if (learningRateSchedule instanceof ConstantSchedule) {
-        ((ConstantSchedule) learningRateSchedule).setValue(learningRate);
-      }
+      learningRateSchedule.setInitialValue(learningRate);
       this.backend.setLrAndSchedule(this.learningRate, this.learningRateSchedule.getBackend());
     }
   }

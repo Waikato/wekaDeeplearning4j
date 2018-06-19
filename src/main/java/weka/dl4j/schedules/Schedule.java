@@ -56,13 +56,6 @@ public abstract class Schedule<T extends ISchedule>
     this.scheduleType = scheduleType;
   }
 
-  @OptionMetadata(
-    displayName = "initialValue",
-    description = "The initial value (default = 1.0).",
-    commandLineParamName = "scheduleType",
-    commandLineParamSynopsis = "-scheduleType <string>",
-    displayOrder = 2
-  )
   public double getInitialValue() {
     return initialValue;
   }

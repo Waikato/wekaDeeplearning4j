@@ -8,6 +8,7 @@ import org.nd4j.linalg.schedule.ISchedule;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.schedules.ConstantSchedule.ConstantScheduleImpl;
+import weka.gui.ProgrammaticProperty;
 
 @EqualsAndHashCode(callSuper = true)
 @ToString
@@ -27,23 +28,20 @@ public class ConstantSchedule extends Schedule<ConstantScheduleImpl> {
 
   @Override
   public void initializeBackend() {
-    this.backend = new ConstantScheduleImpl();
+    this.backend = new ConstantScheduleImpl(initialValue);
   }
 
-  @OptionMetadata(
-    displayName = "value",
-    description = "The constant value (default = 1.0).",
-    commandLineParamName = "value",
-    commandLineParamSynopsis = "-value <double>",
-    displayOrder = 1
-  )
-  public double getValue() {
-    return backend.getValue();
+  @Override
+  @ProgrammaticProperty
+  public double getInitialValue() {
+    return initialValue;
   }
 
-  public void setValue(double value) {
-    initialValue = value;
-    backend.setValue(value);
+  @Override
+  @ProgrammaticProperty
+  public void setInitialValue(double initialValue) {
+    this.initialValue = initialValue;
+    this.backend.setValue(initialValue);
   }
 
   @Data
