@@ -11,6 +11,7 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * Default schedule interface that implements WEKA option handling. Each class that implements
@@ -56,10 +57,12 @@ public abstract class Schedule<T extends ISchedule>
     this.scheduleType = scheduleType;
   }
 
+  @ProgrammaticProperty
   public double getInitialValue() {
     return initialValue;
   }
 
+  @ProgrammaticProperty
   public void setInitialValue(double initialValue) {
     this.initialValue = initialValue;
   }
@@ -71,6 +74,9 @@ public abstract class Schedule<T extends ISchedule>
    * @return API wrapped object
    */
   public static Schedule<? extends ISchedule> create(ISchedule newBackend) {
+    if (newBackend == null){
+      return new ConstantSchedule();
+    }
     return ApiWrapperUtil.getImplementingWrapper(Schedule.class, newBackend, "weka.dl4j.schedules");
   }
 
