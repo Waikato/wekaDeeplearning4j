@@ -1,0 +1,52 @@
+# Template Description file for a Weka package
+#
+#
+
+# Package name (required)
+PackageName=wekaDeeplearning4j{BUILD_SUFFIX}
+
+# Version (required)
+Version={VERSION}
+
+#Date
+Date={DATE}
+
+# Title (required)
+Title=Weka wrappers for Deeplearning4j
+
+Category=Classification/Regression
+
+# Author (required)
+Author=Christopher Beckham, Eibe Frank, Mark Hall, Steven Lang and Felipe Bravo
+
+# Maintainer (required)
+Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
+
+# License (required)
+License=GPL 3.0
+
+Description=Provides access to classifiers and filters using the Deeplearning4j library. Deep neural networks can be built using a multitude of different layers, activations, lossfunctions and more. See https://deeplearning.cms.waikato.ac.nz/install#add-gpu-support to add CUDA support.
+
+Changes=Update Deeplearning4j API to dl4j 1.0.0
+
+# Package URL for obtaining the package archive (required)
+PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/{ZIP_NAME}
+
+# URL for further information
+URL=https://deeplearning.cms.waikato.ac.nz/
+
+# Dependencies
+#{PACKAGE_DEPENDENCIES}
+Depends=weka (>=3.8.0)
+
+# Package(s) that can't be installed alongside this one
+# - old wekaDeeplearning4j
+# - GPU version of this package (GPU-dev)
+# - other platforms inserted on build time
+Precludes=wekaDeeplearning4j-GPU-linux,wekaDeeplearning4j-GPU-macosx,wekaDeeplearning4j-GPU-windows,wekaDeeplearning4j-CPU-linux,wekaDeeplearning4j-CPU-macosx,wekaDeeplearning4j-CPU-windows
+
+# Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
+OSName={OS_NAME}
+
+# Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
+OSArch=64

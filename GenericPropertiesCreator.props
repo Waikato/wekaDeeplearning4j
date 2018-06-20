@@ -1,0 +1,55 @@
+weka.dl4j.NeuralNetConfiguration =\
+ weka.dl4j
+
+weka.dl4j.layers.Layer =\
+ weka.dl4j.layers
+
+weka.dl4j.distribution.Distribution =\
+ weka.dl4j.distribution
+
+org.deeplearning4j.nn.conf.stepfunctions.StepFunction =\
+  weka.dl4j.stepfunctions
+
+weka.dl4j.lossfunctions.LossFunction =\
+ weka.dl4j.lossfunctions
+
+weka.dl4j.iterators.instance.AbstractInstanceIterator =\
+ weka.dl4j.iterators.instance,\
+ weka.dl4j.iterators.instance.sequence,\
+ weka.dl4j.iterators.instance.sequence.text.cnn,\
+ weka.dl4j.iterators.instance.sequence.text.rnn
+
+weka.dl4j.activations.Activation =\
+ weka.dl4j.activations
+
+weka.dl4j.zoo.ZooModel =\
+ weka.dl4j.zoo
+
+org.deeplearning4j.optimize.api.IterationListener =\
+ weka.dl4j.listener
+
+weka.dl4j.updater.Updater =\
+ weka.dl4j.updater
+
+weka.dl4j.dropout.AbstractDropout =\
+ weka.dl4j.dropout
+
+weka.dl4j.schedules.Schedule =\
+ weka.dl4j.schedules
+
+org.nd4j.linalg.schedule.ScheduleType =\
+ org.nd4j.linalg.schedule
+
+weka.dl4j.weightnoise.AbstractWeightNoise =\
+ weka.dl4j.weightnoise
+
+
+weka.dl4j.earlystopping.EarlyStopping =\
+  weka.dl4j.earlystopping
+
+org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess =\ weka.dl4j.text.tokenization.tokenizer.preprocessor
+
+org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory =\ weka.dl4j.text.tokenization.tokenizerfactory
+
+weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\ weka.dl4j.text.stopwords
+

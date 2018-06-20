@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout
+        pattern="[%-5level] %d{HH:mm:ss.SSS} [%t] %logger{1} - %msg%n"/>
+      <!--pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>-->
+    </Console>
+  </Appenders>
+  <Loggers>
+    <!--Remove spam logs from ND4J-->
+    <Logger name="org.nd4j" level="INFO"/>
+    <Logger name="org.deeplearning4j" level="WARN"/>
+    <Logger name="org.reflections" level="ERROR"/>
+
+    <!--Root level-->
+    <Root level="debug">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

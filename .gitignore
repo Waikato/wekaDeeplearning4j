@@ -144,7 +144,13 @@ coverage-report/
 *.bin.gz
 
 # Testing class
-/package/src/main/java/weka/Main.java
+Main.java
 
 # build dir for make_zips.sh
 build/
+
+# Python environments
+env/
+
+# Ignore downloaded imdb dataset
+/src/test/resources/nominal/imdb.arff

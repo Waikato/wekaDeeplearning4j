@@ -94,7 +94,7 @@ clf.setNeuralNetConfiguration(nnc);
 Finally the layers are set with
 ```java
 // Add the layers to the classifier
-clf.setLayers(new Layer[]{denseLayer, outputLayer});
+clf.setLayers(denseLayer, outputLayer);
 ```
 
 ### Without Maven
@@ -128,11 +128,11 @@ public class Main {
 
 You can now compile it including the libraries in the classpath:
 ```bash
-javac -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/*:$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/lib/*" Main.java
+javac -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j/*:$WEKA_HOME/packages/wekaDeeplearning4j/lib/*" Main.java
 ```
 and run it with:
 ```bash
-java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j<BACKEND>-<PLATFORM>/*:$WEKA_HOME/packages/wekaDeeplearning4j<BACKEND>-<PLATFORM>/lib/*:." Main
+java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j/*:$WEKA_HOME/packages/wekaDeeplearning4j/lib/*:." Main
 ```
 
 (Use `;` as classpath separator for Windows instead) 
@@ -145,11 +145,10 @@ WekaDeeplearning4j adapts the model zoo of Deeplearning4j. That means it is poss
 
 - AlexNet
 - LeNet
+- GoogLeNet
 - SimpleCNN
 - VGG16
 - VGG19
-- ResNet50
-- InceptionResNetV1
 
 This set of models will be extended over the time.
 
