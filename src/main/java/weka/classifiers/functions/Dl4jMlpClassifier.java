@@ -358,6 +358,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     // default serialization
     oos.defaultWriteObject();
 
+    // Write layer configurations
+    String[] layerConfigs = new String[layers.length];
+    for (int i = 0; i < layers.length; i++) {
+      layerConfigs[i] = layers[i].getClass().getName() + "::" + weka.core.Utils.joinOptions(layers[i].getOptions());
+    }
+    oos.writeObject(layerConfigs);
+
     // actually write the network
     if (isInitializationFinished) {
       ModelSerializer.writeModel(model, oos, false);
@@ -375,6 +382,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
       // default deserialization
       ois.defaultReadObject();
+
+      // Restore the layers
+      String[] layerConfigs = (String[]) ois.readObject();
+      layers = new Layer[layerConfigs.length];
+      for (int i = 0; i < layerConfigs.length; i++) {
+        String layerConfigString = layerConfigs[i];
+        String[] split = layerConfigString.split("::");
+        String clsName = split[0];
+        String layerConfig = split[1];
+        String[] options = weka.core.Utils.splitOptions(layerConfig);
+        layers[i] = (Layer) weka.core.Utils.forName(Layer.class, clsName, options);
+      }
 
       // restore the network model
       if (isInitializationFinished) {
@@ -398,15 +417,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         }
         bos.flush();
         model = ModelSerializer.restoreComputationGraph(tmpFile, false);
-
-        layers = Arrays
-            .stream(model.getLayers())
-            .map(l -> Layer.create(l.conf().getLayer()))
-            .toArray(Layer[]::new);
-        System.out.println();
-      } else {
-        layers = new Layer[] {createOutputLayer()};
       }
+    } catch (Exception e) {
+      log.error("Failed to restore serialized model. Error: " + e.getMessage());
+      e.printStackTrace();
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
