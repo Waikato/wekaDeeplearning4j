@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 # Get all necessary variables
 $platform = "windows"
-$version = "1.5.0-alpha.4"
+$version = "1.5.0"
 $nvcc_output = $( nvcc --version )
 $cuda_version = (($nvcc_output -split ",")[1] -split " ")[2]
 $zip_name = "wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip"
