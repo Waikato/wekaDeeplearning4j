@@ -153,7 +153,7 @@ public class TestUtil {
    * @throws Exception Filterapplication went wrong
    */
   public static Instances[] splitTrainTest(Instances data) throws Exception {
-    return splitTrainTest(data, 33);
+    return splitTrainTest(data, 80);
   }
 
   /**

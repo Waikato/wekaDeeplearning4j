@@ -56,7 +56,7 @@ public class StabilityTest {
     log.info("Success: " + success);
 
     log.info(clf.getModel().conf().toYaml());
-    Assert.assertTrue("Performance was < " + minPerfomance, success);
+    Assert.assertTrue("Performance was < " + minPerfomance + ". TestPctCorrect: " + testPctCorrect +", TrainPctCorrect: " + trainPctCorrect, success);
   }
 
   @Test
