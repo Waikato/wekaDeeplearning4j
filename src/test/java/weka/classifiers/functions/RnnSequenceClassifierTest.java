@@ -60,7 +60,6 @@ import weka.util.TestUtil;
  * @author Steven Lang
  */
 @Log4j2
-@Ignore
 public class RnnSequenceClassifierTest {
 
   /** Current name */
@@ -198,6 +197,7 @@ public class RnnSequenceClassifierTest {
     // Randomize data
     data = DatasetLoader.loadAnger();
     data.randomize(new Random(42));
+
     TestUtil.holdout(clf, data, 1);
   }
 

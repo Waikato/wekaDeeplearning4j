@@ -100,7 +100,7 @@ public class TestUtil {
    * @throws Exception
    */
   public static void holdout(Classifier clf, Instances data) throws Exception {
-    holdout(clf, data, 33);
+    holdout(clf, data, 66);
   }
 
   /**
@@ -117,7 +117,7 @@ public class TestUtil {
   }
 
   /**
-   * Split the dataset into p% traind an (100-p)% testImdb set
+   * Split the dataset into p% train and (100-p)% testImdb set
    *
    * @param data Input data
    * @param p train percentage
@@ -134,12 +134,12 @@ public class TestUtil {
     RemovePercentage rp = new RemovePercentage();
     rp.setInputFormat(data);
     rp.setPercentage(p);
+    rp.setInvertSelection(true);
     Instances train = Filter.useFilter(data, rp);
 
     rp = new RemovePercentage();
     rp.setInputFormat(data);
     rp.setPercentage(p);
-    rp.setInvertSelection(true);
     Instances test = Filter.useFilter(data, rp);
 
     return new Instances[] {train, test};
