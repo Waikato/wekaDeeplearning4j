@@ -6,5 +6,5 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
      -layer "weka.dl4j.layers.DenseLayer -nOut 32 -activation \"weka.dl4j.activations.ActivationReLU \" " \
      -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" " \
      -numEpochs 10 \
-     -t ../package/datasets/nominal/iris.arff \
+     -t ../datasets/nominal/iris.arff \
      -split-percentage 66

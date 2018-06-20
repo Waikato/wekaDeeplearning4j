@@ -12,5 +12,5 @@ java -Xmx5g -cp ${WEKA_HOME}/weka.jar weka.Run \
 	 -layer "weka.dl4j.layers.OutputLayer " \
 	 -early-stopping "weka.dl4j.earlystopping.EarlyStopping -valPercentage 10 -maxEpochsNoImprovement 5" \
      -numEpochs 10 \
-     -t ../package/datasets/nominal/mnist.meta.minimal.arff \
+     -t ../datasets/nominal/mnist.meta.minimal.arff \
      -split-percentage 66
