@@ -25,7 +25,7 @@ Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
 # License (required)
 License=GPL 3.0
 
-Description=Provides a wrapper classifier for feedforward networks, including convolutional networks, trained using the Deeplearning4j library. This package provides only CPU support. If you want to run the algorithms on GPU install the wekaDeeplearning4jGPU-dev package and make sure that you have set up CUDA correctly.
+Description=Provides access to classifiers and filters using the Deeplearning4j library. Deep neural networks can be built using a multitude of different layers, activations, lossfunctions and more. See https://deeplearning.cms.waikato.ac.nz/install#add-gpu-support to add CUDA support.
 
 Changes=Update Deeplearning4j API to dl4j 1.0.0
 
@@ -43,7 +43,7 @@ Depends=weka (>=3.8.0)
 # - old wekaDeeplearning4j
 # - GPU version of this package (GPU-dev)
 # - other platforms inserted on build time
-Precludes={PRECLUDES}
+Precludes=wekaDeeplearning4j-GPU-linux,wekaDeeplearning4j-GPU-macosx,wekaDeeplearning4j-GPU-windows,wekaDeeplearning4j-CPU-linux,wekaDeeplearning4j-CPU-macosx,wekaDeeplearning4j-CPU-windows
 
 # Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
 OSName={OS_NAME}
