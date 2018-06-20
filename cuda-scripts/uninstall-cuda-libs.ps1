@@ -17,4 +17,5 @@ else
     Remove-Item $(Join-Path $package_path "lib" "*cuda-*")
 }
 
+Write-Output "Successfully removed the CUDA libraries from the wekaDeeplearning4j package!"
 

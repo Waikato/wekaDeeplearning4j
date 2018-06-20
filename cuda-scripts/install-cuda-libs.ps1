@@ -5,13 +5,13 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $platform = "windows"
 $version = "1.5.0"
 $nvcc_output = $( nvcc --version )
-$cuda_version = (($nvcc_output -split ",")[1] -split " ")[2]
+$cuda_version = (($nvcc_output -split ",")[4] -split " ")[2]
 $zip_name = "wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip"
 $url = "https://github.com/Waikato/wekaDeeplearning4j/releases/download/v$version/$zip_name"
 $output = $( Join-Path $PSScriptRoot $zip_name )
 
 # Check if cuda_version could be detected
-if ($cuda_version != "8.0" -and $cuda_version != "9.0" -and $cuda_version != "9.1")
+if ($cuda_version -ne "8.0" -and $cuda_version -ne "9.0" -and $cuda_version -ne "9.1")
 {
     Write-Output "Could not detect CUDA version. Is CUDA installed?"
     exit
@@ -28,7 +28,7 @@ else
 }
 
 # Check if package is installed
-if (-not(Test-Path [io.path]::combine($weka_home, "packages", "wekaDeeplearning4j")))
+if (-not(Test-Path ([io.path]::combine($weka_home, "packages", "wekaDeeplearning4j"))))
 {
     Write-Output "Could not find $weka_home/packages/wekaDeeplearning4j. Is the wekaDeeplearning4j package installed?"
     exit
