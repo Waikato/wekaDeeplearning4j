@@ -3,6 +3,7 @@ package weka.zoo;
 import java.util.Arrays;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.conf.GradientNormalization;
+import org.junit.Ignore;
 import weka.classifiers.functions.RnnSequenceClassifier;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
  * @author Steven Lang
  */
 @Log4j2
+@Ignore
 public class ZooModelTest {
 
   @Test
