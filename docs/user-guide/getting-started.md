@@ -1,6 +1,7 @@
 # Usage
 If you are new to Weka, you should probably first start reading the [Weka primer](https://weka.wikispaces.com/Primer) as a basic introduction.
 
+
 As most of Weka, the WekaDeeplearning4j's functionality is accessible in three ways:
 
 - Via the commandline interface
@@ -100,8 +101,8 @@ clf.setLayers(denseLayer, outputLayer);
 ### Without Maven
 If you are not using the package in a maven project as described [here](install#using-wekadeeplearning4j-in-a-maven-project), you need to add the following directories to your java classpath
 
-- `$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/*`
-- `$WEKA_HOME/packages/wekaDeeplearning4j-<BACKEND>-<PLATFORM>/lib*`
+- `$WEKA_HOME/packages/wekaDeeplearning4j/*`
+- `$WEKA_HOME/packages/wekaDeeplearning4j/lib*`
 
 Assuming you have the following `Main.java` file:
 ```java
@@ -116,7 +117,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) throws Exception {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        String irisPath = Paths.get(System.getenv("WEKA_HOME"), "packages", "wekaDeeplearning4j-<BACKEND>-<PLATFORM>", "datasets", "nominal", "iris.arff").toString();
+        String irisPath = Paths.get(System.getenv("WEKA_HOME"), "packages", "wekaDeeplearning4j", "datasets", "nominal", "iris.arff").toString();
         Instances inst = new Instances(new FileReader(irisPath));
         inst.setClassIndex(inst.numAttributes() - 1);
         Evaluation ev = new Evaluation(inst);
