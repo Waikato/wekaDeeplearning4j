@@ -2,6 +2,11 @@ package weka.zoo;
 
 import java.util.Arrays;
 import lombok.extern.log4j.Log4j2;
+import org.deeplearning4j.nn.conf.GradientNormalization;
+import weka.classifiers.functions.RnnSequenceClassifier;
+import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
+import weka.dl4j.updater.Adam;
 import weka.dl4j.zoo.ResNet50;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -24,7 +29,7 @@ import java.util.ArrayList;
  * @author Steven Lang
  */
 @Log4j2
-public class ModelZooTest {
+public class ZooModelTest {
 
   @Test
   public void testLeNetMnist() throws Exception {
@@ -50,6 +55,20 @@ public class ModelZooTest {
   public void testResNet50() throws Exception {
     buildModel(new ResNet50());
   }
+
+  @Test
+  public void testDarknet19() throws Exception{
+    buildModel(new Darknet19());
+  }
+  @Test
+  public void testFaceNetNN4Small2() throws Exception{
+    buildModel(new FaceNetNN4Small2());
+  }
+  @Test
+  public void testInceptionResNetV1() throws Exception{
+    buildModel(new InceptionResNetV1());
+  }
+
 
   private void buildModel(ZooModel model) throws Exception {
     // CLF
