@@ -16,6 +16,8 @@ weka.dl4j.lossfunctions.LossFunction=weka.gui.GenericObjectEditor
 
 weka.dl4j.iterators.instance.AbstractInstanceIterator=weka.gui.GenericObjectEditor
 
+weka.dl4j.iterators.instance.ImageInstanceIterator=weka.gui.GenericObjectEditor
+
 weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator=weka.gui.GenericObjectEditor
 
 weka.dl4j.activations.Activation=weka.gui.GenericObjectEditor
