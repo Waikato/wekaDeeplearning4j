@@ -1,4 +1,4 @@
-package weka.dl4j.iterators.instance;
+package weka.dl4j.iterators.instance.api;
 
 /**
  * Interface for objects for which convolution can be applied.

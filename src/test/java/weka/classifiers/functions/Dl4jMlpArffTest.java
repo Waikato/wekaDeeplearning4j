@@ -10,12 +10,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.nd4j.linalg.activations.Activation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
+import weka.dl4j.iterators.instance.api.ConvolutionInstanceIterator;
 import weka.dl4j.layers.*;
 import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.dl4j.updater.Adam;
@@ -23,7 +22,6 @@ import weka.dl4j.weightnoise.DropConnect;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

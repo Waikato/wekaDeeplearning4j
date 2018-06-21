@@ -1,11 +1,9 @@
 package weka.classifiers.functions;
 
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.Assert;
 import org.junit.Test;
-import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
@@ -13,7 +11,7 @@ import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
+import weka.dl4j.iterators.instance.api.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.ConvolutionLayer;

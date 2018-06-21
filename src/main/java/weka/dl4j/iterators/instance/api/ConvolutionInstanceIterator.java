@@ -19,7 +19,7 @@
  *
  */
 
-package weka.dl4j.iterators.instance;
+package weka.dl4j.iterators.instance.api;
 
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -30,6 +30,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 
 import java.util.Enumeration;
+import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a

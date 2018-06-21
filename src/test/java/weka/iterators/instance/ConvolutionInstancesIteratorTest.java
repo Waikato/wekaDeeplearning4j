@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
+import weka.dl4j.iterators.instance.api.ConvolutionInstanceIterator;
 import weka.util.DatasetLoader;
 
 import java.util.HashSet;

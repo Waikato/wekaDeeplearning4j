@@ -35,6 +35,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 
 import java.io.File;
+import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 
 /**
  * An iterator that loads images.
