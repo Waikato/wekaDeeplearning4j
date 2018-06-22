@@ -164,6 +164,7 @@ def build_main_package():
     os.makedirs(f'dist/{package_main_name}/lib', exist_ok=True)
 
     excludes = [
+        'weka*.jar',
         '*cuda*',
         '*.pom',
         "*android-x86*",
