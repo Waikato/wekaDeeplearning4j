@@ -36,13 +36,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.core.LoggerContext;
+//import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
@@ -53,7 +53,6 @@ import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.optimize.api.TrainingListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -99,6 +98,7 @@ import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
+import weka.dl4j.listener.TrainingListener;
 import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
@@ -116,7 +116,7 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  * @author Eibe Frank
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class Dl4jMlpClassifier extends RandomizableClassifier
     implements BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
@@ -250,17 +250,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Load the log4j2.xml specified in the package sources if no configuration is currently set.
    */
   private static void loadLoggerIfConfigMissing(){
-    LoggerContext context = (LoggerContext) LogManager
-        .getContext(false);
-    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
-    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
-      // Use log4j2.xml shipped with the package ...
-      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
-      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
-          "log4j2.xml").toUri();
-      context.setConfigLocation(uri);
-      log.info("Logging configuration loaded from source: {}", uri.toString());
-    }
+//    LoggerContext context = (LoggerContext) LogManager
+//        .getContext(false);
+//    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
+//    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
+//      // Use log4j2.xml shipped with the package ...
+//      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
+//      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
+//          "log4j2.xml").toUri();
+//      context.setConfigLocation(uri);
+//      log.info("Logging configuration loaded from source: {}", uri.toString());
+//    }
   }
 
   /**
@@ -1203,14 +1203,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * Get the iterationlistener
    */
-  protected List<TrainingListener> getListener() throws Exception {
+  protected TrainingListener getListener() throws Exception {
     int numSamples = trainData.numInstances();
-    List<TrainingListener> listeners = new ArrayList<>();
+    TrainingListener listener;
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
       int numEpochs = getNumEpochs();
-      ((EpochListener) iterationListener)
+      iterationListener
           .init(
               trainData.numClasses(),
               numEpochs,
@@ -1218,11 +1218,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
               trainIterator,
               earlyStopping.getValDataSetIterator());
       ((EpochListener) iterationListener).setLogFile(logFile);
-      listeners.add(iterationListener);
-    } else {
-      listeners.add(iterationListener);
     }
-    return listeners;
+    listener = iterationListener;
+    return listener;
   }
 
   /**

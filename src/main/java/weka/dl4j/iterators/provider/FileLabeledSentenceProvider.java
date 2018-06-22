@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.nd4j.linalg.primitives.Pair;
@@ -15,7 +15,7 @@ import org.nd4j.linalg.primitives.Pair;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class FileLabeledSentenceProvider implements LabeledSentenceProvider {
 
   private List<File> files;

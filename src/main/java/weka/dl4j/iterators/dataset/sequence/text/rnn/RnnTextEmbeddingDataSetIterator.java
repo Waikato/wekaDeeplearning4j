@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
@@ -28,7 +28,7 @@ import weka.core.stopwords.AbstractStopwords;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Serializable {
 
   private static final long serialVersionUID = 1682821361704251554L;

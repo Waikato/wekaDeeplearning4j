@@ -28,7 +28,7 @@ weka.dl4j.activations.Activation =\
 weka.dl4j.zoo.ZooModel =\
  weka.dl4j.zoo
 
-org.deeplearning4j.optimize.api.IterationListener =\
+weka.dl4j.listener.TrainingListener =\
  weka.dl4j.listener
 
 weka.dl4j.updater.Updater =\

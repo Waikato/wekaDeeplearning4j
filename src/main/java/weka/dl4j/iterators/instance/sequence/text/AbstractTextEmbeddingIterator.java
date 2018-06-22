@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
@@ -37,7 +37,7 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInstanceIterator {
 
   private static final long serialVersionUID = -7281727147475986632L;

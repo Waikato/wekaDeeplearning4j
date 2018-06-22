@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.junit.Assert;
@@ -36,7 +36,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class RelationalInstanceIteratorTest {
 
   /** Seed */

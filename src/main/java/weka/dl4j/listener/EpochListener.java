@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
@@ -27,7 +27,7 @@ import weka.core.OptionMetadata;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class EpochListener extends TrainingListener {
   private static final long serialVersionUID = -8852994767947925554L;
 

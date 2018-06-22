@@ -9,5 +9,5 @@ import org.deeplearning4j.nn.conf.WorkspaceMode;
  */
 public class Preferences {
   /** Global workspace mode */
-  public static WorkspaceMode WORKSPACE_MODE = WorkspaceMode.SINGLE;
+  public static WorkspaceMode WORKSPACE_MODE = WorkspaceMode.ENABLED;
 }

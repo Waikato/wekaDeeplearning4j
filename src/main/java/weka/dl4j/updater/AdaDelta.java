@@ -1,7 +1,7 @@
 package weka.dl4j.updater;
 
 import java.util.Enumeration;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.gui.ProgrammaticProperty;
@@ -11,7 +11,7 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class AdaDelta extends Updater< org.nd4j.linalg.learning.config.AdaDelta > {
   private static final long serialVersionUID = -5776515704843860182L;
 

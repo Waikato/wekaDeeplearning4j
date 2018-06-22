@@ -1,6 +1,6 @@
 package weka.classifiers.functions;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +29,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class StabilityTest {
 
   public static void evaluate(Dl4jMlpClassifier clf, Instances data, double minPerfomance)

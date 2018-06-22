@@ -2,7 +2,7 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.assertEquals;
 
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import weka.dl4j.dropout.AbstractDropout;
 import weka.dl4j.dropout.AlphaDropout;
@@ -15,7 +15,7 @@ import weka.dl4j.dropout.GaussianNoise;
  *
  * @author Steven Lang
  */
-@Log4j2
+@Slf4j
 public class DropoutLayerTest extends AbstractFeedForwardLayerTest<DropoutLayer> {
 
 
