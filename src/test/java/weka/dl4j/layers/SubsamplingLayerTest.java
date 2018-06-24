@@ -3,7 +3,7 @@ package weka.dl4j.layers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import org.deeplearning4j.nn.conf.ConvolutionMode;
+import weka.dl4j.ConvolutionMode;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.Before;
 import org.junit.Test;

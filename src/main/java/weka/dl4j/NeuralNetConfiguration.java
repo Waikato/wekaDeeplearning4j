@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.weights.WeightInit;
@@ -86,7 +85,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
         .miniBatch(miniBatch)
         .minimize(minimize)
         .weightNoise(weightNoise.getBackend())
-        .gradientNormalization(gradientNormalization)
+        .gradientNormalization(gradientNormalization.getBackend())
         .gradientNormalizationThreshold(gradientNormalizationThreshold)
         .inferenceWorkspaceMode(inferenceWorkspaceMode)
         .trainingWorkspaceMode(trainingWorkspaceMode);

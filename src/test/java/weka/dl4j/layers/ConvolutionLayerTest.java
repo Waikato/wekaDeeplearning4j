@@ -3,8 +3,8 @@ package weka.dl4j.layers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
+import weka.dl4j.ConvolutionMode;
+import weka.dl4j.AlgoMode;
 import org.junit.Before;
 import org.junit.Test;
 

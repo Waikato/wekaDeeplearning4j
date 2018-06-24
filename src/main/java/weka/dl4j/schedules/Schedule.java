@@ -5,7 +5,6 @@ import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.nd4j.linalg.schedule.ISchedule;
-import org.nd4j.linalg.schedule.ScheduleType;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;

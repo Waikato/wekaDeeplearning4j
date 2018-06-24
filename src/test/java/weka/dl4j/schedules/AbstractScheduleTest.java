@@ -2,14 +2,13 @@ package weka.dl4j.schedules;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Assert;
 import org.junit.Test;
-import org.nd4j.linalg.schedule.ScheduleType;
 import weka.dl4j.ApiWrapperTest;
 
 public abstract class AbstractScheduleTest<T extends Schedule> extends ApiWrapperTest<T> {
+
   @Test
-  public void setScheduleType(){
+  public void setScheduleType() {
     for (ScheduleType type : ScheduleType.values()) {
       wrapper.setScheduleType(type);
 
@@ -18,7 +17,7 @@ public abstract class AbstractScheduleTest<T extends Schedule> extends ApiWrappe
   }
 
   @Test
-  public void setInitialValue(){
+  public void setInitialValue() {
     double value = 123.456;
     wrapper.setInitialValue(value);
 

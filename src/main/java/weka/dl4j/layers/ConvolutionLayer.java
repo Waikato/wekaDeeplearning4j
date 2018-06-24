@@ -22,8 +22,8 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
+import weka.dl4j.ConvolutionMode;
+import weka.dl4j.AlgoMode;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -78,11 +78,11 @@ public class ConvolutionLayer
     displayOrder = 2
   )
   public ConvolutionMode getConvolutionMode() {
-    return backend.getConvolutionMode();
+    return ConvolutionMode.fromBackend(backend.getConvolutionMode());
   }
 
   public void setConvolutionMode(ConvolutionMode convolutionMode) {
-    backend.setConvolutionMode(convolutionMode);
+    backend.setConvolutionMode(convolutionMode.getBackend());
   }
 
   @OptionMetadata(
@@ -93,11 +93,11 @@ public class ConvolutionLayer
     displayOrder = 3
   )
   public AlgoMode getCudnnAlgoMode() {
-    return backend.getCudnnAlgoMode();
+    return AlgoMode.fromBackend(backend.getCudnnAlgoMode());
   }
 
   public void setCudnnAlgoMode(AlgoMode cudnnAlgoMode) {
-    backend.setCudnnAlgoMode(cudnnAlgoMode);
+    backend.setCudnnAlgoMode(cudnnAlgoMode.getBackend());
   }
 
   @OptionMetadata(

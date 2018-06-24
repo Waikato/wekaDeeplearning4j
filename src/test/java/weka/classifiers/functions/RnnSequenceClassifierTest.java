@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.deeplearning4j.nn.conf.GradientNormalization;
+import weka.dl4j.GradientNormalization;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;

@@ -20,8 +20,7 @@
  */
 package weka.dl4j.layers;
 
-import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
+import weka.dl4j.ConvolutionMode;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -108,11 +107,11 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
       displayOrder = 2
   )
   public ConvolutionMode getConvolutionMode() {
-    return backend.getConvolutionMode();
+    return ConvolutionMode.fromBackend(backend.getConvolutionMode());
   }
 
   public void setConvolutionMode(ConvolutionMode convolutionMode) {
-    backend.setConvolutionMode(convolutionMode);
+    backend.setConvolutionMode(convolutionMode.getBackend());
   }
 
 

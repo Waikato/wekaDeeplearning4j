@@ -51,13 +51,13 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
 
   @Override
   public org.nd4j.linalg.schedule.InverseSchedule getBackend() {
-    return new org.nd4j.linalg.schedule.InverseSchedule(scheduleType, initialValue, gamma, power);
+    return new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue, gamma, power);
   }
 
   @Override
   public void initializeBackend() {
     backend =
-        new org.nd4j.linalg.schedule.InverseSchedule(scheduleType, initialValue, gamma, power);
+        new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue, gamma, power);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
     this.gamma = newBackend.getGamma();
     this.power = newBackend.getPower();
     this.initialValue = newBackend.getInitialValue();
-    this.scheduleType = newBackend.getScheduleType();
+    this.scheduleType = ScheduleType.fromBackend(newBackend.getScheduleType());
   }
 
   /**

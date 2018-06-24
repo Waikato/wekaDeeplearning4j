@@ -55,12 +55,12 @@ public class MapSchedule extends Schedule<org.nd4j.linalg.schedule.MapSchedule> 
   @Override
   public void initializeBackend() {
     values = Collections.singletonMap(0, 0.1);
-    backend = new org.nd4j.linalg.schedule.MapSchedule(scheduleType, values);
+    backend = new org.nd4j.linalg.schedule.MapSchedule(scheduleType.getBackend(), values);
   }
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.MapSchedule newBackend) {
-    this.scheduleType = newBackend.getScheduleType();
+    this.scheduleType = ScheduleType.fromBackend(newBackend.getScheduleType());
     this.values = newBackend.getValues();
   }
 

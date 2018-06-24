@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.ConvolutionMode;
+import weka.dl4j.ConvolutionMode;
 import weka.dl4j.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.PoolingType;
 import org.junit.After;
