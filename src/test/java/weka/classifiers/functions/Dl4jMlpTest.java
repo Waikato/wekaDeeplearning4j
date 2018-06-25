@@ -13,7 +13,7 @@ import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.layers.Layer;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
+import weka.dl4j.PoolingType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -597,5 +597,33 @@ public class Dl4jMlpTest {
     clf.setCacheMode(CacheMode.MEMORY);
     final Instances data = DatasetLoader.loadAnger();
     TestUtil.holdout(clf, data);
+  }
+
+  @Test
+  public void testSetCacheMode() throws Exception {
+    clf.setInstanceIterator(idiMnist);
+
+    DenseLayer denseLayer = new DenseLayer();
+    denseLayer.setNOut(128);
+    denseLayer.setActivationFunction(new ActivationReLU());
+
+    DenseLayer denseLayer2 = new DenseLayer();
+    denseLayer2.setNOut(32);
+    denseLayer2.setActivationFunction(new ActivationReLU());
+
+    OutputLayer outputLayer = new OutputLayer();
+    outputLayer.setActivationFunction(new ActivationSoftmax());
+    outputLayer.setLossFn(new LossMCXENT());
+
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+    nnc.setSeed(TestUtil.SEED);
+
+    clf.setNeuralNetConfiguration(nnc);
+    clf.setLayers(denseLayer, denseLayer2, outputLayer);
+    clf.setIterationListener(new EpochListener());
+
+    clf.setCacheMode(CacheMode.FILESYSTEM);
+    TestUtil.holdout(clf, dataMnist);
   }
 }

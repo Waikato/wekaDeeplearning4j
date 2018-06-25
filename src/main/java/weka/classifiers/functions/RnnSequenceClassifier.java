@@ -2,7 +2,7 @@ package weka.classifiers.functions;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.inputs.InputType;
@@ -37,7 +37,7 @@ import weka.gui.ProgrammaticProperty;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class RnnSequenceClassifier extends Dl4jMlpClassifier
     implements CapabilitiesHandler, Classifier, Serializable, OptionHandler {
   /** SerialVersionUID */

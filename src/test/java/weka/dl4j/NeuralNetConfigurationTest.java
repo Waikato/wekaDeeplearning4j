@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import weka.dl4j.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
@@ -65,7 +65,7 @@ import weka.util.DatasetLoader;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class NeuralNetConfigurationTest {
 
   /** Default number of epochs */

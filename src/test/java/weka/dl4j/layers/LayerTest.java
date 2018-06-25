@@ -4,7 +4,7 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.layers.Layer;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
+import weka.dl4j.PoolingType;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.Assert;
 import org.junit.Test;

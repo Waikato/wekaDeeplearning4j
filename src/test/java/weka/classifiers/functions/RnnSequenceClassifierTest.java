@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import weka.dl4j.GradientNormalization;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
@@ -59,7 +59,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class RnnSequenceClassifierTest {
 
   /** Current name */

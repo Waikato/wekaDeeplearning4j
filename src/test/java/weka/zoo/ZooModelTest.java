@@ -1,7 +1,7 @@
 package weka.zoo;
 
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.junit.Ignore;
 import weka.classifiers.functions.RnnSequenceClassifier;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
  *
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 @Ignore
 public class ZooModelTest {
 

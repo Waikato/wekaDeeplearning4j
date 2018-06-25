@@ -36,13 +36,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.core.LoggerContext;
-//import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
@@ -116,7 +116,7 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  * @author Eibe Frank
  * @author Steven Lang
  */
-@Slf4j
+@Log4j2
 public class Dl4jMlpClassifier extends RandomizableClassifier
     implements BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
@@ -250,17 +250,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Load the log4j2.xml specified in the package sources if no configuration is currently set.
    */
   private static void loadLoggerIfConfigMissing(){
-//    LoggerContext context = (LoggerContext) LogManager
-//        .getContext(false);
-//    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
-//    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
-//      // Use log4j2.xml shipped with the package ...
-//      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
-//      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
-//          "log4j2.xml").toUri();
-//      context.setConfigLocation(uri);
-//      log.info("Logging configuration loaded from source: {}", uri.toString());
-//    }
+    LoggerContext context = (LoggerContext) LogManager
+        .getContext(false);
+    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
+    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
+      // Use log4j2.xml shipped with the package ...
+      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
+      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
+          "log4j2.xml").toUri();
+      context.setConfigLocation(uri);
+      log.info("Logging configuration loaded from source: {}", uri.toString());
+    }
   }
 
   /**
