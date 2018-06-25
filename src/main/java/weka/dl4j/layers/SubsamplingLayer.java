@@ -24,6 +24,7 @@ import weka.dl4j.ConvolutionMode;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.PoolingType;
 import weka.gui.ProgrammaticProperty;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
     setKernelSize(new int[] {2, 2});
     setStride(new int[] {1, 1});
     setPadding(new int[] {0, 0});
-    setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType.MAX);
+    setPoolingType(PoolingType.MAX);
     setEps(1e-8);
     setPnorm(1);
   }
@@ -245,12 +246,12 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
     commandLineParamSynopsis = "-poolingType <string>",
     displayOrder = 10
   )
-  public org.deeplearning4j.nn.conf.layers.PoolingType getPoolingType() {
-    return backend.getPoolingType();
+  public PoolingType getPoolingType() {
+    return PoolingType.fromBackend(backend.getPoolingType());
   }
 
-  public void setPoolingType(org.deeplearning4j.nn.conf.layers.PoolingType poolingType) {
-    backend.setPoolingType(poolingType);
+  public void setPoolingType(PoolingType poolingType) {
+    backend.setPoolingType(poolingType.getBackend());
   }
   /**
    * Returns an enumeration describing the available options.
