@@ -4,7 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import weka.dl4j.ConvolutionMode;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
+import weka.dl4j.PoolingType;
 import org.junit.Before;
 import org.junit.Test;
 

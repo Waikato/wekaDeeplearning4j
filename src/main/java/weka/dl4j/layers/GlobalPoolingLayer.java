@@ -1,7 +1,7 @@
 package weka.dl4j.layers;
 
 import java.util.Enumeration;
-import org.deeplearning4j.nn.conf.layers.PoolingType;
+import weka.dl4j.PoolingType;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 
@@ -35,11 +35,11 @@ public class GlobalPoolingLayer extends
     displayOrder = 10
   )
   public PoolingType getPoolingType() {
-    return backend.getPoolingType();
+    return PoolingType.fromBackend(backend.getPoolingType());
   }
 
   public void setPoolingType(PoolingType poolingType) {
-    backend.setPoolingType(poolingType);
+    backend.setPoolingType(poolingType.getBackend());
   }
 
   @OptionMetadata(
