@@ -157,8 +157,8 @@ def build_main_package():
         f'Building main package for {Colors.BOLD}CPU{Colors.ENDC} (all platforms)')
     clean_dirs()
     printout('Pulling dependencies')
-    cmd = 'mvn -q -Dmaven.javadoc.skip=true -DskipTests=true dependency:resolve process-sources'
-    exec_cmd(cmd)
+    cmd = './gradlew clean copyDependencies'
+    exec_cmd(cmd, print_output=True, exit_on_error=True)
     update_progress()
 
     os.makedirs(f'dist/{package_main_name}/lib', exist_ok=True)
@@ -222,8 +222,8 @@ def build_cuda_package(cuda_version: str, platform: str):
     package_name = f'{basename}-cuda-{cuda_version}-{version}-{platform}'
 
     printout('Pulling dependencies')
-    mvn_get_dependencies_cmd = f'mvn -q -Dmaven.javadoc.skip=true -DskipTests=true dependency:resolve process-sources -P cuda-{cuda_version}'
-    exec_cmd(mvn_get_dependencies_cmd)
+    mvn_get_dependencies_cmd = f'./gradlew clean copyDependencies -Dcuda={cuda_version}'
+    exec_cmd(mvn_get_dependencies_cmd,print_output=True, exit_on_error=True)
     update_progress()
 
     os.makedirs(f'dist/{package_name}/lib/', exist_ok=True)
