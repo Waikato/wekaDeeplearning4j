@@ -34,9 +34,16 @@ ext.versions = [
 ]
 
 /*
+ * Remove copied dependencies with clean task.
+ */
+clean.doFirst {
+    delete 'lib'
+}
+
+/*
  * Copy all compile-time dependencies into 'lib'.
  */
-task copyDependencies(type: Copy) {
+task copyDependencies(dependsOn: clean, type: Copy) {
     from configurations.compileClasspath
     into 'lib'
 }
@@ -46,7 +53,6 @@ task copyDependencies(type: Copy) {
  */
 task mainInitDistDir(dependsOn: clean) {
     doFirst {
-        delete "dist"
         mkdir "dist/${project.name}/lib"
     }
 }
@@ -125,8 +131,9 @@ task makeMainZip(dependsOn: [mainCopyJar, mainCopyDescriptionProps, mainCopyMisc
  * Task to start building the main package distribution
  */
 task makeMain(dependsOn: makeMainZip) {
-    delete "lib"
-    println("Building main package distribution. Final zip file can be found in ./dist/")
+    doLast{
+        println("Main package distribution built. Final zip file can be found in ./dist/")
+    }
 }
 
 /**
@@ -152,7 +159,6 @@ def createCudaDirTask(cuda_version, platform) {
     return tasks.create("makeCuda-$cuda_version-$platform", Copy) {
         def cuda_dist_lib_dir = "dist/${project.name}-cuda-$cuda_version-$platform/lib"
         doFirst {
-            delete cuda_dist_lib_dir
             mkdir cuda_dist_lib_dir
         }
 
@@ -207,10 +213,13 @@ if (is_cuda_version_valid) {
         createCudaZipTask(cuda_version, pf)
     }
 
-    // Cuda task
+    /*
+     * Cuda task
+     */
     task makeCuda(dependsOn: make_cuda_deps) {
-        delete "lib"
-        println("Building cuda-$cuda_version package distribution. Final zip file can be found in ./dist/")
+        doLast{
+            println("Cuda-$cuda_version package distribution built. Final zip file can be found in ./dist/")
+        }
     }
 }
 
@@ -237,7 +246,9 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$versions.log4j"
 
     // Other
-    implementation "edu.cmu.cs:ark-tweet-nlp:$versions.ark_tweet_nlp"
+    implementation ("edu.cmu.cs:ark-tweet-nlp:$versions.ark_tweet_nlp"){
+        exclude group: 'junit', module: 'junit'
+    }
     implementation "commons-lang:commons-lang:$versions.commons_lang"
     implementation "org.reflections:reflections:$versions.reflections"
 
@@ -246,9 +257,9 @@ dependencies {
     testImplementation "com.github.fracpete:inetutils4j:$versions.inetutils4j"
     testImplementation "junit:junit:$versions.junit"
 
-    // CUDA dependencies if set with "-Dcuda=X.Y"
+    // Cuda dependencies
     if (cuda_version != null) {
-        if (cuda_version in valid_cuda_versions) {
+        if (is_cuda_version_valid) {
             implementation "org.nd4j:nd4j-cuda-$cuda_version-platform:$versions.nd4j"
             implementation "org.deeplearning4j:deeplearning4j-cuda-$cuda_version:$versions.dl4j"
         } else {

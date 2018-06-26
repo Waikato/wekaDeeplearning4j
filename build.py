@@ -37,7 +37,7 @@ def update_progress():
     global BUILD_PROGRESS
     steps = get_max_progress_steps()
     BUILD_PROGRESS += (1.0 / steps)
-    printout('-' * 60)
+    printout('-' * 64)
 
 
 def get_max_progress_steps() -> int:
@@ -112,7 +112,6 @@ def install_main_package():
 
     main_zip = f'wekaDeeplearning4j-{version}.zip'
 
-    printout('Installing package')
     exec_cmd(
         f'java -cp {weka_jar} weka.core.WekaPackageManager -install-package dist/{main_zip}')
     update_progress()
