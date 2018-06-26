@@ -3,7 +3,7 @@
 #
 
 # Package name (required)
-PackageName=wekaDeeplearning4j{BUILD_SUFFIX}
+PackageName=wekaDeeplearning4j
 
 # Version (required)
 Version={VERSION}
@@ -46,7 +46,7 @@ Depends=weka (>=3.8.0)
 Precludes=wekaDeeplearning4j-GPU-linux,wekaDeeplearning4j-GPU-macosx,wekaDeeplearning4j-GPU-windows,wekaDeeplearning4j-CPU-linux,wekaDeeplearning4j-CPU-macosx,wekaDeeplearning4j-CPU-windows
 
 # Specify which OS's the package can operate with. Omitting this entry indicates no restrictions on OS. (optional)
-OSName={OS_NAME}
+OSName=
 
 # Specify which architecture the package can operate with. Omitting this entry indicates no restriction. (optional)
 OSArch=64

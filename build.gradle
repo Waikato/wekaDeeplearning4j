@@ -1,35 +1,228 @@
+// Specify plugins
 plugins {
     id 'java-library'
 }
 
+// Set project info
 group 'nz.ac.waikato.cms.weka'
-version new File('version').text.replace("\n","")
+version new File('version').text.replace("\n", "")
 description 'Deep learning for WEKA'
-sourceCompatibility 1.8
+def cuda_version = System.properties['cuda']
+def valid_cuda_versions = ['8.0', '9.0', '9.1']
+def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
-// Dependency versions
+// Set JDK compatibility
+allprojects {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+/*
+ * Dependency versions.
+ */
 ext.versions = [
-        'nd4j': '1.0.0-beta',
-        'dl4j': '1.0.0-beta',
-        'weka': '3.8.1',
-        'junit': '4.12',
-        'log4j':'2.9.1',
-        'ark_tweet_nlp' : '0.3.2',
+        'nd4j'         : '1.0.0-beta',
+        'dl4j'         : '1.0.0-beta',
+        'weka'         : '3.8.1',
+        'junit'        : '4.12',
+        'log4j'        : '2.9.1',
+        'ark_tweet_nlp': '0.3.2',
         'commons_lang' : '2.6',
-        'openblas' : '0.2.19-1.3',
-        'inetutils4j' : '0.0.2',
-        'reflections' : '0.9.10'
+        'openblas'     : '0.2.19-1.3',
+        'inetutils4j'  : '0.0.2',
+        'reflections'  : '0.9.10'
 ]
 
-// Copy all compiletime dependencies into 'lib'
+/*
+ * Copy all compile-time dependencies into 'lib'.
+ */
 task copyDependencies(type: Copy) {
     from configurations.compileClasspath
     into 'lib'
 }
 
+/*
+ * Initialize distribution directory.
+ */
+task mainInitDistDir(dependsOn: clean) {
+    doFirst {
+        delete "dist"
+        mkdir "dist/${project.name}/lib"
+    }
+}
 
+/*
+ * Copy main package libraries.
+ */
+task mainCopyLibs(dependsOn: [copyDependencies, mainInitDistDir], type: Copy) {
+    // Copy dependencies
+    from('lib/') {
+        exclude "weka*.jar"
+        exclude "*cuda*"
+        exclude "*.pom"
+        exclude "*android-x86*"
+        exclude "*android-arm*"
+        exclude "*ios-arm*"
+        exclude "*ios-x86*"
+        exclude "*x86.jar"
+        exclude "*linux-ppc64le*.jar"
+        exclude "*linux-armhf*.jar"
+        exclude "*linux-i686*.jar"
+        exclude "*win-i686*.jar"
+    }
+    into "dist/${project.name}/lib"
+}
+
+/*
+ * Copy miscelleneous main package files.
+ */
+task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
+    from('./') {
+        include 'GenericPropertiesCreator.props'
+        include 'GUIEditors.props'
+        include 'datasets/**'
+        include 'doc/**'
+        include 'src/main/**'
+        exclude 'src/main/*.iml'
+    }
+
+    into "dist/${project.name}/"
+}
+
+/*
+ * Copy Description.props file and replaces properties that are only known at build time, such as
+ * DATE, VERSION and ZIP_NAME.
+ */
+task mainCopyDescriptionProps(dependsOn: mainInitDistDir, type: Copy) {
+    from 'Description.props'
+    into "dist/${project.name}/"
+
+    def date = new Date().format("Y-M-D")
+    filter {
+        it.replaceAll("\\{DATE}", date)
+                .replaceAll("\\{VERSION}", "${project.version}")
+                .replaceAll("\\{ZIP_NAME}", "${project.name}-${project.version}.zip")
+    }
+}
+
+/*
+ * Copy the projects jar archive into the main package distribution.
+ */
+task mainCopyJar(dependsOn: [mainInitDistDir, assemble], type: Copy) {
+    from jar.archivePath
+    into "dist/${project.name}"
+}
+
+/*
+ * Zip up the main package distribution. Destination is 'dist'.
+ */
+task makeMainZip(dependsOn: [mainCopyJar, mainCopyDescriptionProps, mainCopyMisc, mainCopyLibs], type: Zip) {
+    from "dist/${project.name}"
+    destinationDir file("dist")
+}
+
+/*
+ * Task to start building the main package distribution
+ */
+task makeMain(dependsOn: makeMainZip) {
+    delete "lib"
+    println("Building main package distribution. Final zip file can be found in ./dist/")
+}
+
+/**
+ * Get the excluding platforms, given a specified platform.
+ * E.g. given 'linux', the result would be ['macosx', 'windows']
+ * @param platform Specified platform.
+ * @return Platforms that are not the specified platform
+ */
+static def getExcludePlatform(platform) {
+    def platforms = ['linux', 'windows', 'macosx']
+    platforms.remove(platform)
+    return new Tuple(platforms[0], platforms[1])
+}
+
+/**
+ * Create a task that initilializes the cuda package distribution for a specific cuda version and
+ * platform.
+ * @param cuda_version CUDA version
+ * @param platform Distribution platform
+ * @return Task that creates the distribution for the given cuda version and platform
+ */
+def createCudaDirTask(cuda_version, platform) {
+    return tasks.create("makeCuda-$cuda_version-$platform", Copy) {
+        def cuda_dist_lib_dir = "dist/${project.name}-cuda-$cuda_version-$platform/lib"
+        doFirst {
+            delete cuda_dist_lib_dir
+            mkdir cuda_dist_lib_dir
+        }
+
+        def excl_platforms = getExcludePlatform(platform)
+        def platform_exclude_1 = excl_platforms[0]
+        def platform_exclude_2 = excl_platforms[1]
+
+        from "lib"
+        into cuda_dist_lib_dir
+        exclude "*$platform_exclude_1*"
+        exclude "*$platform_exclude_2*"
+        exclude "*android-x86*"
+        exclude "*android-arm*"
+        exclude "*ios-arm*"
+        exclude "*ios-x86*"
+        exclude "*x86.jar"
+        exclude "*linux-ppc64le*.jar"
+        exclude "*linux-armhf*.jar"
+        exclude "*linux-i686*.jar"
+        exclude "*win-i686*.jar"
+        include "*cuda-$cuda_version*"
+        include "cuda-$cuda_version*"
+        include "cuda-platform-$cuda_version*"
+    }
+}
+
+/**
+ * Create a task that zips the cuda distribtuion for a given cuda version and platform.
+ * @param cuda_version CUDA version
+ * @param platform Distribution platform
+ * @return Task that zips the distribution for the given cuda version and platform
+ */
+def createCudaZipTask(cuda_version, platform) {
+    return tasks.create("makeCuda-$cuda_version-$platform-zip", Zip) {
+        def cuda_dist_dir = "dist/${project.name}-cuda-$cuda_version-$platform"
+        from cuda_dist_dir
+        baseName "${project.name}-cuda-$cuda_version-$version-$platform-x86_64"
+        destinationDir file("dist")
+        dependsOn "makeCuda-$cuda_version-$platform"
+    }
+}
+
+/*
+ * Create the necessary cuda tasks on the fly if a cuda version was given.
+ */
+if (is_cuda_version_valid) {
+    def make_cuda_deps = [copyDependencies]
+    def platforms = ["linux", "macosx", "windows"]
+    (platforms).each { pf ->
+        make_cuda_deps = make_cuda_deps + "makeCuda-$cuda_version-$pf-zip"
+        createCudaDirTask(cuda_version, pf)
+        createCudaZipTask(cuda_version, pf)
+    }
+
+    // Cuda task
+    task makeCuda(dependsOn: make_cuda_deps) {
+        delete "lib"
+        println("Building cuda-$cuda_version package distribution. Final zip file can be found in ./dist/")
+    }
+}
+
+/*
+ * Specify dependencies.
+ */
 dependencies {
+
+    // Weka
     implementation "nz.ac.waikato.cms.weka:weka-stable:$versions.weka"
+
+    // Deeplearning4j and ND4J
     implementation "org.deeplearning4j:deeplearning4j-core:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-nlp:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-zoo:$versions.dl4j"
@@ -38,22 +231,24 @@ dependencies {
     implementation "org.nd4j:nd4j-native-api:$versions.nd4j"
     implementation "org.bytedeco.javacpp-presets:openblas-platform:$versions.openblas"
 
+    // Logging
     implementation "org.apache.logging.log4j:log4j-api:$versions.log4j"
     implementation "org.apache.logging.log4j:log4j-core:$versions.log4j"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$versions.log4j"
+
+    // Other
     implementation "edu.cmu.cs:ark-tweet-nlp:$versions.ark_tweet_nlp"
     implementation "commons-lang:commons-lang:$versions.commons_lang"
     implementation "org.reflections:reflections:$versions.reflections"
 
+    // Tests
     testImplementation group: "nz.ac.waikato.cms.weka", name: "weka-stable", version: "$versions.weka", classifier: "tests"
     testImplementation "com.github.fracpete:inetutils4j:$versions.inetutils4j"
     testImplementation "junit:junit:$versions.junit"
 
-
-    def cuda_version = System.properties['cuda']
-    if(cuda_version != null){
-        def valid_cuda_versions = ['8.0', '9.0', '9.1']
-        if(cuda_version in valid_cuda_versions){
+    // CUDA dependencies if set with "-Dcuda=X.Y"
+    if (cuda_version != null) {
+        if (cuda_version in valid_cuda_versions) {
             implementation "org.nd4j:nd4j-cuda-$cuda_version-platform:$versions.nd4j"
             implementation "org.deeplearning4j:deeplearning4j-cuda-$cuda_version:$versions.dl4j"
         } else {
@@ -62,6 +257,9 @@ dependencies {
     }
 }
 
+/*
+ * Specify repositories to get the dependencies from
+ */
 repositories {
     jcenter()
     mavenCentral()

@@ -1,21 +1,18 @@
 #!/bin/bash
 #set -x
-build_dir="./build"
+build_dir="./release-files"
 rm -r ${build_dir}
 mkdir ${build_dir}
 mkdir -p ${build_dir}/props
 version=$(cat version)
-main_pack_name=wekaDeeplearning4j-${version}
+main_pack_name=wekaDeeplearning4j
 function copy_files {
-	for f in dist/*/;
-	do
-		ffixed=`cut -d'/' -f2 <(echo ${f})`
-	done
-	mkdir -p ${build_dir}/props/${main_pack_name}
-	cp dist/*.zip ${build_dir}
+  cp dist/*.zip ${build_dir}
   cp dist/${main_pack_name}/Description.props ${build_dir}/props/${main_pack_name}/
+  cp cuda-scripts/*.sh ${build_dir}
+  cp cuda-scripts/*ps1 ${build_dir}
 }
-./build.py -a
+./build.py -a -v
 copy_files
 
 ## Generate sha256 sums
