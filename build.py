@@ -139,6 +139,9 @@ if __name__ == '__main__':
     VERBOSE = opts.verbose
     version = get_version()
 
+    # Clean dist dir first
+    exec_cmd('./gradlew cleanDist')
+
     # Build the main package (CPU, all platforms) in any case
     build_main_package()
 

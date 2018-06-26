@@ -41,6 +41,15 @@ clean.doFirst {
 }
 
 /*
+ * Clean dist dir.
+ */
+task cleanDist(){
+    doLast{
+        delete 'dist'
+    }
+}
+
+/*
  * Copy all compile-time dependencies into 'lib'.
  */
 task copyDependencies(dependsOn: clean, type: Copy) {
