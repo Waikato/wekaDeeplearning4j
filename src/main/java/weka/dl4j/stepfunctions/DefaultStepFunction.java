@@ -5,6 +5,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.util.Enumeration;
+import weka.dl4j.ApiWrapper;
 
 /**
  * A version of DeepLearning4j's DefaultStepFunction that implements WEKA option handling.
@@ -13,7 +14,9 @@ import java.util.Enumeration;
  */
 @JsonTypeName("default")
 public class DefaultStepFunction
-    extends org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction implements OptionHandler {
+    extends StepFunction<org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction> implements OptionHandler {
+
+  private static final long serialVersionUID = -5500643918837817474L;
 
   /**
    * Returns an enumeration describing the available options.
@@ -46,5 +49,10 @@ public class DefaultStepFunction
   public void setOptions(String[] options) throws Exception {
 
     Option.setOptions(options, this, this.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction();
   }
 }

@@ -14,6 +14,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.distribution.Disabled;
 import weka.dl4j.distribution.Distribution;
 import weka.dl4j.dropout.AbstractDropout;
+import weka.dl4j.stepfunctions.StepFunction;
 import weka.dl4j.updater.Adam;
 import weka.dl4j.updater.Sgd;
 import weka.dl4j.updater.Updater;
