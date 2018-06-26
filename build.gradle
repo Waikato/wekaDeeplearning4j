@@ -204,7 +204,7 @@ def createCudaZipTask(cuda_version, platform) {
     return tasks.create("makeCuda-$cuda_version-$platform-zip", Zip) {
         def cuda_dist_dir = "dist/${project.name}-cuda-$cuda_version-$platform"
         from cuda_dist_dir
-        baseName "${project.name}-cuda-$cuda_version-$version-$platform-x86_64"
+        archiveName "${project.name}-cuda-$cuda_version-$version-$platform-x86_64.zip"
         destinationDir file("dist")
         dependsOn "makeCuda-$cuda_version-$platform"
     }
