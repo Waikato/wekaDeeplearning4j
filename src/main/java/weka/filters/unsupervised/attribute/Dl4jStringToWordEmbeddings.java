@@ -203,7 +203,26 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
   protected Instances process(Instances instances) throws Exception {
 
     Instances result = getOutputFormat();
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+      result = doProcess(instances);
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
+    }
 
+
+    return result;
+  }
+
+  /**
+   * Do the actual process step.
+   * @param instances Input
+   * @return Output
+   * @throws IOException Something went wrong.
+   */
+  protected Instances doProcess(Instances instances) throws IOException {
+    Instances result = getOutputFormat();
     if (this.textIndex > instances.numAttributes())
       throw new IOException("Invalid attribute index.");
 
@@ -283,7 +302,6 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
         result.add(inst);
       }
     }
-
     return result;
   }
 
