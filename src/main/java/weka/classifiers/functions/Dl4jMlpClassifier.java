@@ -50,7 +50,9 @@ import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
+import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
+import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -711,8 +713,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
 
     final Layer lastLayer = layers[layers.length - 1];
-    if (!(lastLayer.getBackend() instanceof BaseOutputLayer)) {
-      throw new MissingOutputLayerException("Last layer in network must be an output layer!");
+    org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend = lastLayer.getBackend();
+    if (!(lastLayerBackend instanceof BaseOutputLayer
+        || lastLayerBackend instanceof LossLayer
+        || lastLayerBackend instanceof ActivationLayer)) {
+      throw new MissingOutputLayerException("Last layer in network must be an output layer but was: "+ lastLayerBackend
+          .getClass().getSimpleName());
     }
 
     // Check if layers are valid

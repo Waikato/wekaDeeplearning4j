@@ -1,6 +1,7 @@
 package weka.dl4j.layers;
 
 import java.util.Enumeration;
+import org.nd4j.linalg.activations.impl.ActivationIdentity;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.activations.Activation;
@@ -17,6 +18,7 @@ public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.laye
     backend.setGradientNormalizationThreshold(Double.NaN);
     backend.setGradientNormalization(null);
     backend.setBiasInit(Double.NaN);
+    setActivationFunction(new weka.dl4j.activations.ActivationIdentity());
   }
 
   @OptionMetadata(

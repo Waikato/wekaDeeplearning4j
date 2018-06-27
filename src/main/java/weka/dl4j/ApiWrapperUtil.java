@@ -3,6 +3,7 @@ package weka.dl4j;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.Set;
+import lombok.extern.log4j.Log4j2;
 import org.reflections.Reflections;
 
 /**
@@ -10,6 +11,7 @@ import org.reflections.Reflections;
  *
  * @author Steven Lang
  */
+@Log4j2
 public class ApiWrapperUtil {
 
   /** Return the implementing wrapper class of a given backend object. */
