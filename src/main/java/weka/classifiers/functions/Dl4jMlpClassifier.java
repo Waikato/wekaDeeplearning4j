@@ -48,7 +48,6 @@ import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
-import weka.dl4j.ConvolutionMode;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
@@ -83,13 +82,14 @@ import weka.core.WekaException;
 import weka.core.WekaPackageManager;
 import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
+import weka.dl4j.ConvolutionMode;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
+import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.FeedForwardLayer;
@@ -1310,9 +1310,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   public void setZooModel(ZooModel zooModel) {
     this.zooModel = zooModel;
 
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     try {
       // Try to parse the layers so the user can change them afterwards
       final int dummyNumLabels = 2;
+
+      Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
       ComputationGraph tmpCg = zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0]);
       tmpCg.init();
       layers =
@@ -1320,10 +1323,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
               .map(l -> Layer.create(l.conf().getLayer()))
               .collect(Collectors.toList())
               .toArray(new Layer[tmpCg.getLayers().length]);
+
+
     } catch (Exception e) {
       if (!(zooModel instanceof CustomNet)) {
         log.error("Could not set layers from zoomodel.", e);
       }
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
     }
   }
 
