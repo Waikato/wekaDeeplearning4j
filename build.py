@@ -122,7 +122,7 @@ def build_main_package():
     """Build the main (CPU) package with gradle"""
     update_progress()
     printout('Building main package ...')
-    exec_cmd("./gradlew clean makeMainZip")
+    exec_cmd("./gradlew clean makeMain")
 
 
 def build_cuda_package(cuda_version: str):
