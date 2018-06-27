@@ -2,7 +2,6 @@ package weka.classifiers.functions;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +9,14 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import weka.dl4j.GradientNormalization;
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
+import weka.dl4j.text.tokenization.tokenizer.factory.CharacterNGramTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -29,24 +28,23 @@ import weka.core.stemmers.SnowballStemmer;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
-import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.sequence.RelationalInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextFilesEmbeddingInstanceIterator;
 import weka.dl4j.layers.LSTM;
 import weka.dl4j.layers.RnnOutputLayer;
-import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMSE;
 import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
 import weka.dl4j.text.stopwords.Dl4jNull;
 import weka.dl4j.text.stopwords.Dl4jRainbow;
 import weka.dl4j.text.stopwords.Dl4jWordsFromFile;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.StemmingPreprocessor;
-import weka.dl4j.text.tokenization.tokenizerfactory.CharacterNGramTokenizerFactory;
-import weka.dl4j.text.tokenization.tokenizerfactory.TweetNLPTokenizerFactory;
+import weka.dl4j.text.tokenization.preprocessor.CommonPreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.EndingPreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.LowCasePreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.StemmingPreProcessor;
+import weka.dl4j.text.tokenization.tokenizer.factory.TweetNLPTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.impl.CharacterNGramTokenizerFactoryImpl;
+import weka.dl4j.text.tokenization.tokenizer.factory.impl.TweetNLPTokenizerFactoryImpl;
 import weka.dl4j.updater.Adam;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
@@ -302,12 +300,12 @@ public class RnnSequenceClassifierTest {
         new Dl4jAbstractStopwords[] {new Dl4jRainbow(), new Dl4jNull(), wff}) {
       tii.setStopwords(sw);
 
-      final StemmingPreprocessor spp = new StemmingPreprocessor();
+      final StemmingPreProcessor spp = new StemmingPreProcessor();
       spp.setStemmer(new SnowballStemmer());
       // Iterate TokenPreProcess
       for (TokenPreProcess tpp :
           new TokenPreProcess[] {
-            new CommonPreprocessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
+            new CommonPreProcessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
           }) {
         tii.setTokenPreProcess(tpp);
 

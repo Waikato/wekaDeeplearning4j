@@ -163,7 +163,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
     SentenceIterator iter = new WekaInstanceSentenceIterator(instances, this.textIndex - 1);
 
     // sets the tokenizer
-    this.tokenizerFactory.setTokenPreProcessor(this.preprocessor);
+    this.tokenizerFactory.getBackend().setTokenPreProcessor(this.preprocessor.getBackend());
 
     // initializes stopwords
     this.stopWordsHandler.initialize();
@@ -172,7 +172,7 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
     this.vec =
         new Glove.Builder()
             .iterate(iter)
-            .tokenizerFactory(this.tokenizerFactory)
+            .tokenizerFactory(this.tokenizerFactory.getBackend())
             .alpha(this.alpha)
             .learningRate(this.learningRate)
             .epochs(this.epochs)

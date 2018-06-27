@@ -14,69 +14,29 @@
  */
 
 /*
- *    TweetNLPTokenizerFactory.java
+ *    TweetNLPTokenizerFactoryImpl.java
  *    Copyright (C) 1999-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizerfactory;
+package weka.dl4j.text.tokenization.tokenizer.factory;
 
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
-import weka.core.Option;
-import weka.core.OptionHandler;
-
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
+import weka.dl4j.text.tokenization.tokenizer.factory.impl.NGramTokenizerFactoryImpl;
 
 /**
- * A DeepLearning4j's TokenizerFactory interface for the CMU TweetNLP tokenizer.
+ * A DeepLearning4j's TokenizerFactory interface for Weka core tokenizers.
  *
  * @author Felipe Bravo-Marquez
  */
-public class TweetNLPTokenizerFactory implements TokenizerFactory, Serializable, OptionHandler {
+public class NGramTokenizerFactory extends TokenizerFactory<NGramTokenizerFactoryImpl> implements
+    Serializable, OptionHandler {
 
-  /** For Serialization */
-  private static final long serialVersionUID = 4694868790645893109L;
-
-  /** The TokenPreProcess object */
-  private TokenPreProcess tokenPreProcess;
-
-  /* (non-Javadoc)
-   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
-   */
-  @Override
-  public Tokenizer create(String toTokenize) {
-    Tokenizer t = new TweetNLPTokenizer(toTokenize);
-    t.setTokenPreProcessor(tokenPreProcess);
-    return t;
-  }
-
-  /* (non-Javadoc)
-   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
-   */
-  @Override
-  public Tokenizer create(InputStream toTokenize) {
-    return null;
-  }
-
-  /* (non-Javadoc)
-   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
-   */
-  @Override
-  public TokenPreProcess getTokenPreProcessor() {
-    return tokenPreProcess;
-  }
-
-  /* (non-Javadoc)
-   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
-   */
-  @Override
-  public void setTokenPreProcessor(TokenPreProcess preProcessor) {
-    this.tokenPreProcess = preProcessor;
-  }
+  private static final long serialVersionUID = 1087235421927714355L;
 
   /**
    * Returns a string describing this object.
@@ -84,7 +44,7 @@ public class TweetNLPTokenizerFactory implements TokenizerFactory, Serializable,
    * @return a description of the object suitable for displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "Uses the CMU TweetNLP tokenizer.";
+    return "Splits a string into an n-gram with min and max grams.";
   }
 
   /**
@@ -115,5 +75,57 @@ public class TweetNLPTokenizerFactory implements TokenizerFactory, Serializable,
    */
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  @OptionMetadata(
+      displayName = "NMax",
+      description = "NGram max size.",
+      commandLineParamName = "NMax",
+      commandLineParamSynopsis = "-NMax <int>",
+      displayOrder = 0
+  )
+  public int getNMax() {
+    return backend.getNMax();
+  }
+
+  public void setNMax(int nMax) {
+    backend.setNMax(nMax);
+  }
+
+  @OptionMetadata(
+      displayName = "NMin",
+      description = "NGram min size.",
+      commandLineParamName = "NMin",
+      commandLineParamSynopsis = "-NMin <int>",
+      displayOrder = 1
+  )
+  public int getNMin() {
+    return backend.getNMin();
+  }
+
+  public void setNMin(int nMin) {
+    backend.setNMin(nMin);
+  }
+
+
+  @OptionMetadata(
+      displayName = "delimiters",
+      description =
+          "Set of delimiter characters to use in tokenizing (\\r, \\n and \\t can be used for carriage-return, line-feed and tab).",
+      commandLineParamName = "delimiters",
+      commandLineParamSynopsis = "-delimiters <int>",
+      displayOrder = 2
+  )
+  public String getDelimiters() {
+    return backend.getDelimiters();
+  }
+
+  public void setDelimiters(String delimiters) {
+    backend.setDelimiters(delimiters);
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new NGramTokenizerFactoryImpl();
   }
 }

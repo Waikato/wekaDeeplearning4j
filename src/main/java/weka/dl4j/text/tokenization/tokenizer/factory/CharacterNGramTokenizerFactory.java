@@ -14,36 +14,31 @@
  */
 
 /*
- *    StemmingPreProcessor.java
+ *    TweetNLPTokenizerFactoryImpl.java
  *    Copyright (C) 1999-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import weka.core.Option;
-import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
-import weka.core.stemmers.NullStemmer;
-import weka.core.stemmers.Stemmer;
+package weka.dl4j.text.tokenization.tokenizer.factory;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
+import weka.dl4j.text.tokenization.tokenizer.factory.impl.CharacterNGramTokenizerFactoryImpl;
 
 /**
- * Implements basic cleaning inherited from CommonPreprocessor + does stemming using a Weka Stemmer.
+ * A DeepLearning4j's TokenizerFactory interface for Weka core tokenizers.
  *
  * @author Felipe Bravo-Marquez
  */
-public class StemmingPreprocessor
-    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
-    implements Serializable, OptionHandler {
+public class CharacterNGramTokenizerFactory
+    extends TokenizerFactory<CharacterNGramTokenizerFactoryImpl> implements Serializable,
+    OptionHandler {
 
-  /** For serialization */
-  private static final long serialVersionUID = 436336311776463684L;
 
-  /** A Weka stemmer objet */
-  private Stemmer stemmer = new NullStemmer();
+  private static final long serialVersionUID = -3574411395352628655L;
 
   /**
    * Returns a string describing this object.
@@ -51,7 +46,7 @@ public class StemmingPreprocessor
    * @return a description of the object suitable for displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "This tokenizer preprocessor implements basic cleaning inherited from CommonPreprocessor + does stemming using a Weka Stemmer.\n";
+    return "Splits a string into all character n-grams it contains based on the given maximum and minimum for n.";
   }
 
   /**
@@ -84,27 +79,38 @@ public class StemmingPreprocessor
     Option.setOptionsForHierarchy(options, this, super.getClass());
   }
 
-  /* (non-Javadoc)
-   * @see org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor#preProcess(java.lang.String)
-   */
-  @Override
-  public String preProcess(String token) {
-    String prep = super.preProcess(token);
-    return stemmer.stem(prep);
+  @OptionMetadata(
+      displayName = "NMax",
+      description = "NGram max size.",
+      commandLineParamName = "NMax",
+      commandLineParamSynopsis = "-NMax <int>",
+      displayOrder = 0
+  )
+  public int getNMax() {
+    return backend.getNMax();
+  }
+
+  public void setNMax(int nMax) {
+    backend.setNMax(nMax);
   }
 
   @OptionMetadata(
-    displayName = "stemmer",
-    description = "The Weka stemmer to use.",
-    commandLineParamName = "stemmer",
-    commandLineParamSynopsis = "-stemmer <String>",
-    displayOrder = 0
+      displayName = "NMin",
+      description = "NGram min size.",
+      commandLineParamName = "NMin",
+      commandLineParamSynopsis = "-NMin <int>",
+      displayOrder = 1
   )
-  public Stemmer getStemmer() {
-    return stemmer;
+  public int getNMin() {
+    return backend.getNMin();
   }
 
-  public void setStemmer(Stemmer stemmer) {
-    this.stemmer = stemmer;
+  public void setNMin(int nMin) {
+    backend.setNMin(nMin);
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new CharacterNGramTokenizerFactoryImpl();
   }
 }

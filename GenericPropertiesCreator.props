@@ -7,7 +7,7 @@ weka.dl4j.layers.Layer =\
 weka.dl4j.distribution.Distribution =\
  weka.dl4j.distribution
 
-org.deeplearning4j.nn.conf.stepfunctions.StepFunction =\
+weka.dl4j.stepfunctions.StepFunction =\
   weka.dl4j.stepfunctions
 
 weka.dl4j.lossfunctions.LossFunction =\
@@ -44,11 +44,14 @@ weka.dl4j.weightnoise.AbstractWeightNoise =\
  weka.dl4j.weightnoise
 
 weka.dl4j.earlystopping.EarlyStopping =\
-  weka.dl4j.earlystopping
+ weka.dl4j.earlystopping
 
-org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess =\ weka.dl4j.text.tokenization.tokenizer.preprocessor
+weka.dl4j.text.tokenization.preprocessor.TokenPreProcess =\
+ weka.dl4j.text.tokenization.preprocessor
 
-org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory =\ weka.dl4j.text.tokenization.tokenizerfactory
+weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory =\
+ weka.dl4j.text.tokenization.tokenizer.factory
 
-weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\ weka.dl4j.text.stopwords
+weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\
+ weka.dl4j.text.stopwords
 

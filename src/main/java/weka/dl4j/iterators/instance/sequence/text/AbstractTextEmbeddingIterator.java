@@ -18,8 +18,6 @@ import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.OptionMetadata;
@@ -28,8 +26,10 @@ import weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator;
 import weka.dl4j.iterators.provider.CollectionLabeledSentenceProvider;
 import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
 import weka.dl4j.text.stopwords.Dl4jRainbow;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import weka.dl4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.preprocessor.CommonPreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
+import weka.dl4j.text.tokenization.tokenizer.factory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 import weka.gui.ProgrammaticProperty;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   /** Word vector file location */
   protected File wordVectorLocation = new File(System.getProperty("user.home"));
   /** Token pre processor */
-  protected TokenPreProcess tokenPreProcess = new CommonPreprocessor();
+  protected TokenPreProcess tokenPreProcess = new CommonPreProcessor();
   /** Tokenizer factory */
   protected TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
   /** Stop words */
@@ -328,7 +328,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   @Override
   public void initialize() {
     super.initialize();
-    tokenizerFactory.setTokenPreProcessor(tokenPreProcess);
+    tokenizerFactory.getBackend().setTokenPreProcessor(tokenPreProcess.getBackend());
     initWordVectors();
   }
 

@@ -9,8 +9,6 @@ import java.util.stream.IntStream;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
@@ -21,6 +19,8 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 import weka.core.Instances;
 import weka.core.stopwords.AbstractStopwords;
+import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
+import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 
 /**
  * A DataSetIterator implementation that reads text documents from an arff file and translates each
@@ -70,7 +70,7 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
     this.truncateLength = truncateLength;
 
     this.tokenizerFactory = tokenFact;
-    this.tokenizerFactory.setTokenPreProcessor(tpp);
+    this.tokenizerFactory.getBackend().setTokenPreProcessor(tpp.getBackend());
     this.stopWords = stopWords;
     this.sentenceProvider = sentenceProvider;
   }
@@ -104,7 +104,7 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
     List<List<String>> allTokens = new ArrayList<>(numDocuments);
     int maxLength = 0;
     for (String s : reviews) {
-      List<String> tokens = tokenizerFactory.create(s).getTokens();
+      List<String> tokens = tokenizerFactory.getBackend().create(s).getTokens();
       List<String> tokensFiltered = new ArrayList<>();
       for (String t : tokens) {
         if (wordVectors.hasWord(t) && !stopWords.isStopword(t)) tokensFiltered.add(t);
@@ -158,7 +158,7 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
       // Assign "1" to each position where a feature is present, that is, in the interval of
       // [0, lastIdx)
       featuresMask
-          .get(new INDArrayIndex[] {NDArrayIndex.point(i), NDArrayIndex.interval(0, lastIdx)})
+          .get(NDArrayIndex.point(i), NDArrayIndex.interval(0, lastIdx))
           .assign(1);
 
       /*

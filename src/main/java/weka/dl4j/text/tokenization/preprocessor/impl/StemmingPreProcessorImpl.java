@@ -1,3 +1,5 @@
+package weka.dl4j.text.tokenization.preprocessor.impl;
+
 /*
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -14,30 +16,38 @@
  */
 
 /*
- *    CommonPreprocessor.java
+ *    StemmingPreProcessor.java
  *    Copyright (C) 1999-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import weka.core.Option;
-import weka.core.OptionHandler;
-
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
+import weka.core.stemmers.NullStemmer;
+import weka.core.stemmers.Stemmer;
 
 /**
- * A serializable version of DeepLearning4j's CommonPreprocessor.
+ * Implements basic cleaning inherited from CommonPreProcessor + does stemming using a Weka
+ * Stemmer.
  *
  * @author Felipe Bravo-Marquez
  */
-public class CommonPreprocessor
+public class StemmingPreProcessorImpl
     extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor
     implements Serializable, OptionHandler {
 
-  /** For serialization */
-  private static final long serialVersionUID = 7854676262098995012L;
+  /**
+   * For serialization
+   */
+  private static final long serialVersionUID = 436336311776463684L;
+
+  /**
+   * A Weka stemmer objet
+   */
+  private Stemmer stemmer = new NullStemmer();
 
   /**
    * Returns a string describing this object.
@@ -45,8 +55,7 @@ public class CommonPreprocessor
    * @return a description of the object suitable for displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "All numbers, punctuation symbols and some special symbols are stripped off. \n"
-        + "Additionally it forces lower case for all tokens.\n";
+    return "This tokenizer preprocessor implements basic cleaning inherited from CommonPreProcessor + does stemming using a Weka Stemmer.\n";
   }
 
   /**
@@ -77,5 +86,29 @@ public class CommonPreprocessor
    */
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreProcessor#preProcess(java.lang.String)
+   */
+  @Override
+  public String preProcess(String token) {
+    String prep = super.preProcess(token);
+    return stemmer.stem(prep);
+  }
+
+  @OptionMetadata(
+      displayName = "stemmer",
+      description = "The Weka stemmer to use.",
+      commandLineParamName = "stemmer",
+      commandLineParamSynopsis = "-stemmer <String>",
+      displayOrder = 0
+  )
+  public Stemmer getStemmer() {
+    return stemmer;
+  }
+
+  public void setStemmer(Stemmer stemmer) {
+    this.stemmer = stemmer;
   }
 }

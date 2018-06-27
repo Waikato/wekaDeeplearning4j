@@ -31,10 +31,14 @@ import java.util.List;
  */
 public class Dl4jRainbow extends Dl4jAbstractStopwords {
 
-  /** for serialization. */
+  /**
+   * for serialization.
+   */
   private static final long serialVersionUID = -722795295494945193L;
 
-  /** The hash set containing the list of stopwords. */
+  /**
+   * The hash set containing the list of stopwords.
+   */
   protected List<String> stopWords;
 
   /**
@@ -47,7 +51,9 @@ public class Dl4jRainbow extends Dl4jAbstractStopwords {
     return "Stopwords list based on Rainbow:\n" + "http://www.cs.cmu.edu/~mccallum/bow/rainbow/";
   }
 
-  /** Performs intialization of the scheme. */
+  /**
+   * Performs intialization of the scheme.
+   */
   @Override
   public void initialize() {
 

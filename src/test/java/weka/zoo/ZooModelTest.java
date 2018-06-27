@@ -30,7 +30,6 @@ import java.util.ArrayList;
  * @author Steven Lang
  */
 @Log4j2
-@Ignore
 public class ZooModelTest {
 
   @Test

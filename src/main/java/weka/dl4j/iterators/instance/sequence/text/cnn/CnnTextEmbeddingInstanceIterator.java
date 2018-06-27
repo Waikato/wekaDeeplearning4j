@@ -24,7 +24,7 @@ public class CnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingItera
     LabeledSentenceProvider clsp = getSentenceProvider(data);
     return new CnnSentenceDataSetIterator.Builder()
         .wordVectors(wordVectors)
-        .tokenizerFactory(tokenizerFactory)
+        .tokenizerFactory(tokenizerFactory.getBackend())
         .sentenceProvider(clsp)
         .minibatchSize(batchSize)
         .maxSentenceLength(truncateLength)

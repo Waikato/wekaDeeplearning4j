@@ -164,7 +164,7 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
     SentenceIterator iter = new WekaInstanceSentenceIterator(instances, this.textIndex - 1);
 
     // sets the tokenizer
-    this.tokenizerFactory.setTokenPreProcessor(this.preprocessor);
+    this.tokenizerFactory.getBackend().setTokenPreProcessor(this.preprocessor.getBackend());
 
     // initializes stopwords
     this.stopWordsHandler.initialize();
@@ -188,7 +188,7 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
             .windowSize(this.windowSize)
             .iterate(iter)
             .stopWords(this.stopWordsHandler.getStopList())
-            .tokenizerFactory(this.tokenizerFactory)
+            .tokenizerFactory(this.tokenizerFactory.getBackend())
             .build();
 
     // fit model

@@ -25,19 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * <!-- globalinfo-start -->
- * Dummy stopwords scheme, returns an empty list of stopWords..
- * <!-- globalinfo-end -->
+ * <!-- globalinfo-start --> Dummy stopwords scheme, returns an empty list of stopWords.. <!--
+ * globalinfo-end -->
  *
  * @author fracpete, Felipe Bravo-Marquez
  */
 public class Dl4jNull extends Dl4jAbstractStopwords {
 
-  /** For serialization. */
+  /**
+   * For serialization.
+   */
   private static final long serialVersionUID = -9129283649432847013L;
 
-  /** The list of stopwords. */
+  /**
+   * The list of stopwords.
+   */
   protected List<String> stopWords;
 
   /* (non-Javadoc)

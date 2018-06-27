@@ -19,24 +19,26 @@
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import weka.core.Option;
-import weka.core.OptionHandler;
+package weka.dl4j.text.tokenization.preprocessor;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.dl4j.text.tokenization.preprocessor.impl.LowCasePreProcessorImpl;
 
 /**
- * A serializable version of DeepLearning4j's LowCasePreProcessor.
+ * A wrapper that extends the PreProcessor API for {@link LowCasePreProcessorImpl}.
  *
- * @author Felipe Bravo-Marquez
+ * @author Steven Lang
  */
 public class LowCasePreProcessor
-    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor
+    extends TokenPreProcess<LowCasePreProcessorImpl>
     implements Serializable, OptionHandler {
 
-  /** For Serialization */
+  /**
+   * For Serialization
+   */
   private static final long serialVersionUID = -9082424217073308036L;
 
   /**
@@ -76,5 +78,10 @@ public class LowCasePreProcessor
    */
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new LowCasePreProcessorImpl();
   }
 }

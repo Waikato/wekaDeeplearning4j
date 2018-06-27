@@ -19,39 +19,47 @@
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizerfactory;
+package weka.dl4j.text.tokenization.tokenizer;
 
+import cmu.arktweetnlp.Twokenize;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * A DeepLearning4j's Tokenizer interface to Weka Tokenizer.
+ * A DeepLearning4j's Tokenizer interface for the CMU TweetNLP tokenizer.
  *
  * @author Felipe Bravo-Marquez
  */
-public class WekaTokenizer implements Tokenizer {
+public class TweetNLPTokenizer implements Tokenizer, Serializable {
 
-  /** The TokenPreProcess Object */
+  private static final long serialVersionUID = 4313371978509941373L;
+  /**
+   * The TokenPreProcess Object
+   */
   private TokenPreProcess tokenPreProcess;
 
-  /** The Weka Tokenizer Object */
-  private weka.core.tokenizers.Tokenizer wekaTokenizer;
+  /**
+   * The list of tokenized tokens
+   */
+  private List<String> tokens;
 
-  /** The number of tokens */
-  private int numTokens = 0;
+  /**
+   * The String iterator
+   */
+  private Iterator<String> iterator;
 
   /**
    * initializes the Object
    *
    * @param content the String to tokenize
-   * @param wekaTokenizer the WekaTokenizer Object
    */
-  public WekaTokenizer(String content, weka.core.tokenizers.Tokenizer wekaTokenizer) {
-    this.wekaTokenizer = wekaTokenizer;
-    this.wekaTokenizer.tokenize(content);
+  public TweetNLPTokenizer(String content) {
+    this.tokens = Twokenize.tokenizeRawTweetText(content);
+    this.iterator = tokens.iterator();
   }
 
   /* (non-Javadoc)
@@ -59,7 +67,7 @@ public class WekaTokenizer implements Tokenizer {
    */
   @Override
   public int countTokens() {
-    return this.numTokens;
+    return this.tokens.size();
   }
 
   /* (non-Javadoc)
@@ -87,7 +95,7 @@ public class WekaTokenizer implements Tokenizer {
    */
   @Override
   public boolean hasMoreTokens() {
-    return this.wekaTokenizer.hasMoreElements();
+    return this.iterator.hasNext();
   }
 
   /* (non-Javadoc)
@@ -96,10 +104,10 @@ public class WekaTokenizer implements Tokenizer {
   @Override
   public String nextToken() {
 
-    this.numTokens++;
-
-    String base = this.wekaTokenizer.nextElement();
-    if (tokenPreProcess != null) base = tokenPreProcess.preProcess(base);
+    String base = this.iterator.next();
+    if (tokenPreProcess != null) {
+      base = tokenPreProcess.preProcess(base);
+    }
     return base;
   }
 }

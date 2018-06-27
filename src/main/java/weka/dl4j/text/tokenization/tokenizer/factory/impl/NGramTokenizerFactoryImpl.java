@@ -14,42 +14,53 @@
  */
 
 /*
- *    TweetNLPTokenizerFactory.java
+ *    TweetNLPTokenizerFactoryImpl.java
  *    Copyright (C) 1999-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizerfactory;
+package weka.dl4j.text.tokenization.tokenizer.factory.impl;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.core.tokenizers.CharacterNGramTokenizer;
-
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Enumeration;
+import weka.core.tokenizers.NGramTokenizer;
+import weka.dl4j.text.tokenization.tokenizer.WekaTokenizer;
 
 /**
  * A DeepLearning4j's TokenizerFactory interface for Weka core tokenizers.
  *
  * @author Felipe Bravo-Marquez
  */
-public class CharacterNGramTokenizerFactory
-    implements TokenizerFactory, Serializable, OptionHandler {
+public class NGramTokenizerFactoryImpl implements TokenizerFactory, Serializable, OptionHandler {
 
-  /** For Serialization */
+  /**
+   * For Serialization
+   */
   private static final long serialVersionUID = 4694868790645893109L;
-  /** the maximum number of N */
+  /**
+   * the maximum number of N
+   */
   protected int nMax = 3;
-  /** the minimum number of N */
+  /**
+   * the minimum number of N
+   */
   protected int nMin = 1;
-  /** The TokenPreProcess object */
+  /**
+   * Delimiters used in tokenization
+   */
+  protected String delimiters = " \r\n\t.,;:'\"()?!";
+  /**
+   * The TokenPreProcess object
+   */
   private TokenPreProcess tokenPreProcess;
-  private CharacterNGramTokenizer wekaTokenizer;
+  private NGramTokenizer wekaTokenizer;
 
   /* (non-Javadoc)
    * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
@@ -57,9 +68,10 @@ public class CharacterNGramTokenizerFactory
   @Override
   public Tokenizer create(String toTokenize) {
 
-    this.wekaTokenizer = new CharacterNGramTokenizer();
+    this.wekaTokenizer = new NGramTokenizer();
     this.wekaTokenizer.setNGramMinSize(this.nMin);
     this.wekaTokenizer.setNGramMaxSize(this.nMax);
+    this.wekaTokenizer.setDelimiters(this.delimiters);
 
     WekaTokenizer t = new WekaTokenizer(toTokenize, wekaTokenizer);
     t.setTokenPreProcessor(tokenPreProcess);
@@ -96,7 +108,7 @@ public class CharacterNGramTokenizerFactory
    * @return a description of the object suitable for displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "Splits a string into all character n-grams it contains based on the given maximum and minimum for n.";
+    return "Splits a string into an n-gram with min and max grams.";
   }
 
   /**
@@ -130,11 +142,11 @@ public class CharacterNGramTokenizerFactory
   }
 
   @OptionMetadata(
-    displayName = "NMax",
-    description = "NGram max size.",
-    commandLineParamName = "NMax",
-    commandLineParamSynopsis = "-NMax <int>",
-    displayOrder = 0
+      displayName = "NMax",
+      description = "NGram max size.",
+      commandLineParamName = "NMax",
+      commandLineParamSynopsis = "-NMax <int>",
+      displayOrder = 0
   )
   public int getNMax() {
     return nMax;
@@ -145,11 +157,11 @@ public class CharacterNGramTokenizerFactory
   }
 
   @OptionMetadata(
-    displayName = "NMin",
-    description = "NGram min size.",
-    commandLineParamName = "NMin",
-    commandLineParamSynopsis = "-NMin <int>",
-    displayOrder = 1
+      displayName = "NMin",
+      description = "NGram min size.",
+      commandLineParamName = "NMin",
+      commandLineParamSynopsis = "-NMin <int>",
+      displayOrder = 1
   )
   public int getNMin() {
     return nMin;
@@ -157,5 +169,21 @@ public class CharacterNGramTokenizerFactory
 
   public void setNMin(int nMin) {
     this.nMin = nMin;
+  }
+
+  @OptionMetadata(
+      displayName = "delimiters",
+      description =
+          "Set of delimiter characters to use in tokenizing (\\r, \\n and \\t can be used for carriage-return, line-feed and tab).",
+      commandLineParamName = "delimiters",
+      commandLineParamSynopsis = "-delimiters <int>",
+      displayOrder = 2
+  )
+  public String getDelimiters() {
+    return delimiters;
+  }
+
+  public void setDelimiters(String delimiters) {
+    this.delimiters = delimiters;
   }
 }

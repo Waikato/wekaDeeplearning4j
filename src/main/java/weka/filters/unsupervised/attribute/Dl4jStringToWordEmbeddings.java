@@ -25,14 +25,14 @@ package weka.filters.unsupervised.attribute;
 
 import org.deeplearning4j.models.sequencevectors.SequenceVectors;
 import org.deeplearning4j.models.word2vec.VocabWord;
-import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
-import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
 import weka.core.*;
 import weka.core.Capabilities.Capability;
 import weka.dl4j.text.stopwords.Dl4jAbstractStopwords;
 import weka.dl4j.text.stopwords.Dl4jNull;
-import weka.dl4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
-import weka.dl4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.preprocessor.CommonPreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
+import weka.dl4j.text.tokenization.tokenizer.factory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
@@ -67,7 +67,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
    */
   protected Action action = Action.WORD_VECTOR;
   /** The TokenPreProcess object */
-  protected TokenPreProcess preprocessor = new CommonPreprocessor();
+  protected TokenPreProcess preprocessor = new CommonPreProcessor();
   /** The TokenizerFactory object */
   protected TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
   /** The Stopwords class */
@@ -249,7 +249,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
           values[n] = instances.instance(i).value(n);
 
         String content = instances.instance(i).stringValue(attrCont);
-        List<String> words = this.tokenizerFactory.create(content).getTokens();
+        List<String> words = this.tokenizerFactory.getBackend().create(content).getTokens();
 
         int m = 0;
         for (String word : words) {
@@ -364,7 +364,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
   @OptionMetadata(
     displayName = "preprocessor",
     description =
-        "The token Preprocessor for preprocessing the Strings. Default: CommonPreprocessor.",
+        "The token Preprocessor for preprocessing the Strings. Default: CommonPreProcessor.",
     commandLineParamName = "preprocessor",
     commandLineParamSynopsis = "-preprocessor <String>",
     displayOrder = 5

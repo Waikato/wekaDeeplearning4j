@@ -21,13 +21,16 @@
 
 package weka.dl4j.text.stopwords;
 
-import weka.core.Option;
-import weka.core.Utils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
+import weka.core.Option;
+import weka.core.Utils;
 
 /**
  * Abstract File based stopwords handler.
@@ -36,10 +39,14 @@ import java.util.*;
  */
 abstract class Dl4jAbstractFileBasedStopwords extends Dl4jAbstractStopwords {
 
-  /** for serialization */
+  /**
+   * for serialization
+   */
   private static final long serialVersionUID = 3733779108023241551L;
 
-  /** a file containing stopwords. */
+  /**
+   * a file containing stopwords.
+   */
   protected File stopWordsFile = new File(System.getProperty("user.dir"));
 
   /**
@@ -52,7 +59,9 @@ abstract class Dl4jAbstractFileBasedStopwords extends Dl4jAbstractStopwords {
     Vector<Option> result = new Vector<Option>();
 
     Enumeration<Option> enm = super.listOptions();
-    while (enm.hasMoreElements()) result.add(enm.nextElement());
+    while (enm.hasMoreElements()) {
+      result.add(enm.nextElement());
+    }
 
     result.addElement(
         new Option(
@@ -90,8 +99,11 @@ abstract class Dl4jAbstractFileBasedStopwords extends Dl4jAbstractStopwords {
     String tmpStr;
 
     tmpStr = Utils.getOption("stopwords", options);
-    if (tmpStr.isEmpty()) setStopwords(new File("."));
-    else setStopwords(new File(tmpStr));
+    if (tmpStr.isEmpty()) {
+      setStopwords(new File("."));
+    } else {
+      setStopwords(new File(tmpStr));
+    }
 
     super.setOptions(options);
   }
@@ -144,7 +156,9 @@ abstract class Dl4jAbstractFileBasedStopwords extends Dl4jAbstractStopwords {
       reader = null;
       try {
         reader = new BufferedReader(new FileReader(stopWordsFile));
-        while ((line = reader.readLine()) != null) result.add(line.trim());
+        while ((line = reader.readLine()) != null) {
+          result.add(line.trim());
+        }
       } catch (Exception e) {
         error("Failed to read stopwords file '" + stopWordsFile + "'!");
         e.printStackTrace();

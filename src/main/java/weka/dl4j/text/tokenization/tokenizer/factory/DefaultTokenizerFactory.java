@@ -14,30 +14,33 @@
  */
 
 /*
- *    EndingPreProcessor.java
+ *    DefaultTokenizerFactory.java
  *    Copyright (C) 1999-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
-package weka.dl4j.text.tokenization.tokenizer.preprocessor;
-
-import weka.core.Option;
-import weka.core.OptionHandler;
+package weka.dl4j.text.tokenization.tokenizer.factory;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.dl4j.text.tokenization.tokenizer.factory.impl.DefaultTokenizerFactoryImpl;
 
 /**
- * A serializable version of DeepLearning4j's EndingPreProcessor.
+ * A wrapper that extends the TokenizerFactory API for {@link DefaultTokenizerFactoryImpl}.
  *
- * @author Felipe Bravo-Marquez
+ * @author Steven Lang
  */
-public class EndingPreProcessor
-    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.EndingPreProcessor
+public class DefaultTokenizerFactory
+    extends
+    TokenizerFactory<DefaultTokenizerFactoryImpl>
     implements Serializable, OptionHandler {
 
-  /** For Serialization */
-  private static final long serialVersionUID = -7863874149371478868L;
+  /**
+   * For Serialization
+   */
+  private static final long serialVersionUID = 762619182220458182L;
 
   /**
    * Returns a string describing this object.
@@ -45,7 +48,7 @@ public class EndingPreProcessor
    * @return a description of the object suitable for displaying in the explorer/experimenter gui
    */
   public String globalInfo() {
-    return "Gets rid of endings: ed,ing, ly, s, ..\n";
+    return "Default tokenizer based on string tokenizer.";
   }
 
   /**
@@ -76,5 +79,10 @@ public class EndingPreProcessor
    */
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    backend = new DefaultTokenizerFactoryImpl();
   }
 }

@@ -23,13 +23,19 @@ package weka.dl4j.text.stopwords;
 import java.util.ArrayList;
 import java.util.List;
 
-/** @author fracpete, Felipe Bravo-Marquez */
+/**
+ * @author fracpete, Felipe Bravo-Marquez
+ */
 public class Dl4jWordsFromFile extends Dl4jAbstractFileBasedStopwords {
 
-  /** for serialization. */
+  /**
+   * for serialization.
+   */
   private static final long serialVersionUID = -722795295494945193L;
 
-  /** The list of stopwords. */
+  /**
+   * The list of stopwords.
+   */
   protected List<String> stopWords;
 
   /**
@@ -54,7 +60,9 @@ public class Dl4jWordsFromFile extends Dl4jAbstractFileBasedStopwords {
     return "The file containing the stopwords.";
   }
 
-  /** Performs intialization of the scheme. */
+  /**
+   * Performs intialization of the scheme.
+   */
   @Override
   public void initialize() {
     List<String> words;
@@ -63,7 +71,9 @@ public class Dl4jWordsFromFile extends Dl4jAbstractFileBasedStopwords {
     words = read();
     for (String word : words) {
       // comment?
-      if (!word.startsWith("#")) stopWords.add(word);
+      if (!word.startsWith("#")) {
+        stopWords.add(word);
+      }
     }
   }
 

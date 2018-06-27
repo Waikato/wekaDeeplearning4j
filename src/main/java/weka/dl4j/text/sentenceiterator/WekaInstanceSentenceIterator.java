@@ -21,12 +21,11 @@
 
 package weka.dl4j.text.sentenceiterator;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import org.deeplearning4j.text.sentenceiterator.BaseSentenceIterator;
 import weka.core.Instance;
 import weka.core.Instances;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * A Deeplearning4j's sentence iterator for Weka Instances. It considers Strings from a given
@@ -36,19 +35,29 @@ import java.util.Iterator;
  */
 public class WekaInstanceSentenceIterator extends BaseSentenceIterator {
 
-  /** The Weka Instances object to process */
+  /**
+   * The Weka Instances object to process
+   */
   private Instances instances;
 
-  /** The attribute String index */
+  /**
+   * The attribute String index
+   */
   private int index;
 
-  /** The Weka Instance iterator */
+  /**
+   * The Weka Instance iterator
+   */
   private Iterator<Instance> iterator;
 
-  /** An internal iterator for string attributes with multiple lines */
+  /**
+   * An internal iterator for string attributes with multiple lines
+   */
   private Iterator<String> internalIt;
 
-  /** A flag indicator for string attributs with multiple lines */
+  /**
+   * A flag indicator for string attributs with multiple lines
+   */
   private boolean interItOn;
 
   /**
@@ -79,8 +88,11 @@ public class WekaInstanceSentenceIterator extends BaseSentenceIterator {
    */
   @Override
   public boolean hasNext() {
-    if (this.interItOn) return this.iterator.hasNext() || this.internalIt.hasNext();
-    else return this.iterator.hasNext();
+    if (this.interItOn) {
+      return this.iterator.hasNext() || this.internalIt.hasNext();
+    } else {
+      return this.iterator.hasNext();
+    }
   }
 
   /* (non-Javadoc)
@@ -99,8 +111,9 @@ public class WekaInstanceSentenceIterator extends BaseSentenceIterator {
       return line;
 
     } else {
-      if (this.internalIt.hasNext()) return this.internalIt.next();
-      else {
+      if (this.internalIt.hasNext()) {
+        return this.internalIt.next();
+      } else {
         this.interItOn = false;
         String line = getNextWekaString();
         String[] intLines = line.split("\n+");
