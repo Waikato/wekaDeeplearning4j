@@ -18,6 +18,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.Classifier;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.CapabilitiesHandler;
@@ -73,6 +74,13 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     final Layer lastLayer = layers[layers.length - 1];
     if (!(lastLayer.getBackend() instanceof RnnOutputLayer)) {
       throw new MissingOutputLayerException("Last layer in network must be an output layer!");
+    }
+
+    // If only class is present, build zeroR
+    if(data.numAttributes() == 1 && data.classIndex() == 0){
+      zeroR = new ZeroR();
+      zeroR.buildClassifier(data);
+      return;
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
