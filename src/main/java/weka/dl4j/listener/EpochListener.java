@@ -154,24 +154,6 @@ public class EpochListener extends TrainingListener {
     }
   }
 
-  @Override
-  public void iterationDone(Model model, int iteration, int epoch) {}
-
-  @Override
-  public void onEpochStart(Model model) {}
-
-  @Override
-  public void onForwardPass(Model model, List<INDArray> activations) {}
-
-  @Override
-  public void onForwardPass(Model model, Map<String, INDArray> activations) {}
-
-  @Override
-  public void onGradientCalculation(Model model) {}
-
-  @Override
-  public void onBackwardPass(Model model) {}
-
   public int getN() {
     return this.n;
   }

@@ -2,6 +2,7 @@ package weka.dl4j.listener;
 
 import java.io.Serializable;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.optimize.api.BaseTrainingListener;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -14,7 +15,7 @@ import java.util.Enumeration;
  * @author Steven Lang
  */
 public abstract class TrainingListener
-    implements org.deeplearning4j.optimize.api.TrainingListener, OptionHandler, Serializable {
+    extends BaseTrainingListener implements OptionHandler, Serializable {
   /** SerialVersionUID */
   private static final long serialVersionUID = 8106114790187499011L;
 
