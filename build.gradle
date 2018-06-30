@@ -112,7 +112,10 @@ task mainCopyDescriptionProps(dependsOn: mainInitDistDir, type: Copy) {
     from 'Description.props'
     into "dist/${project.name}/"
 
-    def date = new Date().format("Y-M-D")
+    def date = new Date().format("yyyy-MM-dd")
+    println(date)
+    println(date)
+    println(date)
     filter {
         it.replaceAll("\\{DATE}", date)
                 .replaceAll("\\{VERSION}", "${project.version}")
