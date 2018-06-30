@@ -32,7 +32,7 @@ import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.dropout.Dropout;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.api.ConvolutionInstanceIterator;
+import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
