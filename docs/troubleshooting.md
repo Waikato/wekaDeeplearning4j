@@ -44,6 +44,6 @@ This extracts the library to `./usr/lib/x86_64-linux-gnu/libgomp.so.1`. Afterwar
 
 ## Package Installation: Skipping package wekaDeeplearning4j the OS/arch (Windows 7/8/10 x86) does not meet package OS/arch constraints: 64
 
-**Issue:**: Either your operating system is 32 bit or your installed Java version is 32 bit. WekaDeeplearning4j requires a 64 bit OS and Java installation.
+**Issue:** Either your operating system is 32 bit or your installed Java version is 32 bit. WekaDeeplearning4j requires a 64 bit OS and Java installation.
 
-**Solution**: Install a 64 bit Java version. If your operating system is 32 bit, there is no solution besides installing a 64 bit OS.
+**Solution:** Install a 64 bit Java version. If your operating system is 32 bit, there is no solution besides installing a 64 bit OS.
