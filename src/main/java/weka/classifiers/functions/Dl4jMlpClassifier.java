@@ -30,6 +30,7 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -242,6 +243,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected boolean isInitializationFinished = false;
 
   /**
+   * List of indices to store the label order.
+   */
+  protected int[] labelSortIndex;
+
+  /**
    * Default constructor
    */
   public Dl4jMlpClassifier() {
@@ -251,7 +257,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   /**
    * Load the log4j2.xml specified in the package sources if no configuration is currently set.
    */
-  private static void loadLoggerIfConfigMissing(){
+  private static void loadLoggerIfConfigMissing() {
     LoggerContext context = (LoggerContext) LogManager
         .getContext(false);
     ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
@@ -363,7 +369,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     // Write layer configurations
     String[] layerConfigs = new String[layers.length];
     for (int i = 0; i < layers.length; i++) {
-      layerConfigs[i] = layers[i].getClass().getName() + "::" + weka.core.Utils.joinOptions(layers[i].getOptions());
+      layerConfigs[i] = layers[i].getClass().getName() + "::" + weka.core.Utils
+          .joinOptions(layers[i].getOptions());
     }
     oos.writeObject(layerConfigs);
 
@@ -430,9 +437,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   /**
    * Generate the, for this model type, typical output layer.
+   *
    * @return New OutputLayer object
    */
-  protected Layer<? extends BaseOutputLayer> createOutputLayer(){
+  protected Layer<? extends BaseOutputLayer> createOutputLayer() {
     return new OutputLayer();
   }
 
@@ -704,6 +712,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   @Override
   public void initializeClassifier(Instances data) throws Exception {
 
+    // If only class is present, build zeroR
+    if (data.numAttributes() == 1 && data.classIndex() == 0) {
+      zeroR = new ZeroR();
+      zeroR.buildClassifier(data);
+      return;
+    }
+
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
 
@@ -717,8 +732,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     if (!(lastLayerBackend instanceof BaseOutputLayer
         || lastLayerBackend instanceof LossLayer
         || lastLayerBackend instanceof ActivationLayer)) {
-      throw new MissingOutputLayerException("Last layer in network must be an output layer but was: "+ lastLayerBackend
-          .getClass().getSimpleName());
+      throw new MissingOutputLayerException(
+          "Last layer in network must be an output layer but was: " + lastLayerBackend
+              .getClass().getSimpleName());
     }
 
     // Check if layers are valid
@@ -727,6 +743,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     // Apply preprocessing
     data = preProcessInput(data);
     data = initEarlyStopping(data);
+    saveLabelSortIndex(data);
 
     if (data != null) {
       trainData = data;
@@ -763,6 +780,31 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       isInitializationFinished = true;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
+    }
+  }
+
+  /**
+   * Store the label sort index for mapping weka-labels to resorted dl4j-labels.
+   *
+   * @param data Input data
+   */
+  protected void saveLabelSortIndex(Instances data) {
+    if (data.classAttribute().isNominal()) {
+      // Save Label order as DL4J automatically sorts them
+      List<String> labels = new ArrayList<>();
+      int numClassValues = data.classAttribute().numValues();
+      for (int i = 0; i < numClassValues; i++) {
+        labels.add(data.classAttribute().value(i));
+      }
+      List<String> labelsSorted = new ArrayList<>(labels);
+      Collections.sort(labelsSorted);
+      labelSortIndex = new int[numClassValues];
+
+      for (int i = 0; i < numClassValues; i++) {
+        String label = labels.get(i);
+        int sortedIndex = labelsSorted.indexOf(label);
+        labelSortIndex[i] = sortedIndex;
+      }
     }
   }
 
@@ -1431,7 +1473,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       // Build weka distribution output
       for (int i = 0; i < currentBatchSize; i++) {
         for (int j = 0; j < insts.numClasses(); j++) {
-          preds[i + offset][j] = predBatch.getDouble(i, j);
+          int jResorted = fixLabelIndexIfNominal(j, insts);
+          preds[i + offset][jResorted] = predBatch.getDouble(i, j);
         }
       }
       offset += currentBatchSize; // add batchsize as offset
@@ -1450,6 +1493,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       }
     }
     return preds;
+  }
+
+  /**
+   * Fixes nominal label indices. Dl4j sorts them during training time. A mapping from weka-labels
+   * resorted labels is stored in {@link this.labelsSortIndex}.
+   *
+   * @param j Original index
+   * @param insts Test dataset
+   * @return Remapped index if test dataset has nominal label. Else return {@code j}
+   */
+  protected int fixLabelIndexIfNominal(int j, Instances insts) {
+    if (insts.classAttribute().isNominal()) {
+      return labelSortIndex[j];
+    } else {
+      return j;
+    }
   }
 
   /**
@@ -1511,6 +1570,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
   /**
    * Returns the activations at a certain
+   *
    * @param layerName Layer name to get the activations from
    * @return Activations in form of instances
    */
@@ -1519,21 +1579,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     iter.reset();
     DataSet next;
     INDArray acts = null;
-    while (iter.hasNext()){
+    while (iter.hasNext()) {
       next = iter.next();
       INDArray features = next.getFeatures();
       int layerIdx = model.getLayer(layerName).getIndex() - 1;
       Map<String, INDArray> activations = model.feedForward(features, layerIdx, false);
       INDArray activationAtLayer = activations.get(layerName);
 
-      if (acts == null){
+      if (acts == null) {
         acts = activationAtLayer;
       } else {
         acts = Nd4j.concat(0, acts, activationAtLayer);
       }
     }
 
-    if (acts == null){
+    if (acts == null) {
       return new Instances(input, 0);
     } else {
       return Utils.ndArrayToInstances(acts);
