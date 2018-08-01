@@ -12,5 +12,5 @@ git add cuda-scripts/install-cuda-libs.ps1 -v
 git add cuda-scripts/install-cuda-libs.sh -v
 git commit -m "Version bump v${old} to v${new}"
 echo "Adding git tag: v$2"
-git tag $2
+git tag v$2
 echo "Do not forget to push the new tag."
