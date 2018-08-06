@@ -1474,7 +1474,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       for (int i = 0; i < currentBatchSize; i++) {
         for (int j = 0; j < insts.numClasses(); j++) {
           int jResorted = fixLabelIndexIfNominal(j, insts);
-          preds[i + offset][jResorted] = predBatch.getDouble(i, j);
+          preds[i + offset][j] = predBatch.getDouble(i, jResorted);
         }
       }
       offset += currentBatchSize; // add batchsize as offset
