@@ -28,6 +28,7 @@ import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import weka.core.Environment;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.Option;
@@ -36,6 +37,8 @@ import weka.dl4j.ArffMetaDataLabelGenerator;
 
 import java.io.File;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
+import weka.gui.FilePropertyMetadata;
+import weka.gui.knowledgeflow.KFGUIConsts;
 
 /**
  * An iterator that loads images.
@@ -62,6 +65,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   /** The location of the folder containing the images */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
 
+  @FilePropertyMetadata(fileChooserDialogType = KFGUIConsts.SAVE_DIALOG, directoriesOnly = true)
   @OptionMetadata(
     displayName = "directory of images",
     description = "The directory containing the images (default = user home).",
@@ -129,9 +133,16 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
    * @throws InvalidInputDataException if validation is unsuccessful
    */
   public void validate(Instances data) throws InvalidInputDataException {
-
-    if (!getImagesLocation().isDirectory()) {
-      throw new InvalidInputDataException("Directory not valid: " + getImagesLocation());
+    Environment env = Environment.getSystemWide();
+    String resolved = getImagesLocation().toString();
+    try {
+      resolved = env.substitute(getImagesLocation().toString());
+    } catch (Exception ex) {
+      // ignore
+    }
+    File imagesLoc = new File(resolved);
+    if (!imagesLoc.isDirectory()) {
+      throw new InvalidInputDataException("Directory not valid: " + resolved);
     }
     if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
       throw new InvalidInputDataException(
@@ -148,8 +159,16 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
    * @throws Exception
    */
   protected ImageRecordReader getImageRecordReader(Instances data) throws Exception {
+    Environment env = Environment.getSystemWide();
+    String resolved = getImagesLocation().toString();
+    try {
+      resolved = env.substitute(getImagesLocation().toString());
+    } catch (Exception ex) {
+      // ignore
+    }
+
     ArffMetaDataLabelGenerator labelGenerator =
-        new ArffMetaDataLabelGenerator(data, getImagesLocation().toString());
+        new ArffMetaDataLabelGenerator(data, resolved);
     ImageRecordReader reader =
         new ImageRecordReader(getHeight(), getWidth(), getNumChannels(), labelGenerator);
     CollectionInputSplit cis = new CollectionInputSplit(labelGenerator.getPathURIs());
