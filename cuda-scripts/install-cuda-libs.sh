@@ -9,7 +9,7 @@ case "${unameOut}" in
     *)          platform="UNSUPPORTED:${unameOut}"
 esac
 
-version='1.5.4'
+version='1.5.5'
 zip_name="wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip"
 selected_download=$1
 
