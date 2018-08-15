@@ -94,7 +94,7 @@ public class EpochListener extends TrainingListener {
             next = iterator.next(batch);
           }
           INDArray output =
-              net.outputSingle(next.getFeatureMatrix()); // get the networks prediction
+              net.outputSingle(next.getFeatures()); // get the networks prediction
           if (isClassification) classificationEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
           else regressionEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
         }

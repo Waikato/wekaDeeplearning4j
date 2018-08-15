@@ -118,23 +118,13 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
   }
 
   /**
-   * Returns the total number of examples in the dataset.
-   *
-   * @return the total number of examples in the dataset.
-   */
-  @Override
-  public int totalExamples() {
-    return data.numExamples();
-  }
-
-  /**
    * Returns the number of input columns.
    *
    * @return the number of input columns
    */
   @Override
   public int inputColumns() {
-    return data.get(0).getFeatureMatrix().columns();
+    return data.get(0).getFeatures().columns();
   }
 
   /**
@@ -184,25 +174,6 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
     return batchSize;
   }
 
-  /**
-   * The cursor given the location in the dataset.
-   *
-   * @return cursor
-   */
-  @Override
-  public int cursor() {
-    return cursor;
-  }
-
-  /**
-   * The number of examples in the dataset.
-   *
-   * @return the number of examples
-   */
-  @Override
-  public int numExamples() {
-    return data.numExamples();
-  }
 
   /**
    * Gets the preprocessor.

@@ -23,7 +23,6 @@ package weka.classifiers.functions.dl4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -220,15 +219,15 @@ public class Utils {
    * @throws WekaException Invalid input
    */
   public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
-    int batchsize = ndArray.size(0);
-    int[] shape = ndArray.shape();
+    int batchsize = (int) ndArray.size(0);
+    long[] shape = ndArray.shape();
     int dims = shape.length;
     if (dims < 2){
       throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
           + "but was " + Arrays.toString(shape));
     }
 
-    int prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
+    long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
     prod = prod/ batchsize;
 
     ArrayList<Attribute> atts = new ArrayList<>();

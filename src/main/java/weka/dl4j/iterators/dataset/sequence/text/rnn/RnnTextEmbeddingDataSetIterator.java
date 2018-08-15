@@ -191,11 +191,6 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
   }
 
   @Override
-  public int totalExamples() {
-    return data.numInstances();
-  }
-
-  @Override
   public int inputColumns() {
     return vectorSize;
   }
@@ -225,14 +220,9 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
     return batchSize;
   }
 
-  @Override
-  public int cursor() {
-    return cursor;
-  }
 
-  @Override
   public int numExamples() {
-    return totalExamples();
+    return data.numInstances();
   }
 
   @Override

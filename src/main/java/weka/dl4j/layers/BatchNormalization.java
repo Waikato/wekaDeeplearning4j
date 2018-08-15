@@ -161,13 +161,13 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
 
   @ProgrammaticProperty
   @Deprecated
-  public int getNOut() {
+  public long getNOut() {
     return backend.getNOut();
   }
 
   @ProgrammaticProperty
   @Deprecated
-  public void setNOut(int nOut) {
+  public void setNOut(long nOut) {
     backend.setNOut(nOut);
   }
 
