@@ -230,11 +230,11 @@ public class ConvolutionLayer
       commandLineParamSynopsis = "-nFilters <int>",
       displayOrder = 1
   )
-  public int getNOut() {
+  public long getNOut() {
     return backend.getNOut();
   }
 
-  public void setNOut(int nOut) {
+  public void setNOut(long nOut) {
     backend.setNOut(nOut);
   }
 

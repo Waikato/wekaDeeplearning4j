@@ -43,11 +43,11 @@ public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.laye
     commandLineParamSynopsis = "-nOut <int>",
     displayOrder = 2
   )
-  public int getNOut() {
+  public long getNOut() {
     return backend.getNOut();
   }
 
-  public void setNOut(int nOut) {
+  public void setNOut(long nOut) {
     backend.setNOut(nOut);
   }
 

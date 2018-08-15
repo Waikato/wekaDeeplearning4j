@@ -147,11 +147,6 @@ public class RelationalDataSetIterator implements DataSetIterator {
   }
 
   @Override
-  public int totalExamples() {
-    return data.numInstances();
-  }
-
-  @Override
   public int inputColumns() {
     return numFeatures;
   }
@@ -181,12 +176,6 @@ public class RelationalDataSetIterator implements DataSetIterator {
     return batchSize;
   }
 
-  @Override
-  public int cursor() {
-    return cursor;
-  }
-
-  @Override
   public int numExamples() {
     return data.numInstances();
   }

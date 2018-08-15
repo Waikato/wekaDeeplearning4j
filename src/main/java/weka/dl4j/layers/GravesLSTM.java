@@ -14,6 +14,7 @@ import weka.dl4j.activations.ActivationSigmoid;
  *
  * @author Steven Lang
  */
+@Deprecated
 public class GravesLSTM extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.GravesLSTM>
     implements OptionHandler, Serializable {
 

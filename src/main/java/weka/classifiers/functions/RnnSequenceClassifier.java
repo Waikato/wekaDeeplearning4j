@@ -213,7 +213,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     // Get predictions batch-wise
     while (next) {
       final DataSet ds = it.next();
-      final INDArray features = ds.getFeatureMatrix();
+      final INDArray features = ds.getFeatures();
       final INDArray labelsMask = ds.getLabelsMaskArray();
       INDArray lastTimeStepIndices;
       if (labelsMask != null){
@@ -222,7 +222,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
         lastTimeStepIndices = Nd4j.zeros(features.size(0), 1);
       }
       INDArray predBatch = model.outputSingle(features);
-      int currentBatchSize = predBatch.size(0);
+      int currentBatchSize = (int) predBatch.size(0);
       for (int i = 0; i < currentBatchSize; i++) {
         int thisTimeSeriesLastIndex = lastTimeStepIndices.getInt(i);
         INDArray thisExampleProbabilities =

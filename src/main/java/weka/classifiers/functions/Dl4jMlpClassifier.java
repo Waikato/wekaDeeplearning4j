@@ -1478,8 +1478,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Get predictions batch-wise
     while (next) {
-      INDArray predBatch = model.outputSingle(it.next().getFeatureMatrix());
-      int currentBatchSize = predBatch.shape()[0];
+      INDArray predBatch = model.outputSingle(it.next().getFeatures());
+      int currentBatchSize = (int) predBatch.shape()[0];
 
       // Build weka distribution output
       for (int i = 0; i < currentBatchSize; i++) {
