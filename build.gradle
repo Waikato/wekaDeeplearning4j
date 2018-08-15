@@ -261,7 +261,7 @@ dependencies {
     }
     implementation "commons-lang:commons-lang:$versions.commons_lang"
     implementation "org.reflections:reflections:$versions.reflections"
-    compileOnly "org.projectlombok:lombok:$versions.lombok"
+    implementation "org.projectlombok:lombok:$versions.lombok"
 
     // Tests
     testImplementation group: "nz.ac.waikato.cms.weka", name: "weka-stable", version: "$versions.weka", classifier: "tests"

@@ -251,10 +251,6 @@ public class NeuralNetConfigurationTest {
   @Test
   public void testOptimizationAlgo() throws Exception {
     for (OptimizationAlgorithm optAlgo : OptimizationAlgorithm.values()) {
-      // Skip deprecated optimization algorithms
-      if (optAlgo.equals(OptimizationAlgorithm.HESSIAN_FREE)) {
-        continue;
-      }
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setOptimizationAlgo(optAlgo);
       log.info(optAlgo.toString());

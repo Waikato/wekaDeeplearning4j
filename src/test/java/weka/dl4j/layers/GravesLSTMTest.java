@@ -23,6 +23,7 @@ import weka.dl4j.activations.ActivationSoftmax;
  *
  * @author Steven Lang
  */
+@Deprecated
 public class GravesLSTMTest extends AbstractFeedForwardLayerTest<GravesLSTM>{
 
 
