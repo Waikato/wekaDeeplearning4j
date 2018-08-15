@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-CUDA_VERSIONS = ['8.0', '9.0', '9.1']
+CUDA_VERSIONS = ['8.0', '9.0', '9.2']
 BUILD_PROGRESS = 0.0
 
 
