@@ -72,6 +72,7 @@ import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.CapabilitiesHandler;
 import weka.core.EmptyIteratorException;
+import weka.core.Environment;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidLayerConfigurationException;
@@ -111,6 +112,8 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.gui.FilePropertyMetadata;
+import weka.gui.knowledgeflow.KFGUIConsts;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -458,6 +461,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    *
    * @param logFile the log file
    */
+  @FilePropertyMetadata(fileChooserDialogType = KFGUIConsts.SAVE_DIALOG, directoriesOnly = false)
   @OptionMetadata(
       displayName = "log file",
       description =
@@ -1254,6 +1258,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected TrainingListener getListener() throws Exception {
     int numSamples = trainData.numInstances();
     TrainingListener listener;
+    Environment env = Environment.getSystemWide();
+    String resolved = logFile.toString();
+    try {
+      resolved = env.substitute(resolved);
+    } catch (Exception ex) {
+      // ignore
+    }
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
@@ -1265,7 +1276,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
               numSamples,
               trainIterator,
               earlyStopping.getValDataSetIterator());
-      ((EpochListener) iterationListener).setLogFile(logFile);
+      ((EpochListener) iterationListener).setLogFile(new File(resolved));
     }
     listener = iterationListener;
     return listener;
