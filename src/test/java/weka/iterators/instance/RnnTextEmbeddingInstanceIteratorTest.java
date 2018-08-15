@@ -63,15 +63,15 @@ public class RnnTextEmbeddingInstanceIteratorTest {
         final DataSet next = it.next();
 
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
-        final int[] shapeFeats = next.getFeatures().shape();
-        final int[] expShapeFeats = {bs, WORD_VEC_SIZE, tl};
+        final long[] shapeFeats = next.getFeatures().shape();
+        final long[] expShapeFeats = {bs, WORD_VEC_SIZE, tl};
         assertEquals(expShapeFeats[0],shapeFeats[0]);
         assertEquals(expShapeFeats[1],shapeFeats[1]);
         assertTrue(expShapeFeats[2] >= shapeFeats[2]);
 
         // Check label shape, expect: (batchsize x numclasses x sequencelength)
-        final int[] shapeLabels = next.getLabels().shape();
-        final int[] expShapeLabels = {bs, data.numClasses(), tl};
+        final long[] shapeLabels = next.getLabels().shape();
+        final long[] expShapeLabels = {bs, data.numClasses(), tl};
         assertEquals(expShapeLabels[0], shapeLabels[0]);
         assertEquals(expShapeLabels[1], shapeLabels[1]);
         assertTrue(expShapeLabels[2] >= shapeLabels[2]);

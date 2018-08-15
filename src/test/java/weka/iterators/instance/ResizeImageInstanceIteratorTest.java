@@ -62,7 +62,7 @@ public class ResizeImageInstanceIteratorTest {
       Assert.assertEquals(label, itLabel);
       labels.add(label);
 
-      int[] shape = next.getFeatures().shape();
+      long[] shape = next.getFeatures().shape();
 
       int batchIndex = 0;
       int channelIndex = 1;
