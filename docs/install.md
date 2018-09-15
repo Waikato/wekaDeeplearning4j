@@ -1,6 +1,7 @@
 # Prerequisites
 - Weka 3.8.0 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
 - WekaDeeplearning4j package 1.5.0 or above ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
+-Java 8 (http://weka.8497.n7.nabble.com/Error-when-installing-wekaDeeplearning4jCPU-td39037.html 
 
 You need to unzip the Weka zip file to a directory of your choice.
 
