@@ -1,7 +1,7 @@
 # Prerequisites
-- Weka 3.8.0 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
-- WekaDeeplearning4j package 1.5.0 or above ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
--Java 8 (http://weka.8497.n7.nabble.com/Error-when-installing-wekaDeeplearning4jCPU-td39037.html 
+- Weka 3.8.1 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
+- WekaDeeplearning4j package latest version ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
+- Java 8 or above
 
 You need to unzip the Weka zip file to a directory of your choice.
 
@@ -9,7 +9,7 @@ You need to unzip the Weka zip file to a directory of your choice.
 For the package no further requisites are necessary.
 
 #### GPU
-The GPU additions needs the CUDA 8.0, 9.0 or 9.1 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
+The GPU additions needs the CUDA 8.0, 9.0 or 9.2 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
 
 - [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
 - [Mac OS X](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html)
@@ -32,7 +32,7 @@ which results in
 ```
 Installed	Repository	Loaded	Package
 =========	==========	======	=======
-1.5.0    	-----     	Yes	    <PACKAGE>: Weka wrappers for Deeplearning4j
+1.5.6    	-----     	Yes	    <PACKAGE>: Weka wrappers for Deeplearning4j
 ```
 
 ## Add GPU Support
@@ -41,7 +41,7 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 ```bash
-./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-9.1-1.5.0-linux-x86_64.zip
+./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.6-linux-x86_64.zip
 ```
 
 # Using wekaDeeplearning4j in a Maven Project
@@ -57,7 +57,7 @@ $ mvn clean install
 or, if you want the cuda version:
 
 ```bash
-$ mvn clean install -P <CUDA-VERSION> # Replace <CUDA-VERSION> with either "8.0", "9.0" or "9.1"
+$ mvn clean install -P <CUDA-VERSION> # Replace <CUDA-VERSION> with either "8.0", "9.0" or "9.2"
 ```
 
 Now you can add the maven dependency in your `pom.xml` file 
