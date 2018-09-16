@@ -1,6 +1,7 @@
 // Specify plugins
 plugins {
     id 'java-library'
+    id 'maven-publish'
 }
 
 // Set project info
@@ -33,6 +34,18 @@ ext.versions = [
         'reflections'  : '0.9.10',
         'lombok'       : '1.18.2'
 ]
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'nz.ac.waikato.cms.weka'
+            artifactId = 'wekaDeeplearning4j'
+            version = "$version"
+
+            from components.java
+        }
+    }
+}
 
 /*
  * Remove copied dependencies with clean task.
