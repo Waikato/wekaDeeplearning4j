@@ -49,15 +49,15 @@ It is also possible to include this package as maven project. As of now it is no
 
 ```bash
 $ git clone https://github.com/Waikato/wekaDeeplearning4j.git
-$ cd wekaDeeplearning4j/package
-$ mvn clean install
+$ cd wekaDeeplearning4j
+$ ./gradlew build -x test publishToMavenLocal
 
 ```
 
 or, if you want the cuda version:
 
 ```bash
-$ mvn clean install -P <CUDA-VERSION> # Replace <CUDA-VERSION> with either "8.0", "9.0" or "9.2"
+$ ./gradlew build -x test publishToMavenLocal -Dcuda=<CUDA-VERSION> # Replace <CUDA-VERSION> with either "8.0", "9.0" or "9.2"
 ```
 
 Now you can add the maven dependency in your `pom.xml` file 
