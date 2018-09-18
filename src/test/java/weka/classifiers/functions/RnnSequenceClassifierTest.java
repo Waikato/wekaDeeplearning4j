@@ -60,9 +60,6 @@ import weka.dl4j.text.tokenization.preprocessor.CommonPreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.EndingPreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.LowCasePreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.StemmingPreProcessor;
-import weka.dl4j.text.tokenization.tokenizer.factory.TweetNLPTokenizerFactory;
-import weka.dl4j.text.tokenization.tokenizer.factory.impl.CharacterNGramTokenizerFactoryImpl;
-import weka.dl4j.text.tokenization.tokenizer.factory.impl.TweetNLPTokenizerFactoryImpl;
 import weka.dl4j.updater.Adam;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
@@ -332,7 +329,6 @@ public class RnnSequenceClassifierTest {
             new TokenizerFactory[] {
               new DefaultTokenizerFactory(),
               new CharacterNGramTokenizerFactory(),
-              new TweetNLPTokenizerFactory(),
             }) {
           tii.setTokenizerFactory(tf);
 
