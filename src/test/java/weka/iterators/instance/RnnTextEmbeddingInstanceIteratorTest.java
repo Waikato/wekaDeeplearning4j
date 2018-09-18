@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,10 +51,9 @@ public class RnnTextEmbeddingInstanceIteratorTest {
   private static final int WORD_VEC_SIZE = 300;
   /** Initialize iterator */
   @Before
-  public void init() {
+  public void init() throws IOException {
     this.tii = new RnnTextEmbeddingInstanceIterator();
-    final String modelPath = "/home/slang/Downloads/GoogleNews-vectors-negative300-SLIM.bin.gz";
-    this.tii.setWordVectorLocation(new File(modelPath));
+    this.tii.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
     this.tii.setTrainBatchSize(10);
   }
 
