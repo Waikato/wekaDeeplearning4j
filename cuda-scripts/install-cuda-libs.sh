@@ -45,7 +45,7 @@ fi
 
 echo -e "Extracting the CUDA libraries ..."
 unzip -q ${zip_name} -d out
-cp out/lib/* ${WEKA_HOME}/packages/wekaDeeplearning4j/lib/
+cp out/lib/* ${weka_home}/packages/wekaDeeplearning4j/lib/
 rm -r out
 echo -e "Successfully installed the CUDA libraries to the wekaDeeplearning4j package!"
 echo -e "To remove the CUDA libraries, run the 'uninstall-cuda-libs.sh' script."
