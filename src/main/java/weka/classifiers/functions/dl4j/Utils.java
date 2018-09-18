@@ -18,8 +18,6 @@
 
 package weka.classifiers.functions.dl4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -29,11 +27,13 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.WekaException;
+import weka.core.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -244,5 +244,73 @@ public class Utils {
     }
 
     return instances;
+  }
+
+  /**
+   * Access private field of a given object.
+   *
+   * @param obj       Object to be accessed
+   * @param fieldName Field name
+   * @param <T>       Return type
+   * @return Value of field with name {@code fieldName}
+   */
+  public static <T> T getFieldValue(Object obj, String fieldName) {
+    try {
+      Field f = obj.getClass().getSuperclass().getDeclaredField(fieldName);
+      f.setAccessible(true);
+      T field = (T) f.get(obj);
+      return field;
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Could not access private field " + fieldName + " of " +
+              "CnnSentenceDataSetIterator");
+    }
+  }
+
+  /**
+   * Set private field of a given object.
+   *
+   * @param obj       Object to be accessed
+   * @param fieldName Field name
+   * @param value     Field value to be set
+   * @param <T>       Field type
+   */
+  public static <T> void setFieldValue(Object obj, String fieldName, T value) {
+    try {
+      Field f = obj.getClass().getSuperclass().getDeclaredField(fieldName);
+      f.setAccessible(true);
+      f.set(obj, value);
+    } catch (NoSuchFieldException | IllegalAccessException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Could not access private field " + fieldName + " of " +
+              "CnnSentenceDataSetIterator");
+    }
+  }
+
+  /**
+   * Invoke a method on a given object.
+   *
+   * @param obj        Object to be referenced
+   * @param methodName Method name which is to be invoked
+   * @param args       Method arguments
+   * @param <T>        Return type
+   * @return Method return value
+   */
+  public static <T> T invokeMethod(Object obj, String methodName, Object... args) {
+    try {
+      Class<?>[] parameterTypes = new Class[args.length];
+      for (int i = 0; i < args.length; i++) {
+        parameterTypes[i] = args[i].getClass();
+      }
+
+      Class<?> clazz = obj.getClass().getSuperclass();
+      Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+      method.setAccessible(true);
+      return (T) method.invoke(obj, args);
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      e.printStackTrace();
+      throw new RuntimeException("Could not access private method " + methodName + " of " +
+              "CnnSentenceDataSetIterator");
+    }
   }
 }
