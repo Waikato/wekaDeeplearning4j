@@ -44,7 +44,7 @@ $ java -cp ${WEKA_HOME}/weka.jar weka.Run \
 ## Documentation
 The full documentation, giving installation instructions and getting started guides, is available at [https://deeplearning.cms.waikato.ac.nz/](https://deeplearning.cms.waikato.ac.nz/).
 
-The java documentation can be found [here](https://waikato.github.io/wekaDeeplearning4j/doc/).
+The java documentation can be found [here](https://waikato.github.io/wekaDeeplearning4j/).
 
 ## Contributing
 
