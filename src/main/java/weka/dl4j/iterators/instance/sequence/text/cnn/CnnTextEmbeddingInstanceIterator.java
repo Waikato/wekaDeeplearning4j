@@ -41,14 +41,14 @@ public class CnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingItera
     initialize();
     LabeledSentenceProvider clsp = getSentenceProvider(data);
     return new CnnSentenceDataSetIterator.Builder()
-        .wordVectors(wordVectors)
-        .tokenizerFactory(tokenizerFactory.getBackend())
-        .sentenceProvider(clsp)
-        .minibatchSize(batchSize)
-        .maxSentenceLength(truncateLength)
-        .useNormalizedWordVectors(false)
-        .sentencesAlongHeight(true)
-        .stopwords(stopwords)
+            .stopwords(stopwords)
+            .wordVectors(wordVectors)
+            .tokenizerFactory(tokenizerFactory.getBackend())
+            .sentenceProvider(clsp)
+            .minibatchSize(batchSize)
+            .maxSentenceLength(truncateLength)
+            .useNormalizedWordVectors(false)
+            .sentencesAlongHeight(true)
         .build();
   }
 
