@@ -48,6 +48,16 @@ publishing {
 }
 
 /*
+ * JavaDoc task
+ */
+task javaDoc(type: Javadoc){
+    failOnError = false
+    source = sourceSets.main.allJava
+    classpath = configurations.compileClasspath
+    options.memberLevel = JavadocMemberLevel.PUBLIC
+}
+
+/*
  * Remove copied dependencies with clean task.
  */
 clean.doFirst {
