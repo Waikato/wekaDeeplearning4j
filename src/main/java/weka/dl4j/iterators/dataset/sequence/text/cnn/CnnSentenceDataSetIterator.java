@@ -24,7 +24,6 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.primitives.Pair;
 import weka.core.stopwords.AbstractStopwords;
 
@@ -34,6 +33,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static org.nd4j.linalg.indexing.NDArrayIndex.*;
 import static weka.classifiers.functions.dl4j.Utils.*;
 
 /**
@@ -85,18 +85,64 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
     @Override
     public DataSet next(int num) {
         if (!hasNext()) {
+            // This should not happen as hasNext() should always be called prior to next(..)
             throw new NoSuchElementException("No next element available");
         }
-        LabeledSentenceProvider sentenceProvider = getSentenceProvider();
-        int maxSentenceLength = getMaxSentenceLength();
-        int numClasses = getNumClasses();
-        String unknownWordSentinel = getUnknownWordSentinel();
-        Map<String, Integer> labelClassMap = getLabelClassMap();
 
-        List<Pair<List<String>, String>> tokenizedSentences = new ArrayList<>(num);
-        int maxLength = -1;
-        int minLength = Integer.MAX_VALUE;
-        for (int i = tokenizedSentences.size(); i < num && sentenceProvider.hasNext(); i++) {
+        // Get the data for this mini batch
+        List<Datum> data = collectData(num);
+
+        // Get min and max token sizes in the current mini batch
+        int maxTokenSizeBatch = Integer.MIN_VALUE;
+        int minTokenSizeBatch = Integer.MAX_VALUE;
+        if (data.size() > 0){
+            maxTokenSizeBatch = data.stream().mapToInt(Datum::numTokens).max().getAsInt();
+            minTokenSizeBatch = data.stream().mapToInt(Datum::numTokens).min().getAsInt();
+        }
+
+
+        // Clip maxTokenSizeBatch with tokenLimit as upper bound
+        int tokenLimit = getMaxSentenceLength();
+        if (tokenLimit > 0) {
+            maxTokenSizeBatch = Math.min(maxTokenSizeBatch, tokenLimit);
+        }
+
+        // Create labels
+        INDArray labels = createLabels(data);
+
+        // Create features
+        INDArray features = createFeatures(data, maxTokenSizeBatch);
+
+
+        // Create feature mask if token sizes vary
+        INDArray featuresMask = null;
+        boolean hasDifferentTokenSizes = minTokenSizeBatch != maxTokenSizeBatch;
+        if (hasDifferentTokenSizes) {
+            featuresMask = createFeatureMask(data, maxTokenSizeBatch);
+        }
+
+        // Create DataSet
+        DataSet dataSet = new DataSet(features, labels, featuresMask, null);
+
+        // Preprocess DataSet
+        applyPreProcessing(dataSet);
+
+        // Increment the cursor
+        incrementCursor(dataSet.numExamples());
+        return dataSet;
+    }
+
+    /**
+     * Collect the data (List of datapoints containing tokens and an associated label.
+     *
+     * @param num Requested number of data points
+     * @return List of datapoints
+     */
+    protected List<Datum> collectData(int num) {
+        LabeledSentenceProvider sentenceProvider = getSentenceProvider();
+        String unknownWordSentinel = getUnknownWordSentinel();
+        List<Datum> data = new ArrayList<>(num);
+        for (int i = data.size(); i < num && sentenceProvider.hasNext(); i++) {
             Pair<String, String> p = sentenceProvider.nextSentence();
             String sentence = p.getFirst();
             String label = p.getSecond();
@@ -112,121 +158,143 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
                 tokens.add(unknownWordSentinel);
             }
 
-            // Update max/min token lengths
-            maxLength = Math.max(maxLength, tokens.size());
-            minLength = Math.min(minLength, tokens.size());
-            tokenizedSentences.add(new Pair<>(tokens, label));
+            data.add(new Datum(tokens, label));
         }
+        return data;
+    }
 
-        // Limit max length
-        if (maxSentenceLength > 0) {
-            maxLength = Math.min(maxLength, maxSentenceLength);
-        }
+    /**
+     * Create labels NDArray based on the input batch data
+     *
+     * @param data Input batch data
+     * @return NDArray containing the labels
+     */
+    protected INDArray createLabels(List<Datum> data) {
+        int numClasses = getNumClasses();
+        INDArray labels = Nd4j.create(data.size(), numClasses);
+        boolean isClassification = numClasses > 1;
+        boolean isRegression = numClasses == 1;
 
-        int currMinibatchSize = tokenizedSentences.size();
-
-        INDArray labels = Nd4j.create(currMinibatchSize, numClasses);
-        final boolean isClassification = numClasses > 1;
+        // Create labels based on task (Regression/Classification)
         if (isClassification) {
-            for (int i = 0; i < currMinibatchSize; i++) {
-                String labelStr = tokenizedSentences.get(i).getSecond();
-                if (!labelClassMap.containsKey(labelStr)) {
-                    throw new IllegalStateException(
-                            "Got label \""
-                                    + labelStr
-                                    + "\" that is not present in list of LabeledSentenceProvider labels");
-                }
-
-                int labelIdx = labelClassMap.get(labelStr);
-                labels.putScalar(i, labelIdx, 1.0);
-            }
-        } else if (numClasses == 1) {
-            // Fix labels array for Regression task
-            for (int i = 0; i < currMinibatchSize; i++) {
-                final String labelStr = tokenizedSentences.get(i).getSecond();
-                double lbl = Double.parseDouble(labelStr);
-                labels.putScalar(i, lbl);
-            }
+            createLabelsOneHot(data, labels);
+        } else if (isRegression) {
+            createLabelsRegression(data, labels);
         } else {
             throw new IllegalStateException("Number of classes must be >= 1.");
         }
+        return labels;
+    }
+
+    /**
+     * Create labels from a regression task and store them in {@code labels}.
+     *
+     * @param data   Input batch data
+     * @param labels NDArray to store the labels in
+     */
+    protected void createLabelsRegression(List<Datum> data, INDArray labels) {
+        // Fix labels array for Regression task
+        for (int i = 0; i < data.size(); i++) {
+            final String labelStr = data.get(i).getLabel();
+            double lbl = Double.parseDouble(labelStr);
+            labels.putScalar(i, lbl);
+        }
+    }
+
+    /**
+     * Create one-hot encoded labels for classification and store them in {@code labels}.
+     *
+     * @param data   Input batch data
+     * @param labels NDArray to store the labels in
+     */
+    protected void createLabelsOneHot(List<Datum> data, INDArray labels) {
+        Map<String, Integer> labelClassMap = getLabelClassMap();
+        for (int i = 0; i < data.size(); i++) {
+            String label = data.get(i).getLabel();
+            if (!labelClassMap.containsKey(label)) {
+                throw new IllegalStateException("Invalid label " + label + ".");
+            }
+
+            // Assign value 1.0 label at one-hot encoded label index
+            int oneHotIndex = labelClassMap.get(label);
+            labels.putScalar(i, oneHotIndex, 1.0);
+        }
+    }
+
+    /**
+     * Create the features based on the data of this batch.
+     *
+     * @param data              Batch data
+     * @param maxTokenSizeBatch Maximum token size in this batch
+     * @return INDArray containing the features
+     */
+    protected INDArray createFeatures(List<Datum> data, int maxTokenSizeBatch) {
+        int tokenLimit = getMaxSentenceLength();
 
         // Determine feature shape
-        int[] featuresShape = new int[4];
-        featuresShape[0] = currMinibatchSize;
-        featuresShape[1] = 1;
-        int wordVectorSize = getWordVectorSize();
-        boolean sentencesAlongHeight = isSentencesAlongHeight();
-        if (sentencesAlongHeight) {
-            featuresShape[2] = maxLength;
-            featuresShape[3] = wordVectorSize;
-        } else {
-            featuresShape[2] = wordVectorSize;
-            featuresShape[3] = maxLength;
-        }
+        int[] featuresShape = getFeatureShape(maxTokenSizeBatch, data.size());
 
         // Create features from tokens
         INDArray features = Nd4j.create(featuresShape);
-        for (int i = 0; i < currMinibatchSize; i++) {
-            List<String> currSentence = tokenizedSentences.get(i).getFirst();
-
-            for (int j = 0; j < currSentence.size() && j < maxSentenceLength; j++) {
-                INDArray vector = getVector(currSentence.get(j));
-
+        for (int i = 0; i < data.size(); i++) {
+            List<String> currSentence = data.get(i).getTokens();
+            for (int j = 0; j < currSentence.size() && j < tokenLimit; j++) {
+                String token = currSentence.get(j);
+                INDArray vectorizedToken = getVector(token);
                 INDArrayIndex[] indices = new INDArrayIndex[4];
-                indices[0] = NDArrayIndex.point(i);
-                indices[1] = NDArrayIndex.point(0);
-                if (sentencesAlongHeight) {
-                    indices[2] = NDArrayIndex.point(j);
-                    indices[3] = NDArrayIndex.all();
-                } else {
-                    indices[2] = NDArrayIndex.all();
-                    indices[3] = NDArrayIndex.point(j);
-                }
-
-                features.put(indices, vector);
+                indices[0] = point(i);
+                indices[1] = point(0);
+                indices[2] = point(j);
+                indices[3] = all();
+                features.put(indices, vectorizedToken);
             }
         }
+        return features;
+    }
 
-        INDArray featuresMask = null;
-
-        // Create feature mask
-        if (minLength != maxLength) {
-            int idxSeq;
-            if (sentencesAlongHeight) {
-                featuresMask = Nd4j.create(currMinibatchSize, 1, maxLength, 1);
-                idxSeq = 2;
-            } else {
-                featuresMask = Nd4j.create(currMinibatchSize, 1, 1, maxLength);
-                idxSeq = 3;
-            }
-
-            INDArrayIndex[] idxs = new INDArrayIndex[4];
-            idxs[1] = NDArrayIndex.all();
-            idxs[2] = NDArrayIndex.all();   //One of [2] and [3] will get replaced, depending on sentencesAlongHeight
-            idxs[3] = NDArrayIndex.all();
-            for (int i = 0; i < currMinibatchSize; i++) {
-                idxs[0] = NDArrayIndex.point(i);
-                int sentenceLength = tokenizedSentences.get(i).getFirst().size();
-                if (sentenceLength >= maxLength) {
-                    idxs[idxSeq] = NDArrayIndex.all();
-                } else {
-                    idxs[idxSeq] = NDArrayIndex.interval(0, sentenceLength);
-                }
-                featuresMask.get(idxs).assign(1.0);
-            }
+    /**
+     * Create the feature mask.
+     *
+     * @param data         Tokenized sentences with labels
+     * @param maxTokenSize Maximum token size
+     * @return Feature mask
+     */
+    protected INDArray createFeatureMask(List<Datum> data, int maxTokenSize) {
+        INDArray featuresMask = Nd4j.create(data.size(), 1, maxTokenSize, 1);
+        INDArrayIndex[] indices = new INDArrayIndex[4];
+        indices[1] = all();
+        indices[3] = all();
+        for (int i = 0; i < data.size(); i++) {
+            indices[0] = point(i);
+            int sentenceLength = data.get(i).numTokens();
+            sentenceLength = Math.min(sentenceLength, maxTokenSize);
+            indices[2] = interval(0, sentenceLength);
+            featuresMask.put(indices, 1.0);
         }
+        return featuresMask;
+    }
 
-        // Create DataSet
-        DataSet ds = new DataSet(features, labels, featuresMask, null);
-        DataSetPreProcessor dataSetPreProcessor = getDataSetPreProcessor();
-        if (dataSetPreProcessor != null) {
-            dataSetPreProcessor.preProcess(ds);
+    /**
+     * Apply the preprocessing step if preprocessor is available.
+     *
+     * @param dataSet DataSet
+     */
+    protected void applyPreProcessing(DataSet dataSet) {
+        DataSetPreProcessor preProcessor = getDataSetPreProcessor();
+        if (preProcessor != null) {
+            preProcessor.preProcess(dataSet);
         }
+    }
 
-        // Increment the cursor
-        incrementCursor(ds.numExamples());
-        return ds;
+    /**
+     * Get the feature shape.
+     *
+     * @param maxLength  Maximum token lenght
+     * @param numSamples Minibatch size
+     * @return Feature shape
+     */
+    protected int[] getFeatureShape(int maxLength, int numSamples) {
+        return new int[]{numSamples, 1, maxLength, getWordVectorSize()};
     }
 
 
@@ -289,8 +357,6 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
 
     /**
      * CnnSentenceDataSetIterator.Builder implementation that supports stopwords.
-     *
-     * @author Steven Lang
      */
     public static class Builder extends org.deeplearning4j.iterator.CnnSentenceDataSetIterator.Builder {
 
@@ -317,6 +383,59 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
          */
         public CnnSentenceDataSetIterator build() {
             return new CnnSentenceDataSetIterator(this);
+        }
+    }
+
+    /**
+     * Simple data point of tokens with an associated label
+     */
+    private class Datum {
+        /**
+         * Tokens in this datum
+         */
+        private List<String> tokens;
+
+        /**
+         * Associated label with the tokens
+         */
+        private String label;
+
+        /**
+         * Constructor with tokens and label.
+         *
+         * @param tokens Tokens
+         * @param label  Label
+         */
+        public Datum(List<String> tokens, String label) {
+            this.tokens = tokens;
+            this.label = label;
+        }
+
+        /**
+         * Get the number of tokens in this datum.
+         *
+         * @return Number of tokens in this datum
+         */
+        public int numTokens() {
+            return tokens.size();
+        }
+
+        /**
+         * Get the label.
+         *
+         * @return Label
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * Get the tokens.
+         *
+         * @return Tokens
+         */
+        public List<String> getTokens() {
+            return tokens;
         }
     }
 }
