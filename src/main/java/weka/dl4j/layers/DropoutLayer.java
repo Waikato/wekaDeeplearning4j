@@ -19,8 +19,10 @@
 package weka.dl4j.layers;
 
 import java.io.Serializable;
-import java.util.Enumeration;
+import java.util.*;
+
 import org.deeplearning4j.nn.conf.dropout.Dropout;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -50,15 +52,17 @@ public class DropoutLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.la
 
   @Override
   public void initializeBackend() {
-    backend= new org.deeplearning4j.nn.conf.layers.DropoutLayer();
-    Dropout dropout = new Dropout(0.8);
-    dropout.setPSchedule(new ConstantScheduleImpl());
-    backend.setIDropout(dropout);
+    Utils.runWithLocalClassloader(getClass(), () -> {
+      backend= new org.deeplearning4j.nn.conf.layers.DropoutLayer();
+      Dropout dropout = new Dropout(0.8);
+      dropout.setPSchedule(new ConstantScheduleImpl());
+      backend.setIDropout(dropout);
+    });
   }
 
   @OptionMetadata(
       displayName = "dropout",
-      description = "The dropout method to use (default = Dropout(0.0)).",
+      description = "The dropout method to use (default = Dropout(0.8)).",
       commandLineParamName = "dropout",
       commandLineParamSynopsis = "-dropout <Dropout>",
       displayOrder = 25
