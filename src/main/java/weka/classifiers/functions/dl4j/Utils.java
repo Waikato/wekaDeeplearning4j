@@ -254,4 +254,25 @@ public class Utils {
               "CnnSentenceDataSetIterator");
     }
   }
+
+    /**
+     * Run some code-block using the local class loader from a given class.
+     *
+     * @param clz   Class to use the classloader from
+     * @param block Code block to run
+     */
+    public static void runWithLocalClassloader(Class clz, VoidCallable block) {
+        // Obtain the new loader
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            // Switch to the new loader
+            Thread.currentThread().setContextClassLoader(clz.getClassLoader());
+
+            // Call the actual code block
+            block.call();
+        } finally {
+            // Switch back to the old loader
+            Thread.currentThread().setContextClassLoader(origLoader);
+        }
+    }
 }
