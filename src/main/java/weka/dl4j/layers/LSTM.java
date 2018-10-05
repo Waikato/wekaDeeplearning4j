@@ -56,7 +56,7 @@ public class LSTM extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.LST
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A densely connected layer from DeepLearning4J.";
+    return "A LSTM layer from DeepLearning4J.";
   }
 
 

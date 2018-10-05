@@ -53,7 +53,7 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A convolution layer from DeepLearning4J.";
+    return "A batch norm layer from DeepLearning4J.";
   }
 
 
