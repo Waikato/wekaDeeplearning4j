@@ -39,3 +39,7 @@ weka.dl4j.text.tokenization.preprocessor.TokenPreProcess=weka.gui.GenericObjectE
 weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory=weka.gui.GenericObjectEditor
 
 weka.dl4j.text.stopwords.Dl4jAbstractStopwords=weka.gui.GenericObjectEditor
+
+
+### Misc ###
+weka.core.LogConfiguration=weka.gui.GenericObjectEditor

@@ -18,13 +18,7 @@
 
 package weka.dl4j.listener;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
@@ -54,9 +48,6 @@ public class EpochListener extends TrainingListener {
 
   /** Evaluate every N epochs */
   private int n = 5;
-
-  /** Log to this file if set */
-  private transient PrintWriter logFile;
 
   /** Enable intermediate evaluations */
   private boolean isIntermediateEvaluationsEnabled = true;
@@ -153,23 +144,9 @@ public class EpochListener extends TrainingListener {
     return s;
   }
 
-  /**
-   * Set the log file
-   *
-   * @param logFile Logging file
-   */
-  public void setLogFile(File logFile) throws IOException {
-    if (logFile.exists()) logFile.delete();
-    this.logFile = new PrintWriter(new FileWriter(logFile, false));
-  }
-
   @Override
   public void log(String msg) {
     log.info(msg);
-    if (logFile != null) {
-      logFile.write(msg + System.lineSeparator());
-      logFile.flush();
-    }
   }
 
   public int getN() {
