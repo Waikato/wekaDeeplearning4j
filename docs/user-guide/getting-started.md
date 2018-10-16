@@ -12,6 +12,32 @@ All three ways are explained in the following. The main classifier exposed by th
 Simple examples are given in the examples section for the [Iris dataset](examples/classifying-iris) and the [MNIST dataset](examples/classifying-mnist).
 
 Make sure your `WEKA_HOME` environment variable is set.
+
+## GUI
+The `Dl4jMlpClassifier` can be configured as shown below:
+
+![Dl4jMlpClassifier](../img/gui/mlp-classifier.png)
+
+The `network configuration` option exposes further hyperparameter tuning:
+
+![Neural Network Configuration](../img/gui/neural-net-config.png)
+
+The `layer specification` option lets the user specify the sequence of layers that build the neural network architecture:
+
+![Layer List](../img/gui/layer-array.png)
+
+The user can choose from the following available layers:
+
+![Available Layers](../img/gui/layer-selection.png)
+
+A layer can be further configured, e.g. the `ConvolutionLayer`'s options:
+
+![ConvolutionLayer Configuration](../img/gui/cnn-layer-config.png)
+
+As explained further in the [data section](../user-guide/data.md), depending on the dataset a certain `InstanceIterator` has to be loaded that handles parsing of certain data types (text/image). The iterator can be selected from the `Dl4jMlpClassifier` window via the `instance iterator` option. E.g. `ImageInstanceIterator` exposes the following options:
+
+![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
+
 ## Commandline Interface
 A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
@@ -138,31 +164,6 @@ java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j/*:$WEKA_HOM
 
 (Use `;` as classpath separator for Windows instead) 
 
-## GUI
-A tutorial on how to use the GUI is coming soon.
-The `Dl4jMlpClassifier` can be configured as shown below:
-
-![Dl4jMlpClassifier](../img/gui/mlp-classifier.png)
-
-The `network configuration` option exposes further hyperparameter tuning:
-
-![Neural Network Configuration](../img/gui/neural-net-config.png)
-
-The `layer specification` option lets the user specify the sequence of layers that build the neural network architecture:
-
-![Layer List](../img/gui/layer-array.png)
-
-The user can choose from the following available layers:
-
-![Available Layers](../img/gui/layer-selection.png)
-
-A layer can be further configured, e.g. the `ConvolutionLayer`'s options:
-
-![ConvolutionLayer Configuration](../img/gui/cnn-layer-config.png)
-
-As explained further in the [data section](../user-guide/data.md), depending on the dataset a certain `InstanceIterator` has to be loaded that handles parsing of certain data types (text/image). The iterator can be selected from the `Dl4jMlpClassifier` window via the `instance iterator` option. E.g. `ImageInstanceIterator` exposes the following options:
-
-![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
 
 # Model Zoo
 WekaDeeplearning4j adapts the model zoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
