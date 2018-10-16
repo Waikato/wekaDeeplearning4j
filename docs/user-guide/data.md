@@ -25,6 +25,9 @@ and you want to build a simple dense network of the form
 DenseLayer -> DenseLayer -> ... -> OutputLayer
 ```
 
+
+![DefaultInstanceIterator](../img/gui/default-instance-iterator.png)
+
 ## ConvolutionInstanceIterator
 To use convolutional neural networks in the case of a more sophisticated dataset, where the ARFF file represents column-wise flattened image pixels as e.g.:
 ```
@@ -55,6 +58,8 @@ it is necessary to set the iterator to `ConvolutionInstanceIterator`.
 - `width`: Width of the images
 - `numChannels`: Depth of the image (e.g.: RGB images have a depth of 3, whereas Greyscale images have a depth of 1)
 
+![ConvolutionInstanceIterator](../img/gui/convolution-instance-iterator.png)
+
 ## ImageInstanceIterator
 If the dataset consists of a set of image files it is necessary to prepare a meta data ARFF file in the following format:
 ```
@@ -78,6 +83,8 @@ This file informs the internals about the association between the image files an
 - `numChannels`: Depth of the image (e.g.: RGB images have a depth of 3, whereas Greyscale images have a depth of 1)
 - `imagesLocation`: The absolute path to the location of the images listed in the meta-data ARFF file
 
+![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
+
 ## Cnn/RnnTextEmbeddingInstanceIterator
 If you are going to process text data, it is usually necessary to project the documents into an embedding space. This means, each token (e.g. a word) is mapped with the help of an embedding into a certain feature space. That is, each document will then contain a series of vectors, where each vector represents a token in the embedding space. The `Cnn/RnnTextEmbeddingInstanceIterator` accepts datasets containing a document and a class as shown below:
 ```
@@ -99,6 +106,7 @@ If you are going to process text data, it is usually necessary to project the do
 - `tokenPreProcess`: Defines how tokens are preprocessed
 - `truncateLength`: Maximum number of words per document
 
+![RnnTextEmbeddingInstanceIterator](../img/gui/rnn-text-embedding-instance-iterator.png)
 
 ## Cnn/RnnTextFilesEmbeddingInstanceIterator
 This iterator extends the `Cnn/RnnTextEmbeddingInstanceIterator` and allows the use of distributed documents that are not collected in a single ARFF file. Similar to the `ImageInstanceIterator`, this iterator is applicable to an ARFF file containing the meta data, such as:
@@ -121,6 +129,8 @@ review_1.txt,neg
 - `tokenPreProcess`: Defines how tokens are preprocessed
 - `truncateLength`: Maximum number of words per document
 - `textsLocation`: The absolute path to the location of the text files listed in the meta data ARFF file
+
+![RnnTextFilesEmbeddingInstanceIterator](../img/gui/rnn-text-files-embedding-instance-iterator.png)
 
 ## RelationalInstanceIterator
 
@@ -151,6 +161,9 @@ Each row in the dataset can be a multivariate sequence. Therefore, this format i
 
 - `truncateLength`: Maximum sequence lengthARFF file
 - `relationalAttributeIndex`: Index of the relational attribute in the given dataset
+
+
+![RelationalInstanceIterator](../img/gui/relational-instance-iterator.png)
 
 # Caching
 
