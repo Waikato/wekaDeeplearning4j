@@ -30,7 +30,7 @@ The install script automatically downloads the libraries and copies them into yo
 
 ## Usage
 
-Example scipts are provided in the `weka-run-test-scripts` directory, e.g.:
+Example scripts are provided in the `weka-run-test-scripts` directory, e.g.:
 ```bash
 $ java -cp ${WEKA_HOME}/weka.jar weka.Run \
        .Dl4jMlpClassifier \
