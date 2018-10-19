@@ -1,4 +1,6 @@
-![Logo](docs/img/Weka_3_full.png)
+<p align="center">
+     <img src="./docs/img/Weka_3_full.png" width="500">
+</p>
 
 # WekaDeeplearning4j
 
@@ -12,7 +14,7 @@ WekaDeeplearning4j gives users the ability to train and test deep learning model
 
 The full documentation, giving installation instructions and getting started guides, is available [here](https://deeplearning.cms.waikato.ac.nz/).
 
-![Weka Workbench GUI](docs/img/gui.png)
+![Weka GUI](docs/img/gui.png)
 
 ## Installation
 The package can be installed via the [Weka Package Manager](https://waikato.github.io/weka-wiki/packages/manager/) GUI. 
