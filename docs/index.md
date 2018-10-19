@@ -1,6 +1,6 @@
-# WekaDeeplearning4J: Deep Learning using Weka
+# WekaDeeplearning4j: Deep Learning using Weka
 ![Logo](img/Weka_3_full.png)
-WekaDeeplearning4J is a deep learning package for the [Weka](https://www.cs.waikato.ac.nz/ml/weka/index.html) workbench. It is developed to incorporate the modern techniques of deep learning into Weka. The backend is provided by the [Deeplearning4J](https://deeplearning4j.org/) Java library. 
+WekaDeeplearning4j is a deep learning package for the [Weka](https://www.cs.waikato.ac.nz/ml/weka/index.html) workbench. It is developed to incorporate the modern techniques of deep learning into Weka. The backend is provided by the [Deeplearning4j](https://deeplearning4j.org/) Java library. 
 
 The source code for this package is available on [GitHub](https://github.com/Waikato/wekaDeeplearning4j). The java-doc can be found [here](https://waikato.github.io/wekaDeeplearning4j/).
 
