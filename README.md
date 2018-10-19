@@ -2,28 +2,30 @@
 
 ![Logo](docs/img/Weka_3_full.png)
 
-DL4J wrapper for WEKA. Original code written by Mark Hall. This package currently introduces a new classifier,
-`Dl4jMlpClassifier`, which allows arbitrary-depth MLPs to be built with a degree of flexibility (e.g. type of weight initialisation,
-loss function, gradient descent algorithm, etc.).
+WekaDeeplearning4j gives users the ability to train and test deep learning models from within the Weka environment. Our goal is to make deep learning available to users with zero knowledge of programming. The package uses Deeplearning4j as backend. Weka, and therefore also the WekaDeeplearning4j package, can be accessed via various interfaces. While the main focus of this package is the Weka GUI for users with no programming experience, it is also possible to access the presented features via the Weka commandline line runner as well as from the Weka Java API. Check out the [getting-started](https://deeplearning.cms.waikato.ac.nz/user-guide/getting-started/) tutorials for more information.
 
 The full documentation, giving installation instructions and getting started guides, is available [here](https://deeplearning.cms.waikato.ac.nz/).
 
 ![Weka Workbench GUI](docs/img/gui.png)
 
-## Installation with Pre-Built Zip
-The [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) provides a pre-built zip file of the package that allow easy installation via commandline
+## Installation
+The package can be installed via the [Weka Package Manager](https://waikato.github.io/weka-wiki/packages/manager/) GUI. 
+
+Alternatively, the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) on GitHub provides the zip file of the package that allow easy installation via the commandline:
+
 ```bash
 java -cp weka.jar weka.core.WekaPackageManager \
      -install-package package.zip
 ```
 
-or via the GUI package manager as described [here](http://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2).
-
 ### GPU Support
 
 To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and run the latest `install-cuda-libs.sh` for Linux/Macosx or `install-cuda-libs.ps1` for Windows. Make sure CUDA is installed on your system as explained [here](https://deeplearning.cms.waikato.ac.nz/install/#gpu).
 
+#### Manual Download
+
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
+
 ```bash
 ./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.9-linux-x86_64.zip
 ```
