@@ -79,7 +79,7 @@ Weighted Avg.    0.940    0.030    0.941      0.940    0.940      0.911    0.986
   0  3 47 |  c = Iris-virginica
 ```
 
-The same Setup can be achieved in Java with the following code:
+The same setup can be achieved in Java with the following code:
 ```java
 // Setup layers
 DenseLayer dense = new DenseLayer();
