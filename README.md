@@ -25,20 +25,73 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 ```bash
-./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.1-1.5.0-linux-x86_64.zip
+./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.9-linux-x86_64.zip
 ```
 
 ## Usage
+As most of Weka, WekaDeeplearning4j's functionality is accessible in three ways:
 
-Example scripts are provided in the `weka-run-test-scripts` directory, e.g.:
+- Using the Weka workbench GUI
+- Programming with Weka in Java
+- Via the commandline interface
+
+All three ways are explained in the [getting-started](https://deeplearning.cms.waikato.ac.nz/user-guide/getting-started/) documentation. 
+
+Example commandline scripts are provided in the `weka-run-test-scripts` directory, e.g. a simple network with one dense layer of 32 neurons and one output layer, classifying the iris dataset, would look like the following:
 ```bash
 $ java -cp ${WEKA_HOME}/weka.jar weka.Run \
        .Dl4jMlpClassifier \
-       -S 1 \
        -layer "weka.dl4j.layers.DenseLayer -nOut 32 -activation \"weka.dl4j.activations.ActivationReLU \" " \
        -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" " \
-       -numEpochs 10 \
-       -t ../datasets/nominal/iris.arff
+       -numEpochs 30 \
+       -t datasets/nominal/iris.arff
+```
+
+which results in:
+
+```
+=== Stratified cross-validation ===
+
+Correctly Classified Instances         141               94      %
+Incorrectly Classified Instances         9                6      %
+Kappa statistic                          0.91  
+Mean absolute error                      0.0842
+Root mean squared error                  0.1912
+Relative absolute error                 18.9359 %
+Root relative squared error             40.5586 %
+Total Number of Instances              150     
+
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 1.000    0.000    1.000      1.000    1.000      1.000    1.000     1.000     Iris-setosa
+                 0.880    0.030    0.936      0.880    0.907      0.864    0.978     0.928     Iris-versicolor
+                 0.940    0.060    0.887      0.940    0.913      0.868    0.979     0.972     Iris-virginica
+Weighted Avg.    0.940    0.030    0.941      0.940    0.940      0.911    0.986     0.967     
+
+
+=== Confusion Matrix ===
+
+  a  b  c   <-- classified as
+ 50  0  0 |  a = Iris-setosa
+  0 44  6 |  b = Iris-versicolor
+  0  3 47 |  c = Iris-virginica
+```
+
+The same Setup can be achieved in Java with the following code:
+```java
+// Setup layers
+DenseLayer dense = new DenseLayer();
+dense.setNOut(32);
+OutputLayer out = new OutputLayer();
+        
+// Setup MLP
+Dl4jMlpClassifier mlp = new Dl4jMlpClassifier();
+mlp.setLayers(dense, out);
+        
+// Build model
+mlp.buildClassifier(loadIris());
 ```
 
 ## Documentation
