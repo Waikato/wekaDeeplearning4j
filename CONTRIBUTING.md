@@ -13,21 +13,20 @@ The package uses Gradle to manage dependencies and build the necessary weka pack
 $ ./gradlew makeMain
 $ ./gradlew makeCuda -Dcuda=8.0
 $ ./gradlew makeCuda -Dcuda=9.0
-$ ./gradlew makeCuda -Dcuda=9.1
+$ ./gradlew makeCuda -Dcuda=9.2
 ```
 
 or to use the provided `build.py` script. The usage is as follows:
 ```bash
 $ ./build.py -h
-usage: build.py [-h] [--cuda-version {8.0,9.0,9.1}] [--build-all] [--verbose]
+usage: build.py [-h] [--cuda-version {8.0,9.0,9.2}] [--build-all] [--verbose]
 
 Build the wekaDeeplearning4j packages.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --cuda-version {8.0,9.0,9.1}, -c {8.0,9.0,9.1}
+  --cuda-version {8.0,9.0,9.2}, -c {8.0,9.0,9.2}
                         The cuda version.
   --build-all, -a       Flag to build all platform/cuda packages.
   --verbose, -v         Enable verbose output.
-
 ```
