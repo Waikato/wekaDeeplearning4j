@@ -1,12 +1,20 @@
-# wekaDeeplearning4j
+<p align="center">
+     <img src="./docs/img/Weka_3_full.png" width="500">
+</p>
 
-![Logo](docs/img/Weka_3_full.png)
+# WekaDeeplearning4j
+
+[![GitHub release](https://img.shields.io/github/release/Waikato/wekaDeeplearning4j.svg)](https://GitHub.com/Waikato/wekaDeeplearning4j/releases/)
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+[![Build Status](https://travis-ci.com/Waikato/wekaDeeplearning4j.svg?branch=master)](https://travis-ci.com/Waikato/wekaDeeplearning4j)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Waikato/wekaDeeplearning4j/issues)
+
 
 WekaDeeplearning4j gives users the ability to train and test deep learning models from within the Weka environment. Our goal is to make deep learning available to users with zero knowledge of programming. The package uses Deeplearning4j as backend. Weka, and therefore also the WekaDeeplearning4j package, can be accessed via various interfaces. While the main focus of this package is the Weka GUI for users with no programming experience, it is also possible to access the presented features via the Weka commandline line runner as well as from the Weka Java API. Check out the [getting-started](https://deeplearning.cms.waikato.ac.nz/user-guide/getting-started/) tutorials for more information.
 
 The full documentation, giving installation instructions and getting started guides, is available [here](https://deeplearning.cms.waikato.ac.nz/).
 
-![Weka Workbench GUI](docs/img/gui.png)
+![Weka GUI](docs/img/gui.png)
 
 ## Installation
 The package can be installed via the [Weka Package Manager](https://waikato.github.io/weka-wiki/packages/manager/) GUI. 
