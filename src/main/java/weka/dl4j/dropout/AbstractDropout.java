@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.deeplearning4j.nn.conf.dropout.IDropout;
-import org.deeplearning4j.nn.conf.layers.Layer;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.dl4j.ApiWrapper;
@@ -45,7 +45,9 @@ public abstract class AbstractDropout<T extends IDropout> implements ApiWrapper<
   T backend;
 
   public AbstractDropout() {
-    initializeBackend();
+    // Run with init with local class loader since dropout backend init needs access to the
+    // Nd4j backend
+    Utils.runWithLocalClassloader(this.getClass(), this::initializeBackend);
   }
 
   @Override

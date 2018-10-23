@@ -58,7 +58,7 @@ public class GravesLSTM extends FeedForwardLayer<org.deeplearning4j.nn.conf.laye
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A densely connected layer from DeepLearning4J.";
+    return "A Graves LSTM layer from DeepLearning4J.";
   }
 
   @OptionMetadata(

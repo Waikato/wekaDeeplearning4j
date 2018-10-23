@@ -18,30 +18,10 @@
 
 package weka.classifiers.functions;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
@@ -65,24 +45,8 @@ import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
-import weka.core.BatchPredictor;
-import weka.core.Capabilities;
+import weka.core.*;
 import weka.core.Capabilities.Capability;
-import weka.core.CapabilitiesHandler;
-import weka.core.EmptyIteratorException;
-import weka.core.Environment;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.InvalidLayerConfigurationException;
-import weka.core.InvalidNetworkArchitectureException;
-import weka.core.InvalidValidationPercentageException;
-import weka.core.MissingOutputLayerException;
-import weka.core.OptionMetadata;
-import weka.core.SelectedTag;
-import weka.core.Tag;
-import weka.core.WekaException;
-import weka.core.WekaPackageManager;
-import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.NeuralNetConfiguration;
@@ -93,12 +57,7 @@ import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
-import weka.dl4j.layers.ConvolutionLayer;
-import weka.dl4j.layers.FeedForwardLayer;
-import weka.dl4j.layers.GlobalPoolingLayer;
-import weka.dl4j.layers.Layer;
-import weka.dl4j.layers.OutputLayer;
-import weka.dl4j.layers.SubsamplingLayer;
+import weka.dl4j.layers.*;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.TrainingListener;
 import weka.dl4j.zoo.CustomNet;
@@ -110,8 +69,11 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
-import weka.gui.FilePropertyMetadata;
-import weka.gui.knowledgeflow.KFGUIConsts;
+
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -176,11 +138,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * The size of the serialized network model in bytes.
    */
   protected long modelSize;
-  /**
-   * The file that log information will be written to.
-   */
-  protected File logFile =
-      new File(Paths.get(WekaPackageManager.WEKA_HOME.getAbsolutePath(), "network.log").toString());
+
   /**
    * The layers of the network.
    */
@@ -249,28 +207,36 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected int[] labelSortIndex;
 
   /**
-   * Default constructor
+   * Logging configuration.
    */
-  public Dl4jMlpClassifier() {
-    loadLoggerIfConfigMissing();
+  protected LogConfiguration logConfig = new LogConfiguration();
+
+
+  /**
+   * Get the log configuration.
+   *
+   * @return Log configuration
+   */
+  public LogConfiguration getLogConfig() {
+    return logConfig;
   }
 
   /**
-   * Load the log4j2.xml specified in the package sources if no configuration is currently set.
+   * Set the log configuration.
+   *
+   * @param logConfig Log configuration
    */
-  private static void loadLoggerIfConfigMissing() {
-    LoggerContext context = (LoggerContext) LogManager
-        .getContext(false);
-    ConfigurationSource configuration = context.getConfiguration().getConfigurationSource();
-    if (ConfigurationSource.NULL_SOURCE.equals(configuration)) {
-      // Use log4j2.xml shipped with the package ...
-      String wekaHomeDir = WekaPackageManager.getPackageHome().getPath();
-      URI uri = Paths.get(wekaHomeDir, "wekaDeeplearning4j", "src", "main", "resources",
-          "log4j2.xml").toUri();
-      context.setConfigLocation(uri);
-      log.info("Logging configuration loaded from source: {}", uri.toString());
-    }
+  @OptionMetadata(
+          displayName = "log config",
+          description = "The log configuration.",
+          commandLineParamName = "logConfig",
+          commandLineParamSynopsis = "-logConfig <LogConfiguration>",
+          displayOrder = 1
+  )
+  public void setLogConfig(LogConfiguration logConfig) {
+    this.logConfig = logConfig;
   }
+
 
   /**
    * The main method for running this class.
@@ -445,33 +411,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     return new OutputLayer();
   }
 
-  /**
-   * Get the log file
-   *
-   * @return the log file
-   */
-  public File getLogFile() {
-    return logFile;
-  }
-
-  /**
-   * Set the log file
-   *
-   * @param logFile the log file
-   */
-  @FilePropertyMetadata(fileChooserDialogType = KFGUIConsts.SAVE_DIALOG, directoriesOnly = false)
-  @OptionMetadata(
-      displayName = "log file",
-      description =
-          "The name of the log file to write loss information to "
-              + "(default = $WEKA_HOME/network.log).",
-      commandLineParamName = "logFile",
-      commandLineParamSynopsis = "-logFile <string>",
-      displayOrder = 1
-  )
-  public void setLogFile(File logFile) {
-    this.logFile = logFile;
-  }
 
   public Layer[] getLayers() {
     return layers;
@@ -713,6 +652,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   @Override
   public void initializeClassifier(Instances data) throws Exception {
+    logConfig.apply();
+
 
     // If only class is present, build zeroR
     if (data.numAttributes() == 1 && data.classIndex() == 0) {
@@ -1256,13 +1197,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   protected TrainingListener getListener() throws Exception {
     int numSamples = trainData.numInstances();
     TrainingListener listener;
-    Environment env = Environment.getSystemWide();
-    String resolved = logFile.toString();
-    try {
-      resolved = env.substitute(resolved);
-    } catch (Exception ex) {
-      // ignore
-    }
+
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
@@ -1274,7 +1209,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
               numSamples,
               trainIterator,
               earlyStopping.getValDataSetIterator());
-      ((EpochListener) iterationListener).setLogFile(new File(resolved));
     }
     listener = iterationListener;
     return listener;

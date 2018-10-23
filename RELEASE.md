@@ -5,9 +5,9 @@
 $ ./gradlew test
 ```
 
-2. Increase the version and tag the release with the new version. The 'version-bump.sh' might be helpful.
+2. Increase the version and tag the release with the new version. The `version-bump.sh <old-version-tag> <new-version-tag>` script might be helpful.
 
-3. Create ZIP files for each package and generate their sha256 sums:
+3. Create ZIP files in `./release-files` for each package and generate their sha256 sums with:
 ```bash
 $ ./make-release-files.sh
 ```

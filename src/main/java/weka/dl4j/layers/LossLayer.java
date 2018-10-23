@@ -69,7 +69,7 @@ public class LossLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.layer
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A ZeroPadding layer from DeepLearning4J.";
+    return "A loss layer from DeepLearning4J.";
   }
 
 

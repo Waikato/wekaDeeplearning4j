@@ -58,7 +58,7 @@ public class RnnOutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "An RnnOutput layer from DeepLearning4J.";
+    return "A RnnOutput layer from DeepLearning4J.";
   }
 
 

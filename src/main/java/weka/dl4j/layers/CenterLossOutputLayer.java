@@ -116,7 +116,7 @@ public class CenterLossOutputLayer extends FeedForwardLayer<org.deeplearning4j.n
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A ZeroPadding layer from DeepLearning4J.";
+    return "A CenterLossOutput layer from DeepLearning4J.";
   }
 
 

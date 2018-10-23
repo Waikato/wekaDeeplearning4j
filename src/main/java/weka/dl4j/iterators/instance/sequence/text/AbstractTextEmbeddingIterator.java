@@ -145,7 +145,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
       saver.setFieldSeparator(" ");
       saver.setInstances(insts);
       final File tmpFile =
-          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString(), ".csv")
+          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString() + ".csv")
               .toFile();
       saver.setFile(tmpFile);
       saver.setNoHeaderRow(true);
@@ -223,7 +223,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
           StringBuilder sb = new StringBuilder();
           sb.append(parts[parts.length - 1]);
           for (int i = 0; i < parts.length - 1; i++) {
-            if (i < parts.length - 2) {
+            if (i < parts.length - 1) {
               sb.append(" ");
             }
             sb.append(parts[i]);

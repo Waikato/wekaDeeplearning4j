@@ -3,13 +3,11 @@
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout
-        pattern="[%-5level] %d{HH:mm:ss.SSS} [%t] %logger{1} - %msg%n"/>
+        pattern="[%-5level] %d{HH:mm:ss.SSS} [%t] %logger - %msg%n"/>
     </Console>
   </Appenders>
   <Loggers>
-    <!--Remove spam logs from ND4J-->
-    <Logger name="org.nd4j" level="INFO"/>
-    <Logger name="org.deeplearning4j" level="WARN"/>
+    <!--Remove spam logs from reflection-->
     <Logger name="org.reflections" level="ERROR"/>
 
     <!--Root level-->

@@ -55,3 +55,6 @@ weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory =\
 weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\
  weka.dl4j.text.stopwords
 
+weka.core.LogConfiguration =\
+ weka.core
+

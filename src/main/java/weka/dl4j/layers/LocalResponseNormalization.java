@@ -74,4 +74,15 @@ public class LocalResponseNormalization extends
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
   }
+
+
+  /**
+   * Global info.
+   *
+   * @return string describing this class.
+   */
+  public String globalInfo() {
+    return "A local response normalization layer from DeepLearning4J.";
+  }
+
 }

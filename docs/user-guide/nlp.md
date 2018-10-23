@@ -1,4 +1,4 @@
-# Text Processing in WekaDeeplearning4J
+# Text Processing in WekaDeeplearning4j
 There are currently two main deep learning architectures supported to process text data, as explained in the below.
 Text can be interpreted as a sequence of so called *tokens*, where a token can be e.g. a character, word, sentence or even a whole document. These tokens can further be mapped with the help of an [embedding](https://en.wikipedia.org/wiki/Word_embedding) into a vector space defined by the embedding. Therefore, a text document can be represented as a sequence of vectors. This can be achieved by using the [Cnn/RnnTextEmbeddingInstanceIterator](data.md#cnnrnntextembeddinginstanceiterator) and providing an embedding that was previously downloaded (e.g. Google's pretrained News model from [here](https://code.google.com/archive/p/word2vec/)). 
 

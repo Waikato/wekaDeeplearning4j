@@ -164,6 +164,22 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
+          displayName = "biasUpdater",
+          description = "The updater to use for the bias (default = SGD).",
+          commandLineParamName = "biasUpdater",
+          commandLineParamSynopsis = "-biasUpdater <string>",
+          displayOrder = 13
+  )
+  public Updater getBiasUpdater() {
+    return biasUpdater;
+  }
+
+  public void setBiasUpdater(Updater biasUpdater) {
+    this.biasUpdater = biasUpdater;
+  }
+
+
+  @OptionMetadata(
     displayName = "dropout",
     description = "The dropout method to use (default = Dropout(0.0).",
     commandLineParamName = "dropout",
@@ -193,27 +209,13 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
     this.weightNoise = weightNoise;
   }
 
-  @OptionMetadata(
-    displayName = "biasUpdater",
-    description = "The updater to use for the bias (default = SGD).",
-    commandLineParamName = "biasUpdater",
-    commandLineParamSynopsis = "-biasUpdater <string>",
-    displayOrder = 27
-  )
-  public Updater getBiasUpdater() {
-    return biasUpdater;
-  }
-
-  public void setBiasUpdater(Updater biasUpdater) {
-    this.biasUpdater = biasUpdater;
-  }
 
   @OptionMetadata(
     displayName = "l1 regularization factor",
     description = "L1 regularization factor (default = 0.00).",
     commandLineParamName = "l1",
     commandLineParamSynopsis = "-l1 <double>",
-    displayOrder = 13
+    displayOrder = 14
   )
   public double getL1() {
     return l1;
@@ -285,7 +287,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   @OptionMetadata(
     displayName = "distribution",
-    description = "The distribution (default = NormalDistribution(1e-3, 1)).",
+    description = "The weight init distribution type. Only applies when weightinit=DISTRIBUTION (default = Disabled).",
     commandLineParamName = "dist",
     commandLineParamSynopsis = "-dist <specification>",
     displayOrder = 19
