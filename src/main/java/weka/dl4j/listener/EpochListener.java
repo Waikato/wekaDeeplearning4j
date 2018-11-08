@@ -44,7 +44,7 @@ public class EpochListener extends TrainingListener {
   private static final long serialVersionUID = -8852994767947925554L;
 
   /** Epoch counter */
-  private int currentEpoch = 0;
+  // private int currentEpoch = 0;
 
   /** Evaluate every N epochs */
   private int n = 5;
