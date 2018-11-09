@@ -37,6 +37,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Enumeration;
 
 /**
  * General logger configuration.
@@ -44,7 +45,7 @@ import java.util.Collection;
  * @author Steven Lang
  */
 @Log4j2
-public class LogConfiguration implements Serializable {
+public class LogConfiguration implements Serializable, OptionHandler {
 
     private static final long serialVersionUID = 7910114399022582661L;
     /**
@@ -297,6 +298,34 @@ public class LogConfiguration implements Serializable {
      */
     protected void updateLogLevel(String loggerName, LogLevel level) {
         Configurator.setLevel(loggerName, level.getLevel());
+    }
+
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options
+     */
+    @Override public Enumeration<Option> listOptions() {
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    @Override public void setOptions(String[] options) throws Exception {
+        Option.setOptions(options, this, this.getClass());
+    }
+
+    /**
+     * Gets the current settings of the log configuration
+     *
+     * @return return an array of strings suitable for passing to setOptions
+     */
+    @Override public String[] getOptions() {
+        return Option.getOptions(this, this.getClass());
     }
 
     /**
