@@ -37,14 +37,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.Classifier;
 import weka.classifiers.rules.ZeroR;
-import weka.core.Capabilities;
+import weka.core.*;
 import weka.core.Capabilities.Capability;
-import weka.core.CapabilitiesHandler;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.MissingOutputLayerException;
-import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
 import weka.dl4j.CacheMode;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.CustomNet;
@@ -84,6 +78,16 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
 
+    if (trainData != null && trainData.numInstances() > 0) {
+      return;
+    }
+
+    if (trainData != null) {
+      if (!trainData.equalHeaders(data)) {
+        throw new WekaException(trainData.equalHeadersMsg(data));
+      }
+    }
+
     // Check basic network structure
     if (layers.length == 0) {
       throw new MissingOutputLayerException("No layers have been added!");
@@ -95,7 +99,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     }
 
     // If only class is present, build zeroR
-    if(data.numAttributes() == 1 && data.classIndex() == 0){
+    if(zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0){
       zeroR = new ZeroR();
       zeroR.buildClassifier(data);
       return;
@@ -110,7 +114,10 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
       instanceIterator.initialize();
 
-      createModel();
+      // Could be null due to resuming from a previous run
+      if (model == null){
+        createModel();
+      }
 
       // Setup the datasetiterators (needs to be done after the model initialization)
       trainIterator = getDataSetIterator(this.trainData);
@@ -118,7 +125,9 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       // Set the iteration listener
       model.setListeners(getListener());
 
-      numEpochsPerformed = 0;
+      numEpochsPerformedThisSession = 0;
+      maxEpochs += numEpochs; // set the current upper bound
+
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
