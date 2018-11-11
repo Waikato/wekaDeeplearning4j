@@ -19,6 +19,7 @@
 package weka.classifiers.functions;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,8 @@ import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
 import static org.junit.Assert.assertEquals;
+import static weka.util.TestUtil.readClf;
+import static weka.util.TestUtil.saveClf;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
@@ -688,18 +691,8 @@ public class Dl4jMlpTest {
     assertEquals(numEpochs, clfLoaded2.numEpochs);
     assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
     assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
+
+    Files.delete(Paths.get(clfPath));
   }
 
-  public void saveClf(String path, Classifier clf) throws IOException {
-    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
-    oos.writeObject(clf);
-    oos.close();
-  }
-
-  public Dl4jMlpClassifier readClf(String path) throws IOException, ClassNotFoundException {
-    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
-    Dl4jMlpClassifier clf = (Dl4jMlpClassifier) ois.readObject();
-    ois.close();
-    return clf;
-  }
 }
