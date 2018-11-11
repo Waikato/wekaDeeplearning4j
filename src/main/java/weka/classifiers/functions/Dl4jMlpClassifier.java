@@ -220,7 +220,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Whether to allow training to continue at a later point after the initial
    * model is built.
    */
-  protected boolean m_resume;
+  protected boolean resume;
 
 
   /**
@@ -641,7 +641,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     commandLineParamIsFlag = true,
     displayOrder = 31)
   public void setResume(boolean resume) {
-    m_resume = resume;
+    this.resume = resume;
   }
 
   /**
@@ -651,7 +651,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return the current value of finalize
    */
   public boolean getResume() {
-    return m_resume;
+    return resume;
   }
 
 
@@ -745,6 +745,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
+      // Could be null due to resuming from a previous run
       if (model == null) {
         // If zoo model was set, use this model as internal MultiLayerNetwork
         if (useZooModel()) {
@@ -764,7 +765,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         log.info(model.conf().toYaml());
       }
 
-      // numEpochsPerformed = 0;
       numEpochsPerformedThisSession = 0;
       maxEpochs += numEpochs; // set the current upper bound
 
