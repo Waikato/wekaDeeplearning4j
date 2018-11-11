@@ -18,24 +18,18 @@
 
 package weka.classifiers.functions;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.junit.*;
+import weka.classifiers.Classifier;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.PoolingType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +64,8 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
@@ -643,5 +639,67 @@ public class Dl4jMlpTest {
 
     clf.setCacheMode(CacheMode.FILESYSTEM);
     TestUtil.holdout(clf, dataMnist);
+  }
+
+  @Test
+  public void testResume() throws Exception {
+    clf.setResume(true);
+    final ConvolutionInstanceIterator it = new ConvolutionInstanceIterator();
+    it.setHeight(1);
+    it.setWidth(4);
+    clf.setInstanceIterator(it);
+
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
+
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[] {1, 1});
+    cl.setStride(new int[] {1, 1});
+
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(cl, dl, ol);
+    int numEpochs = 5;
+    clf.setNumEpochs(numEpochs);
+    assertEquals(numEpochs, clf.numEpochs);
+    clf.buildClassifier(dataIris);
+    assertEquals(numEpochs, clf.numEpochsPerformed);
+    assertEquals(numEpochs, clf.numEpochsPerformedThisSession);
+
+    // Save classifier
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    String clfPath = Paths.get(tmpDir, "dl4j-mlp-clf.ser").toString();
+    saveClf(clfPath, clf);
+
+    // Reload classifier and run #numEpochs epochs again
+    Dl4jMlpClassifier clfLoaded = readClf(clfPath);
+    clfLoaded.buildClassifier(dataIris);
+
+    // Check if epochs are correctly counted
+    assertEquals(numEpochs, clfLoaded.numEpochs);
+    assertEquals(numEpochs * 2, clfLoaded.numEpochsPerformed);
+    assertEquals(numEpochs, clfLoaded.numEpochsPerformedThisSession);
+
+    // Repeat procedure one more time and check again
+    saveClf(clfPath, clfLoaded);
+    Dl4jMlpClassifier clfLoaded2 = readClf(clfPath);
+    clfLoaded2.buildClassifier(dataIris);
+
+    assertEquals(numEpochs, clfLoaded2.numEpochs);
+    assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
+    assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
+  }
+
+  public void saveClf(String path, Classifier clf) throws IOException {
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
+    oos.writeObject(clf);
+    oos.close();
+  }
+
+  public Dl4jMlpClassifier readClf(String path) throws IOException, ClassNotFoundException {
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
+    Dl4jMlpClassifier clf = (Dl4jMlpClassifier) ois.readObject();
+    ois.close();
+    return clf;
   }
 }
