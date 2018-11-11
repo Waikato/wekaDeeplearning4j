@@ -79,6 +79,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     getCapabilities().testWithFail(data);
 
     if (trainData != null && trainData.numInstances() > 0) {
+      // Resume run: only initialize iterator
+      trainIterator = getDataSetIterator(trainData);
       return;
     }
 

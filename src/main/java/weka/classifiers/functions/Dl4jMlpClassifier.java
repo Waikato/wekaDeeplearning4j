@@ -693,6 +693,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     logConfig.apply();
 
     if (trainData != null && trainData.numInstances() > 0) {
+      // Resume run: only initialize iterator
+      trainIterator = getDataSetIterator(trainData);
       return;
     }
 
