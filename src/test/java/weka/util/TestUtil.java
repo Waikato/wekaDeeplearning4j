@@ -22,7 +22,7 @@ package weka.util;
 // import org.deeplearning4j.ui.stats.StatsListener;
 // import org.deeplearning4j.ui.storage.FileStatsStorage;
 
-import java.io.File;
+import java.io.*;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -298,5 +298,19 @@ public class TestUtil {
       datum.setValue(0, i);
     }
     return generated;
+  }
+
+
+  public static void saveClf(String path, Classifier clf) throws IOException {
+    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
+    oos.writeObject(clf);
+    oos.close();
+  }
+
+  public static Dl4jMlpClassifier readClf(String path) throws IOException, ClassNotFoundException {
+    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
+    Dl4jMlpClassifier clf = (Dl4jMlpClassifier) ois.readObject();
+    ois.close();
+    return clf;
   }
 }

@@ -155,10 +155,15 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * The number of epochs to perform.
    */
   protected int numEpochs = 10;
+  /** The current upper bound for the number of epochs */
+  protected int maxEpochs = 0;
   /**
-   * The number of epochs that have been performed.
+   * The total number of epochs that have been performed.
    */
   protected int numEpochsPerformed;
+
+  /** The number of epochs performed in this session of iterating */
+  protected int numEpochsPerformedThisSession;
   /**
    * The dataset trainIterator.
    */
@@ -211,6 +216,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   protected LogConfiguration logConfig = new LogConfiguration();
 
+  /**
+   * Whether to allow training to continue at a later point after the initial
+   * model is built.
+   */
+  protected boolean resume;
+
 
   /**
    * Get the log configuration.
@@ -231,8 +242,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
           description = "The log configuration.",
           commandLineParamName = "logConfig",
           commandLineParamSynopsis = "-logConfig <LogConfiguration>",
-          displayOrder = 1
-  )
+          displayOrder = 1)
   public void setLogConfig(LogConfiguration logConfig) {
     this.logConfig = logConfig;
   }
@@ -618,6 +628,34 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   }
 
   /**
+   * If called with argument true, then the next time done() is called the model is effectively
+   * "frozen" and no further iterations can be performed
+   *
+   * @param resume true if the model is to be finalized after performing iterations
+   */
+
+  @OptionMetadata(description = "Set whether training can be resumed at a later date",
+    displayName = "Allow training to be resumed after the set number of epochs",
+    commandLineParamName = "resume",
+    commandLineParamSynopsis = "-resume",
+    commandLineParamIsFlag = true,
+    displayOrder = 31)
+  public void setResume(boolean resume) {
+    this.resume = resume;
+  }
+
+  /**
+   * Returns true if the model is to be finalized (or has been finalized) after
+   * training.
+   *
+   * @return the current value of finalize
+   */
+  public boolean getResume() {
+    return resume;
+  }
+
+
+  /**
    * The method used to train the classifier.
    *
    * @param data set of instances serving as training data
@@ -654,9 +692,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
   public void initializeClassifier(Instances data) throws Exception {
     logConfig.apply();
 
+    if (trainData != null && trainData.numInstances() > 0) {
+      // Resume run: only initialize iterator
+      trainIterator = getDataSetIterator(trainData);
+      return;
+    }
+
+    if (trainData != null) {
+      if (!trainData.equalHeaders(data)) {
+        throw new WekaException(trainData.equalHeadersMsg(data));
+      }
+    }
 
     // If only class is present, build zeroR
-    if (data.numAttributes() == 1 && data.classIndex() == 0) {
+    if (zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0) {
       zeroR = new ZeroR();
       zeroR.buildClassifier(data);
       return;
@@ -698,11 +747,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
-      // If zoo model was set, use this model as internal MultiLayerNetwork
-      if (useZooModel()) {
-        createZooModel();
-      } else {
-        createModel();
+      // Could be null due to resuming from a previous run
+      if (model == null) {
+        // If zoo model was set, use this model as internal MultiLayerNetwork
+        if (useZooModel()) {
+          createZooModel();
+        } else {
+          createModel();
+        }
       }
       // Initialize iterator
       instanceIterator.initialize();
@@ -715,10 +767,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         log.info(model.conf().toYaml());
       }
 
+      numEpochsPerformedThisSession = 0;
+      maxEpochs += numEpochs; // set the current upper bound
+
       // Set the iteration listener
       model.setListeners(getListener());
-
-      numEpochsPerformed = 0;
 
       isInitializationFinished = true;
     } finally {
@@ -1201,10 +1254,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
 
     // Initialize weka listener
     if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
-      int numEpochs = getNumEpochs();
+      // int numEpochs = getNumEpochs();
+      int numEpochs = maxEpochs;
       iterationListener
           .init(
               trainData.numClasses(),
+              numEpochsPerformed,
               numEpochs,
               numSamples,
               trainIterator,
@@ -1219,7 +1274,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   public boolean next() throws Exception {
 
-    if (numEpochsPerformed >= getNumEpochs() || zeroR != null || trainData == null) {
+    if (numEpochsPerformedThisSession >= getNumEpochs() || zeroR != null || trainData == null) {
       return false;
     }
 
@@ -1238,7 +1293,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
       trainIterator.reset();
       sw.stop();
       numEpochsPerformed++;
-      log.info("Epoch [{}/{}] took {}", numEpochsPerformed, numEpochs, sw.toString());
+      numEpochsPerformedThisSession++;
+      log.info("Epoch [{}/{}] took {}", numEpochsPerformed, maxEpochs, sw.toString());
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
@@ -1274,7 +1330,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    */
   public void done() {
 
-    trainData = null;
+    trainData = new Instances(trainData,0);
   }
 
   /**
