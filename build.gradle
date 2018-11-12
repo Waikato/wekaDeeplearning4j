@@ -302,6 +302,12 @@ dependencies {
     }
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
 /*
  * Specify repositories to get the dependencies from
  */
