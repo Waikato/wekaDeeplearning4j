@@ -306,6 +306,10 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+    
+    if (project.hasProperty('excludeTests')) { 
+        exclude project.property('excludeTests')
+    }
 }
 
 /*
