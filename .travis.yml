@@ -13,4 +13,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-- ./gradlew build -PexcludeTests=**/ZooModelTest*
+- ./gradlew build -PexcludeTests=**/ZooModelTest* --fail-fast
