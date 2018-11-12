@@ -302,6 +302,16 @@ dependencies {
     }
 }
 
+test {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    
+    if (project.hasProperty('excludeTests')) { 
+        exclude project.property('excludeTests')
+    }
+}
+
 /*
  * Specify repositories to get the dependencies from
  */
