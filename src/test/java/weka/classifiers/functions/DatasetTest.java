@@ -21,6 +21,8 @@ package weka.classifiers.functions;
 import java.io.File;
 import org.junit.Assert;
 import weka.classifiers.Evaluation;
+import weka.dl4j.activations.Activation;
+import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -35,6 +37,9 @@ import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.lossfunctions.LossFunction;
+import weka.dl4j.lossfunctions.LossMCXENT;
+import weka.dl4j.lossfunctions.LossMSE;
 import weka.util.DatasetLoader;
 
 /**
@@ -89,7 +94,7 @@ public class DatasetTest {
    */
   @Test
   public void testDateClass() throws Exception {
-    runClf(DatasetLoader.loadWineDate());
+    runClf(DatasetLoader.loadWineDate(), new ActivationIdentity(), new LossMSE());
   }
   /**
    * Test numeric class.
@@ -98,7 +103,7 @@ public class DatasetTest {
    */
   @Test
   public void testNumericClass() throws Exception {
-    runClf(DatasetLoader.loadFishCatch());
+    runClf(DatasetLoader.loadFishCatch(), new ActivationIdentity(), new LossMSE());
   }
 
   /**
@@ -117,6 +122,10 @@ public class DatasetTest {
   }
 
   private void runClf(Instances data) throws Exception {
+    runClf(data, new ActivationSoftmax(), new LossMCXENT());
+  }
+
+  private void runClf(Instances data, Activation outputActivation, LossFunction loss) throws Exception {
     // Data
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(32);
@@ -124,8 +133,10 @@ public class DatasetTest {
     denseLayer.setActivationFunction(new ActivationReLU());
 
     OutputLayer outputLayer = new OutputLayer();
-    outputLayer.setActivationFunction(new ActivationSoftmax());
+    outputLayer.setActivationFunction(outputActivation);
+    outputLayer.setLossFn(loss);
     outputLayer.setLayerName("Output-layer");
+
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
 
