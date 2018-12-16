@@ -76,6 +76,8 @@ cnnTextIter.setTrainBatchSize(batchSize);
 cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
 clf.setInstanceIterator(cnnTextIter);
 
+// Create a new Multi-Layer-Perceptron classifier
+Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
 
 // Define the layers
 // All N convolutional layers will be merged into a single
