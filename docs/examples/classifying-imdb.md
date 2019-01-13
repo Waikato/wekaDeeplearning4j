@@ -70,14 +70,15 @@ Below is an example building a CNN with two `ConvolutionLayer` that are automati
 int vectorSize = 300;
 int batchSize = 64;
 
+// Create a new Multi-Layer-Perceptron classifier
+Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+
 // Initialize iterator
 CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
 cnnTextIter.setTrainBatchSize(batchSize);
 cnnTextIter.setWordVectorLocation(DatasetLoader.loadGoogleNewsVectors());
 clf.setInstanceIterator(cnnTextIter);
 
-// Create a new Multi-Layer-Perceptron classifier
-Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
 
 // Define the layers
 // All N convolutional layers will be merged into a single
@@ -87,14 +88,14 @@ conv1.setKernelSize(new int[] {4, vectorSize});
 conv1.setNOut(10);
 conv1.setStride(new int[] {1, vectorSize});
 conv1.setConvolutionMode(ConvolutionMode.Same);
-conv1.setActivationFn(new ActivationReLU());
+conv1.setActivationFunction(new ActivationReLU());
 
 ConvolutionLayer conv2 = new ConvolutionLayer();
 conv2.setKernelSize(new int[] {3, vectorSize});
 conv2.setNOut(10);
 conv2.setStride(new int[] {1, vectorSize});
 conv2.setConvolutionMode(ConvolutionMode.Same);
-conv2.setActivationFn(new ActivationReLU());
+conv2.setActivationFunction(new ActivationReLU());
 
 GlobalPoolingLayer gpl = new GlobalPoolingLayer();
 

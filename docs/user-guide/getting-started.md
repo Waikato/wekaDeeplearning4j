@@ -104,11 +104,11 @@ The networks architecture can be set up by creating each layer step by step:
 ```java
 DenseLayer denseLayer = new DenseLayer();
 denseLayer.setNOut(10);
-denseLayer.setActivationFn(new ActivationReLU());
+denseLayer.setActivationFunction(new ActivationReLU());
 
 // Define the output layer
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(new ActivationSoftmax());
+outputLayer.setActivationFunction(new ActivationSoftmax());
 ```
 
 Further configuration can be done by setting a `NeuralNetConfiguration`

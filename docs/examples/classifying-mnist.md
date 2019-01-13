@@ -70,7 +70,7 @@ convLayer1.setKernelSizeX(3);
 convLayer1.setKernelSizeY(3);
 convLayer1.setStrideX(1);
 convLayer1.setStrideY(1);
-convLayer1.setActivationFn(new ActivationReLU());
+convLayer1.setActivationFunction(new ActivationReLU());
 convLayer1.setNOut(8);
 
 // First maxpooling layer, 2x2 filter
@@ -87,7 +87,7 @@ convLayer2.setKernelSizeX(3);
 convLayer2.setKernelSizeY(3);
 convLayer2.setStrideX(1);
 convLayer2.setStrideY(1);
-convLayer2.setActivationFn(new ActivationReLU());
+convLayer2.setActivationFunction(new ActivationReLU());
 convLayer2.setNOut(8);
 
 // Second maxpooling layer, 2x2 filter
@@ -100,7 +100,7 @@ poolLayer2.setStrideY(1);
 
 // Output layer with softmax activation
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(new ActivationSoftmax());
+outputLayer.setActivationFunction(new ActivationSoftmax());
 outputLayer.setLossFn(new LossMCXENT());
 
 
