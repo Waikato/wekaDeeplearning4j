@@ -876,7 +876,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
         final String tmpDir = System.getProperty("java.io.tmpdir");
         final String suffix = cacheDirSuffix.isEmpty() ? "" : "-" + cacheDirSuffix;
         final File cacheDir = Paths.get(tmpDir, "dataset-cache" + suffix).toFile();
-        cacheDir.delete(); // remove old existing cache
+        if (cacheDir.exists() && cacheDir.isDirectory()) {
+          // delete contents then directory
+          File[] fs = cacheDir.listFiles();
+          for (File f : fs) {
+            f.delete();
+          }
+          if (!cacheDir.delete()) {
+            // remove old existing cache
+            System.err.println("Unable to delete cache dir " + cacheDir.toString());
+          }
+        }
+
         final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
         it = new CachingDataSetIterator(it, fsCache);
         break;
