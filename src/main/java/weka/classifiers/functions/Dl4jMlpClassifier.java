@@ -1514,7 +1514,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * @return Remapped index if test dataset has nominal label. Else return {@code j}
    */
   protected int fixLabelIndexIfNominal(int j, Instances insts) {
-    if (insts.classAttribute().isNominal()) {
+    if (insts.classAttribute().isNominal() && getInstanceIterator() instanceof ImageInstanceIterator) {
       return labelSortIndex[j];
     } else {
       return j;
