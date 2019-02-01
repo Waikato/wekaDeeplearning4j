@@ -699,7 +699,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     }
 
     if (trainData != null) {
-      if (!trainData.equalHeaders(data)) {
+      if (!trainData.equalHeaders(data) && resume) {
         throw new WekaException(trainData.equalHeadersMsg(data));
       }
     }
@@ -747,8 +747,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
-      // Could be null due to resuming from a previous run
-      if (model == null) {
+      // Could be non-null due to resuming from a previous run
+      if (model == null || !resume) {
         // If zoo model was set, use this model as internal MultiLayerNetwork
         if (useZooModel()) {
           createZooModel();
@@ -1329,8 +1329,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier
    * Clean up after learning.
    */
   public void done() {
-
-    trainData = new Instances(trainData,0);
+    if(zeroR == null){
+      trainData = new Instances(trainData,0);
+    }
   }
 
   /**
