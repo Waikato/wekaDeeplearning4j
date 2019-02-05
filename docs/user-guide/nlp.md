@@ -35,6 +35,34 @@ Currently supported embedding formats are:
 - Google binary format
 - DL4J compressed format
 
+#### Polyglot Embeddings
+To convert [Polyglot Embeddings](https://sites.google.com/site/rmyeid/projects/polyglot) into CSV files run the following in python 3.3 or higher (requires numpy and pandas):
+```python
+import pickle
+import numpy as np
+import pandas as pd
+
+# Define input/output files
+fin = './polyglot-sv.pkl'
+fout = './polyglot-sv.csv'
+
+# Load embedding
+words, embeddings = pickle.load(open(fin, 'rb'), encoding='latin1')
+
+# Print embedding size
+m, n = embeddings.shape
+print("Emebddings contains {} words embedded as vectors of length {}".format(m, n))
+
+# Use pandas to export to .csv
+print("Starting conversion ...")
+df = pd.DataFrame(embeddings)
+df.insert(0, "word", words)
+df.to_csv(fout, header=False, index=False, sep=" ")
+
+print("Finished conversion from .pkl to .csv")
+
+```
+
 ### Weka Filters
 
  1. __Dl4jStringToWord2Vec__: calculates word embeddings on a string attribute using the [Word2Vec](https://code.google.com/archive/p/word2vec/) method
