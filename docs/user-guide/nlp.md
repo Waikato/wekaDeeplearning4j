@@ -64,6 +64,7 @@ print("Finished conversion from .pkl to .csv")
 ```
 
 ### Weka Filters
+We provide two filters that will generate a word embedding from a given text corpus. These will not transform the input data into processed instances (as e.g. `StringToWordVector` does) but output a word embedding that contains tuples of words and their associated vectors in the embedding space. This embedding can be saved and further used in a `Cnn/RnnEmbeddingInstanceIterator` (`location of word vectors` option).
 
  1. __Dl4jStringToWord2Vec__: calculates word embeddings on a string attribute using the [Word2Vec](https://code.google.com/archive/p/word2vec/) method
  2. __Dl4jStringToGlove__: calculates word embeddings on a string attribute using the [Glove]( https://nlp.stanford.edu/projects/glove/) method.
