@@ -42,7 +42,7 @@ data.setClassIndex(data.numAttributes() - 1);
 
 // Define the output layer
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(new ActivationSoftmax());
+outputLayer.setActivationFunction(new ActivationSoftmax());
 outputLayer.setLossFn(new LossMCXENT());
 
 NeuralNetConfiguration nnc = new NeuralNetConfiguration();

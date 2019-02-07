@@ -5,7 +5,7 @@ As of [ai.stanford.edu](http://ai.stanford.edu/~amaas/data/sentiment/):
 > This is a dataset for binary sentiment classification containing substantially more data than previous benchmark datasets. We provide a set of 25,000 highly polar movie reviews for training, and 25,000 for testing. There is additional unlabeled data for use as well. Raw text and already processed bag of words formats are provided. See the README file contained in the release for more details.
 
 
-The full IMDB dataset in the ARFF format can be found [here](https://github.com/Waikato/wekaDeeplearning4j/blob/develop/package/src/test/resources/nominal/imdb.arff).
+The full IMDB dataset in the ARFF format can be found [here](https://sourceforge.net/projects/weka/files/datasets/text-datasets/imdb-sentiment-2011.arff.gz/download).
 
 ## Java RNN
 The following code builds a network consisting of an LSTM layer and an RnnOutputLayer, loading imdb reviews and mapping them into a sequence of vectors in the embedding space that is defined by the Google News model. Furthermore, gradient clipping at a value of 1.0 is applied to prevent the network from exploding gradients.
@@ -70,6 +70,9 @@ Below is an example building a CNN with two `ConvolutionLayer` that are automati
 int vectorSize = 300;
 int batchSize = 64;
 
+// Create a new Multi-Layer-Perceptron classifier
+Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+
 // Initialize iterator
 CnnTextEmbeddingInstanceIterator cnnTextIter = new CnnTextEmbeddingInstanceIterator();
 cnnTextIter.setTrainBatchSize(batchSize);
@@ -85,14 +88,14 @@ conv1.setKernelSize(new int[] {4, vectorSize});
 conv1.setNOut(10);
 conv1.setStride(new int[] {1, vectorSize});
 conv1.setConvolutionMode(ConvolutionMode.Same);
-conv1.setActivationFn(new ActivationReLU());
+conv1.setActivationFunction(new ActivationReLU());
 
 ConvolutionLayer conv2 = new ConvolutionLayer();
 conv2.setKernelSize(new int[] {3, vectorSize});
 conv2.setNOut(10);
 conv2.setStride(new int[] {1, vectorSize});
 conv2.setConvolutionMode(ConvolutionMode.Same);
-conv2.setActivationFn(new ActivationReLU());
+conv2.setActivationFunction(new ActivationReLU());
 
 GlobalPoolingLayer gpl = new GlobalPoolingLayer();
 

@@ -19,17 +19,12 @@
 package weka.filters.unsupervised.attribute;
 
 import static org.junit.Assert.*;
+import static weka.util.TestUtil.saveClf;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.Test;
-import weka.classifiers.Classifier;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -79,6 +74,8 @@ public class Dl4jMlpFilterTest {
     checkLayer(clf, iris, dl1.getLayerName(), clfPath);
     checkLayer(clf, iris, dl2.getLayerName(), clfPath);
     checkLayer(clf, iris, dl3.getLayerName(), clfPath);
+
+    Files.delete(Paths.get(clfPath));
   }
 
   @Test
@@ -132,18 +129,4 @@ public class Dl4jMlpFilterTest {
       }
     }
   }
-
-  public void saveClf(String path, Classifier clf) throws IOException {
-    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
-    oos.writeObject(clf);
-    oos.close();
-  }
-
-  public Dl4jMlpClassifier readClf(String path) throws IOException, ClassNotFoundException {
-    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
-    Dl4jMlpClassifier clf = (Dl4jMlpClassifier) ois.readObject();
-    ois.close();
-    return clf;
-  }
-
 }

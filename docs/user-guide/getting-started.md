@@ -1,5 +1,5 @@
 # Usage
-If you are new to Weka, you should probably first start reading the [Weka primer](https://weka.wikispaces.com/Primer) as a basic introduction.
+If you are new to Weka, a good resource to get started is the  [Weka manual](https://www.cs.waikato.ac.nz/ml/weka/Witten_et_al_2016_appendix.pdf).
 
 
 As most of Weka, the WekaDeeplearning4j's functionality is accessible in three ways:
@@ -104,11 +104,11 @@ The networks architecture can be set up by creating each layer step by step:
 ```java
 DenseLayer denseLayer = new DenseLayer();
 denseLayer.setNOut(10);
-denseLayer.setActivationFn(new ActivationReLU());
+denseLayer.setActivationFunction(new ActivationReLU());
 
 // Define the output layer
 OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFn(new ActivationSoftmax());
+outputLayer.setActivationFunction(new ActivationSoftmax());
 ```
 
 Further configuration can be done by setting a `NeuralNetConfiguration`

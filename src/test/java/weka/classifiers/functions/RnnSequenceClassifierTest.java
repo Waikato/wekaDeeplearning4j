@@ -20,6 +20,8 @@ package weka.classifiers.functions;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +67,10 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
+
+import static org.junit.Assert.assertEquals;
+import static weka.util.TestUtil.readClf;
+import static weka.util.TestUtil.saveClf;
 
 /**
  * JUnit tests for the RnnSequenceClassifier. Tests nominal classes with iris, numerical classes
@@ -402,82 +408,67 @@ public class RnnSequenceClassifierTest {
     TestUtil.holdout(clf, copy);
   }
 
-  //  @Test
-  //  public void testImdbDl4j() throws Exception {
-  //
-  //    int vectorSize = 300; // Size of the word vectors. 300 in the Google News model
-  //
-  //    tii = new RnnTextEmbeddingInstanceIterator();
-  //    tii.setTruncateLength(truncateLength);
-  //    tii.setWordVectorLocation(modelSlim);
-  //    final int bs = batchSize;
-  //    tii.setTrainBatchSize(bs);
-  //
-  //    final Instances[] insts = TestUtil.splitTrainTest(data, 50);
-  //    Instances trainData = insts[0];
-  //    Instances testData = insts[1];
-  //
-  //    final int seed = 42;
-  //    DataSetIterator trainIter = tii.getDataSetIterator(trainData, seed, bs);
-  //    DataSetIterator testIter = tii.getDataSetIterator(testData, seed, bs);
-  //
-  //    final int queueSize = 4;
-  //    trainIter = new AsyncDataSetIterator(trainIter, queueSize);
-  //    testIter = new AsyncDataSetIterator(testIter, queueSize);
-  //
-  //    // Download and extract data
-  //    Nd4j.getMemoryManager().togglePeriodicGc(false); // https://deeplearning4j.org/workspaces
-  //
-  //    // Set up network configuration
-  //    final int n = 256;
-  //    MultiLayerConfiguration conf =
-  //        new org.deeplearning4j.nn.conf.NeuralNetConfiguration.Builder()
-  //            .updater(
-  //                Updater
-  //                    .ADAM) // To configure:
-  // .updater(Adam.builder().beta1(0.9).beta2(0.999).getBackend())
-  //            .regularization(true)
-  //            .l2(1e-5)
-  //            .weightInit(WeightInit.XAVIER)
-  //            .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-  //            .gradientNormalizationThreshold(1.0)
-  //            .learningRate(2e-2)
-  //            .seed(seed)
-  //            .trainingWorkspaceMode(WorkspaceMode.SEPARATE)
-  //            .inferenceWorkspaceMode(WorkspaceMode.SEPARATE) //
-  // https://deeplearning4j.org/workspaces
-  //            .list()
-  //            .layer(
-  //                0, new
-  // LSTM.Builder().nIn(vectorSize).nOut(n).activation(Activation.TANH).getBackend())
-  //            .layer(
-  //                1,
-  //                new org.deeplearning4j.nn.conf.layers.RnnOutputLayer.Builder()
-  //                    .activation(Activation.SOFTMAX)
-  //                    .lossFunction(LossFunctions.LossFunction.MCXENT)
-  //                    .nIn(n)
-  //                    .nOut(2)
-  //                    .getBackend())
-  //            .pretrain(false)
-  //            .backprop(true)
-  //            .getBackend();
-  //
-  //    MultiLayerNetwork net = new MultiLayerNetwork(conf);
-  //    net.init();
-  //    net.setListeners(new StatsListener(fss));
-  //
-  //    log.info("Starting training");
-  //    StopWatch sw = new StopWatch();
-  //    for (int i = 0; i < epochs; i++) {
-  //      sw.start();
-  //      net.fit(trainIter);
-  //      sw.stop();
-  //      trainIter.reset();
-  //      log.info("Epoch " + i + " complete, took {} . Starting evaluation:", sw.toString());
-  //      sw.reset();
-  //      // Run evaluation. This is on 25k reviews, so can take some time
-  //      Evaluation evaluation = net.evaluate(testIter);
-  //      log.info(evaluation.stats());
-  //    }
-  //  }
+  @Test
+  public void testResume() throws Exception {
+    // Define layers
+    LSTM lstm1 = new LSTM();
+    lstm1.setNOut(5);
+    lstm1.setActivationFunction(new ActivationTanH());
+
+    RnnOutputLayer rnnOut = new RnnOutputLayer();
+    rnnOut.setLossFn(new LossMSE());
+    rnnOut.setActivationFunction(new ActivationIdentity());
+
+    // Network config
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setL2(1e-5);
+    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+    nnc.setGradientNormalizationThreshold(1.0);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
+
+    // Config classifier
+    clf.setLayers(lstm1, rnnOut);
+    clf.setNeuralNetConfiguration(nnc);
+    clf.settBPTTbackwardLength(2);
+    clf.settBPTTforwardLength(2);
+    int numEpochs = 5;
+    clf.setNumEpochs(numEpochs);
+
+    // Randomize data
+    data = DatasetLoader.loadAnger();
+    data.randomize(new Random(42));
+
+    TestUtil.holdout(clf, data, 1);
+
+    assertEquals(numEpochs, clf.numEpochsPerformed);
+    assertEquals(numEpochs, clf.numEpochsPerformedThisSession);
+
+    // Save classifier
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    String clfPath = Paths.get(tmpDir, "lstm-clf.ser").toString();
+    saveClf(clfPath, clf);
+
+    // Reload classifier and run #numEpochs epochs again
+    Dl4jMlpClassifier clfLoaded = readClf(clfPath);
+    clfLoaded.buildClassifier(data);
+
+    // Check if epochs are correctly counted
+    assertEquals(numEpochs, clfLoaded.numEpochs);
+    assertEquals(numEpochs * 2, clfLoaded.numEpochsPerformed);
+    assertEquals(numEpochs, clfLoaded.numEpochsPerformedThisSession);
+
+    // Repeat procedure one more time and check again
+    saveClf(clfPath, clfLoaded);
+    Dl4jMlpClassifier clfLoaded2 = readClf(clfPath);
+    clfLoaded2.buildClassifier(data);
+
+    assertEquals(numEpochs, clfLoaded2.numEpochs);
+    assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
+    assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
+
+
+    Files.delete(Paths.get(clfPath));
+  }
 }

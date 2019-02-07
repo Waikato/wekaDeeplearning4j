@@ -43,6 +43,8 @@ public abstract class TrainingListener
   protected int numClasses;
   /** Number of classes */
   protected int numEpochs;
+  /** The current epoch */
+  protected int currentEpoch;
   /** Training dataset iterator */
   protected transient DataSetIterator validationIterator;
   /** Validation dataset iterator */
@@ -58,11 +60,13 @@ public abstract class TrainingListener
    */
   public void init(
       int numClasses,
+      int currentEpoch,
       int numEpochs,
       int numSamples,
       DataSetIterator trainIterator,
       DataSetIterator validationIterator) {
     this.numClasses = numClasses;
+    this.currentEpoch = currentEpoch;
     this.numEpochs = numEpochs;
     this.numSamples = numSamples;
     this.trainIterator = trainIterator;

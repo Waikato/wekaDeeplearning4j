@@ -150,7 +150,7 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
 
             // Skip stopwords
             tokens = tokens.stream()
-                    .filter(stopwords::isStopword)
+                    .filter(s -> !stopwords.isStopword(s))
                     .collect(Collectors.toList());
 
             // If tokens are empty, add at least the UNKNOWN_WORD_SENTINEL

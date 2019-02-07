@@ -22,6 +22,7 @@ import java.io.File;
 import org.datavec.api.split.CollectionInputSplit;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.datavec.image.transform.ResizeImageTransform;
+import weka.core.Environment;
 import weka.core.Instances;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
@@ -156,8 +157,15 @@ public class ResizeImageInstanceIterator extends ImageInstanceIterator {
 
   @Override
   protected ImageRecordReader getImageRecordReader(Instances data) throws Exception {
+    Environment env = Environment.getSystemWide();
+    String resolved = getImagesLocation().toString();
+    try {
+      resolved = env.substitute(resolved);
+    } catch (Exception ex) {
+      // ignore
+    }
     ArffMetaDataLabelGenerator labelGenerator =
-        new ArffMetaDataLabelGenerator(data, getImagesLocation().toString());
+        new ArffMetaDataLabelGenerator(data, resolved);
     ResizeImageTransform rit = new ResizeImageTransform(getWidth(), getHeight());
     ImageRecordReader reader =
         new ImageRecordReader(getHeight(), getWidth(), getNumChannels(), labelGenerator, rit);
