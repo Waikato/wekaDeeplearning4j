@@ -19,3 +19,6 @@ The following Neural Network Layers are available to build sophisticated archite
 
 Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)
+
+## Contributing
+Contributions are always welcome. If you want to contribute to the project, check out our [contribution guide](https://github.com/Waikato/wekaDeeplearning4j/blob/master/CONTRIBUTING.md).
