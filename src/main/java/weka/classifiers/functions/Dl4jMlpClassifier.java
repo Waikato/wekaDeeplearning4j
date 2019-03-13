@@ -588,7 +588,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   @OptionMetadata(description = "The early stopping configuration to use.",
-    displayName = "early stopping configuration",
+    displayName = "early stopping",
     commandLineParamName = "early-stopping",
     commandLineParamSynopsis = "-early-stopping <string>", displayOrder = 7)
   public EarlyStopping getEarlyStopping() {
@@ -619,7 +619,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   @OptionMetadata(
     description = "The queue size for asynchronous data transfer (default: 0, synchronous transfer).",
-    displayName = "queue size for asynchronous data transfer",
+    displayName = "data queue size",
     commandLineParamName = "queueSize",
     commandLineParamSynopsis = "-queueSize <int>", displayOrder = 30)
   public
@@ -637,7 +637,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   @OptionMetadata(
     description = "Set whether training can be resumed at a later date",
-    displayName = "Allow training to be resumed after the set number of epochs",
+    displayName = "resume",
     commandLineParamName = "resume", commandLineParamSynopsis = "-resume",
     commandLineParamIsFlag = true, displayOrder = 31)
   public
@@ -655,7 +655,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return resume;
   }
 
-  @OptionMetadata(displayName = "Do not clear FILESYSTEM cache",
+  @OptionMetadata(displayName = "preserve filesystem cache",
     description = "If true, the filesystem cache will not be cleared when "
       + "starting or resuming training of a model. This can save time on data "
       + "preparation for a given problem, but will cause errors if a dataset "
