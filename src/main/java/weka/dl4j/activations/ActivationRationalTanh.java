@@ -18,11 +18,10 @@
 
 package weka.dl4j.activations;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's ActivationRationalTanh that implements WEKA option handling.
@@ -30,14 +29,17 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("RationalTanh")
-public class ActivationRationalTanh extends Activation<org.nd4j.linalg.activations.impl.ActivationRationalTanh>
+public class ActivationRationalTanh extends
+    Activation<org.nd4j.linalg.activations.impl.ActivationRationalTanh>
     implements OptionHandler {
 
   private static final long serialVersionUID = -20670350590983508L;
+
   @Override
   public void initializeBackend() {
     backend = new org.nd4j.linalg.activations.impl.ActivationRationalTanh();
   }
+
   /**
    * Returns an enumeration describing the available options.
    *
@@ -64,7 +66,7 @@ public class ActivationRationalTanh extends Activation<org.nd4j.linalg.activatio
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

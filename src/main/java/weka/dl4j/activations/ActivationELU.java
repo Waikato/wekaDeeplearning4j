@@ -20,11 +20,10 @@ package weka.dl4j.activations;
 
 import static org.nd4j.linalg.activations.impl.ActivationLReLU.DEFAULT_ALPHA;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 import weka.core.OptionMetadata;
 
 /**
@@ -41,10 +40,12 @@ public class ActivationELU extends Activation<org.nd4j.linalg.activations.impl.A
 
 
   protected double alpha = DEFAULT_ALPHA;
+
   @Override
   public void initializeBackend() {
     backend = new org.nd4j.linalg.activations.impl.ActivationELU();
   }
+
   @OptionMetadata(
       displayName = "alpha",
       description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
@@ -61,14 +62,14 @@ public class ActivationELU extends Activation<org.nd4j.linalg.activations.impl.A
   }
 
   @Override
-  public void setBackend(org.nd4j.linalg.activations.impl.ActivationELU newBackend) {
-    super.setBackend(newBackend);
-    this.alpha = newBackend.getAlpha();
+  public org.nd4j.linalg.activations.impl.ActivationELU getBackend() {
+    return new org.nd4j.linalg.activations.impl.ActivationELU(alpha);
   }
 
   @Override
-  public org.nd4j.linalg.activations.impl.ActivationELU getBackend() {
-    return new org.nd4j.linalg.activations.impl.ActivationELU(alpha);
+  public void setBackend(org.nd4j.linalg.activations.impl.ActivationELU newBackend) {
+    super.setBackend(newBackend);
+    this.alpha = newBackend.getAlpha();
   }
 
   /**
@@ -97,7 +98,7 @@ public class ActivationELU extends Activation<org.nd4j.linalg.activations.impl.A
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

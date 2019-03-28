@@ -20,7 +20,6 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 import weka.dl4j.activations.Activation;
 import weka.dl4j.activations.ActivationCube;
@@ -41,18 +40,18 @@ import weka.dl4j.activations.ActivationSoftmax;
  *
  * @author Steven Lang
  */
-public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM>{
+public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM> {
 
 
   @Override
-  public LSTM getApiWrapper(){
-    return new  LSTM();
+  public LSTM getApiWrapper() {
+    return new LSTM();
   }
 
   @Test
-  public void testGateActivationFunction(){
+  public void testGateActivationFunction() {
     Activation[] acts =
-        new Activation[] {
+        new Activation[]{
             new ActivationCube(),
             new ActivationELU(),
             new ActivationHardSigmoid(),

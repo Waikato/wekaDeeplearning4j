@@ -21,10 +21,9 @@ package weka.dl4j.layers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.PoolingType;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * A subsampling layer test.
@@ -35,7 +34,7 @@ public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
 
   @Override
   public SubsamplingLayer getApiWrapper() {
-    return new  SubsamplingLayer();
+    return new SubsamplingLayer();
   }
 
   @Test
@@ -50,7 +49,7 @@ public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
 
   @Test
   public void testPoolingType() {
-    for (PoolingType type : PoolingType.values()){
+    for (PoolingType type : PoolingType.values()) {
       wrapper.setPoolingType(type);
 
       assertEquals(type, wrapper.getPoolingType());
@@ -58,24 +57,25 @@ public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
   }
 
   @Test
-  public void testKernelSize(){
-    int[] size = {20,20};
+  public void testKernelSize() {
+    int[] size = {20, 20};
     wrapper.setKernelSize(size);
 
     assertArrayEquals(size, wrapper.getKernelSize());
   }
 
   @Test
-  public void testStrideSize(){
-    int[] size = {20,20};
+  public void testStrideSize() {
+    int[] size = {20, 20};
     wrapper.setStride(size);
 
     assertArrayEquals(size, wrapper.getStride());
 
   }
+
   @Test
-  public void testPaddingSize(){
-    int[] size = {20,20};
+  public void testPaddingSize() {
+    int[] size = {20, 20};
     wrapper.setPadding(size);
 
     assertArrayEquals(size, wrapper.getPadding());
@@ -83,7 +83,7 @@ public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
   }
 
   @Test
-  public void testPnorm(){
+  public void testPnorm() {
     int p = 123;
     wrapper.setPnorm(p);
 

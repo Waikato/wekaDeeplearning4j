@@ -36,10 +36,14 @@ import weka.dl4j.activations.ActivationSigmoid;
 public class GravesLSTM extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.GravesLSTM>
     implements OptionHandler, Serializable {
 
-  /** SerialVersionUID */
+  /**
+   * SerialVersionUID
+   */
   private static final long serialVersionUID = -8982185320769591891L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public GravesLSTM() {
     super();
     setLayerName("GravesLSTM layer");

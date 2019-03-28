@@ -18,11 +18,10 @@
 
 package weka.dl4j.activations;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's ActivationSigmoid that implements WEKA option handling.
@@ -30,14 +29,17 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("Sigmoid")
-public class ActivationSigmoid extends Activation<org.nd4j.linalg.activations.impl.ActivationSigmoid>
+public class ActivationSigmoid extends
+    Activation<org.nd4j.linalg.activations.impl.ActivationSigmoid>
     implements OptionHandler {
 
   private static final long serialVersionUID = 1082773128147974228L;
+
   @Override
   public void initializeBackend() {
     backend = new org.nd4j.linalg.activations.impl.ActivationSigmoid();
   }
+
   /**
    * Returns an enumeration describing the available options.
    *
@@ -64,7 +66,7 @@ public class ActivationSigmoid extends Activation<org.nd4j.linalg.activations.im
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

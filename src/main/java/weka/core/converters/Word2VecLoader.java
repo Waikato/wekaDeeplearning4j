@@ -18,16 +18,15 @@
 
 package weka.core.converters;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Loads Word2Vec seriliazed embeddings into Weka.
@@ -36,16 +35,24 @@ import java.util.ArrayList;
  */
 public class Word2VecLoader extends AbstractFileLoader implements BatchConverter {
 
-  /** For serialization */
+  /**
+   * For serialization
+   */
   private static final long serialVersionUID = -5963779116425129124L;
 
-  /** the file extension. */
+  /**
+   * the file extension.
+   */
   public static String FILE_EXTENSION = ".bin";
 
-  /** the extension for compressed files. */
+  /**
+   * the extension for compressed files.
+   */
   public static String FILE_EXTENSION_COMPRESSED = FILE_EXTENSION + ".gz";
 
-  /** Word2Vec object */
+  /**
+   * Word2Vec object
+   */
   private Word2Vec vec;
 
   /**
@@ -73,7 +80,7 @@ public class Word2VecLoader extends AbstractFileLoader implements BatchConverter
    * @return the file extensions
    */
   public String[] getFileExtensions() {
-    return new String[] {FILE_EXTENSION, FILE_EXTENSION_COMPRESSED};
+    return new String[]{FILE_EXTENSION, FILE_EXTENSION_COMPRESSED};
   }
 
   /* (non-Javadoc)
@@ -141,8 +148,9 @@ public class Word2VecLoader extends AbstractFileLoader implements BatchConverter
     for (String word : vec.getVocab().words()) {
       double[] values = new double[result.numAttributes()];
 
-      for (int i = 0; i < this.vec.getWordVector(word).length; i++)
+      for (int i = 0; i < this.vec.getWordVector(word).length; i++) {
         values[i] = this.vec.getWordVector(word)[i];
+      }
 
       values[result.numAttributes() - 1] = result.attribute("word_id").addStringValue(word);
 
@@ -167,7 +175,9 @@ public class Word2VecLoader extends AbstractFileLoader implements BatchConverter
 
     setRetrieval(NONE);
 
-    if (file == null) throw new IOException("Source file object is null!");
+    if (file == null) {
+      throw new IOException("Source file object is null!");
+    }
 
     m_sourceFile = file;
     m_File = file.getAbsolutePath();

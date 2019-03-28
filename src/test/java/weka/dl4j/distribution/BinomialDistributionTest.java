@@ -18,7 +18,7 @@
 
 package weka.dl4j.distribution;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -44,6 +44,6 @@ public class BinomialDistributionTest extends ApiWrapperTest<BinomialDistributio
 
   @Override
   public BinomialDistribution getApiWrapper() {
-    return new  BinomialDistribution();
+    return new BinomialDistribution();
   }
 }

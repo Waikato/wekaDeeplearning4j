@@ -28,17 +28,18 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 public class AdaGrad extends Updater<org.nd4j.linalg.learning.config.AdaGrad> {
+
   private static final long serialVersionUID = 3881105990718165790L;
 
   @OptionMetadata(
-    displayName = "epsilon",
-    description =
-        "The epsilon parameter (default = "
-            + org.nd4j.linalg.learning.config.AdaGrad.DEFAULT_ADAGRAD_EPSILON
-            + ").",
-    commandLineParamName = "epsilon",
-    commandLineParamSynopsis = "-epsilon <double>",
-    displayOrder = 1
+      displayName = "epsilon",
+      description =
+          "The epsilon parameter (default = "
+              + org.nd4j.linalg.learning.config.AdaGrad.DEFAULT_ADAGRAD_EPSILON
+              + ").",
+      commandLineParamName = "epsilon",
+      commandLineParamSynopsis = "-epsilon <double>",
+      displayOrder = 1
   )
   public double getEpsilon() {
     return backend.getEpsilon();
@@ -65,7 +66,7 @@ public class AdaGrad extends Updater<org.nd4j.linalg.learning.config.AdaGrad> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

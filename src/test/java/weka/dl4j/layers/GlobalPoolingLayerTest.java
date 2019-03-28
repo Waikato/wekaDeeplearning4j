@@ -23,9 +23,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import weka.dl4j.PoolingType;
-import org.junit.Before;
 import org.junit.Test;
+import weka.dl4j.PoolingType;
 
 /**
  * A global pooling layer test.
@@ -37,12 +36,12 @@ public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer
 
   @Override
   public GlobalPoolingLayer getApiWrapper() {
-    return new  GlobalPoolingLayer();
+    return new GlobalPoolingLayer();
   }
 
   @Test
   public void testPoolingType() {
-    for (PoolingType type : PoolingType.values()){
+    for (PoolingType type : PoolingType.values()) {
       wrapper.setPoolingType(type);
 
       assertEquals(type, wrapper.getPoolingType());
@@ -50,14 +49,15 @@ public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer
   }
 
   @Test
-  public void testPoolingDimension(){
-    int[] dim = {25,25};
+  public void testPoolingDimension() {
+    int[] dim = {25, 25};
     wrapper.setPoolingDimensions(dim);
 
     assertArrayEquals(dim, wrapper.getPoolingDimensions());
   }
+
   @Test
-  public void testCollapseDimensions(){
+  public void testCollapseDimensions() {
     wrapper.setCollapseDimensions(true);
     assertTrue(wrapper.isCollapseDimensions());
     wrapper.setCollapseDimensions(false);
@@ -65,7 +65,7 @@ public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer
   }
 
   @Test
-  public void testPnorm(){
+  public void testPnorm() {
     int p = 123;
     wrapper.setPnorm(p);
 

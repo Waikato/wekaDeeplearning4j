@@ -18,14 +18,13 @@
 
 package weka.dl4j.layers;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.gui.ProgrammaticProperty;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's BatchNormalization layer that implements WEKA option handling.
@@ -34,13 +33,18 @@ import java.util.Enumeration;
  * @author Eibe Frank
  * @author Steven Lang
  */
-public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.BatchNormalization>
+public class BatchNormalization extends
+    FeedForwardLayer<org.deeplearning4j.nn.conf.layers.BatchNormalization>
     implements OptionHandler, Serializable {
 
-  /** The ID used to serialize this class. */
+  /**
+   * The ID used to serialize this class.
+   */
   private static final long serialVersionUID = 6804344091980568487L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public BatchNormalization() {
     super();
     setLayerName("Batch normalization layer");
@@ -57,13 +61,12 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
 
-
   @OptionMetadata(
-    displayName = "decay parameter",
-    description = "The decay parameter (default = 0.9).",
-    commandLineParamName = "decay",
-    commandLineParamSynopsis = "-decay <double>",
-    displayOrder = 1
+      displayName = "decay parameter",
+      description = "The decay parameter (default = 0.9).",
+      commandLineParamName = "decay",
+      commandLineParamSynopsis = "-decay <double>",
+      displayOrder = 1
   )
   public double getDecay() {
     return backend.getDecay();
@@ -74,11 +77,11 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
   @OptionMetadata(
-    displayName = "eps parameter",
-    description = "The eps parameter (default = 1e-5).",
-    commandLineParamName = "eps",
-    commandLineParamSynopsis = "-eps <double>",
-    displayOrder = 2
+      displayName = "eps parameter",
+      description = "The eps parameter (default = 1e-5).",
+      commandLineParamName = "eps",
+      commandLineParamSynopsis = "-eps <double>",
+      displayOrder = 2
   )
   public double getEps() {
     return backend.getEps();
@@ -89,11 +92,11 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
   @OptionMetadata(
-    displayName = "gamma parameter",
-    description = "The gamma parameter (default = 1).",
-    commandLineParamName = "gamma",
-    commandLineParamSynopsis = "-gamma <double>",
-    displayOrder = 3
+      displayName = "gamma parameter",
+      description = "The gamma parameter (default = 1).",
+      commandLineParamName = "gamma",
+      commandLineParamSynopsis = "-gamma <double>",
+      displayOrder = 3
   )
   public double getGamma() {
     return backend.getGamma();
@@ -104,11 +107,11 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
   @OptionMetadata(
-    displayName = "beta parameter",
-    description = "The beta parameter (default = 0).",
-    commandLineParamName = "beta",
-    commandLineParamSynopsis = "-beta <double>",
-    displayOrder = 4
+      displayName = "beta parameter",
+      description = "The beta parameter (default = 0).",
+      commandLineParamName = "beta",
+      commandLineParamSynopsis = "-beta <double>",
+      displayOrder = 4
   )
   public double getBeta() {
     return backend.getBeta();
@@ -119,11 +122,11 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
   @OptionMetadata(
-    displayName = "lock gamma and beta",
-    description = "Whether to lock gamma and beta.",
-    commandLineParamName = "beta",
-    commandLineParamSynopsis = "-lockGammaBeta",
-    displayOrder = 5
+      displayName = "lock gamma and beta",
+      description = "Whether to lock gamma and beta.",
+      commandLineParamName = "beta",
+      commandLineParamSynopsis = "-lockGammaBeta",
+      displayOrder = 5
   )
   public boolean getLockGammaAndBeta() {
     return backend.isLockGammaBeta();
@@ -143,11 +146,11 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
   }
 
   @OptionMetadata(
-    displayName = "isMinibatch",
-    description = "Whether minibatches are not not used.",
-    commandLineParamName = "isMinibatch",
-    commandLineParamSynopsis = "-isMinibatch",
-    displayOrder = 6
+      displayName = "isMinibatch",
+      description = "Whether minibatches are not not used.",
+      commandLineParamName = "isMinibatch",
+      commandLineParamSynopsis = "-isMinibatch",
+      displayOrder = 6
   )
   public boolean getIsMinibatch() {
     return backend.isMinibatch();
@@ -177,7 +180,7 @@ public class BatchNormalization extends FeedForwardLayer<org.deeplearning4j.nn.c
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

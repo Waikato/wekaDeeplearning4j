@@ -18,10 +18,9 @@
 
 package weka.dl4j.schedules;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import weka.dl4j.ApiWrapperTest;
 
 public class StepScheduleTest extends AbstractScheduleTest<StepSchedule> {
 

@@ -37,8 +37,15 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.Classifier;
 import weka.classifiers.rules.ZeroR;
-import weka.core.*;
+import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.CapabilitiesHandler;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.MissingOutputLayerException;
+import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
+import weka.core.WekaException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.CustomNet;
@@ -53,17 +60,24 @@ import weka.gui.ProgrammaticProperty;
 @Log4j2
 public class RnnSequenceClassifier extends Dl4jMlpClassifier
     implements CapabilitiesHandler, Classifier, Serializable, OptionHandler {
-  /** SerialVersionUID */
+
+  /**
+   * SerialVersionUID
+   */
   private static final long serialVersionUID = 5643486590174837865L;
 
-  /** Truncated backpropagation through time backward length */
+  /**
+   * Truncated backpropagation through time backward length
+   */
   protected int tBPTTbackwardLength = 25;
-  /** Truncated backpropagation through time forward length */
+  /**
+   * Truncated backpropagation through time forward length
+   */
   protected int tBPTTforwardLength = 25;
 
   public RnnSequenceClassifier() {
     super();
-    layers = new Layer[] {new weka.dl4j.layers.RnnOutputLayer()};
+    layers = new Layer[]{new weka.dl4j.layers.RnnOutputLayer()};
   }
 
   /**
@@ -101,7 +115,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     }
 
     // If only class is present, build zeroR
-    if(zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0){
+    if (zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0) {
       zeroR = new ZeroR();
       zeroR.buildClassifier(data);
       return;
@@ -117,7 +131,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       instanceIterator.initialize();
 
       // Could be null due to resuming from a previous run
-      if (model == null){
+      if (model == null) {
         createModel();
       }
 
@@ -212,7 +226,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
    *
    * @param insts the instances to get predictions for
    * @return the class probability estimates (if the class is nominal) or the numeric predictions
-   *     (if it is numeric)
+   * (if it is numeric)
    * @throws Exception if something goes wrong at prediction time
    */
   @Override
@@ -245,7 +259,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
       final INDArray features = ds.getFeatures();
       final INDArray labelsMask = ds.getLabelsMaskArray();
       INDArray lastTimeStepIndices;
-      if (labelsMask != null){
+      if (labelsMask != null) {
         lastTimeStepIndices = Nd4j.argMax(labelsMask, 1);
       } else {
         lastTimeStepIndices = Nd4j.zeros(features.size(0), 1);
@@ -290,11 +304,11 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   }
 
   @OptionMetadata(
-    description = "Number of backpropagations through time backward (default = 25).",
-    displayName = "truncated backprop through time backward",
-    commandLineParamName = "tBPTTBackward",
-    commandLineParamSynopsis = "-tBPTTBackward <int>",
-    displayOrder = 20
+      description = "Number of backpropagations through time backward (default = 25).",
+      displayName = "truncated backprop through time backward",
+      commandLineParamName = "tBPTTBackward",
+      commandLineParamSynopsis = "-tBPTTBackward <int>",
+      displayOrder = 20
   )
   public int gettBPTTbackwardLength() {
     return tBPTTbackwardLength;
@@ -305,11 +319,11 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   }
 
   @OptionMetadata(
-    description = "Number of backpropagations through time forward (default = 25).",
-    displayName = "truncated backprop through time forward",
-    commandLineParamName = "tBPTTForward",
-    commandLineParamSynopsis = "-tBPTTForward <int>",
-    displayOrder = 21
+      description = "Number of backpropagations through time forward (default = 25).",
+      displayName = "truncated backprop through time forward",
+      commandLineParamName = "tBPTTForward",
+      commandLineParamSynopsis = "-tBPTTForward <int>",
+      displayOrder = 21
   )
   public int gettBPTTforwardLength() {
     return tBPTTforwardLength;
@@ -335,9 +349,10 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
   /**
    * Generate the, for this model type, typical output layer.
+   *
    * @return New OutputLayer object
    */
-  protected Layer<? extends BaseOutputLayer> createOutputLayer(){
+  protected Layer<? extends BaseOutputLayer> createOutputLayer() {
     return new weka.dl4j.layers.RnnOutputLayer();
   }
 

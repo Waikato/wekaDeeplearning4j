@@ -33,7 +33,8 @@ public class FaceNetNN4Small2 implements ZooModel {
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
-    org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder()
+    org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2
+        .builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
         .inputShape(shape)
@@ -44,6 +45,7 @@ public class FaceNetNN4Small2 implements ZooModel {
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData().getInputShape();
+    return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
+        .getInputShape();
   }
 }

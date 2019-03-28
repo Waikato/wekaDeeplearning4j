@@ -20,11 +20,11 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.AlgoMode;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.AlgoMode;
+import weka.dl4j.ConvolutionMode;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.gui.ProgrammaticProperty;
 
@@ -39,18 +39,22 @@ public class ConvolutionLayer
     extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.ConvolutionLayer>
     implements OptionHandler, Serializable {
 
-  /** The ID used to serialize this class. */
+  /**
+   * The ID used to serialize this class.
+   */
   private static final long serialVersionUID = 6905344091980568487L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public ConvolutionLayer() {
     super();
     setLayerName("Convolution layer");
     setActivationFunction(new ActivationIdentity());
     setConvolutionMode(ConvolutionMode.Truncate);
-    setKernelSize(new int[] {3, 3});
-    setStride(new int[] {1, 1});
-    setPadding(new int[] {0, 0});
+    setKernelSize(new int[]{3, 3});
+    setStride(new int[]{1, 1});
+    setPadding(new int[]{0, 0});
     setCudnnAlgoMode(AlgoMode.PREFER_FASTEST);
   }
 
@@ -70,11 +74,11 @@ public class ConvolutionLayer
 
 
   @OptionMetadata(
-    displayName = "convolution mode",
-    description = "The convolution mode (default = Truncate).",
-    commandLineParamName = "mode",
-    commandLineParamSynopsis = "-mode <string>",
-    displayOrder = 2
+      displayName = "convolution mode",
+      description = "The convolution mode (default = Truncate).",
+      commandLineParamName = "mode",
+      commandLineParamSynopsis = "-mode <string>",
+      displayOrder = 2
   )
   public ConvolutionMode getConvolutionMode() {
     return ConvolutionMode.fromBackend(backend.getConvolutionMode());
@@ -85,11 +89,11 @@ public class ConvolutionLayer
   }
 
   @OptionMetadata(
-    displayName = "CudnnAlgoMode",
-    description = "The Cudnn algo mode (default = PREFER_FASTEST).",
-    commandLineParamName = "cudnnAlgoMode",
-    commandLineParamSynopsis = "-cudnnAlgoMode <string>",
-    displayOrder = 3
+      displayName = "CudnnAlgoMode",
+      description = "The Cudnn algo mode (default = PREFER_FASTEST).",
+      commandLineParamName = "cudnnAlgoMode",
+      commandLineParamSynopsis = "-cudnnAlgoMode <string>",
+      displayOrder = 3
   )
   public AlgoMode getCudnnAlgoMode() {
     return AlgoMode.fromBackend(backend.getCudnnAlgoMode());
@@ -100,34 +104,34 @@ public class ConvolutionLayer
   }
 
   @OptionMetadata(
-    displayName = "number of rows in kernel",
-    description = "The number of rows in the kernel (default = 5).",
-    commandLineParamName = "rows",
-    commandLineParamSynopsis = "-rows <int>",
-    displayOrder = 4
+      displayName = "number of rows in kernel",
+      description = "The number of rows in the kernel (default = 5).",
+      commandLineParamName = "rows",
+      commandLineParamSynopsis = "-rows <int>",
+      displayOrder = 4
   )
   public int getKernelSizeX() {
     return backend.getKernelSize()[0];
   }
 
   public void setKernelSizeX(int kernelSizeX) {
-    int[] kernelSize = new int[] {kernelSizeX, getKernelSizeY()};
+    int[] kernelSize = new int[]{kernelSizeX, getKernelSizeY()};
     backend.setKernelSize(kernelSize);
   }
 
   @OptionMetadata(
-    displayName = "number of columns in kernel",
-    description = "The number of columns in the kernel (default = 5).",
-    commandLineParamName = "columns",
-    commandLineParamSynopsis = "-columns <int>",
-    displayOrder = 5
+      displayName = "number of columns in kernel",
+      description = "The number of columns in the kernel (default = 5).",
+      commandLineParamName = "columns",
+      commandLineParamSynopsis = "-columns <int>",
+      displayOrder = 5
   )
   public int getKernelSizeY() {
     return backend.getKernelSize()[1];
   }
 
   public void setKernelSizeY(int kernelSizeY) {
-    int[] kernelSize = new int[] {getKernelSizeX(), kernelSizeY};
+    int[] kernelSize = new int[]{getKernelSizeX(), kernelSizeY};
     backend.setKernelSize(kernelSize);
   }
 
@@ -141,18 +145,18 @@ public class ConvolutionLayer
   }
 
   @OptionMetadata(
-    displayName = "number of rows in stride",
-    description = "The stride along the rows (default = 1).",
-    commandLineParamName = "strideRows",
-    commandLineParamSynopsis = "-strideRows <int>",
-    displayOrder = 6
+      displayName = "number of rows in stride",
+      description = "The stride along the rows (default = 1).",
+      commandLineParamName = "strideRows",
+      commandLineParamSynopsis = "-strideRows <int>",
+      displayOrder = 6
   )
   public int getStrideRows() {
     return backend.getStride()[0];
   }
 
   public void setStrideRows(int rows) {
-    int[] stride = new int[] {rows, getStrideColumns()};
+    int[] stride = new int[]{rows, getStrideColumns()};
     backend.setStride(stride);
   }
 
@@ -166,34 +170,34 @@ public class ConvolutionLayer
   }
 
   @OptionMetadata(
-    displayName = "number of columns in stride",
-    description = "The stride along the columns (default = 1).",
-    commandLineParamName = "strideColumns",
-    commandLineParamSynopsis = "-strideColumns <int>",
-    displayOrder = 7
+      displayName = "number of columns in stride",
+      description = "The stride along the columns (default = 1).",
+      commandLineParamName = "strideColumns",
+      commandLineParamSynopsis = "-strideColumns <int>",
+      displayOrder = 7
   )
   public int getStrideColumns() {
     return backend.getStride()[1];
   }
 
   public void setStrideColumns(int columns) {
-    int[] stride = new int[] {getStrideRows(), columns};
+    int[] stride = new int[]{getStrideRows(), columns};
     backend.setStride(stride);
   }
 
   @OptionMetadata(
-    displayName = "number of rows in padding",
-    description = "The number of rows in the padding (default = 0).",
-    commandLineParamName = "paddingRows",
-    commandLineParamSynopsis = "-paddingRows <int>",
-    displayOrder = 8
+      displayName = "number of rows in padding",
+      description = "The number of rows in the padding (default = 0).",
+      commandLineParamName = "paddingRows",
+      commandLineParamSynopsis = "-paddingRows <int>",
+      displayOrder = 8
   )
   public int getPaddingRows() {
     return backend.getPadding()[0];
   }
 
   public void setPaddingRows(int padding) {
-    int[] pad = new int[] {padding, getPaddingColumns()};
+    int[] pad = new int[]{padding, getPaddingColumns()};
     backend.setPadding(pad);
   }
 
@@ -207,18 +211,18 @@ public class ConvolutionLayer
   }
 
   @OptionMetadata(
-    displayName = "number of columns in padding",
-    description = "The number of columns in the padding (default = 0).",
-    commandLineParamName = "paddingColumns",
-    commandLineParamSynopsis = "-paddingColumns <int>",
-    displayOrder = 9
+      displayName = "number of columns in padding",
+      description = "The number of columns in the padding (default = 0).",
+      commandLineParamName = "paddingColumns",
+      commandLineParamSynopsis = "-paddingColumns <int>",
+      displayOrder = 9
   )
   public int getPaddingColumns() {
     return backend.getPadding()[1];
   }
 
   public void setPaddingColumns(int padding) {
-    int[] pad = new int[] {getPaddingRows(), padding};
+    int[] pad = new int[]{getPaddingRows(), padding};
     backend.setPadding(pad);
   }
 

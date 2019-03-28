@@ -18,7 +18,15 @@
 
 package weka.classifiers.functions;
 
-import java.io.*;
+import static org.junit.Assert.assertEquals;
+import static weka.util.TestUtil.readClf;
+import static weka.util.TestUtil.saveClf;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,11 +34,10 @@ import java.util.List;
 import java.util.Random;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.junit.*;
-import weka.classifiers.Classifier;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.layers.Layer;
-import weka.dl4j.PoolingType;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +46,9 @@ import weka.core.InvalidNetworkArchitectureException;
 import weka.core.MissingOutputLayerException;
 import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
+import weka.dl4j.ConvolutionMode;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.PoolingType;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
@@ -54,6 +63,7 @@ import weka.dl4j.layers.BatchNormalization;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.GlobalPoolingLayer;
+import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
@@ -66,10 +76,6 @@ import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
-import static org.junit.Assert.assertEquals;
-import static weka.util.TestUtil.readClf;
-import static weka.util.TestUtil.saveClf;
-
 /**
  * JUnit tests for the Dl4jMlpClassifier. Tests nominal classes with iris, numerical classes with
  * diabetes and image classification with minimal mnist.
@@ -78,19 +84,34 @@ import static weka.util.TestUtil.saveClf;
  */
 public class Dl4jMlpTest {
 
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpTest.class);
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Classifier */
+  /**
+   * Current name
+   */
+  @Rule
+  public TestName name = new TestName();
+  /**
+   * Classifier
+   */
   private Dl4jMlpClassifier clf;
-  /** Dataset mnist */
+  /**
+   * Dataset mnist
+   */
   private Instances dataMnist;
-  /** Mnist image loader */
+  /**
+   * Mnist image loader
+   */
   private ImageInstanceIterator idiMnist;
-  /** Dataset iris */
+  /**
+   * Dataset iris
+   */
   private Instances dataIris;
-  /** Start time for time measurement */
+  /**
+   * Start time for time measurement
+   */
   private long startTime;
 
   @Before
@@ -224,8 +245,8 @@ public class Dl4jMlpTest {
 
     ConvolutionLayer cl = new ConvolutionLayer();
     cl.setNOut(3);
-    cl.setKernelSize(new int[] {1, 1});
-    cl.setStride(new int[] {1, 1});
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
 
     DenseLayer dl = new DenseLayer();
     dl.setNOut(10);
@@ -251,8 +272,8 @@ public class Dl4jMlpTest {
 
     ConvolutionLayer cl = new ConvolutionLayer();
     cl.setNOut(3);
-    cl.setKernelSize(new int[] {1, 1});
-    cl.setStride(new int[] {1, 1});
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
 
     OutputLayer ol = new OutputLayer();
     clf.setLayers(cl, dl, ol);
@@ -276,8 +297,8 @@ public class Dl4jMlpTest {
 
     ConvolutionLayer cl = new ConvolutionLayer();
     cl.setNOut(3);
-    cl.setKernelSize(new int[] {1, 1});
-    cl.setStride(new int[] {1, 1});
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
 
     OutputLayer ol = new OutputLayer();
     clf.setLayers(cl, dl, ol);
@@ -331,8 +352,6 @@ public class Dl4jMlpTest {
 
   /**
    * Test no outputlayer
-   *
-   * @throws MissingOutputLayerException
    */
   @Test(expected = MissingOutputLayerException.class)
   public void testLastLayerNoOutputLayer() throws Exception {
@@ -340,13 +359,18 @@ public class Dl4jMlpTest {
     clf.initializeClassifier(dataIris);
   }
 
-  /** Test async iterator */
+  /**
+   * Test async iterator
+   */
   @Test
   public void testAsyncIterator() throws Exception {
     clf.setQueueSize(4);
     clf.buildClassifier(dataIris);
   }
-  /** Test zoo model with wrong iterator */
+
+  /**
+   * Test zoo model with wrong iterator
+   */
   @Test(expected = WrongIteratorException.class)
   public void testZooModelWithoutImageIterator() throws Exception {
     clf.setZooModel(new LeNet());
@@ -361,7 +385,7 @@ public class Dl4jMlpTest {
 
     OutputLayer ol = new OutputLayer();
 
-    Layer[] ls = new Layer[] {dl1, ol};
+    Layer[] ls = new Layer[]{dl1, ol};
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.CONJUGATE_GRADIENT);
@@ -387,27 +411,27 @@ public class Dl4jMlpTest {
     int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
 
     ConvolutionLayer conv1 = new ConvolutionLayer();
-    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setKernelSize(new int[]{4, vectorSize});
     conv1.setNOut(10);
-    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setStride(new int[]{1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
     conv1.setActivationFunction(new ActivationReLU());
 
     BatchNormalization bn1 = new BatchNormalization();
 
     ConvolutionLayer conv2 = new ConvolutionLayer();
-    conv2.setKernelSize(new int[] {3, vectorSize});
+    conv2.setKernelSize(new int[]{3, vectorSize});
     conv2.setNOut(10);
-    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setStride(new int[]{1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
     conv2.setActivationFunction(new ActivationReLU());
 
     BatchNormalization bn2 = new BatchNormalization();
 
     ConvolutionLayer conv3 = new ConvolutionLayer();
-    conv3.setKernelSize(new int[] {2, vectorSize});
+    conv3.setKernelSize(new int[]{2, vectorSize});
     conv3.setNOut(10);
-    conv3.setStride(new int[] {1, vectorSize});
+    conv3.setStride(new int[]{1, vectorSize});
     conv3.setConvolutionMode(ConvolutionMode.Same);
     conv3.setActivationFunction(new ActivationReLU());
 
@@ -459,15 +483,15 @@ public class Dl4jMlpTest {
     int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
 
     ConvolutionLayer conv1 = new ConvolutionLayer();
-    conv1.setKernelSize(new int[] {3, vectorSize});
+    conv1.setKernelSize(new int[]{3, vectorSize});
     conv1.setNOut(10);
-    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setStride(new int[]{1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
 
     ConvolutionLayer conv2 = new ConvolutionLayer();
-    conv2.setKernelSize(new int[] {2, vectorSize});
+    conv2.setKernelSize(new int[]{2, vectorSize});
     conv2.setNOut(10);
-    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setStride(new int[]{1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
@@ -509,15 +533,15 @@ public class Dl4jMlpTest {
     int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
 
     ConvolutionLayer conv1 = new ConvolutionLayer();
-    conv1.setKernelSize(new int[] {3, vectorSize});
+    conv1.setKernelSize(new int[]{3, vectorSize});
     conv1.setNOut(10);
-    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setStride(new int[]{1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
 
     ConvolutionLayer conv2 = new ConvolutionLayer();
-    conv2.setKernelSize(new int[] {2, vectorSize});
+    conv2.setKernelSize(new int[]{2, vectorSize});
     conv2.setNOut(10);
-    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setStride(new int[]{1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
@@ -545,16 +569,16 @@ public class Dl4jMlpTest {
     int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
 
     ConvolutionLayer conv1 = new ConvolutionLayer();
-    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setKernelSize(new int[]{4, vectorSize});
     conv1.setNOut(10);
-    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setStride(new int[]{1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
     conv1.setActivationFunction(new ActivationReLU());
 
     ConvolutionLayer conv2 = new ConvolutionLayer();
-    conv2.setKernelSize(new int[] {3, vectorSize});
+    conv2.setKernelSize(new int[]{3, vectorSize});
     conv2.setNOut(10);
-    conv2.setStride(new int[] {1, vectorSize});
+    conv2.setStride(new int[]{1, vectorSize});
     conv2.setConvolutionMode(ConvolutionMode.Same);
     conv2.setActivationFunction(new ActivationReLU());
 
@@ -601,9 +625,9 @@ public class Dl4jMlpTest {
 //    int vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
     int vectorSize = 300;
     ConvolutionLayer conv1 = new ConvolutionLayer();
-    conv1.setKernelSize(new int[] {4, vectorSize});
+    conv1.setKernelSize(new int[]{4, vectorSize});
     conv1.setNOut(10);
-    conv1.setStride(new int[] {1, vectorSize});
+    conv1.setStride(new int[]{1, vectorSize});
     conv1.setConvolutionMode(ConvolutionMode.Same);
     conv1.setActivationFunction(new ActivationReLU());
 
@@ -657,8 +681,8 @@ public class Dl4jMlpTest {
 
     ConvolutionLayer cl = new ConvolutionLayer();
     cl.setNOut(3);
-    cl.setKernelSize(new int[] {1, 1});
-    cl.setStride(new int[] {1, 1});
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
 
     OutputLayer ol = new OutputLayer();
     clf.setLayers(cl, dl, ol);

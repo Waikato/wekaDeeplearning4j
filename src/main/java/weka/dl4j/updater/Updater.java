@@ -46,30 +46,41 @@ public abstract class Updater<T extends IUpdater>
   private static final long serialVersionUID = -7446042621087079745L;
   private static final double DEFAULT_LEARNING_RATE = 0.1;
 
-  /** Backing IUpdater object */
+  /**
+   * Backing IUpdater object
+   */
   T backend;
 
-  /** Learning rate schedule */
+  /**
+   * Learning rate schedule
+   */
   private Schedule<? extends ISchedule> learningRateSchedule = new ConstantSchedule();
 
-  /** Learning rate */
+  /**
+   * Learning rate
+   */
   private double learningRate = DEFAULT_LEARNING_RATE;
 
   public Updater() {
     initializeBackend();
-    if (learningRateSchedule instanceof ConstantSchedule){
+    if (learningRateSchedule instanceof ConstantSchedule) {
       learningRateSchedule.setInitialValue(getLearningRate());
     }
+  }
+
+  /**
+   * Create an API wrapped updater from a given updater object.
+   *
+   * @param newBackend Backend object
+   * @return API wrapped object
+   */
+  public static Updater<? extends IUpdater> create(IUpdater newBackend) {
+    return ApiWrapperUtil.getImplementingWrapper(Updater.class, newBackend, "weka.dl4j.updater");
   }
 
   @ProgrammaticProperty
   public boolean hasLearningRate() {
     return backend.hasLearningRate();
-  }
-
-  @Override
-  public void setBackend(T newBackend) {
-    this.backend = newBackend;
   }
 
   /**
@@ -78,11 +89,11 @@ public abstract class Updater<T extends IUpdater>
    * @return Learning rate
    */
   @OptionMetadata(
-    displayName = "lr",
-    description = "The learning rate (default = " + DEFAULT_LEARNING_RATE + ").",
-    commandLineParamName = "lr",
-    commandLineParamSynopsis = "-lr <double>",
-    displayOrder = 1
+      displayName = "lr",
+      description = "The learning rate (default = " + DEFAULT_LEARNING_RATE + ").",
+      commandLineParamName = "lr",
+      commandLineParamSynopsis = "-lr <double>",
+      displayOrder = 1
   )
   public double getLearningRate() {
     return backend.getLearningRate(0, 0);
@@ -107,11 +118,11 @@ public abstract class Updater<T extends IUpdater>
    * @return Learning rate schedule
    */
   @OptionMetadata(
-    displayName = "lrSchedule",
-    description = "The learning rate schedule (default = ConstantScheduleImpl).",
-    commandLineParamName = "lrSchedule",
-    commandLineParamSynopsis = "-lrSchedule <Schedule>",
-    displayOrder = 1
+      displayName = "lrSchedule",
+      description = "The learning rate schedule (default = ConstantScheduleImpl).",
+      commandLineParamName = "lrSchedule",
+      commandLineParamSynopsis = "-lrSchedule <Schedule>",
+      displayOrder = 1
   )
   public Schedule getLearningRateSchedule() {
     return learningRateSchedule;
@@ -135,14 +146,9 @@ public abstract class Updater<T extends IUpdater>
     return backend;
   }
 
-  /**
-   * Create an API wrapped updater from a given updater object.
-   *
-   * @param newBackend Backend object
-   * @return API wrapped object
-   */
-  public static Updater<? extends IUpdater> create(IUpdater newBackend) {
-    return ApiWrapperUtil.getImplementingWrapper(Updater.class, newBackend, "weka.dl4j.updater");
+  @Override
+  public void setBackend(T newBackend) {
+    this.backend = newBackend;
   }
 
   /**

@@ -25,8 +25,6 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.activations.Activation;
-import weka.dl4j.activations.ActivationIdentity;
-import weka.gui.ProgrammaticProperty;
 
 /**
  * A version of DeepLearning4j's ActivationLayer layer that implements WEKA option handling.
@@ -41,7 +39,9 @@ public class ActivationLayer extends Layer<org.deeplearning4j.nn.conf.layers.Act
 
   private static final long serialVersionUID = 5492158451092620414L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public ActivationLayer() {
     super();
     setLayerName("Activation layer");
@@ -72,8 +72,6 @@ public class ActivationLayer extends Layer<org.deeplearning4j.nn.conf.layers.Act
   }
 
 
-
-
   /**
    * Returns an enumeration describing the available options.
    *
@@ -81,7 +79,7 @@ public class ActivationLayer extends Layer<org.deeplearning4j.nn.conf.layers.Act
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

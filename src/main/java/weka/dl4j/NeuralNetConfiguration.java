@@ -32,7 +32,6 @@ import weka.core.OptionMetadata;
 import weka.dl4j.distribution.Disabled;
 import weka.dl4j.distribution.Distribution;
 import weka.dl4j.dropout.AbstractDropout;
-import weka.dl4j.stepfunctions.StepFunction;
 import weka.dl4j.updater.Adam;
 import weka.dl4j.updater.Sgd;
 import weka.dl4j.updater.Updater;
@@ -75,7 +74,9 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   protected WorkspaceMode inferenceWorkspaceMode = Preferences.WORKSPACE_MODE;
   protected WorkspaceMode trainingWorkspaceMode = Preferences.WORKSPACE_MODE;
 
-  /** Constructor that provides default values for the settings. */
+  /**
+   * Constructor that provides default values for the settings.
+   */
   public NeuralNetConfiguration() {
     setUpdater(new Adam());
     setWeightInit(WeightInit.XAVIER);
@@ -115,14 +116,14 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    description =
-        "Optimization algorithm (LINE_GRADIENT_DESCENT,"
-            + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
-            + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
-    displayName = "optimization algorithm",
-    commandLineParamName = "algorithm",
-    commandLineParamSynopsis = "-algorithm <string>",
-    displayOrder = 1
+      description =
+          "Optimization algorithm (LINE_GRADIENT_DESCENT,"
+              + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
+              + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
+      displayName = "optimization algorithm",
+      commandLineParamName = "algorithm",
+      commandLineParamSynopsis = "-algorithm <string>",
+      displayOrder = 1
   )
   public OptimizationAlgorithm getOptimizationAlgo() {
     return optimizationAlgo;
@@ -133,12 +134,12 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "whether to minimize objective",
-    description = "Whether to minimize objective.",
-    commandLineParamIsFlag = true,
-    commandLineParamName = "minimize",
-    commandLineParamSynopsis = "-minimize",
-    displayOrder = 7
+      displayName = "whether to minimize objective",
+      description = "Whether to minimize objective.",
+      commandLineParamIsFlag = true,
+      commandLineParamName = "minimize",
+      commandLineParamSynopsis = "-minimize",
+      displayOrder = 7
   )
   public boolean isMinimize() {
     return minimize;
@@ -149,11 +150,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "updater",
-    description = "The updater to use (default = SGD).",
-    commandLineParamName = "updater",
-    commandLineParamSynopsis = "-updater <string>",
-    displayOrder = 12
+      displayName = "updater",
+      description = "The updater to use (default = SGD).",
+      commandLineParamName = "updater",
+      commandLineParamSynopsis = "-updater <string>",
+      displayOrder = 12
   )
   public Updater getUpdater() {
     return updater;
@@ -164,11 +165,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-          displayName = "biasUpdater",
-          description = "The updater to use for the bias (default = SGD).",
-          commandLineParamName = "biasUpdater",
-          commandLineParamSynopsis = "-biasUpdater <string>",
-          displayOrder = 13
+      displayName = "biasUpdater",
+      description = "The updater to use for the bias (default = SGD).",
+      commandLineParamName = "biasUpdater",
+      commandLineParamSynopsis = "-biasUpdater <string>",
+      displayOrder = 13
   )
   public Updater getBiasUpdater() {
     return biasUpdater;
@@ -180,11 +181,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
 
   @OptionMetadata(
-    displayName = "dropout",
-    description = "The dropout method to use (default = Dropout(0.0).",
-    commandLineParamName = "dropout",
-    commandLineParamSynopsis = "-dropout <Dropout>",
-    displayOrder = 25
+      displayName = "dropout",
+      description = "The dropout method to use (default = Dropout(0.0).",
+      commandLineParamName = "dropout",
+      commandLineParamSynopsis = "-dropout <Dropout>",
+      displayOrder = 25
   )
   public AbstractDropout getDropout() {
     return dropout;
@@ -195,11 +196,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "weightNoise",
-    description = "The weight noise method to use (default = None).",
-    commandLineParamName = "weightNoise",
-    commandLineParamSynopsis = "-weightNoise <WeightNoise>",
-    displayOrder = 26
+      displayName = "weightNoise",
+      description = "The weight noise method to use (default = None).",
+      commandLineParamName = "weightNoise",
+      commandLineParamSynopsis = "-weightNoise <WeightNoise>",
+      displayOrder = 26
   )
   public AbstractWeightNoise getWeightNoise() {
     return weightNoise;
@@ -211,11 +212,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
 
   @OptionMetadata(
-    displayName = "l1 regularization factor",
-    description = "L1 regularization factor (default = 0.00).",
-    commandLineParamName = "l1",
-    commandLineParamSynopsis = "-l1 <double>",
-    displayOrder = 14
+      displayName = "l1 regularization factor",
+      description = "L1 regularization factor (default = 0.00).",
+      commandLineParamName = "l1",
+      commandLineParamSynopsis = "-l1 <double>",
+      displayOrder = 14
   )
   public double getL1() {
     return l1;
@@ -226,11 +227,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "l2 regularization factor",
-    description = "L2 regularization factor (default = 0.00).",
-    commandLineParamName = "l2",
-    commandLineParamSynopsis = "-l2 <double>",
-    displayOrder = 15
+      displayName = "l2 regularization factor",
+      description = "L2 regularization factor (default = 0.00).",
+      commandLineParamName = "l2",
+      commandLineParamSynopsis = "-l2 <double>",
+      displayOrder = 15
   )
   public double getL2() {
     return l2;
@@ -241,11 +242,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "weight initialization method",
-    description = "The method for weight initialization (default = XAVIER).",
-    commandLineParamName = "weightInit",
-    commandLineParamSynopsis = "-weightInit <specification>",
-    displayOrder = 18
+      displayName = "weight initialization method",
+      description = "The method for weight initialization (default = XAVIER).",
+      commandLineParamName = "weightInit",
+      commandLineParamSynopsis = "-weightInit <specification>",
+      displayOrder = 18
   )
   public WeightInit getWeightInit() {
     return weightInit;
@@ -256,11 +257,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "gradient normalization method",
-    description = "The gradient normalization method (default = None).",
-    commandLineParamName = "gradientNormalization",
-    commandLineParamSynopsis = "-gradientNormalization <specification>",
-    displayOrder = 22
+      displayName = "gradient normalization method",
+      description = "The gradient normalization method (default = None).",
+      commandLineParamName = "gradientNormalization",
+      commandLineParamSynopsis = "-gradientNormalization <specification>",
+      displayOrder = 22
   )
   public GradientNormalization getGradientNormalization() {
     return this.gradientNormalization;
@@ -271,11 +272,11 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "gradient normalization threshold",
-    description = "The gradient normalization threshold (default = 1).",
-    commandLineParamName = "gradNormThreshold",
-    commandLineParamSynopsis = "-gradNormThreshold <double>",
-    displayOrder = 23
+      displayName = "gradient normalization threshold",
+      description = "The gradient normalization threshold (default = 1).",
+      commandLineParamName = "gradNormThreshold",
+      commandLineParamSynopsis = "-gradNormThreshold <double>",
+      displayOrder = 23
   )
   public double getGradientNormalizationThreshold() {
     return this.gradientNormalizationThreshold;
@@ -286,26 +287,27 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   }
 
   @OptionMetadata(
-    displayName = "distribution",
-    description = "The weight init distribution type. Only applies when weightinit=DISTRIBUTION (default = Disabled).",
-    commandLineParamName = "dist",
-    commandLineParamSynopsis = "-dist <specification>",
-    displayOrder = 19
+      displayName = "distribution",
+      description = "The weight init distribution type. Only applies when weightinit=DISTRIBUTION (default = Disabled).",
+      commandLineParamName = "dist",
+      commandLineParamSynopsis = "-dist <specification>",
+      displayOrder = 19
   )
   public Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> getDist() {
     return dist;
   }
 
-  public void setDist(Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> dist) {
+  public void setDist(
+      Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> dist) {
     this.dist = dist;
   }
 
   @OptionMetadata(
-    displayName = "bias initialization",
-    description = "The bias initialization (default = 0.0).",
-    commandLineParamName = "biasInit",
-    commandLineParamSynopsis = "-biasInit <double>",
-    displayOrder = 20
+      displayName = "bias initialization",
+      description = "The bias initialization (default = 0.0).",
+      commandLineParamName = "biasInit",
+      commandLineParamSynopsis = "-biasInit <double>",
+      displayOrder = 20
   )
   public double getBiasInit() {
     return this.biasInit;
@@ -366,7 +368,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 
@@ -377,7 +379,7 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
    * Returns a string describing this search method
    *
    * @return a description of the search method suitable for displaying in the explorer/experimenter
-   *     gui
+   * gui
    */
   public String globalInfo() {
     return "Class for fine tuning configurations of the network.\n"

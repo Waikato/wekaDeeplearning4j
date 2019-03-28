@@ -18,12 +18,11 @@
 
 package weka.dl4j.layers;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.dl4j.activations.ActivationReLU;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's DenseLayer that implements WEKA option handling.
@@ -38,7 +37,9 @@ public class DenseLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.laye
   // The serial version ID used when serializing this class
   protected static final long serialVersionUID = -6905917800811990400L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public DenseLayer() {
     super();
     setLayerName("Dense layer");
@@ -47,7 +48,7 @@ public class DenseLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.laye
 
   @Override
   public void initializeBackend() {
-    backend= new org.deeplearning4j.nn.conf.layers.DenseLayer();
+    backend = new org.deeplearning4j.nn.conf.layers.DenseLayer();
   }
 
   /**

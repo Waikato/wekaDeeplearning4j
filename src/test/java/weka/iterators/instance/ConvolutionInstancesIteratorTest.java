@@ -18,6 +18,10 @@
 
 package weka.iterators.instance;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +35,6 @@ import weka.core.Instances;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.util.DatasetLoader;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * JUnit tests for the ConvolutionInstanceIterator {@link ConvolutionInstanceIterator}
  *
@@ -43,17 +42,27 @@ import java.util.stream.Collectors;
  */
 public class ConvolutionInstancesIteratorTest {
 
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger =
       LoggerFactory.getLogger(ConvolutionInstancesIteratorTest.class);
-  /** Seed */
+  /**
+   * Seed
+   */
   private static final int SEED = 42;
-  /** Iterator object */
+  /**
+   * Iterator object
+   */
   private ConvolutionInstanceIterator cii;
-  /** Data */
+  /**
+   * Data
+   */
   private Instances mnistMiniArff;
 
-  /** Initialize iterator */
+  /**
+   * Initialize iterator
+   */
   @Before
   public void init() throws Exception {
     this.cii = new ConvolutionInstanceIterator();
@@ -64,7 +73,9 @@ public class ConvolutionInstancesIteratorTest {
     this.mnistMiniArff = DatasetLoader.loadMiniMnistArff();
   }
 
-  /** Test getDataSetIterator */
+  /**
+   * Test getDataSetIterator
+   */
   @Test
   public void testGetIterator() throws Exception {
     final int batchSize = 1;

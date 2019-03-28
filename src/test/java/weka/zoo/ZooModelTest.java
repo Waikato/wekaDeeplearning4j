@@ -18,15 +18,9 @@
 
 package weka.zoo;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import javax.naming.OperationNotSupportedException;
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.junit.Ignore;
-import weka.classifiers.functions.RnnSequenceClassifier;
-import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
-import weka.dl4j.updater.Adam;
-import weka.dl4j.zoo.ResNet50;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
@@ -35,11 +29,17 @@ import weka.core.Instances;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
-import weka.dl4j.zoo.*;
+import weka.dl4j.zoo.AlexNet;
+import weka.dl4j.zoo.CustomNet;
+import weka.dl4j.zoo.Darknet19;
+import weka.dl4j.zoo.FaceNetNN4Small2;
+import weka.dl4j.zoo.InceptionResNetV1;
+import weka.dl4j.zoo.LeNet;
+import weka.dl4j.zoo.ResNet50;
+import weka.dl4j.zoo.VGG16;
+import weka.dl4j.zoo.VGG19;
+import weka.dl4j.zoo.ZooModel;
 import weka.util.DatasetLoader;
-
-import javax.naming.OperationNotSupportedException;
-import java.util.ArrayList;
 
 /**
  * JUnit tests for the ModelZoo ({@link weka.zoo}). Mainly checks out whether the initialization of
@@ -76,15 +76,17 @@ public class ZooModelTest {
   }
 
   @Test
-  public void testDarknet19() throws Exception{
+  public void testDarknet19() throws Exception {
     buildModel(new Darknet19());
   }
+
   @Test
-  public void testFaceNetNN4Small2() throws Exception{
+  public void testFaceNetNN4Small2() throws Exception {
     buildModel(new FaceNetNN4Small2());
   }
+
   @Test
-  public void testInceptionResNetV1() throws Exception{
+  public void testInceptionResNetV1() throws Exception {
     buildModel(new InceptionResNetV1());
   }
 
@@ -123,7 +125,9 @@ public class ZooModelTest {
   }
 
 
-  /** Test CustomNet init */
+  /**
+   * Test CustomNet init
+   */
   @Test(expected = UnsupportedOperationException.class)
   public void testCustomNetInit() throws OperationNotSupportedException {
     new CustomNet().init(0, 0, null);

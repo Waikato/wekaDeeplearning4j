@@ -25,7 +25,6 @@ import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.Option;
-import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 
 /**
@@ -38,12 +37,14 @@ import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
  */
 public class DefaultInstanceIterator extends AbstractInstanceIterator {
 
-  /** The ID used to serialize this class */
+  /**
+   * The ID used to serialize this class
+   */
   private static final long serialVersionUID = 1316260988724548474L;
 
   @Override
   public void validate(Instances data) throws InvalidInputDataException {
-    if (data.classIndex() < 0){
+    if (data.classIndex() < 0) {
       throw new InvalidInputDataException("Class index not set.");
     }
   }
@@ -79,7 +80,7 @@ public class DefaultInstanceIterator extends AbstractInstanceIterator {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

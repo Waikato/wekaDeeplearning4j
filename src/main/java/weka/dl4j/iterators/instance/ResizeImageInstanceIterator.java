@@ -35,24 +35,48 @@ import weka.gui.ProgrammaticProperty;
  */
 public class ResizeImageInstanceIterator extends ImageInstanceIterator {
 
-  /** SerialVersionUID */
+  /**
+   * SerialVersionUID
+   */
   private static final long serialVersionUID = -3310258401133869149L;
 
-  /** New image height */
+  /**
+   * New image height
+   */
   protected int resizeHeight = 28;
 
-  /** New image width */
+  /**
+   * New image width
+   */
   protected int resizeWidth = 28;
 
-  /** Backing image iterator */
+  /**
+   * Backing image iterator
+   */
   protected ImageInstanceIterator iii = new ImageInstanceIterator();
 
   /**
    * Empty constructor for Weka
    */
-  public ResizeImageInstanceIterator(){
+  public ResizeImageInstanceIterator() {
   }
 
+
+  /**
+   * Default constructor with the new shape
+   *
+   * @param iii Previous image iterator
+   * @param resizeWidth New image width
+   * @param resizeHeight New image height
+   */
+  public ResizeImageInstanceIterator(ImageInstanceIterator iii, int resizeWidth, int resizeHeight) {
+    super();
+    this.resizeHeight = resizeHeight;
+    this.resizeWidth = resizeWidth;
+    this.setTrainBatchSize(iii.getTrainBatchSize());
+    this.setImagesLocation(iii.getImagesLocation());
+    this.setNumChannels(iii.getNumChannels());
+  }
 
   @OptionMetadata(
       displayName = "image iterator",
@@ -137,22 +161,6 @@ public class ResizeImageInstanceIterator extends ImageInstanceIterator {
   @ProgrammaticProperty
   public void setImagesLocation(File imagesLocation) {
     iii.setImagesLocation(imagesLocation);
-  }
-
-  /**
-   * Default constructor with the new shape
-   *
-   * @param iii Previous image iterator
-   * @param resizeWidth New image width
-   * @param resizeHeight New image height
-   */
-  public ResizeImageInstanceIterator(ImageInstanceIterator iii, int resizeWidth, int resizeHeight) {
-    super();
-    this.resizeHeight = resizeHeight;
-    this.resizeWidth = resizeWidth;
-    this.setTrainBatchSize(iii.getTrainBatchSize());
-    this.setImagesLocation(iii.getImagesLocation());
-    this.setNumChannels(iii.getNumChannels());
   }
 
   @Override

@@ -18,6 +18,15 @@
 
 package weka.dl4j;
 
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.datavec.api.io.labels.PathLabelGenerator;
 import org.datavec.api.writable.Text;
 import org.datavec.api.writable.Writable;
@@ -26,12 +35,6 @@ import org.slf4j.LoggerFactory;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
-
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A LabelGenerator based on the file path in the Arff-Meta dataset
@@ -42,19 +45,29 @@ public class ArffMetaDataLabelGenerator implements PathLabelGenerator {
 
   private static final long serialVersionUID = 5918725700616180163L;
 
-  /** The logger used in this class. */
+  /**
+   * The logger used in this class.
+   */
   protected final Logger log = LoggerFactory.getLogger(Dl4jMlpClassifier.class);
 
-  /** Mapping from paths to labels */
+  /**
+   * Mapping from paths to labels
+   */
   private Map<String, String> fileLabelMap;
 
-  /** Paths of the input files */
+  /**
+   * Paths of the input files
+   */
   private List<String> paths;
 
-  /** Labels of the input files */
+  /**
+   * Labels of the input files
+   */
   private List<String> labels;
 
-  /** Basepath where the files reside */
+  /**
+   * Basepath where the files reside
+   */
   private String basePath;
 
   /**

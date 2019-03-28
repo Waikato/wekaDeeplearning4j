@@ -18,6 +18,11 @@
 
 package weka.classifiers.functions.dl4j;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -27,13 +32,11 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import weka.core.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.WekaException;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -42,7 +45,9 @@ import java.util.Arrays;
  */
 public class Utils {
 
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   /**
@@ -152,6 +157,7 @@ public class Utils {
 
   /**
    * Convert an arbitrary NDArray to Weka instances
+   *
    * @param ndArray Input array
    * @return Instances object
    * @throws WekaException Invalid input
@@ -160,13 +166,13 @@ public class Utils {
     int batchsize = (int) ndArray.size(0);
     long[] shape = ndArray.shape();
     int dims = shape.length;
-    if (dims < 2){
+    if (dims < 2) {
       throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
           + "but was " + Arrays.toString(shape));
     }
 
     long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
-    prod = prod/ batchsize;
+    prod = prod / batchsize;
 
     ArrayList<Attribute> atts = new ArrayList<>();
     for (int i = 0; i < prod; i++) {
@@ -190,9 +196,9 @@ public class Utils {
   /**
    * Access private field of a given object.
    *
-   * @param obj       Object to be accessed
+   * @param obj Object to be accessed
    * @param fieldName Field name
-   * @param <T>       Return type
+   * @param <T> Return type
    * @return Value of field with name {@code fieldName}
    */
   public static <T> T getFieldValue(Object obj, String fieldName) {
@@ -204,17 +210,17 @@ public class Utils {
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
       throw new RuntimeException("Could not access private field " + fieldName + " of " +
-              "CnnSentenceDataSetIterator");
+          "CnnSentenceDataSetIterator");
     }
   }
 
   /**
    * Set private field of a given object.
    *
-   * @param obj       Object to be accessed
+   * @param obj Object to be accessed
    * @param fieldName Field name
-   * @param value     Field value to be set
-   * @param <T>       Field type
+   * @param value Field value to be set
+   * @param <T> Field type
    */
   public static <T> void setFieldValue(Object obj, String fieldName, T value) {
     try {
@@ -224,17 +230,17 @@ public class Utils {
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
       throw new RuntimeException("Could not access private field " + fieldName + " of " +
-              "CnnSentenceDataSetIterator");
+          "CnnSentenceDataSetIterator");
     }
   }
 
   /**
    * Invoke a method on a given object.
    *
-   * @param obj        Object to be referenced
+   * @param obj Object to be referenced
    * @param methodName Method name which is to be invoked
-   * @param args       Method arguments
-   * @param <T>        Return type
+   * @param args Method arguments
+   * @param <T> Return type
    * @return Method return value
    */
   public static <T> T invokeMethod(Object obj, String methodName, Object... args) {
@@ -251,28 +257,28 @@ public class Utils {
     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
       e.printStackTrace();
       throw new RuntimeException("Could not access private method " + methodName + " of " +
-              "CnnSentenceDataSetIterator");
+          "CnnSentenceDataSetIterator");
     }
   }
 
-    /**
-     * Run some code-block using the local class loader from a given class.
-     *
-     * @param clz   Class to use the classloader from
-     * @param block Code block to run
-     */
-    public static void runWithLocalClassloader(Class clz, VoidCallable block) {
-        // Obtain the new loader
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            // Switch to the new loader
-            Thread.currentThread().setContextClassLoader(clz.getClassLoader());
+  /**
+   * Run some code-block using the local class loader from a given class.
+   *
+   * @param clz Class to use the classloader from
+   * @param block Code block to run
+   */
+  public static void runWithLocalClassloader(Class clz, VoidCallable block) {
+    // Obtain the new loader
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      // Switch to the new loader
+      Thread.currentThread().setContextClassLoader(clz.getClassLoader());
 
-            // Call the actual code block
-            block.call();
-        } finally {
-            // Switch back to the old loader
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
+      // Call the actual code block
+      block.call();
+    } finally {
+      // Switch back to the old loader
+      Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
 }

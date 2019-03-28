@@ -34,10 +34,15 @@ import weka.dl4j.activations.ActivationSigmoid;
  */
 public class LSTM extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.LSTM>
     implements OptionHandler, Serializable {
-  /** SerialVersionUID */
+
+  /**
+   * SerialVersionUID
+   */
   private static final long serialVersionUID = 7681606601452628181L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public LSTM() {
     super();
     setLayerName("LSTM layer");

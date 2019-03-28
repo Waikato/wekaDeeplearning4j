@@ -18,6 +18,13 @@
 
 package weka;
 
+import java.io.File;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Collection;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,14 +33,6 @@ import weka.core.Instances;
 import weka.dl4j.ArffMetaDataLabelGenerator;
 import weka.util.DatasetLoader;
 
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Collection;
-import java.util.HashSet;
-
 /**
  * JUnit tests for the {@link ArffMetaDataLabelGenerator}
  *
@@ -41,13 +40,19 @@ import java.util.HashSet;
  */
 public class ArffMetaDataLabelGeneratorTest {
 
-  /** Generator object */
+  /**
+   * Generator object
+   */
   private ArffMetaDataLabelGenerator gen;
 
-  /** MNIST metadata */
+  /**
+   * MNIST metadata
+   */
   private Instances metaData;
 
-  /** MNIST basepath */
+  /**
+   * MNIST basepath
+   */
   private String basePath;
 
   /**
@@ -63,7 +68,9 @@ public class ArffMetaDataLabelGeneratorTest {
     this.gen = new ArffMetaDataLabelGenerator(this.metaData, this.basePath);
   }
 
-  /** Test the getLabelForPath method. */
+  /**
+   * Test the getLabelForPath method.
+   */
   @Test
   public void testGetLabelForPath() {
     for (Instance inst : this.metaData) {
@@ -75,7 +82,9 @@ public class ArffMetaDataLabelGeneratorTest {
     }
   }
 
-  /** Test the getPathUris method. */
+  /**
+   * Test the getPathUris method.
+   */
   @Test
   public void testGetPathUris() {
     final Collection<URI> pathURIs = this.gen.getPathURIs();
@@ -86,7 +95,9 @@ public class ArffMetaDataLabelGeneratorTest {
     Assert.assertTrue(pathURIs.containsAll(metaDataUris));
   }
 
-  /** Test the getPathUris method. */
+  /**
+   * Test the getPathUris method.
+   */
   @Test
   public void testPathsWithSpaces() throws Exception {
     String originalArff = "src/test/resources/nominal/mnist.meta.minimal.arff";

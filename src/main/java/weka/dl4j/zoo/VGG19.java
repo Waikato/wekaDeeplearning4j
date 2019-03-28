@@ -28,6 +28,7 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public class VGG19 implements ZooModel {
+
   private static final long serialVersionUID = -4452023767749633607L;
 
   @Override

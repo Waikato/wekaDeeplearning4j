@@ -19,17 +19,15 @@
 package weka.dl4j.layers;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import weka.dl4j.activations.ActivationReLU;
-import weka.dl4j.activations.ActivationSoftmax;
-import weka.dl4j.layers.Layer;
-import weka.dl4j.PoolingType;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.Assert;
 import org.junit.Test;
-import org.nd4j.linalg.activations.Activation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.PoolingType;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.util.DatasetLoader;
 
@@ -42,8 +40,6 @@ public class LayerTest {
 
   /**
    * Test subsampling layer.
-   *
-   * @throws Exception
    */
   @Test
   public void testSubsamplingLayer() throws Exception {
@@ -100,8 +96,6 @@ public class LayerTest {
 
   /**
    * Test batchnorm layer.
-   *
-   * @throws Exception
    */
   @Test
   public void testBatchNormLayer() throws Exception {
@@ -134,10 +128,9 @@ public class LayerTest {
     Assert.assertEquals(DatasetLoader.NUM_INSTANCES_MNIST, res.length);
     Assert.assertEquals(DatasetLoader.NUM_CLASSES_MNIST, res[0].length);
   }
+
   /**
    * Test batchnorm layer.
-   *
-   * @throws Exception
    */
   @Test
   public void testConvolutionalLayer() throws Exception {
@@ -152,7 +145,7 @@ public class LayerTest {
     clf.setInstanceIterator(imgIter);
 
     ConvolutionLayer convLayer = new ConvolutionLayer();
-    convLayer.setKernelSize(new int[] {3, 3});
+    convLayer.setKernelSize(new int[]{3, 3});
     convLayer.setActivationFunction(new ActivationReLU());
     convLayer.setNOut(32);
     OutputLayer outputLayer = new OutputLayer();

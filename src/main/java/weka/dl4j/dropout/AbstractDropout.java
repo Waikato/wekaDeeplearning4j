@@ -31,8 +31,8 @@ import weka.dl4j.ApiWrapperUtil;
 
 /**
  * Abstract dropout class.
- * @param <T> Dropout implementation
  *
+ * @param <T> Dropout implementation
  * @author Steven Lang
  */
 @EqualsAndHashCode
@@ -50,17 +50,6 @@ public abstract class AbstractDropout<T extends IDropout> implements ApiWrapper<
     Utils.runWithLocalClassloader(this.getClass(), this::initializeBackend);
   }
 
-  @Override
-  public void setBackend(T newBackend) {
-    this.backend = newBackend;
-  }
-
-  @Override
-  public T getBackend() {
-    return backend;
-  }
-
-
   /**
    * Create an API wrapped layer from a given layer object.
    *
@@ -68,10 +57,20 @@ public abstract class AbstractDropout<T extends IDropout> implements ApiWrapper<
    * @return API wrapped object
    */
   public static AbstractDropout<? extends IDropout> create(IDropout
-       newBackend) {
-    return ApiWrapperUtil.getImplementingWrapper(AbstractDropout.class, newBackend, "weka.dl4j.dropout");
+      newBackend) {
+    return ApiWrapperUtil
+        .getImplementingWrapper(AbstractDropout.class, newBackend, "weka.dl4j.dropout");
   }
 
+  @Override
+  public T getBackend() {
+    return backend;
+  }
+
+  @Override
+  public void setBackend(T newBackend) {
+    this.backend = newBackend;
+  }
 
   /**
    * Returns an enumeration describing the available options.

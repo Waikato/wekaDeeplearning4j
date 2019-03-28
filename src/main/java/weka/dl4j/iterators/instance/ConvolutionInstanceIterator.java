@@ -18,6 +18,7 @@
 
 package weka.dl4j.iterators.instance;
 
+import java.util.Enumeration;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.functions.dl4j.Utils;
@@ -25,8 +26,6 @@ import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
-
-import java.util.Enumeration;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 
 /**
@@ -40,26 +39,34 @@ import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
  * @author Steven Lang
  */
 public class ConvolutionInstanceIterator extends DefaultInstanceIterator implements
-        ConvolutionalIterator {
+    ConvolutionalIterator {
 
-  /** The version ID used for serializing objects of this class */
+  /**
+   * The version ID used for serializing objects of this class
+   */
   private static final long serialVersionUID = -3101209034945158130L;
 
-  /** The desired output height */
+  /**
+   * The desired output height
+   */
   protected int height = 28;
 
-  /** The desired output width */
+  /**
+   * The desired output width
+   */
   protected int width = 28;
 
-  /** The desired number of channels */
+  /**
+   * The desired number of channels
+   */
   protected int numChannels = 1;
 
   @OptionMetadata(
-    displayName = "desired width",
-    description = "The desired width of the images (default = 28).",
-    commandLineParamName = "width",
-    commandLineParamSynopsis = "-width <int>",
-    displayOrder = 1
+      displayName = "desired width",
+      description = "The desired width of the images (default = 28).",
+      commandLineParamName = "width",
+      commandLineParamSynopsis = "-width <int>",
+      displayOrder = 1
   )
   public int getWidth() {
     return width;
@@ -70,11 +77,11 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
   }
 
   @OptionMetadata(
-    displayName = "desired height",
-    description = "The desired height of the images (default = 28).",
-    commandLineParamName = "height",
-    commandLineParamSynopsis = "-height <int>",
-    displayOrder = 2
+      displayName = "desired height",
+      description = "The desired height of the images (default = 28).",
+      commandLineParamName = "height",
+      commandLineParamSynopsis = "-height <int>",
+      displayOrder = 2
   )
   public int getHeight() {
     return height;
@@ -85,11 +92,11 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
   }
 
   @OptionMetadata(
-    displayName = "desired number of channels",
-    description = "The desired number of channels (default = 1).",
-    commandLineParamName = "numChannels",
-    commandLineParamSynopsis = "-numChannels <int>",
-    displayOrder = 3
+      displayName = "desired number of channels",
+      description = "The desired number of channels (default = 1).",
+      commandLineParamName = "numChannels",
+      commandLineParamSynopsis = "-numChannels <int>",
+      displayOrder = 3
   )
   public int getNumChannels() {
     return numChannels;
@@ -123,7 +130,7 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**
