@@ -122,3 +122,28 @@ eval.crossValidateModel(clf, data, numFolds, new Random(1));
 System.out.println("% Correct = " + eval.pctCorrect());
 ```
 
+## GUI: LeNet MNIST Evaluation
+
+
+The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preprocess` tab via `Open File`. A randomly sampled MNIST dataset of 420 images is provided in the WekaDeeplearning4j package for testing purposes (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist.meta.minimal.arff`). In the next step, the `Dl4jMlpClassifier` has to be selected as `Classifier` in the `Classify` tab. A click on the classifier will open the configuration window
+
+![Classifier](../img/gui/mlp-classifier.png)
+
+To correctly load the images it is further necessary to select the `Image-Instance-Iterator` as `instance iterator` and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`). 
+
+![Image Instance Iterator](../img/gui/image-instance-iterator.png)
+
+Select `LeNet` from the `zooModel` option as network architecture. 
+
+![LeNet](../img/gui/layer-array.png)
+
+A holdout evaluation strategy has to be selected in the `Test options` box via `Percentage split`, which can be set to 66% for a 2/3 - 1/3 split. The classifier training is now ready to be started with the `Start` button. The resulting classifier evaluation can be examined in the `Classifier output` box. Here, an evaluation summary is shown for the training and testing split. 
+
+The above setup, trained for 50 epochs with a batch size of 256 produces a classification accuracy of 93.71% on the test data after training on the smaller sampled MNIST dataset and a score of 98.57% after training on the full MNIST dataset.
+
+| MNIST   |  Train Size |  Test Size |  Train Accuracy |  Test Accuracy | Train Time      |
+| -----   | ----------: | ---------: | --------------: | -------------: | --------------: |
+| Sampled |         277 |        143 |          100.0% |         93.71% | 48.99s          |
+| Full    |      60.000 |     10.000 |          98.76% |         98.57% | 406.30s         |
+
+Table 1: Results for training time and classification accuracy after 50 epochs for both the sampled and the full MNIST training dataset using the LeNet architecture. Experiments were run on a NVIDIA TITAN X Pascal GPU.

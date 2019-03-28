@@ -22,3 +22,6 @@ Further configurations can be found in the [Getting Started](user-guide/getting-
 
 ## Contributing
 Contributions are always welcome. If you want to contribute to the project, check out our [contribution guide](https://github.com/Waikato/wekaDeeplearning4j/blob/master/CONTRIBUTING.md).
+
+### Future Work
+Future work on WekaDeeplearning4j will include transfer learning, network weight and activation visualization, and support for multiple embeddings as input channels for textual data.
