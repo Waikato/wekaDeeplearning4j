@@ -2,15 +2,14 @@
 package weka.dl4j.layers;
 
 import java.util.Enumeration;
-import org.nd4j.linalg.activations.impl.ActivationIdentity;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.activations.Activation;
 
 /**
  * Abstract feed forward layer.
- * @param <T> Feed forward layer implementation
  *
+ * @param <T> Feed forward layer implementation
  * @author Steven Lang
  */
 public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.layers.FeedForwardLayer>
@@ -29,11 +28,11 @@ public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.laye
   }
 
   @OptionMetadata(
-    displayName = "activation function",
-    description = "The activation function to use (default = Identity).",
-    commandLineParamName = "activation",
-    commandLineParamSynopsis = "-activation <specification>",
-    displayOrder = 1
+      displayName = "activation function",
+      description = "The activation function to use (default = Identity).",
+      commandLineParamName = "activation",
+      commandLineParamSynopsis = "-activation <specification>",
+      displayOrder = 1
   )
   public Activation getActivationFunction() {
     return Activation.create(backend.getActivationFn());
@@ -44,11 +43,11 @@ public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.laye
   }
 
   @OptionMetadata(
-    displayName = "number of outputs",
-    description = "The number of outputs.",
-    commandLineParamName = "nOut",
-    commandLineParamSynopsis = "-nOut <int>",
-    displayOrder = 2
+      displayName = "number of outputs",
+      description = "The number of outputs.",
+      commandLineParamName = "nOut",
+      commandLineParamSynopsis = "-nOut <int>",
+      displayOrder = 2
   )
   public long getNOut() {
     return backend.getNOut();

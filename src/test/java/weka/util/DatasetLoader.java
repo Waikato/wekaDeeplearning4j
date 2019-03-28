@@ -3,8 +3,10 @@ package weka.util;
 
 import com.github.fracpete.inetutils4j.api.Internet;
 import com.github.fracpete.inetutils4j.core.DefaultCapture;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -13,15 +15,11 @@ import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-
-import java.io.File;
-import java.io.FileReader;
 
 /**
  * Utility class for loading datasets in JUnit tests
@@ -31,22 +29,34 @@ import java.io.FileReader;
 @Log4j2
 public class DatasetLoader {
 
-  /** Number of classes in the iris dataset */
+  /**
+   * Number of classes in the iris dataset
+   */
   public static final int NUM_CLASSES_IRIS = 3;
 
-  /** Number of classes in the mnist dataset */
+  /**
+   * Number of classes in the mnist dataset
+   */
   public static final int NUM_CLASSES_MNIST = 10;
 
-  /** Number of classes in the diabetes dataset */
+  /**
+   * Number of classes in the diabetes dataset
+   */
   public static final int NUM_CLASSES_DIABETES = 1;
 
-  /** Number of instances in the iris dataset */
+  /**
+   * Number of instances in the iris dataset
+   */
   public static final int NUM_INSTANCES_IRIS = 150;
 
-  /** Number of instances in the mnist dataset */
+  /**
+   * Number of instances in the mnist dataset
+   */
   public static final int NUM_INSTANCES_MNIST = 420;
 
-  /** Number of instances in the diabetes dataset */
+  /**
+   * Number of instances in the diabetes dataset
+   */
   public static final int NUM_INSTANCES_DIABETES = 43;
 
   /**
@@ -86,6 +96,7 @@ public class DatasetLoader {
     data.setClassIndex(data.numAttributes() - 1);
     return data;
   }
+
   /**
    * Load the iris arff file with missing values
    *
@@ -121,6 +132,7 @@ public class DatasetLoader {
   public static Instances loadMiniMnistMeta() throws Exception {
     return loadArff("src/test/resources/nominal/mnist.meta.minimal.arff");
   }
+
   /**
    * Load the glass arff file
    *
@@ -162,7 +174,7 @@ public class DatasetLoader {
     File imdbFile = new File(imdbResourcePath);
 
     // Check if file is already downloaded
-    if (!imdbFile.exists()){
+    if (!imdbFile.exists()) {
       String tmpDir = System.getProperty("java.io.tmpdir");
 
       // Download file
@@ -173,8 +185,8 @@ public class DatasetLoader {
           gzipPath,
           true,
           new DefaultCapture());
-        log.info("Download finished");
-        gunzip(gzipPath, imdbResourcePath);
+      log.info("Download finished");
+      gunzip(gzipPath, imdbResourcePath);
     }
     return loadArff(imdbResourcePath);
   }
@@ -182,11 +194,11 @@ public class DatasetLoader {
   /**
    * GZIP unzip from: https://www.mkyong.com/java/how-to-decompress-file-from-gzip-file/
    */
-  public static void gunzip(String inputPath, String outputPath){
+  public static void gunzip(String inputPath, String outputPath) {
 
     byte[] buffer = new byte[1024];
 
-    try{
+    try {
 
       GZIPInputStream gzis =
           new GZIPInputStream(new FileInputStream(inputPath));
@@ -201,7 +213,7 @@ public class DatasetLoader {
 
       gzis.close();
       out.close();
-    }catch(IOException ex){
+    } catch (IOException ex) {
       ex.printStackTrace();
     }
   }
@@ -257,6 +269,7 @@ public class DatasetLoader {
     data.setClassIndex(data.numAttributes() - 1);
     return data;
   }
+
   /**
    * Load the mnist minimal meta arff file
    *
@@ -303,9 +316,9 @@ public class DatasetLoader {
         .loadArff("src/test/resources/numeric/anger.meta.arff");
     ArrayList<Attribute> atts = new ArrayList<>();
     atts.add(data.attribute(0));
-    Attribute cls = new Attribute("cls", Arrays.asList("0","1"));
+    Attribute cls = new Attribute("cls", Arrays.asList("0", "1"));
     atts.add(cls);
-    Instances dataDiscretized = new Instances("anger-classification", atts ,data.numInstances());
+    Instances dataDiscretized = new Instances("anger-classification", atts, data.numInstances());
     dataDiscretized.setClassIndex(1);
     for (Instance datum : data) {
       Instance cpy = (Instance) datum.copy();
@@ -318,10 +331,13 @@ public class DatasetLoader {
   }
 
   public static Instances loadRelationalNumericClass() throws Exception {
-    return DatasetLoader.loadArff("src/test/resources/relational/relational-data-numeric-class.arff");
+    return DatasetLoader
+        .loadArff("src/test/resources/relational/relational-data-numeric-class.arff");
   }
+
   public static Instances loadRelationalNominalClass() throws Exception {
-    return DatasetLoader.loadArff("src/test/resources/relational/relational-data-nominal-class.arff");
+    return DatasetLoader
+        .loadArff("src/test/resources/relational/relational-data-nominal-class.arff");
   }
 
 }

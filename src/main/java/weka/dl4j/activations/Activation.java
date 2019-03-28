@@ -13,8 +13,8 @@ import weka.dl4j.ApiWrapperUtil;
 
 /**
  * Abstract activation class
- * @param <T> Activation implementation
  *
+ * @param <T> Activation implementation
  * @author Steven Lang
  */
 @EqualsAndHashCode
@@ -25,16 +25,6 @@ public abstract class Activation<T extends IActivation>
   private static final long serialVersionUID = 2617232662215304733L;
 
   T backend;
-
-  @Override
-  public void setBackend(T newBackend) {
-    backend = newBackend;
-  }
-
-  @Override
-  public T getBackend() {
-    return backend;
-  }
 
   public Activation() {
     initializeBackend();
@@ -47,7 +37,18 @@ public abstract class Activation<T extends IActivation>
    * @return API wrapped object
    */
   public static Activation<? extends IActivation> create(IActivation newBackend) {
-    return (Activation<? extends IActivation>) ApiWrapperUtil.getImplementingWrapper(Activation.class, newBackend, "weka.dl4j.activations");
+    return (Activation<? extends IActivation>) ApiWrapperUtil
+        .getImplementingWrapper(Activation.class, newBackend, "weka.dl4j.activations");
+  }
+
+  @Override
+  public T getBackend() {
+    return backend;
+  }
+
+  @Override
+  public void setBackend(T newBackend) {
+    backend = newBackend;
   }
 
   /**

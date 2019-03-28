@@ -1,7 +1,7 @@
 
 package weka.dl4j.distribution;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -26,6 +26,6 @@ public class UniformDistributionTest extends ApiWrapperTest<UniformDistribution>
 
   @Override
   public UniformDistribution getApiWrapper() {
-    return new  UniformDistribution();
+    return new UniformDistribution();
   }
 }

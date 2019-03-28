@@ -14,6 +14,16 @@ public enum ScheduleType implements ApiWrapper<org.nd4j.linalg.schedule.Schedule
   ITERATION,
   EPOCH;
 
+  /**
+   * Parse backend schedule type and return weka enum implementation.
+   *
+   * @param scheduleType Schedule type
+   * @return Weka schedule type implementation
+   */
+  public static ScheduleType fromBackend(org.nd4j.linalg.schedule.ScheduleType scheduleType) {
+    return valueOf(scheduleType.name());
+  }
+
   public org.nd4j.linalg.schedule.ScheduleType getBackend() {
     switch (this) {
       case EPOCH:
@@ -34,15 +44,5 @@ public enum ScheduleType implements ApiWrapper<org.nd4j.linalg.schedule.Schedule
   @Override
   public void initializeBackend() {
     // Do nothing as this enum does not have a state
-  }
-
-  /**
-   * Parse backend schedule type and return weka enum implementation.
-   *
-   * @param scheduleType Schedule type
-   * @return Weka schedule type implementation
-   */
-  public static ScheduleType fromBackend(org.nd4j.linalg.schedule.ScheduleType scheduleType) {
-    return valueOf(scheduleType.name());
   }
 }

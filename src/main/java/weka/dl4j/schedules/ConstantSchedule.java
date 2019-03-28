@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.nd4j.linalg.schedule.ISchedule;
 import weka.core.Option;
-import weka.core.OptionMetadata;
 import weka.dl4j.schedules.ConstantSchedule.ConstantScheduleImpl;
 import weka.gui.ProgrammaticProperty;
 
@@ -50,32 +49,6 @@ public class ConstantSchedule extends Schedule<ConstantScheduleImpl> {
     this.backend.setValue(initialValue);
   }
 
-  @Data
-  public static class ConstantScheduleImpl implements ISchedule {
-
-    private double value;
-
-    private static final long serialVersionUID = 7134767476736787119L;
-
-    public ConstantScheduleImpl() {
-      this(1.0);
-    }
-
-    public ConstantScheduleImpl(double value) {
-      this.value = value;
-    }
-
-    @Override
-    public double valueAt(int iteration, int epoch) {
-      return value;
-    }
-
-    @Override
-    public ISchedule clone() {
-      return new ConstantScheduleImpl(value);
-    }
-  }
-
   /**
    * Returns an enumeration describing the available options.
    *
@@ -83,7 +56,7 @@ public class ConstantSchedule extends Schedule<ConstantScheduleImpl> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**
@@ -104,5 +77,30 @@ public class ConstantSchedule extends Schedule<ConstantScheduleImpl> {
    */
   public void setOptions(String[] options) throws Exception {
     Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  @Data
+  public static class ConstantScheduleImpl implements ISchedule {
+
+    private static final long serialVersionUID = 7134767476736787119L;
+    private double value;
+
+    public ConstantScheduleImpl() {
+      this(1.0);
+    }
+
+    public ConstantScheduleImpl(double value) {
+      this.value = value;
+    }
+
+    @Override
+    public double valueAt(int iteration, int epoch) {
+      return value;
+    }
+
+    @Override
+    public ISchedule clone() {
+      return new ConstantScheduleImpl(value);
+    }
   }
 }

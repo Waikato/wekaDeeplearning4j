@@ -48,11 +48,11 @@ public class CnnTextFilesEmbeddingInstanceIterator extends CnnTextEmbeddingInsta
   }
 
   @OptionMetadata(
-    displayName = "directory of text files",
-    description = "The directory containing the text files (default = user home).",
-    commandLineParamName = "textsLocation",
-    commandLineParamSynopsis = "-textsLocation <string>",
-    displayOrder = 3
+      displayName = "directory of text files",
+      description = "The directory containing the text files (default = user home).",
+      commandLineParamName = "textsLocation",
+      commandLineParamSynopsis = "-textsLocation <string>",
+      displayOrder = 3
   )
   public File getTextsLocation() {
     return textsLocation;
@@ -76,7 +76,7 @@ public class CnnTextFilesEmbeddingInstanceIterator extends CnnTextEmbeddingInsta
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

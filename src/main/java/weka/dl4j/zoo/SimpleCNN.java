@@ -11,6 +11,7 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public class SimpleCNN implements ZooModel {
+
   private static final long serialVersionUID = 4217466716595669736L;
 
   @Override

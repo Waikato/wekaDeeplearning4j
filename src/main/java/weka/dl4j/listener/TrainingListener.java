@@ -2,13 +2,12 @@
 package weka.dl4j.listener;
 
 import java.io.Serializable;
+import java.util.Enumeration;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.optimize.api.BaseTrainingListener;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 
 /**
  * Iteration listener that can be attached to a Dl4j model.
@@ -17,24 +16,40 @@ import java.util.Enumeration;
  */
 public abstract class TrainingListener
     extends BaseTrainingListener implements OptionHandler, Serializable {
-  /** SerialVersionUID */
+
+  /**
+   * SerialVersionUID
+   */
   private static final long serialVersionUID = 8106114790187499011L;
 
-  /** Number of samples */
+  /**
+   * Number of samples
+   */
   protected int numSamples;
-  /** Number of epochs */
+  /**
+   * Number of epochs
+   */
   protected int numClasses;
-  /** Number of classes */
+  /**
+   * Number of classes
+   */
   protected int numEpochs;
-  /** The current epoch */
+  /**
+   * The current epoch
+   */
   protected int currentEpoch;
-  /** Training dataset iterator */
+  /**
+   * Training dataset iterator
+   */
   protected transient DataSetIterator validationIterator;
-  /** Validation dataset iterator */
+  /**
+   * Validation dataset iterator
+   */
   protected transient DataSetIterator trainIterator;
 
   /**
    * Initialize the iterator with its necessary member variables
+   *
    * @param numClasses Number of classes
    * @param numEpochs Number of epochs
    * @param numSamples Number of Samples
@@ -58,12 +73,14 @@ public abstract class TrainingListener
 
   /**
    * Log a message
+   *
    * @param msg Message
    */
   public abstract void log(String msg);
 
   @Override
-  public void iterationDone(Model model, int iteration, int epoch) {}
+  public void iterationDone(Model model, int iteration, int epoch) {
+  }
 
   /**
    * Returns an enumeration describing the available options.
@@ -91,7 +108,7 @@ public abstract class TrainingListener
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

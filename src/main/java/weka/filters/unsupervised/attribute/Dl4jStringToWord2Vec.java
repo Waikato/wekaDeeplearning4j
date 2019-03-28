@@ -1,6 +1,7 @@
 
 package weka.filters.unsupervised.attribute;
 
+import java.util.Enumeration;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import weka.core.Instances;
@@ -10,16 +11,10 @@ import weka.core.TechnicalInformation;
 import weka.core.TechnicalInformation.Type;
 import weka.dl4j.text.sentenceiterator.WekaInstanceSentenceIterator;
 
-import java.util.Enumeration;
-
 /**
- *
- * <!-- globalinfo-start -->
- * An attribute filter that calculates word embeddings on a String attribute using the Word2vec
- * implementation provided by DeepLearning4j.
- * <!-- globalinfo-end -->
- * <!-- technical-bibtex-start -->
- * BibTeX:
+ * <!-- globalinfo-start --> An attribute filter that calculates word embeddings on a String
+ * attribute using the Word2vec implementation provided by DeepLearning4j. <!-- globalinfo-end -->
+ * <!-- technical-bibtex-start --> BibTeX:
  *
  * <pre>
  * &#64;@Article{Word2Vec,
@@ -32,41 +27,61 @@ import java.util.Enumeration;
  *
  *
  * </pre>
- *
+ * <p>
  * <!-- technical-bibtex-end -->
  *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
  */
 public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
 
-  /** For serialization */
+  /**
+   * For serialization
+   */
   private static final long serialVersionUID = -1767367935663656698L;
 
-  /** The learning rate */
+  /**
+   * The learning rate
+   */
   protected double learningRate = 0.025;
 
-  /** The minimum learning rate */
+  /**
+   * The minimum learning rate
+   */
   protected double minLearningRate = 0.0001;
 
-  /** True for using adaptive gradients */
+  /**
+   * True for using adaptive gradients
+   */
   protected boolean useAdaGrad = false;
 
-  /** The mini batch size */
+  /**
+   * The mini batch size
+   */
   protected int batchSize = 512;
 
-  /** The negativeSamplingValue sampling value for skip-gram algorithm. */
+  /**
+   * The negativeSamplingValue sampling value for skip-gram algorithm.
+   */
   protected double negativeSamplingValue = 0.0d;
 
-  /** Enable/disable hierarchic softmax */
+  /**
+   * Enable/disable hierarchic softmax
+   */
   protected boolean useHierarchicSoftmax = true;
 
-  /** The sub-sampling threshold. */
+  /**
+   * The sub-sampling threshold.
+   */
   protected double subSamplingThres = 0.0d;
 
-  /** Enables/disables parallel tokenization. */
+  /**
+   * Enables/disables parallel tokenization.
+   */
   protected boolean allowParallelTokenization = true;
 
-  /** Enables/disables periodical vocab truncation during construction. */
+  /**
+   * Enables/disables periodical vocab truncation during construction.
+   */
   protected boolean enableScavenger = false;
 
   /**
@@ -174,11 +189,11 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "batchSize",
-    description = "The mini-batch size (default = 512).",
-    commandLineParamName = "batchSize",
-    commandLineParamSynopsis = "-batchSize <int>",
-    displayOrder = 15
+      displayName = "batchSize",
+      description = "The mini-batch size (default = 512).",
+      commandLineParamName = "batchSize",
+      commandLineParamSynopsis = "-batchSize <int>",
+      displayOrder = 15
   )
   public int getBatchSize() {
     return batchSize;
@@ -189,11 +204,11 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "learningRate",
-    description = "The learning rate (default = 0.025).",
-    commandLineParamName = "learningRate",
-    commandLineParamSynopsis = "-learningRate <double>",
-    displayOrder = 16
+      displayName = "learningRate",
+      description = "The learning rate (default = 0.025).",
+      commandLineParamName = "learningRate",
+      commandLineParamSynopsis = "-learningRate <double>",
+      displayOrder = 16
   )
   public double getLearningRate() {
     return learningRate;
@@ -204,12 +219,12 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "minLearningRate",
-    description =
-        "This method defines minimal learning rate value for training (default = 1.0E-4).",
-    commandLineParamName = "minLearningRate",
-    commandLineParamSynopsis = "-minLearningRate <double>",
-    displayOrder = 17
+      displayName = "minLearningRate",
+      description =
+          "This method defines minimal learning rate value for training (default = 1.0E-4).",
+      commandLineParamName = "minLearningRate",
+      commandLineParamSynopsis = "-minLearningRate <double>",
+      displayOrder = 17
   )
   public double getMinLearningRate() {
     return minLearningRate;
@@ -220,13 +235,13 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "useAdaGrad",
-    description =
-        "This method defines whether adaptive gradients should be used or not (default = false).",
-    commandLineParamName = "useAdaGrad",
-    commandLineParamSynopsis = "-useAdaGrad",
-    commandLineParamIsFlag = true,
-    displayOrder = 18
+      displayName = "useAdaGrad",
+      description =
+          "This method defines whether adaptive gradients should be used or not (default = false).",
+      commandLineParamName = "useAdaGrad",
+      commandLineParamSynopsis = "-useAdaGrad",
+      commandLineParamIsFlag = true,
+      displayOrder = 18
   )
   public boolean isUseAdaGrad() {
     return useAdaGrad;
@@ -237,11 +252,11 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "negative",
-    description = "The negative sampling value for skip-gram algorithm (default = 0.0).",
-    commandLineParamName = "negative",
-    commandLineParamSynopsis = "-negative <double>",
-    displayOrder = 19
+      displayName = "negative",
+      description = "The negative sampling value for skip-gram algorithm (default = 0.0).",
+      commandLineParamName = "negative",
+      commandLineParamSynopsis = "-negative <double>",
+      displayOrder = 19
   )
   public double getNegative() {
     return negativeSamplingValue;
@@ -252,12 +267,12 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "useHierarchicSoftmax",
-    description = "Enable/disable hierarchic softmax (default = true).",
-    commandLineParamName = "useHierarchicSoftmax",
-    commandLineParamSynopsis = "-useHierarchicSoftmax",
-    commandLineParamIsFlag = true,
-    displayOrder = 20
+      displayName = "useHierarchicSoftmax",
+      description = "Enable/disable hierarchic softmax (default = true).",
+      commandLineParamName = "useHierarchicSoftmax",
+      commandLineParamSynopsis = "-useHierarchicSoftmax",
+      commandLineParamIsFlag = true,
+      displayOrder = 20
   )
   public boolean isUseHierarchicSoftmax() {
     return useHierarchicSoftmax;
@@ -268,11 +283,11 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "sampling",
-    description = "The sub-sampling threshold (default = 0.0).",
-    commandLineParamName = "sampling",
-    commandLineParamSynopsis = "-sampling <double>",
-    displayOrder = 21
+      displayName = "sampling",
+      description = "The sub-sampling threshold (default = 0.0).",
+      commandLineParamName = "sampling",
+      commandLineParamSynopsis = "-sampling <double>",
+      displayOrder = 21
   )
   public double getSampling() {
     return subSamplingThres;
@@ -283,12 +298,12 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "allowParallelTokenization",
-    description = "Enables/disables parallel tokenization (default = true).",
-    commandLineParamName = "allowParallelTokenization",
-    commandLineParamSynopsis = "-allowParallelTokenization",
-    commandLineParamIsFlag = true,
-    displayOrder = 22
+      displayName = "allowParallelTokenization",
+      description = "Enables/disables parallel tokenization (default = true).",
+      commandLineParamName = "allowParallelTokenization",
+      commandLineParamSynopsis = "-allowParallelTokenization",
+      commandLineParamIsFlag = true,
+      displayOrder = 22
   )
   public boolean isAllowParallelTokenization() {
     return allowParallelTokenization;
@@ -299,13 +314,13 @@ public class Dl4jStringToWord2Vec extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "enableScavenger",
-    description =
-        "Enables/disables periodical vocab truncation during construction (default = false).",
-    commandLineParamName = "enableScavenger",
-    commandLineParamSynopsis = "-enableScavenger",
-    commandLineParamIsFlag = true,
-    displayOrder = 23
+      displayName = "enableScavenger",
+      description =
+          "Enables/disables periodical vocab truncation during construction (default = false).",
+      commandLineParamName = "enableScavenger",
+      commandLineParamSynopsis = "-enableScavenger",
+      commandLineParamIsFlag = true,
+      displayOrder = 23
   )
   public boolean isEnableScavenger() {
     return enableScavenger;

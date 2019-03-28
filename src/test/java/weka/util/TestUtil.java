@@ -5,7 +5,11 @@ package weka.util;
 // import org.deeplearning4j.ui.stats.StatsListener;
 // import org.deeplearning4j.ui.storage.FileStatsStorage;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -29,13 +33,21 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  */
 public class TestUtil {
 
-  /** Default number of epochs */
+  /**
+   * Default number of epochs
+   */
   public static final int DEFAULT_NUM_EPOCHS = 1;
-  /** Seed */
+  /**
+   * Seed
+   */
   public static final int SEED = 42;
-  /** Default batch size */
+  /**
+   * Default batch size
+   */
   public static final int DEFAULT_BATCHSIZE = 32;
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger = LoggerFactory.getLogger(TestUtil.class);
 
   /**
@@ -44,7 +56,6 @@ public class TestUtil {
    * @param clf Classifier
    * @param data Full dataset
    * @param p Split percentage
-   * @throws Exception
    */
   public static void holdout(Classifier clf, Instances data, double p) throws Exception {
     Instances[] split = splitTrainTest(data, p);
@@ -70,13 +81,13 @@ public class TestUtil {
       logger.info(testEval.toMatrixString());
     }
   }
+
   /**
    * Perform simple holdout with a given percentage
    *
    * @param clf Classifier
    * @param data Full dataset
    * @param p Split percentage
-   * @throws Exception
    */
   public static void holdout(
       Dl4jMlpClassifier clf, Instances data, double p, AbstractInstanceIterator aii)
@@ -98,7 +109,6 @@ public class TestUtil {
    *
    * @param clf Classifier
    * @param data Full datase
-   * @throws Exception
    */
   public static void holdout(Classifier clf, Instances data) throws Exception {
     holdout(clf, data, 66);
@@ -109,7 +119,6 @@ public class TestUtil {
    *
    * @param clf Classifier
    * @param data Full dataset
-   * @throws Exception
    */
   public static void crossValidate(Classifier clf, Instances data) throws Exception {
     Evaluation ev = new Evaluation(data);
@@ -143,7 +152,7 @@ public class TestUtil {
     rp.setPercentage(p);
     Instances test = Filter.useFilter(data, rp);
 
-    return new Instances[] {train, test};
+    return new Instances[]{train, test};
   }
 
   /**
@@ -167,7 +176,9 @@ public class TestUtil {
     String[] opts = clf.getOptions();
     String res = "";
     for (int i = 0; i < opts.length; i += 2) {
-      if (opts[i + 1].equals("NaN")) continue;
+      if (opts[i + 1].equals("NaN")) {
+        continue;
+      }
       res += opts[i] + " \"" + opts[i + 1].replace("\"", "\\\"") + "\" \\\n";
     }
     return res;
@@ -197,7 +208,9 @@ public class TestUtil {
 //    uiServer.attach(statsStorage);
 //  }
 
-  /** Creates a test dataset */
+  /**
+   * Creates a test dataset
+   */
   public static Instances makeTestDataset(
       int seed,
       int numInstances,
@@ -234,7 +247,10 @@ public class TestUtil {
 
     return testset.generate();
   }
-  /** Creates a relational test dataset */
+
+  /**
+   * Creates a relational test dataset
+   */
   public static Instances makeTestDatasetRelational(
       int seed,
       int numInstances,
@@ -275,7 +291,7 @@ public class TestUtil {
       final Instances rel = datum.relationalValue(0);
       RemovePercentage rp = new RemovePercentage();
       rp.setInputFormat(rel);
-      rp.setPercentage(rand.nextDouble()*100);
+      rp.setPercentage(rand.nextDouble() * 100);
       final Instances rel2 = Filter.useFilter(rel, rp);
       final int i = generated.attribute(0).addRelation(rel2);
       datum.setValue(0, i);

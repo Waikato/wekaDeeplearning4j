@@ -1,12 +1,11 @@
 
 package weka.dl4j.distribution;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's NormalDistribution that implements WEKA option handling.
@@ -15,17 +14,18 @@ import java.util.Enumeration;
  * @author Steven Lang
  */
 @JsonTypeName("normal")
-public class NormalDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.NormalDistribution>
+public class NormalDistribution extends
+    Distribution<org.deeplearning4j.nn.conf.distribution.NormalDistribution>
     implements OptionHandler {
 
   private static final long serialVersionUID = 1244534661808099971L;
 
   @OptionMetadata(
-    displayName = "mean",
-    description = "The mean (default = 1e-3).",
-    commandLineParamName = "mean",
-    commandLineParamSynopsis = "-mean <double>",
-    displayOrder = 1
+      displayName = "mean",
+      description = "The mean (default = 1e-3).",
+      commandLineParamName = "mean",
+      commandLineParamSynopsis = "-mean <double>",
+      displayOrder = 1
   )
   public double getMean() {
     return backend.getMean();
@@ -36,11 +36,11 @@ public class NormalDistribution extends Distribution<org.deeplearning4j.nn.conf.
   }
 
   @OptionMetadata(
-    displayName = "standard deviation",
-    description = "The standard deviation (default = 1).",
-    commandLineParamName = "std",
-    commandLineParamSynopsis = "-std <double>",
-    displayOrder = 2
+      displayName = "standard deviation",
+      description = "The standard deviation (default = 1).",
+      commandLineParamName = "std",
+      commandLineParamSynopsis = "-std <double>",
+      displayOrder = 2
   )
   public double getStd() {
     return backend.getStd();
@@ -76,7 +76,7 @@ public class NormalDistribution extends Distribution<org.deeplearning4j.nn.conf.
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

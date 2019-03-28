@@ -2,22 +2,22 @@
 package weka.classifiers.functions;
 
 import java.io.File;
-import org.junit.Assert;
-import weka.classifiers.Evaluation;
-import weka.dl4j.activations.Activation;
-import weka.dl4j.activations.ActivationIdentity;
-import weka.dl4j.activations.ActivationReLU;
-import weka.dl4j.activations.ActivationSoftmax;
-import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.activations.Activation;
+import weka.dl4j.activations.ActivationIdentity;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
+import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.lossfunctions.LossFunction;
@@ -32,23 +32,59 @@ import weka.util.DatasetLoader;
  */
 public class DatasetTest {
 
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger = LoggerFactory.getLogger(DatasetTest.class);
 
-  /** Default number of epochs */
+  /**
+   * Default number of epochs
+   */
   private static final int DEFAULT_NUM_EPOCHS = 1;
 
-  /** Seed */
+  /**
+   * Seed
+   */
   private static final int SEED = 42;
 
-  /** Default batch size */
+  /**
+   * Default batch size
+   */
   private static final int DEFAULT_BATCHSIZE = 32;
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Classifier */
+  /**
+   * Current name
+   */
+  @Rule
+  public TestName name = new TestName();
+  /**
+   * Classifier
+   */
   private Dl4jMlpClassifier clf;
-  /** Start time for time measurement */
+  /**
+   * Start time for time measurement
+   */
   private long startTime;
+
+  private static Evaluation eval(Instances metaData)
+      throws Exception {
+
+    String imagesPath = "src/test/resources/nominal/mnist-minimal";
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    ImageInstanceIterator iii = new ImageInstanceIterator();
+    iii.setImagesLocation(new File(imagesPath));
+    iii.setTrainBatchSize(2);
+
+    clf.setInstanceIterator(iii);
+    clf.setNumEpochs(5);
+
+    // Build clf
+    clf.buildClassifier(metaData);
+
+    // Evaluate clf
+    Evaluation trainEval = new Evaluation(metaData);
+    trainEval.evaluateModel(clf, metaData);
+    return trainEval;
+  }
 
   @Before
   public void before() {
@@ -79,6 +115,7 @@ public class DatasetTest {
   public void testDateClass() throws Exception {
     runClf(DatasetLoader.loadWineDate(), new ActivationIdentity(), new LossMSE());
   }
+
   /**
    * Test numeric class.
    *
@@ -108,7 +145,8 @@ public class DatasetTest {
     runClf(data, new ActivationSoftmax(), new LossMCXENT());
   }
 
-  private void runClf(Instances data, Activation outputActivation, LossFunction loss) throws Exception {
+  private void runClf(Instances data, Activation outputActivation, LossFunction loss)
+      throws Exception {
     // Data
     DenseLayer denseLayer = new DenseLayer();
     denseLayer.setNOut(32);
@@ -119,7 +157,6 @@ public class DatasetTest {
     outputLayer.setActivationFunction(outputActivation);
     outputLayer.setLossFn(loss);
     outputLayer.setLayerName("Output-layer");
-
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
 
@@ -142,7 +179,8 @@ public class DatasetTest {
 
     // Get data
     Instances testProb = DatasetLoader.loadArff(prefix + "mnist.meta.minimal.arff");
-    Instances testProbInverse = DatasetLoader.loadArff(prefix + "mnist.meta.minimal.mixed-class-meta-data.arff");
+    Instances testProbInverse = DatasetLoader
+        .loadArff(prefix + "mnist.meta.minimal.mixed-class-meta-data.arff");
 
     Evaluation evalNormal = eval(testProb);
     Evaluation evalMixed = eval(testProbInverse);
@@ -150,26 +188,5 @@ public class DatasetTest {
     // Compare accuracy
     Assert.assertEquals(evalNormal.pctCorrect(), evalMixed.pctCorrect(), 1e-7);
     Assert.assertEquals(evalNormal.pctIncorrect(), evalMixed.pctIncorrect(), 1e-7);
-  }
-
-  private static Evaluation eval(Instances metaData)
-      throws Exception {
-
-    String imagesPath = "src/test/resources/nominal/mnist-minimal";
-    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-    ImageInstanceIterator iii = new ImageInstanceIterator();
-    iii.setImagesLocation(new File(imagesPath));
-    iii.setTrainBatchSize(2);
-
-    clf.setInstanceIterator(iii);
-    clf.setNumEpochs(5);
-
-    // Build clf
-    clf.buildClassifier(metaData);
-
-    // Evaluate clf
-    Evaluation trainEval = new Evaluation(metaData);
-    trainEval.evaluateModel(clf, metaData);
-    return trainEval;
   }
 }

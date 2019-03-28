@@ -25,7 +25,7 @@ public class Sgd extends Updater<org.nd4j.linalg.learning.config.Sgd> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

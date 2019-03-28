@@ -7,7 +7,6 @@ import static org.nd4j.linalg.learning.config.RmsProp.DEFAULT_RMSPROP_RMSDECAY;
 import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionMetadata;
-import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's RmsProp.
@@ -15,14 +14,15 @@ import weka.gui.ProgrammaticProperty;
  * @author Steven Lang
  */
 public class RmsProp extends Updater<org.nd4j.linalg.learning.config.RmsProp> {
+
   private static final long serialVersionUID = 7400615175279701837L;
 
   @OptionMetadata(
-    displayName = "rmsDecay",
-    description = "The rms decay (default = " + DEFAULT_RMSPROP_RMSDECAY + ").",
-    commandLineParamName = "rmsDecay",
-    commandLineParamSynopsis = "-rmsDecay <double>",
-    displayOrder = 1
+      displayName = "rmsDecay",
+      description = "The rms decay (default = " + DEFAULT_RMSPROP_RMSDECAY + ").",
+      commandLineParamName = "rmsDecay",
+      commandLineParamSynopsis = "-rmsDecay <double>",
+      displayOrder = 1
   )
   public double getRmsDecay() {
     return backend.getRmsDecay();
@@ -33,11 +33,11 @@ public class RmsProp extends Updater<org.nd4j.linalg.learning.config.RmsProp> {
   }
 
   @OptionMetadata(
-    displayName = "epsilon",
-    description = "The epsilon parameter (default = " + DEFAULT_RMSPROP_EPSILON + ").",
-    commandLineParamName = "epsilon",
-    commandLineParamSynopsis = "-epsilon <double>",
-    displayOrder = 2
+      displayName = "epsilon",
+      description = "The epsilon parameter (default = " + DEFAULT_RMSPROP_EPSILON + ").",
+      commandLineParamName = "epsilon",
+      commandLineParamSynopsis = "-epsilon <double>",
+      displayOrder = 2
   )
   public double getEpsilon() {
     return backend.getEpsilon();
@@ -59,7 +59,7 @@ public class RmsProp extends Updater<org.nd4j.linalg.learning.config.RmsProp> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

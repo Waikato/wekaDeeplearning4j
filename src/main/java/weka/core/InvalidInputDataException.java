@@ -1,7 +1,8 @@
 
 package weka.core;
 
-/** Exception raised in the case of an invalid input data
+/**
+ * Exception raised in the case of an invalid input data
  *
  * @author Steven Lang
  */

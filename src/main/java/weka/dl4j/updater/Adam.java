@@ -11,17 +11,18 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 public class Adam extends Updater<org.nd4j.linalg.learning.config.Adam> {
+
   private static final long serialVersionUID = 667880237656554906L;
 
   @OptionMetadata(
-    displayName = "beta1MeanDecay",
-    description =
-        "The mean decay (default = "
-            + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_BETA1_MEAN_DECAY
-            + ").",
-    commandLineParamName = "beta1MeanDecay",
-    commandLineParamSynopsis = "-beta1MeanDecay <double>",
-    displayOrder = 1
+      displayName = "beta1MeanDecay",
+      description =
+          "The mean decay (default = "
+              + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_BETA1_MEAN_DECAY
+              + ").",
+      commandLineParamName = "beta1MeanDecay",
+      commandLineParamSynopsis = "-beta1MeanDecay <double>",
+      displayOrder = 1
   )
   public double getBeta1() {
     return backend.getBeta1();
@@ -32,14 +33,14 @@ public class Adam extends Updater<org.nd4j.linalg.learning.config.Adam> {
   }
 
   @OptionMetadata(
-    displayName = "beta2VarDecay",
-    description =
-        "The var decay (default = "
-            + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_BETA2_VAR_DECAY
-            + ").",
-    commandLineParamName = "beta2VarDecay",
-    commandLineParamSynopsis = "-beta2VarDecay <double>",
-    displayOrder = 2
+      displayName = "beta2VarDecay",
+      description =
+          "The var decay (default = "
+              + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_BETA2_VAR_DECAY
+              + ").",
+      commandLineParamName = "beta2VarDecay",
+      commandLineParamSynopsis = "-beta2VarDecay <double>",
+      displayOrder = 2
   )
   public double getBeta2() {
     return backend.getBeta2();
@@ -50,14 +51,14 @@ public class Adam extends Updater<org.nd4j.linalg.learning.config.Adam> {
   }
 
   @OptionMetadata(
-    displayName = "epsilon",
-    description =
-        "The epsilon parameter (default = "
-            + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_EPSILON
-            + ").",
-    commandLineParamName = "epsilon",
-    commandLineParamSynopsis = "-epsilon <double>",
-    displayOrder = 3
+      displayName = "epsilon",
+      description =
+          "The epsilon parameter (default = "
+              + org.nd4j.linalg.learning.config.Adam.DEFAULT_ADAM_EPSILON
+              + ").",
+      commandLineParamName = "epsilon",
+      commandLineParamSynopsis = "-epsilon <double>",
+      displayOrder = 3
   )
   public double getEpsilon() {
     return backend.getEpsilon();
@@ -84,7 +85,7 @@ public class Adam extends Updater<org.nd4j.linalg.learning.config.Adam> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

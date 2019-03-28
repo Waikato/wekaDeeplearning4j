@@ -12,7 +12,8 @@ import weka.core.OptionHandler;
  * @author Eibe Frank
  */
 @JsonTypeName("MixtureDensity")
-public class LossMixtureDensity extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMixtureDensity>
+public class LossMixtureDensity extends
+    LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMixtureDensity>
     implements OptionHandler {
 
   private static final long serialVersionUID = 5254528896658149765L;
@@ -43,7 +44,7 @@ public class LossMixtureDensity extends LossFunction<org.nd4j.linalg.lossfunctio
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

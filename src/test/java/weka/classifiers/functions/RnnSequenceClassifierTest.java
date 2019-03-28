@@ -1,6 +1,10 @@
 
 package weka.classifiers.functions;
 
+import static org.junit.Assert.assertEquals;
+import static weka.util.TestUtil.readClf;
+import static weka.util.TestUtil.saveClf;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,11 +15,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
-import weka.dl4j.GradientNormalization;
-import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
-import weka.dl4j.text.tokenization.tokenizer.factory.CharacterNGramTokenizerFactory;
-import weka.dl4j.text.tokenization.tokenizer.factory.DefaultTokenizerFactory;
-import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,6 +27,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stemmers.SnowballStemmer;
+import weka.dl4j.GradientNormalization;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;
@@ -45,15 +45,15 @@ import weka.dl4j.text.tokenization.preprocessor.CommonPreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.EndingPreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.LowCasePreProcessor;
 import weka.dl4j.text.tokenization.preprocessor.StemmingPreProcessor;
+import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
+import weka.dl4j.text.tokenization.tokenizer.factory.CharacterNGramTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.DefaultTokenizerFactory;
+import weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory;
 import weka.dl4j.updater.Adam;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
-
-import static org.junit.Assert.assertEquals;
-import static weka.util.TestUtil.readClf;
-import static weka.util.TestUtil.saveClf;
 
 /**
  * JUnit tests for the RnnSequenceClassifier. Tests nominal classes with iris, numerical classes
@@ -64,25 +64,34 @@ import static weka.util.TestUtil.saveClf;
 @Log4j2
 public class RnnSequenceClassifierTest {
 
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Model path slim */
-  private static File modelSlim;
-  /** Classifier */
-  private RnnSequenceClassifier clf;
-  /** Dataset reuters */
-  private Instances data;
-
   private static final int batchSize = 64;
   private static final int epochs = 2;
   private static final int truncateLength = 10;
-
+  /**
+   * Model path slim
+   */
+  private static File modelSlim;
   private static RnnTextEmbeddingInstanceIterator tii;
+  /**
+   * Current name
+   */
+  @Rule
+  public TestName name = new TestName();
+  /**
+   * Classifier
+   */
+  private RnnSequenceClassifier clf;
+  /**
+   * Dataset reuters
+   */
+  private Instances data;
   private long startTime;
 
 //  private FileStatsStorage fss;
 
-  /** Initialize the text instance iterator */
+  /**
+   * Initialize the text instance iterator
+   */
   @BeforeClass
   public static void init() throws IOException {
     modelSlim = DatasetLoader.loadGoogleNewsVectors();
@@ -241,6 +250,7 @@ public class RnnSequenceClassifierTest {
     data.randomize(new Random(42));
     TestUtil.holdout(clf, data, 3);
   }
+
   @Test
   public void testRelationalDataset() throws Exception {
     data = TestUtil
@@ -301,23 +311,23 @@ public class RnnSequenceClassifierTest {
     wff.setStopwords(new File("src/test/resources/stopwords/english.txt"));
     // Iterate stopwords
     for (Dl4jAbstractStopwords sw :
-        new Dl4jAbstractStopwords[] {new Dl4jRainbow(), new Dl4jNull(), wff}) {
+        new Dl4jAbstractStopwords[]{new Dl4jRainbow(), new Dl4jNull(), wff}) {
       tii.setStopwords(sw);
 
       final StemmingPreProcessor spp = new StemmingPreProcessor();
       spp.setStemmer(new SnowballStemmer());
       // Iterate TokenPreProcess
       for (TokenPreProcess tpp :
-          new TokenPreProcess[] {
-            new CommonPreProcessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
+          new TokenPreProcess[]{
+              new CommonPreProcessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
           }) {
         tii.setTokenPreProcess(tpp);
 
         // Iterate tokenizer faktory
         for (TokenizerFactory tf :
-            new TokenizerFactory[] {
-              new DefaultTokenizerFactory(),
-              new CharacterNGramTokenizerFactory(),
+            new TokenizerFactory[]{
+                new DefaultTokenizerFactory(),
+                new CharacterNGramTokenizerFactory(),
             }) {
           tii.setTokenizerFactory(tf);
 
@@ -450,7 +460,6 @@ public class RnnSequenceClassifierTest {
     assertEquals(numEpochs, clfLoaded2.numEpochs);
     assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
     assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
-
 
     Files.delete(Paths.get(clfPath));
   }

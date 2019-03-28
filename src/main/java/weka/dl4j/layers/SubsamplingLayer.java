@@ -1,15 +1,14 @@
 
 package weka.dl4j.layers;
 
-import weka.dl4j.ConvolutionMode;
+import java.io.Serializable;
+import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.ConvolutionMode;
 import weka.dl4j.PoolingType;
 import weka.gui.ProgrammaticProperty;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's SubsamplingLayer that implements WEKA option handling.
@@ -21,17 +20,21 @@ import java.util.Enumeration;
 public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.SubsamplingLayer>
     implements OptionHandler, Serializable {
 
-  /** The ID used to serialize this class. */
+  /**
+   * The ID used to serialize this class.
+   */
   private static final long serialVersionUID = -699034028619492301L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public SubsamplingLayer() {
     super();
     setLayerName("Subsampling layer");
     setConvolutionMode(ConvolutionMode.Truncate);
-    setKernelSize(new int[] {2, 2});
-    setStride(new int[] {1, 1});
-    setPadding(new int[] {0, 0});
+    setKernelSize(new int[]{2, 2});
+    setStride(new int[]{1, 1});
+    setPadding(new int[]{0, 0});
     setPoolingType(PoolingType.MAX);
     setEps(1e-8);
     setPnorm(1);
@@ -52,13 +55,12 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
 
-
   @OptionMetadata(
-    displayName = "eps",
-    description = "The value of the eps parameter (default = 1e-8).",
-    commandLineParamName = "eps",
-    commandLineParamSynopsis = "-eps <double>",
-    displayOrder = 2
+      displayName = "eps",
+      description = "The value of the eps parameter (default = 1e-8).",
+      commandLineParamName = "eps",
+      commandLineParamSynopsis = "-eps <double>",
+      displayOrder = 2
   )
   public double getEps() {
     return backend.getEps();
@@ -69,11 +71,11 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   @OptionMetadata(
-    displayName = "pnorm",
-    description = "The value of the pnorm parameter (default = 1).",
-    commandLineParamName = "pnorm",
-    commandLineParamSynopsis = "-pnorm <int>",
-    displayOrder = 3
+      displayName = "pnorm",
+      description = "The value of the pnorm parameter (default = 1).",
+      commandLineParamName = "pnorm",
+      commandLineParamSynopsis = "-pnorm <int>",
+      displayOrder = 3
   )
   public int getPnorm() {
     return backend.getPnorm();
@@ -82,6 +84,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   public void setPnorm(int p) {
     backend.setPnorm(p);
   }
+
   @OptionMetadata(
       displayName = "convolution mode",
       description = "The convolution mode (default = Truncate).",
@@ -110,7 +113,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setKernelSizeX(int kernelSizeX) {
-    int[] kernelSize = new int[] {kernelSizeX, getKernelSizeY()};
+    int[] kernelSize = new int[]{kernelSizeX, getKernelSizeY()};
     backend.setKernelSize(kernelSize);
   }
 
@@ -126,7 +129,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setKernelSizeY(int kernelSizeY) {
-    int[] kernelSize = new int[] {getKernelSizeX(), kernelSizeY};
+    int[] kernelSize = new int[]{getKernelSizeX(), kernelSizeY};
     backend.setKernelSize(kernelSize);
   }
 
@@ -151,7 +154,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setStrideRows(int rows) {
-    int[] stride = new int[] {rows, getStrideColumns()};
+    int[] stride = new int[]{rows, getStrideColumns()};
     backend.setStride(stride);
   }
 
@@ -176,7 +179,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setStrideColumns(int columns) {
-    int[] stride = new int[] {getStrideRows(), columns};
+    int[] stride = new int[]{getStrideRows(), columns};
     backend.setStride(stride);
   }
 
@@ -192,7 +195,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setPaddingRows(int padding) {
-    int[] pad = new int[] {padding, getPaddingColumns()};
+    int[] pad = new int[]{padding, getPaddingColumns()};
     backend.setPadding(pad);
   }
 
@@ -217,16 +220,16 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   }
 
   public void setPaddingColumns(int padding) {
-    int[] pad = new int[] {getPaddingRows(), padding};
+    int[] pad = new int[]{getPaddingRows(), padding};
     backend.setPadding(pad);
   }
 
   @OptionMetadata(
-    displayName = "pooling type",
-    description = "The type of pooling to use (default = MAX; options: MAX, AVG, SUM, NONE).",
-    commandLineParamName = "poolingType",
-    commandLineParamSynopsis = "-poolingType <string>",
-    displayOrder = 10
+      displayName = "pooling type",
+      description = "The type of pooling to use (default = MAX; options: MAX, AVG, SUM, NONE).",
+      commandLineParamName = "poolingType",
+      commandLineParamSynopsis = "-poolingType <string>",
+      displayOrder = 10
   )
   public PoolingType getPoolingType() {
     return PoolingType.fromBackend(backend.getPoolingType());
@@ -235,6 +238,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
   public void setPoolingType(PoolingType poolingType) {
     backend.setPoolingType(poolingType.getBackend());
   }
+
   /**
    * Returns an enumeration describing the available options.
    *
@@ -242,7 +246,7 @@ public class SubsamplingLayer extends Layer<org.deeplearning4j.nn.conf.layers.Su
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

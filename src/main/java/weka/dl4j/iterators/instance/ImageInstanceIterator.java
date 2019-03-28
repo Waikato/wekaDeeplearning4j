@@ -1,6 +1,7 @@
 
 package weka.dl4j.iterators.instance;
 
+import java.io.File;
 import java.util.Enumeration;
 import org.datavec.api.split.CollectionInputSplit;
 import org.datavec.image.recordreader.ImageRecordReader;
@@ -14,8 +15,6 @@ import weka.core.InvalidInputDataException;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
-
-import java.io.File;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.gui.FilePropertyMetadata;
 import weka.gui.knowledgeflow.KFGUIConsts;
@@ -30,28 +29,38 @@ import weka.gui.knowledgeflow.KFGUIConsts;
 public class ImageInstanceIterator extends AbstractInstanceIterator implements
     ConvolutionalIterator {
 
-  /** The version ID used for serializing objects of this class */
+  /**
+   * The version ID used for serializing objects of this class
+   */
   private static final long serialVersionUID = -3701309032945158130L;
 
-  /** The desired output height */
+  /**
+   * The desired output height
+   */
   protected int height = 28;
 
-  /** The desired output width */
+  /**
+   * The desired output width
+   */
   protected int width = 28;
 
-  /** The desired number of channels */
+  /**
+   * The desired number of channels
+   */
   protected int numChannels = 1;
 
-  /** The location of the folder containing the images */
+  /**
+   * The location of the folder containing the images
+   */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
 
   @FilePropertyMetadata(fileChooserDialogType = KFGUIConsts.SAVE_DIALOG, directoriesOnly = true)
   @OptionMetadata(
-    displayName = "directory of images",
-    description = "The directory containing the images (default = user home).",
-    commandLineParamName = "imagesLocation",
-    commandLineParamSynopsis = "-imagesLocation <string>",
-    displayOrder = 1
+      displayName = "directory of images",
+      description = "The directory containing the images (default = user home).",
+      commandLineParamName = "imagesLocation",
+      commandLineParamSynopsis = "-imagesLocation <string>",
+      displayOrder = 1
   )
   public File getImagesLocation() {
     return imagesLocation;
@@ -62,11 +71,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   }
 
   @OptionMetadata(
-    displayName = "desired width",
-    description = "The desired width of the images (default = 28).",
-    commandLineParamName = "width",
-    commandLineParamSynopsis = "-width <int>",
-    displayOrder = 2
+      displayName = "desired width",
+      description = "The desired width of the images (default = 28).",
+      commandLineParamName = "width",
+      commandLineParamSynopsis = "-width <int>",
+      displayOrder = 2
   )
   public int getWidth() {
     return width;
@@ -77,11 +86,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   }
 
   @OptionMetadata(
-    displayName = "desired height",
-    description = "The desired height of the images (default = 28).",
-    commandLineParamName = "height",
-    commandLineParamSynopsis = "-height <int>",
-    displayOrder = 3
+      displayName = "desired height",
+      description = "The desired height of the images (default = 28).",
+      commandLineParamName = "height",
+      commandLineParamSynopsis = "-height <int>",
+      displayOrder = 3
   )
   public int getHeight() {
     return height;
@@ -92,11 +101,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   }
 
   @OptionMetadata(
-    displayName = "desired number of channels",
-    description = "The desired number of channels (default = 1).",
-    commandLineParamName = "numChannels",
-    commandLineParamSynopsis = "-numChannels <int>",
-    displayOrder = 4
+      displayName = "desired number of channels",
+      description = "The desired number of channels (default = 1).",
+      commandLineParamName = "numChannels",
+      commandLineParamSynopsis = "-numChannels <int>",
+      displayOrder = 4
   )
   public int getNumChannels() {
     return numChannels;
@@ -136,7 +145,6 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
    *
    * @param data the dataset to use
    * @return the image recorder
-   * @throws Exception
    */
   protected ImageRecordReader getImageRecordReader(Instances data) throws Exception {
     Environment env = Environment.getSystemWide();
@@ -164,7 +172,6 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
    * @param seed the seed for the random number generator
    * @param batchSize the batch size to use
    * @return the iterator
-   * @throws Exception
    */
   @Override
   public DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize)
@@ -196,7 +203,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

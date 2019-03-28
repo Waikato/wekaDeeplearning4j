@@ -28,11 +28,19 @@ import weka.util.TestUtil;
  */
 @Log4j2
 public class RnnTextEmbeddingInstanceIteratorTest {
-  /** ImageInstanceIterator object */
-  private RnnTextEmbeddingInstanceIterator tii;
-  /** WordVec size */
+
+  /**
+   * WordVec size
+   */
   private static final int WORD_VEC_SIZE = 300;
-  /** Initialize iterator */
+  /**
+   * ImageInstanceIterator object
+   */
+  private RnnTextEmbeddingInstanceIterator tii;
+
+  /**
+   * Initialize iterator
+   */
   @Before
   public void init() throws IOException {
     this.tii = new RnnTextEmbeddingInstanceIterator();
@@ -66,8 +74,8 @@ public class RnnTextEmbeddingInstanceIteratorTest {
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
         final long[] shapeFeats = next.getFeatures().shape();
         final long[] expShapeFeats = {bs, WORD_VEC_SIZE, tl};
-        assertEquals(expShapeFeats[0],shapeFeats[0]);
-        assertEquals(expShapeFeats[1],shapeFeats[1]);
+        assertEquals(expShapeFeats[0], shapeFeats[0]);
+        assertEquals(expShapeFeats[1], shapeFeats[1]);
         assertTrue(expShapeFeats[2] >= shapeFeats[2]);
 
         // Check label shape, expect: (batchsize x numclasses x sequencelength)

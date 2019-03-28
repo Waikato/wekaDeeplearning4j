@@ -1,7 +1,7 @@
 
 package weka.dl4j.activations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -26,6 +26,6 @@ public class ActivationRReLUTest extends ApiWrapperTest<ActivationRReLU> {
 
   @Override
   public ActivationRReLU getApiWrapper() {
-    return new  ActivationRReLU();
+    return new ActivationRReLU();
   }
 }

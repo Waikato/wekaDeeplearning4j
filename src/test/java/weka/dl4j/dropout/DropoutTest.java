@@ -1,7 +1,7 @@
 
 package weka.dl4j.dropout;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -43,6 +43,6 @@ public class DropoutTest extends ApiWrapperTest<Dropout> {
 
   @Override
   public Dropout getApiWrapper() {
-    return new  Dropout();
+    return new Dropout();
   }
 }

@@ -1,11 +1,10 @@
 
 package weka.dl4j.lossfunctions;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's LossKLD that implements WEKA option handling.
@@ -13,7 +12,8 @@ import java.util.Enumeration;
  * @author Eibe Frank
  */
 @JsonTypeName("KLD")
-public class LossKLD extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossKLD> implements OptionHandler {
+public class LossKLD extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossKLD> implements
+    OptionHandler {
 
   private static final long serialVersionUID = -8491072830196216209L;
 
@@ -43,7 +43,7 @@ public class LossKLD extends LossFunction<org.nd4j.linalg.lossfunctions.impl.Los
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

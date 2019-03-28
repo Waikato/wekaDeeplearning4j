@@ -9,7 +9,6 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.lossfunctions.LossFunction;
 import weka.dl4j.lossfunctions.LossMCXENT;
-import weka.gui.ProgrammaticProperty;
 
 /**
  * A version of DeepLearning4j's LossLayer layer that implements WEKA option handling.

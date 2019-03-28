@@ -21,11 +21,11 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
   private double power = 1;
 
   @OptionMetadata(
-    displayName = "gamma",
-    description = "The gamma value (default = 0.99).",
-    commandLineParamName = "gamma",
-    commandLineParamSynopsis = "-gamma <double>",
-    displayOrder = 2
+      displayName = "gamma",
+      description = "The gamma value (default = 0.99).",
+      commandLineParamName = "gamma",
+      commandLineParamSynopsis = "-gamma <double>",
+      displayOrder = 2
   )
   public double getGamma() {
     return gamma;
@@ -36,11 +36,11 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
   }
 
   @OptionMetadata(
-    displayName = "power",
-    description = "The power value (default = 1.0).",
-    commandLineParamName = "power",
-    commandLineParamSynopsis = "-power <double>",
-    displayOrder = 3
+      displayName = "power",
+      description = "The power value (default = 1.0).",
+      commandLineParamName = "power",
+      commandLineParamSynopsis = "-power <double>",
+      displayOrder = 3
   )
   public double getPower() {
     return power;
@@ -52,13 +52,8 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
 
   @Override
   public org.nd4j.linalg.schedule.InverseSchedule getBackend() {
-    return new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue, gamma, power);
-  }
-
-  @Override
-  public void initializeBackend() {
-    backend =
-        new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue, gamma, power);
+    return new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue,
+        gamma, power);
   }
 
   @Override
@@ -69,6 +64,13 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
     this.scheduleType = ScheduleType.fromBackend(newBackend.getScheduleType());
   }
 
+  @Override
+  public void initializeBackend() {
+    backend =
+        new org.nd4j.linalg.schedule.InverseSchedule(scheduleType.getBackend(), initialValue, gamma,
+            power);
+  }
+
   /**
    * Returns an enumeration describing the available options.
    *
@@ -76,7 +78,7 @@ public class InverseSchedule extends Schedule<org.nd4j.linalg.schedule.InverseSc
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

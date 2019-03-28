@@ -1,11 +1,12 @@
 
 package weka.dl4j.updater;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 public class NadamTest extends AbstractUpdaterTest<Nadam> {
+
   @Test
   public void setBeta1() {
     double value = 123.456;

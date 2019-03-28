@@ -3,7 +3,6 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 import weka.dl4j.activations.Activation;
 import weka.dl4j.activations.ActivationCube;
@@ -24,18 +23,18 @@ import weka.dl4j.activations.ActivationSoftmax;
  *
  * @author Steven Lang
  */
-public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer>{
+public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer> {
 
 
   @Override
-  public ActivationLayer getApiWrapper(){
-    return new  ActivationLayer();
+  public ActivationLayer getApiWrapper() {
+    return new ActivationLayer();
   }
 
   @Test
-  public void testActivationFunction(){
+  public void testActivationFunction() {
     Activation[] acts =
-        new Activation[] {
+        new Activation[]{
             new ActivationCube(),
             new ActivationELU(),
             new ActivationHardSigmoid(),

@@ -19,8 +19,8 @@ import weka.dl4j.iterators.instance.sequence.text.AbstractTextEmbeddingIterator;
  * <p>Assumes the instance with the following attributes:
  *
  * <ul>
- *   <li>Text (e.g. a elementwise document)
- *   <li>Class
+ * <li>Text (e.g. a elementwise document)
+ * <li>Class
  * </ul>
  *
  * @author Steven Lang
@@ -28,7 +28,9 @@ import weka.dl4j.iterators.instance.sequence.text.AbstractTextEmbeddingIterator;
 @Log4j2
 public class RnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingIterator {
 
-  /** The ID used to serialize this class */
+  /**
+   * The ID used to serialize this class
+   */
   private static final long serialVersionUID = 1316260988724548474L;
 
   @Override
@@ -84,7 +86,7 @@ public class RnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingItera
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

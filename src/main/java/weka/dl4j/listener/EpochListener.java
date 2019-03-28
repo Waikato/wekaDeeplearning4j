@@ -24,15 +24,20 @@ import weka.core.OptionMetadata;
  */
 @Log4j2
 public class EpochListener extends TrainingListener {
+
   private static final long serialVersionUID = -8852994767947925554L;
 
   /** Epoch counter */
   // private int currentEpoch = 0;
 
-  /** Evaluate every N epochs */
+  /**
+   * Evaluate every N epochs
+   */
   private int n = 5;
 
-  /** Enable intermediate evaluations */
+  /**
+   * Enable intermediate evaluations
+   */
   private boolean isIntermediateEvaluationsEnabled = true;
 
   @Override
@@ -87,8 +92,11 @@ public class EpochListener extends TrainingListener {
           }
           INDArray output =
               net.outputSingle(next.getFeatures()); // get the networks prediction
-          if (isClassification) classificationEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
-          else regressionEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          if (isClassification) {
+            classificationEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          } else {
+            regressionEvaluation.eval(next.getLabels(), output, next.getLabelsMaskArray());
+          }
         }
 
         // Add loss (denoted as score in dl4j)
@@ -107,7 +115,8 @@ public class EpochListener extends TrainingListener {
               Arrays.stream(classificationEvaluation.stats().split(System.lineSeparator()))
                   .filter(line -> !line.contains("# of classes")) // Remove # classes line
                   .filter(line -> !line.contains("===")) // Remove separators
-                  .filter(line -> !line.contains("Predictions labeled as")) // Remove confusion matrix
+                  .filter(
+                      line -> !line.contains("Predictions labeled as")) // Remove confusion matrix
                   .filter(line -> !line.trim().isEmpty()) // Remove empty lines
                   .collect(Collectors.joining(System.lineSeparator())); // Join to original format
           s += stats + System.lineSeparator();
@@ -137,11 +146,11 @@ public class EpochListener extends TrainingListener {
   }
 
   @OptionMetadata(
-    displayName = "evaluate every N epochs",
-    description = "Evaluate every N epochs (default = 5).",
-    commandLineParamName = "n",
-    commandLineParamSynopsis = "-n <int>",
-    displayOrder = 0
+      displayName = "evaluate every N epochs",
+      description = "Evaluate every N epochs (default = 5).",
+      commandLineParamName = "n",
+      commandLineParamSynopsis = "-n <int>",
+      displayOrder = 0
   )
   public void setN(int evaluateEveryNEpochs) {
     if (evaluateEveryNEpochs < 1) {
@@ -153,11 +162,11 @@ public class EpochListener extends TrainingListener {
   }
 
   @OptionMetadata(
-    displayName = "enable intermediate evaluations",
-    description = "Enable intermediate evaluations (default = true).",
-    commandLineParamName = "eval",
-    commandLineParamSynopsis = "-eval <boolean>",
-    displayOrder = 0
+      displayName = "enable intermediate evaluations",
+      description = "Enable intermediate evaluations (default = true).",
+      commandLineParamName = "eval",
+      commandLineParamSynopsis = "-eval <boolean>",
+      displayOrder = 0
   )
   public boolean isIntermediateEvaluationsEnabled() {
     return isIntermediateEvaluationsEnabled;
@@ -171,7 +180,7 @@ public class EpochListener extends TrainingListener {
    * Returns a string describing this search method
    *
    * @return a description of the search method suitable for displaying in the explorer/experimenter
-   *     gui
+   * gui
    */
   public String globalInfo() {
     return "A listener which evaluates the model while training every N " + "epochs.";

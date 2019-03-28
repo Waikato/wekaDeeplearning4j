@@ -1,6 +1,8 @@
 
 package weka.dl4j.layers;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 import org.nd4j.linalg.lossfunctions.ILossFunction;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -8,9 +10,6 @@ import weka.core.OptionMetadata;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.lossfunctions.LossFunction;
 import weka.dl4j.lossfunctions.LossMCXENT;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's OutputLayer that implements WEKA option handling.
@@ -24,7 +23,9 @@ public class OutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.lay
 
   private static final long serialVersionUID = 139321786136127207L;
 
-  /** Constructor for setting some defaults. */
+  /**
+   * Constructor for setting some defaults.
+   */
   public OutputLayer() {
     super();
     setLayerName("Output layer");
@@ -48,11 +49,11 @@ public class OutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.lay
 
 
   @OptionMetadata(
-    displayName = "loss function",
-    description = "The loss function to use (default = LossMCXENT).",
-    commandLineParamName = "lossFn",
-    commandLineParamSynopsis = "-lossFn <specification>",
-    displayOrder = 1
+      displayName = "loss function",
+      description = "The loss function to use (default = LossMCXENT).",
+      commandLineParamName = "lossFn",
+      commandLineParamSynopsis = "-lossFn <specification>",
+      displayOrder = 1
   )
   public LossFunction<? extends ILossFunction> getLossFn() {
     return LossFunction.create(backend.getLossFn());
@@ -70,7 +71,7 @@ public class OutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.lay
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

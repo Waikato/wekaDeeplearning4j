@@ -24,8 +24,8 @@ import weka.dl4j.iterators.provider.FileLabeledSentenceProvider;
  * <p>Assumes the instance object has the following two attributes:
  *
  * <ul>
- *   <li>Path to text file
- *   <li>Class
+ * <li>Path to text file
+ * <li>Class
  * </ul>
  *
  * @author Steven Lang
@@ -86,11 +86,11 @@ public class RnnTextFilesEmbeddingInstanceIterator extends RnnTextEmbeddingInsta
   }
 
   @OptionMetadata(
-    displayName = "directory of text files",
-    description = "The directory containing the text files (default = user home).",
-    commandLineParamName = "textsLocation",
-    commandLineParamSynopsis = "-textsLocation <string>",
-    displayOrder = 3
+      displayName = "directory of text files",
+      description = "The directory containing the text files (default = user home).",
+      commandLineParamName = "textsLocation",
+      commandLineParamSynopsis = "-textsLocation <string>",
+      displayOrder = 3
   )
   public File getTextsLocation() {
     return textsLocation;
@@ -107,7 +107,7 @@ public class RnnTextFilesEmbeddingInstanceIterator extends RnnTextEmbeddingInsta
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

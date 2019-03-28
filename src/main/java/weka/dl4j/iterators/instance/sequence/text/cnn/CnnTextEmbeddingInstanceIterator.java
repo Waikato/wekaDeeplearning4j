@@ -24,14 +24,14 @@ public class CnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingItera
     initialize();
     LabeledSentenceProvider clsp = getSentenceProvider(data);
     return new CnnSentenceDataSetIterator.Builder()
-            .stopwords(stopwords)
-            .wordVectors(wordVectors)
-            .tokenizerFactory(tokenizerFactory.getBackend())
-            .sentenceProvider(clsp)
-            .minibatchSize(batchSize)
-            .maxSentenceLength(truncateLength)
-            .useNormalizedWordVectors(false)
-            .sentencesAlongHeight(true)
+        .stopwords(stopwords)
+        .wordVectors(wordVectors)
+        .tokenizerFactory(tokenizerFactory.getBackend())
+        .sentenceProvider(clsp)
+        .minibatchSize(batchSize)
+        .maxSentenceLength(truncateLength)
+        .useNormalizedWordVectors(false)
+        .sentencesAlongHeight(true)
         .build();
   }
 
@@ -49,7 +49,7 @@ public class CnnTextEmbeddingInstanceIterator extends AbstractTextEmbeddingItera
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

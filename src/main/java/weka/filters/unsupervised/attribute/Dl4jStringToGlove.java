@@ -1,6 +1,7 @@
 
 package weka.filters.unsupervised.attribute;
 
+import java.util.Enumeration;
 import org.deeplearning4j.models.glove.Glove;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import weka.core.Instances;
@@ -10,16 +11,10 @@ import weka.core.TechnicalInformation;
 import weka.core.TechnicalInformation.Type;
 import weka.dl4j.text.sentenceiterator.WekaInstanceSentenceIterator;
 
-import java.util.Enumeration;
-
 /**
- *
- * <!-- globalinfo-start -->
- * An attribute filter that calculates word embeddings on a String attribute using the Glove
- * implementation provided by DeepLearning4j.
- * <!-- globalinfo-end -->
- * <!-- technical-bibtex-start -->
- * BibTeX:
+ * <!-- globalinfo-start --> An attribute filter that calculates word embeddings on a String
+ * attribute using the Glove implementation provided by DeepLearning4j. <!-- globalinfo-end --> <!--
+ * technical-bibtex-start --> BibTeX:
  *
  * <pre>
  * &#64;@Article{Glove,
@@ -32,14 +27,16 @@ import java.util.Enumeration;
  *
  *
  * </pre>
- *
+ * <p>
  * <!-- technical-bibtex-end -->
  *
  * @author Felipe Bravo-Marquez (fjb11@students.waikato.ac.nz)
  */
 public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
 
-  /** For serialization */
+  /**
+   * For serialization
+   */
   private static final long serialVersionUID = -1767367935663656698L;
 
   /**
@@ -48,22 +45,34 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
    */
   protected boolean symmetric = true;
 
-  /** Parameter specifying, if cooccurrences list should be shuffled between training epochs. */
+  /**
+   * Parameter specifying, if cooccurrences list should be shuffled between training epochs.
+   */
   protected boolean shuffle = true;
 
-  /** Parameter specifying cutoff in weighting function; default 100.0 */
+  /**
+   * Parameter specifying cutoff in weighting function; default 100.0
+   */
   protected double xMax = 100.0;
 
-  /** Parameter in exponent of weighting function */
+  /**
+   * Parameter in exponent of weighting function
+   */
   protected double alpha = 0.75;
 
-  /** The learning rate */
+  /**
+   * The learning rate
+   */
   protected double learningRate = 0.05;
 
-  /** The minimum learning rate */
+  /**
+   * The minimum learning rate
+   */
   protected double minLearningRate = 0.0001;
 
-  /** True for using adaptive gradients */
+  /**
+   * True for using adaptive gradients
+   */
   protected boolean useAdaGrad = false;
 
   /**
@@ -173,11 +182,11 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "learningRate",
-    description = "The learning rate (default = 0.05).",
-    commandLineParamName = "learningRate",
-    commandLineParamSynopsis = "-learningRate <double>",
-    displayOrder = 15
+      displayName = "learningRate",
+      description = "The learning rate (default = 0.05).",
+      commandLineParamName = "learningRate",
+      commandLineParamSynopsis = "-learningRate <double>",
+      displayOrder = 15
   )
   public double getLearningRate() {
     return learningRate;
@@ -188,12 +197,12 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "minLearningRate",
-    description =
-        "This method defines minimal learning rate value for training (default = 1.0E-4).",
-    commandLineParamName = "minLearningRate",
-    commandLineParamSynopsis = "-minLearningRate <double>",
-    displayOrder = 16
+      displayName = "minLearningRate",
+      description =
+          "This method defines minimal learning rate value for training (default = 1.0E-4).",
+      commandLineParamName = "minLearningRate",
+      commandLineParamSynopsis = "-minLearningRate <double>",
+      displayOrder = 16
   )
   public double getMinLearningRate() {
     return minLearningRate;
@@ -204,13 +213,13 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "symmetric",
-    description =
-        "Parameters specifying, if cooccurrences list should be build into both directions from any current word (default = true).",
-    commandLineParamName = "symmetric",
-    commandLineParamSynopsis = "-symmetric",
-    commandLineParamIsFlag = true,
-    displayOrder = 17
+      displayName = "symmetric",
+      description =
+          "Parameters specifying, if cooccurrences list should be build into both directions from any current word (default = true).",
+      commandLineParamName = "symmetric",
+      commandLineParamSynopsis = "-symmetric",
+      commandLineParamIsFlag = true,
+      displayOrder = 17
   )
   public boolean isSymmetric() {
     return symmetric;
@@ -221,13 +230,13 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "shuffle",
-    description =
-        "Parameter specifying, if cooccurrences list should be shuffled between training epochs (default = true).",
-    commandLineParamName = "shuffle",
-    commandLineParamSynopsis = "-shuffle",
-    commandLineParamIsFlag = true,
-    displayOrder = 18
+      displayName = "shuffle",
+      description =
+          "Parameter specifying, if cooccurrences list should be shuffled between training epochs (default = true).",
+      commandLineParamName = "shuffle",
+      commandLineParamSynopsis = "-shuffle",
+      commandLineParamIsFlag = true,
+      displayOrder = 18
   )
   public boolean isShuffle() {
     return shuffle;
@@ -238,11 +247,11 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "xMax",
-    description = "Parameter specifying cutoff in weighting function (default = 100.0).",
-    commandLineParamName = "xMax",
-    commandLineParamSynopsis = "-xMax <double>",
-    displayOrder = 19
+      displayName = "xMax",
+      description = "Parameter specifying cutoff in weighting function (default = 100.0).",
+      commandLineParamName = "xMax",
+      commandLineParamSynopsis = "-xMax <double>",
+      displayOrder = 19
   )
   public double getXMax() {
     return xMax;
@@ -253,11 +262,11 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "alpha",
-    description = "Parameter in exponent of weighting function (default = 0.75).",
-    commandLineParamName = "alpha",
-    commandLineParamSynopsis = "-alpha <double>",
-    displayOrder = 20
+      displayName = "alpha",
+      description = "Parameter in exponent of weighting function (default = 0.75).",
+      commandLineParamName = "alpha",
+      commandLineParamSynopsis = "-alpha <double>",
+      displayOrder = 20
   )
   public double getAlpha() {
     return alpha;
@@ -268,13 +277,13 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "useAdaGrad",
-    description =
-        "This method defines whether adaptive gradients should be used or not (default = false).",
-    commandLineParamName = "useAdaGrad",
-    commandLineParamSynopsis = "-useAdaGrad",
-    commandLineParamIsFlag = true,
-    displayOrder = 21
+      displayName = "useAdaGrad",
+      description =
+          "This method defines whether adaptive gradients should be used or not (default = false).",
+      commandLineParamName = "useAdaGrad",
+      commandLineParamSynopsis = "-useAdaGrad",
+      commandLineParamIsFlag = true,
+      displayOrder = 21
   )
   public boolean isUseAdaGrad() {
     return useAdaGrad;
@@ -285,11 +294,11 @@ public class Dl4jStringToGlove extends Dl4jStringToWordEmbeddings {
   }
 
   @OptionMetadata(
-    displayName = "batchSize",
-    description = "The mini-batch size (default = 1000).",
-    commandLineParamName = "batchSize",
-    commandLineParamSynopsis = "-batchSize <int>",
-    displayOrder = 22
+      displayName = "batchSize",
+      description = "The mini-batch size (default = 1000).",
+      commandLineParamName = "batchSize",
+      commandLineParamSynopsis = "-batchSize <int>",
+      displayOrder = 22
   )
   public int getBatchSize() {
     return batchSize;

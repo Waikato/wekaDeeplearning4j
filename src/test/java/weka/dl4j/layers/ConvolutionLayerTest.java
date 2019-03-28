@@ -4,10 +4,9 @@ package weka.dl4j.layers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.AlgoMode;
-import org.junit.Before;
 import org.junit.Test;
+import weka.dl4j.AlgoMode;
+import weka.dl4j.ConvolutionMode;
 
 /**
  * A dense layer test.
@@ -19,7 +18,7 @@ public class ConvolutionLayerTest extends AbstractFeedForwardLayerTest<Convoluti
 
   @Override
   public ConvolutionLayer getApiWrapper() {
-    return new  ConvolutionLayer();
+    return new ConvolutionLayer();
   }
 
   @Test
@@ -43,24 +42,25 @@ public class ConvolutionLayerTest extends AbstractFeedForwardLayerTest<Convoluti
   }
 
   @Test
-  public void testKernelSize(){
-    int[] size = {20,20};
+  public void testKernelSize() {
+    int[] size = {20, 20};
     wrapper.setKernelSize(size);
 
     assertArrayEquals(size, wrapper.getKernelSize());
   }
 
   @Test
-  public void testStrideSize(){
-    int[] size = {20,20};
+  public void testStrideSize() {
+    int[] size = {20, 20};
     wrapper.setStride(size);
 
     assertArrayEquals(size, wrapper.getStride());
 
   }
+
   @Test
-  public void testPaddingSize(){
-    int[] size = {20,20};
+  public void testPaddingSize() {
+    int[] size = {20, 20};
     wrapper.setPadding(size);
 
     assertArrayEquals(size, wrapper.getPadding());

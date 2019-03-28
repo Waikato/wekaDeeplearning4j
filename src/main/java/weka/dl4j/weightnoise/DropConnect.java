@@ -18,7 +18,9 @@ import weka.dl4j.schedules.Schedule;
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class DropConnect extends AbstractWeightNoise<org.deeplearning4j.nn.conf.weightnoise.DropConnect> implements OptionHandler, Serializable {
+public class DropConnect extends
+    AbstractWeightNoise<org.deeplearning4j.nn.conf.weightnoise.DropConnect> implements
+    OptionHandler, Serializable {
 
   private static final long serialVersionUID = -8153032592556766929L;
 
@@ -35,11 +37,11 @@ public class DropConnect extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
       commandLineParamSynopsis = "-weightRetainProb <double>",
       displayOrder = 1
   )
-  public double getWeightRetainProbability(){
+  public double getWeightRetainProbability() {
     return backend.getWeightRetainProb();
   }
 
-  public void setWeightRetainProbability(double prob){
+  public void setWeightRetainProbability(double prob) {
     backend.setWeightRetainProb(prob);
   }
 
@@ -55,7 +57,7 @@ public class DropConnect extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
       commandLineParamSynopsis = "-weightRetainProbSchedule <Schedule>",
       displayOrder = 2
   )
-  public Schedule<? extends ISchedule> getWeightRetainProbabilitySchedule(){
+  public Schedule<? extends ISchedule> getWeightRetainProbabilitySchedule() {
     return Schedule.create(backend.getWeightRetainProbSchedule());
   }
 
@@ -66,7 +68,7 @@ public class DropConnect extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
 
   @Override
   public void initializeBackend() {
-    backend=new org.deeplearning4j.nn.conf.weightnoise.DropConnect(0.0);
+    backend = new org.deeplearning4j.nn.conf.weightnoise.DropConnect(0.0);
   }
 
   /**
@@ -76,7 +78,7 @@ public class DropConnect extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

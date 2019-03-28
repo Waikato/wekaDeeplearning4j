@@ -1,11 +1,9 @@
 
 package weka.classifiers.functions;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import weka.dl4j.activations.ActivationReLU;
-import weka.dl4j.activations.ActivationSoftmax;
-import weka.dl4j.layers.Layer;
-import weka.dl4j.PoolingType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,16 +13,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.PoolingType;
+import weka.dl4j.activations.ActivationReLU;
+import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
-import weka.dl4j.layers.*;
+import weka.dl4j.layers.BatchNormalization;
+import weka.dl4j.layers.ConvolutionLayer;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.Layer;
+import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.dl4j.updater.Adam;
 import weka.dl4j.weightnoise.DropConnect;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * JUnit tests applying the classifier to images converted to arff files.
@@ -33,13 +36,22 @@ import java.util.List;
  */
 public class Dl4jMlpArffTest {
 
-  /** Logger instance */
+  /**
+   * Logger instance
+   */
   private static final Logger logger = LoggerFactory.getLogger(Dl4jMlpArffTest.class);
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Classifier */
+  /**
+   * Current name
+   */
+  @Rule
+  public TestName name = new TestName();
+  /**
+   * Classifier
+   */
   private Dl4jMlpClassifier clf;
-  /** Start time for time measurement */
+  /**
+   * Start time for time measurement
+   */
   private long startTime;
 
   @Before

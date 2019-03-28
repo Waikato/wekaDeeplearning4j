@@ -24,11 +24,11 @@ public class BinomialDistribution
   protected int numberOfTrials = 1;
 
   @OptionMetadata(
-    displayName = "probability of success",
-    description = "The probability of success (default = 0.5).",
-    commandLineParamName = "prob",
-    commandLineParamSynopsis = "-prob <double>",
-    displayOrder = 1
+      displayName = "probability of success",
+      description = "The probability of success (default = 0.5).",
+      commandLineParamName = "prob",
+      commandLineParamSynopsis = "-prob <double>",
+      displayOrder = 1
   )
   public double getProbabilityOfSuccess() {
     return backend.getProbabilityOfSuccess();
@@ -39,11 +39,11 @@ public class BinomialDistribution
   }
 
   @OptionMetadata(
-    displayName = "number of trials",
-    description = "The number of trials (default = 1).",
-    commandLineParamName = "n",
-    commandLineParamSynopsis = "-n <int>",
-    displayOrder = 1
+      displayName = "number of trials",
+      description = "The number of trials (default = 1).",
+      commandLineParamName = "n",
+      commandLineParamSynopsis = "-n <int>",
+      displayOrder = 1
   )
   public double getNumberOfTrials() {
     return numberOfTrials;
@@ -79,7 +79,7 @@ public class BinomialDistribution
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 
@@ -94,6 +94,7 @@ public class BinomialDistribution
 
   @Override
   public org.deeplearning4j.nn.conf.distribution.BinomialDistribution getBackend() {
-    return new org.deeplearning4j.nn.conf.distribution.BinomialDistribution(numberOfTrials, backend.getProbabilityOfSuccess());
+    return new org.deeplearning4j.nn.conf.distribution.BinomialDistribution(numberOfTrials,
+        backend.getProbabilityOfSuccess());
   }
 }

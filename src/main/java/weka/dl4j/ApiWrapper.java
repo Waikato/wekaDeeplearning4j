@@ -10,22 +10,22 @@ package weka.dl4j;
  */
 public interface ApiWrapper<T> {
 
-    /**
-     * Access the DL4J backend.
-     *
-     * @return DL4J backend for this wrapper
-     */
-    T getBackend();
+  /**
+   * Access the DL4J backend.
+   *
+   * @return DL4J backend for this wrapper
+   */
+  T getBackend();
 
-    /**
-     * Set the DL4J backend.
-     *
-     * @param newBackend Backend that should be wrapped by this class
-     */
-    void setBackend(T newBackend);
+  /**
+   * Set the DL4J backend.
+   *
+   * @param newBackend Backend that should be wrapped by this class
+   */
+  void setBackend(T newBackend);
 
-    /**
-     * Initialize the DL4J backend.
-     */
-    void initializeBackend();
+  /**
+   * Initialize the DL4J backend.
+   */
+  void initializeBackend();
 }

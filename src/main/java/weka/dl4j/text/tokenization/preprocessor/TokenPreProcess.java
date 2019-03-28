@@ -45,14 +45,14 @@ public abstract class TokenPreProcess<T extends org.deeplearning4j.text.tokeniza
   }
 
   @Override
-  public void setBackend(T newBackend) {
-    backend = newBackend;
-  }
-
-  @Override
   public T getBackend() {
     initializeBackend();
     return backend;
+  }
+
+  @Override
+  public void setBackend(T newBackend) {
+    backend = newBackend;
   }
 
   /**

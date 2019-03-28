@@ -4,17 +4,15 @@ package weka.dl4j.distribution;
 import java.io.Serializable;
 import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import weka.core.Option;
 import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
 
 /**
  * Abstract distribution class.
- * @param <T> Distribution implementation
  *
+ * @param <T> Distribution implementation
  * @author Steven Lang
  */
 @EqualsAndHashCode
@@ -36,7 +34,8 @@ public abstract class Distribution<T extends org.deeplearning4j.nn.conf.distribu
    */
   public static Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> create(
       org.deeplearning4j.nn.conf.distribution.Distribution newBackend) {
-    return ApiWrapperUtil.getImplementingWrapper(Distribution.class, newBackend, "weka.dl4j.distribution");
+    return ApiWrapperUtil
+        .getImplementingWrapper(Distribution.class, newBackend, "weka.dl4j.distribution");
   }
 
   @Override
@@ -49,7 +48,7 @@ public abstract class Distribution<T extends org.deeplearning4j.nn.conf.distribu
     this.backend = newBackend;
   }
 
-    /**
+  /**
    * Returns an enumeration describing the available options.
    *
    * @return an enumeration of all the available options.

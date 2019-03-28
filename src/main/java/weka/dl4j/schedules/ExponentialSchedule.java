@@ -21,11 +21,11 @@ public class ExponentialSchedule extends Schedule<org.nd4j.linalg.schedule.Expon
   private double gamma = 0.99;
 
   @OptionMetadata(
-    displayName = "gamma",
-    description = "The gamma value (default = 0.99).",
-    commandLineParamName = "gamma",
-    commandLineParamSynopsis = "-gamma <double>",
-    displayOrder = 2
+      displayName = "gamma",
+      description = "The gamma value (default = 0.99).",
+      commandLineParamName = "gamma",
+      commandLineParamSynopsis = "-gamma <double>",
+      displayOrder = 2
   )
   public double getGamma() {
     return gamma;
@@ -44,7 +44,8 @@ public class ExponentialSchedule extends Schedule<org.nd4j.linalg.schedule.Expon
 
   @Override
   public void initializeBackend() {
-    backend = new org.nd4j.linalg.schedule.ExponentialSchedule(scheduleType.getBackend(), initialValue, gamma);
+    backend = new org.nd4j.linalg.schedule.ExponentialSchedule(scheduleType.getBackend(),
+        initialValue, gamma);
   }
 
   /**
@@ -54,7 +55,7 @@ public class ExponentialSchedule extends Schedule<org.nd4j.linalg.schedule.Expon
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

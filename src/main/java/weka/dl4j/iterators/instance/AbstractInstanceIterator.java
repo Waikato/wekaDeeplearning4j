@@ -1,14 +1,13 @@
 
 package weka.dl4j.iterators.instance;
 
+import java.io.Serializable;
+import java.util.Enumeration;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.io.Serializable;
-import java.util.Enumeration;
 import weka.core.OptionMetadata;
 
 /**
@@ -20,10 +19,14 @@ import weka.core.OptionMetadata;
  */
 public abstract class AbstractInstanceIterator implements OptionHandler, Serializable {
 
-  /** The ID used for serialization */
+  /**
+   * The ID used for serialization
+   */
   private static final long serialVersionUID = 7440584973810993954L;
 
-  /** The batch size for the mini batches */
+  /**
+   * The batch size for the mini batches
+   */
   protected int batchSize = 1;
 
   /**
@@ -79,7 +82,7 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
   /**
    * Initialize the iterator
    */
-  public void initialize(){
+  public void initialize() {
     // Do nothing by default
   }
 
@@ -117,7 +120,7 @@ public abstract class AbstractInstanceIterator implements OptionHandler, Seriali
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

@@ -43,7 +43,7 @@ public class LossFMeasure extends LossFunction<org.nd4j.linalg.lossfunctions.imp
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

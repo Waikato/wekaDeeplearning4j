@@ -22,26 +22,26 @@ public class PolySchedule extends Schedule<org.nd4j.linalg.schedule.PolySchedule
   private int maxIter = 10;
 
   @OptionMetadata(
-    displayName = "maxIter",
-    description = "The maxIter value (default = 10). Should be set to numEpochs.",
-    commandLineParamName = "maxIter",
-    commandLineParamSynopsis = "-maxIter <maxIter>",
-    displayOrder = 2
+      displayName = "maxIter",
+      description = "The maxIter value (default = 10). Should be set to numEpochs.",
+      commandLineParamName = "maxIter",
+      commandLineParamSynopsis = "-maxIter <maxIter>",
+      displayOrder = 2
   )
   public int getMaxIter() {
     return maxIter;
   }
 
   public void setMaxIter(int maxIter) {
-    this.maxIter= maxIter;
+    this.maxIter = maxIter;
   }
 
   @OptionMetadata(
-    displayName = "power",
-    description = "The power value (default = 1.0).",
-    commandLineParamName = "power",
-    commandLineParamSynopsis = "-power <double>",
-    displayOrder = 3
+      displayName = "power",
+      description = "The power value (default = 1.0).",
+      commandLineParamName = "power",
+      commandLineParamSynopsis = "-power <double>",
+      displayOrder = 3
   )
   public double getPower() {
     return power;
@@ -53,12 +53,13 @@ public class PolySchedule extends Schedule<org.nd4j.linalg.schedule.PolySchedule
 
   @Override
   public void initializeBackend() {
-    backend = new org.nd4j.linalg.schedule.PolySchedule(scheduleType.getBackend(), initialValue, power, maxIter);
+    backend = new org.nd4j.linalg.schedule.PolySchedule(scheduleType.getBackend(), initialValue,
+        power, maxIter);
   }
 
   @Override
   public void setBackend(org.nd4j.linalg.schedule.PolySchedule newBackend) {
-    this.maxIter= newBackend.getMaxIter();
+    this.maxIter = newBackend.getMaxIter();
     this.power = newBackend.getPower();
     this.initialValue = newBackend.getInitialValue();
     this.scheduleType = ScheduleType.fromBackend(newBackend.getScheduleType());
@@ -71,7 +72,7 @@ public class PolySchedule extends Schedule<org.nd4j.linalg.schedule.PolySchedule
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

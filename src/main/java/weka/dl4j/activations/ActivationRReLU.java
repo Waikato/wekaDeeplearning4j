@@ -4,11 +4,10 @@ package weka.dl4j.activations;
 import static org.nd4j.linalg.activations.impl.ActivationRReLU.DEFAULT_L;
 import static org.nd4j.linalg.activations.impl.ActivationRReLU.DEFAULT_U;
 
+import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
-
-import java.util.Enumeration;
 import weka.core.OptionMetadata;
 
 /**
@@ -25,10 +24,12 @@ public class ActivationRReLU extends Activation<org.nd4j.linalg.activations.impl
 
   protected double lowerBound = DEFAULT_L;
   protected double upperBound = DEFAULT_U;
+
   @Override
   public void initializeBackend() {
     backend = new org.nd4j.linalg.activations.impl.ActivationRReLU();
   }
+
   @OptionMetadata(
       displayName = "lowerBound",
       description = "The lower bound (default = " + DEFAULT_L + ").",
@@ -92,7 +93,7 @@ public class ActivationRReLU extends Activation<org.nd4j.linalg.activations.impl
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
+   * @throws Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

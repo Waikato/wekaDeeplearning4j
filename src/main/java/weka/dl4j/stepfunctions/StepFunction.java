@@ -5,19 +5,14 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.nd4j.linalg.schedule.ISchedule;
 import weka.core.Option;
 import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
 import weka.dl4j.ApiWrapper;
 import weka.dl4j.ApiWrapperUtil;
-import weka.dl4j.schedules.ConstantSchedule;
-import weka.dl4j.schedules.ScheduleType;
-import weka.gui.ProgrammaticProperty;
 
 /**
- * StepFunction wrapper for Deeplearning4j's
- * {@link org.deeplearning4j.nn.conf.stepfunctions.StepFunction} classes.
+ * StepFunction wrapper for Deeplearning4j's {@link org.deeplearning4j.nn.conf.stepfunctions.StepFunction}
+ * classes.
  *
  * @author Steven Lang
  */
@@ -28,7 +23,9 @@ public abstract class StepFunction<T extends org.deeplearning4j.nn.conf.stepfunc
 
 
   private static final long serialVersionUID = -5534407859577624757L;
-  /** StepFunction that is backing the implementation */
+  /**
+   * StepFunction that is backing the implementation
+   */
   T backend;
 
   public StepFunction() {
@@ -43,18 +40,19 @@ public abstract class StepFunction<T extends org.deeplearning4j.nn.conf.stepfunc
    */
   public static StepFunction<? extends org.deeplearning4j.nn.conf.stepfunctions.StepFunction> create(
       org.deeplearning4j.nn.conf.stepfunctions.StepFunction newBackend) {
-    return ApiWrapperUtil.getImplementingWrapper(StepFunction.class, newBackend, "weka.dl4j.stepfunctions");
-  }
-
-  @Override
-  public void setBackend(T newBackend) {
-    backend = newBackend;
+    return ApiWrapperUtil
+        .getImplementingWrapper(StepFunction.class, newBackend, "weka.dl4j.stepfunctions");
   }
 
   @Override
   public T getBackend() {
     initializeBackend();
     return backend;
+  }
+
+  @Override
+  public void setBackend(T newBackend) {
+    backend = newBackend;
   }
 
   /**

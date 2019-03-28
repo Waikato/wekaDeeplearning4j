@@ -18,7 +18,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import weka.dl4j.GradientNormalization;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.After;
@@ -69,27 +68,45 @@ import weka.util.DatasetLoader;
 @Log4j2
 public class NeuralNetConfigurationTest {
 
-  /** Default number of epochs */
+  /**
+   * Default number of epochs
+   */
   private static final int DEFAULT_NUM_EPOCHS = 1;
 
-  /** Seed */
+  /**
+   * Seed
+   */
   private static final int SEED = 42;
 
-  /** Default batch size */
+  /**
+   * Default batch size
+   */
   private static final int DEFAULT_BATCHSIZE = 32;
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Classifier */
-  private Dl4jMlpClassifier clf;
-  /** Dataset mnist */
-  private Instances dataMnist;
-  /** Mnist image loader */
-  private ImageInstanceIterator idiMnist;
-  /** Start time for time measurement */
-  private long startTime;
-
-  /** Fail message builder */
+  /**
+   * Current name
+   */
+  @Rule
+  public TestName name = new TestName();
+  /**
+   * Fail message builder
+   */
   StringBuilder failMessage = new StringBuilder();
+  /**
+   * Classifier
+   */
+  private Dl4jMlpClassifier clf;
+  /**
+   * Dataset mnist
+   */
+  private Instances dataMnist;
+  /**
+   * Mnist image loader
+   */
+  private ImageInstanceIterator idiMnist;
+  /**
+   * Start time for time measurement
+   */
+  private long startTime;
 
   @Before
   public void before() throws Exception {
@@ -222,7 +239,7 @@ public class NeuralNetConfigurationTest {
 
   @Test
   public void testGradientNormalizationThreshold() throws Exception {
-    for (double gradientNormalizationThreshold : new double[] {0.0, 0.1, 1.0, 10}) {
+    for (double gradientNormalizationThreshold : new double[]{0.0, 0.1, 1.0, 10}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setGradientNormalizationThreshold(gradientNormalizationThreshold);
       checkAppliedParameters(
@@ -242,7 +259,7 @@ public class NeuralNetConfigurationTest {
   @Test
   public void testWeightNoise() throws Exception {
     for (AbstractWeightNoise wn :
-        new AbstractWeightNoise[] {new DropConnect(), new WeightNoise()}) {
+        new AbstractWeightNoise[]{new DropConnect(), new WeightNoise()}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setWeightNoise(wn);
       checkAppliedParameters(conf, wn, BaseLayer::getWeightNoise);
@@ -298,8 +315,8 @@ public class NeuralNetConfigurationTest {
   @Test
   public void testDropout() throws Exception {
     for (AbstractDropout dropout :
-        new AbstractDropout[] {
-          new AlphaDropout(), new Dropout(), new GaussianDropout(), new GaussianNoise()
+        new AbstractDropout[]{
+            new AlphaDropout(), new Dropout(), new GaussianDropout(), new GaussianNoise()
         }) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setDropout(dropout);
@@ -309,7 +326,7 @@ public class NeuralNetConfigurationTest {
 
   @Test
   public void testL1() throws Exception {
-    for (double l1 : new double[] {0.0, 0.1, 1.0, 10}) {
+    for (double l1 : new double[]{0.0, 0.1, 1.0, 10}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setL1(l1);
       checkAppliedParameters(conf, l1, BaseLayer::getL1);
@@ -318,7 +335,7 @@ public class NeuralNetConfigurationTest {
 
   @Test
   public void testL2() throws Exception {
-    for (double l2 : new double[] {0.0, 0.2, 2.0, 20}) {
+    for (double l2 : new double[]{0.0, 0.2, 2.0, 20}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setL2(l2);
       checkAppliedParameters(conf, l2, BaseLayer::getL2);
@@ -327,7 +344,7 @@ public class NeuralNetConfigurationTest {
 
   @Test
   public void testBiasInit() throws Exception {
-    for (double biasInit : new double[] {0.0, 1.0, 10}) {
+    for (double biasInit : new double[]{0.0, 1.0, 10}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setBiasInit(biasInit);
       checkAppliedParameters(conf, biasInit, BaseLayer::getBiasInit);
@@ -337,14 +354,14 @@ public class NeuralNetConfigurationTest {
   @Test
   public void testDistribution() throws Exception {
     for (Distribution dist :
-        new Distribution[] {
-          new ConstantDistribution(),
-          new LogNormalDistribution(),
-          new OrthogonalDistribution(),
-          new TruncatedNormalDistribution(),
-          new BinomialDistribution(),
-          new NormalDistribution(),
-          new UniformDistribution()
+        new Distribution[]{
+            new ConstantDistribution(),
+            new LogNormalDistribution(),
+            new OrthogonalDistribution(),
+            new TruncatedNormalDistribution(),
+            new BinomialDistribution(),
+            new NormalDistribution(),
+            new UniformDistribution()
         }) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setDist(dist);

@@ -21,11 +21,11 @@ public class StepSchedule extends Schedule<org.nd4j.linalg.schedule.StepSchedule
   private double decayRate = 0.99;
 
   @OptionMetadata(
-    displayName = "decayRate",
-    description = "The decayRate value (default = 0.99).",
-    commandLineParamName = "decayRate",
-    commandLineParamSynopsis = "-decayRate <double>",
-    displayOrder = 2
+      displayName = "decayRate",
+      description = "The decayRate value (default = 0.99).",
+      commandLineParamName = "decayRate",
+      commandLineParamSynopsis = "-decayRate <double>",
+      displayOrder = 2
   )
   public double getDecayRate() {
     return decayRate;
@@ -36,11 +36,11 @@ public class StepSchedule extends Schedule<org.nd4j.linalg.schedule.StepSchedule
   }
 
   @OptionMetadata(
-    displayName = "step",
-    description = "The step value (default = 10).",
-    commandLineParamName = "step",
-    commandLineParamSynopsis = "-step <step>",
-    displayOrder = 2
+      displayName = "step",
+      description = "The step value (default = 10).",
+      commandLineParamName = "step",
+      commandLineParamSynopsis = "-step <step>",
+      displayOrder = 2
   )
   public double getStep() {
     return step;
@@ -72,7 +72,7 @@ public class StepSchedule extends Schedule<org.nd4j.linalg.schedule.StepSchedule
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

@@ -42,20 +42,34 @@ import weka.gui.ProgrammaticProperty;
 public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInstanceIterator {
 
   private static final long serialVersionUID = -7281727147475986632L;
-  /** Loaded word vectors */
+  /**
+   * Loaded word vectors
+   */
   public transient WordVectors wordVectors;
-  /** Word vector file location */
+  /**
+   * Word vector file location
+   */
   protected File wordVectorLocation = new File(System.getProperty("user.home"));
-  /** Token pre processor */
+  /**
+   * Token pre processor
+   */
   protected TokenPreProcess tokenPreProcess = new CommonPreProcessor();
-  /** Tokenizer factory */
+  /**
+   * Tokenizer factory
+   */
   protected TokenizerFactory tokenizerFactory = new DefaultTokenizerFactory();
-  /** Stop words */
+  /**
+   * Stop words
+   */
   protected Dl4jAbstractStopwords stopwords = new Dl4jRainbow();
-  /** Truncation length (maximum number of tokens per document) */
+  /**
+   * Truncation length (maximum number of tokens per document)
+   */
   protected int truncateLength = 100;
 
-  /** Initialize the word vectors from the given file */
+  /**
+   * Initialize the word vectors from the given file
+   */
   public void initWordVectors() {
 
     if (wordVectors != null) {
@@ -83,7 +97,9 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
     }
   }
 
-  /** Load wordVectors from a gzipped csv file */
+  /**
+   * Load wordVectors from a gzipped csv file
+   */
   private void loadGZipped() {
     try {
       wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
@@ -149,7 +165,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
    */
   private boolean loadEmbeddingFromCSV(File f) {
     // Try different separators
-    for (String sep : new String[] {" ", ";", ",", "\t", "\\w", ":"}) {
+    for (String sep : new String[]{" ", ";", ",", "\t", "\\w", ":"}) {
       boolean success = loadEmbeddingFromCSV(sep, f);
       if (success) {
         return true;
@@ -163,7 +179,6 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
    *
    * @param separator Separator for CSV interpretation
    * @param file CSV file
-   * @return
    */
   private boolean loadEmbeddingFromCSV(String separator, File file) {
     try {
@@ -174,7 +189,9 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
       String line;
       // Replace separator with whitespace in each line for dl4j parsing
       while ((line = br.readLine()) != null) {
-        if (!line.contains(separator)) return false; // Continue to the next separator
+          if (!line.contains(separator)) {
+              return false; // Continue to the next separator
+          }
         bw.write(line.replaceAll(separator, " "));
         bw.newLine();
       }
@@ -237,11 +254,11 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   }
 
   @OptionMetadata(
-    displayName = "truncation length",
-    description = "The maximum number of tokens per document (default = 100).",
-    commandLineParamName = "truncationLength",
-    commandLineParamSynopsis = "-truncationLength <int>",
-    displayOrder = 2
+      displayName = "truncation length",
+      description = "The maximum number of tokens per document (default = 100).",
+      commandLineParamName = "truncationLength",
+      commandLineParamSynopsis = "-truncationLength <int>",
+      displayOrder = 2
   )
   public int getTruncateLength() {
     return truncateLength;
@@ -252,11 +269,11 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   }
 
   @OptionMetadata(
-    displayName = "location of word vectors",
-    description = "The word vectors location.",
-    commandLineParamName = "wordVectorLocation",
-    commandLineParamSynopsis = "-wordVectorLocation <string>",
-    displayOrder = 3
+      displayName = "location of word vectors",
+      description = "The word vectors location.",
+      commandLineParamName = "wordVectorLocation",
+      commandLineParamSynopsis = "-wordVectorLocation <string>",
+      displayOrder = 3
   )
   public File getWordVectorLocation() {
     return wordVectorLocation;
@@ -272,11 +289,11 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   }
 
   @OptionMetadata(
-    displayName = "token pre processor",
-    description = "The token pre processor.",
-    commandLineParamName = "tokenPreProcessor",
-    commandLineParamSynopsis = "-tokenPreProcessor <string>",
-    displayOrder = 4
+      displayName = "token pre processor",
+      description = "The token pre processor.",
+      commandLineParamName = "tokenPreProcessor",
+      commandLineParamSynopsis = "-tokenPreProcessor <string>",
+      displayOrder = 4
   )
   public TokenPreProcess getTokenPreProcess() {
     return tokenPreProcess;
@@ -287,11 +304,11 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   }
 
   @OptionMetadata(
-    displayName = "tokenizer factory",
-    description = "The tokenizer factory.",
-    commandLineParamName = "tokenizerFactory",
-    commandLineParamSynopsis = "-tokenizerFactory <string>",
-    displayOrder = 5
+      displayName = "tokenizer factory",
+      description = "The tokenizer factory.",
+      commandLineParamName = "tokenizerFactory",
+      commandLineParamSynopsis = "-tokenizerFactory <string>",
+      displayOrder = 5
   )
   public TokenizerFactory getTokenizerFactory() {
     return tokenizerFactory;
@@ -302,11 +319,11 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
   }
 
   @OptionMetadata(
-    displayName = "stop words",
-    description = "The stop words to use.",
-    commandLineParamName = "stopWords",
-    commandLineParamSynopsis = "-stopWords <string>",
-    displayOrder = 5
+      displayName = "stop words",
+      description = "The stop words to use.",
+      commandLineParamName = "stopWords",
+      commandLineParamSynopsis = "-stopWords <string>",
+      displayOrder = 5
   )
   public Dl4jAbstractStopwords getStopwords() {
     return stopwords;
@@ -339,7 +356,7 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
    * @param data Data
    * @return Sentence provider
    */
-  public LabeledSentenceProvider getSentenceProvider(Instances data){
+  public LabeledSentenceProvider getSentenceProvider(Instances data) {
     List<String> sentences = new ArrayList<>();
     List<String> labels = new ArrayList<>();
     final int clsIdx = data.classIndex();

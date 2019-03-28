@@ -2,7 +2,6 @@
 package weka.dl4j.updater;
 
 import java.util.Enumeration;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import weka.core.Option;
@@ -16,14 +15,16 @@ import weka.core.OptionMetadata;
 @EqualsAndHashCode(callSuper = true)
 @ToString
 public class AdaMax extends Updater<org.nd4j.linalg.learning.config.AdaMax> {
+
   private static final long serialVersionUID = 9196053591015785889L;
 
   @OptionMetadata(
-    displayName = "beta1MeanDecay",
-    description = "The mean decay (default = " + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_BETA1_MEAN_DECAY + ").",
-    commandLineParamName = "beta1MeanDecay",
-    commandLineParamSynopsis = "-beta1MeanDecay <double>",
-    displayOrder = 1
+      displayName = "beta1MeanDecay",
+      description = "The mean decay (default = "
+          + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_BETA1_MEAN_DECAY + ").",
+      commandLineParamName = "beta1MeanDecay",
+      commandLineParamSynopsis = "-beta1MeanDecay <double>",
+      displayOrder = 1
   )
   public double getBeta1() {
     return backend.getBeta1();
@@ -34,11 +35,12 @@ public class AdaMax extends Updater<org.nd4j.linalg.learning.config.AdaMax> {
   }
 
   @OptionMetadata(
-    displayName = "beta2VarDecay",
-    description = "The var decay (default = " + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_BETA2_VAR_DECAY + ").",
-    commandLineParamName = "beta2VarDecay",
-    commandLineParamSynopsis = "-beta2VarDecay <double>",
-    displayOrder = 2
+      displayName = "beta2VarDecay",
+      description = "The var decay (default = "
+          + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_BETA2_VAR_DECAY + ").",
+      commandLineParamName = "beta2VarDecay",
+      commandLineParamSynopsis = "-beta2VarDecay <double>",
+      displayOrder = 2
   )
   public double getBeta2() {
     return backend.getBeta2();
@@ -49,11 +51,12 @@ public class AdaMax extends Updater<org.nd4j.linalg.learning.config.AdaMax> {
   }
 
   @OptionMetadata(
-    displayName = "epsilon",
-    description = "The epsilon parameter (default = " + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_EPSILON + ").",
-    commandLineParamName = "epsilon",
-    commandLineParamSynopsis = "-epsilon <double>",
-    displayOrder = 3
+      displayName = "epsilon",
+      description = "The epsilon parameter (default = "
+          + org.nd4j.linalg.learning.config.AdaMax.DEFAULT_ADAMAX_EPSILON + ").",
+      commandLineParamName = "epsilon",
+      commandLineParamSynopsis = "-epsilon <double>",
+      displayOrder = 3
   )
   public double getEpsilon() {
     return backend.getEpsilon();
@@ -75,7 +78,7 @@ public class AdaMax extends Updater<org.nd4j.linalg.learning.config.AdaMax> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

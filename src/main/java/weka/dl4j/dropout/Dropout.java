@@ -64,7 +64,7 @@ public class Dropout extends AbstractDropout<org.deeplearning4j.nn.conf.dropout.
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

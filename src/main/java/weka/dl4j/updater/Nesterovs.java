@@ -6,22 +6,22 @@ import static org.nd4j.linalg.learning.config.Nesterovs.DEFAULT_NESTEROV_MOMENTU
 import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionMetadata;
-import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's Nesterovs.
  *
  * @author Steven Lang
  */
-public class Nesterovs extends  Updater<org.nd4j.linalg.learning.config.Nesterovs> {
+public class Nesterovs extends Updater<org.nd4j.linalg.learning.config.Nesterovs> {
+
   private static final long serialVersionUID = 927121528229628203L;
 
   @OptionMetadata(
-    displayName = "momentum",
-    description = "The momentum (default = " + DEFAULT_NESTEROV_MOMENTUM + ").",
-    commandLineParamName = "momentum",
-    commandLineParamSynopsis = "-momentum <double>",
-    displayOrder = 1
+      displayName = "momentum",
+      description = "The momentum (default = " + DEFAULT_NESTEROV_MOMENTUM + ").",
+      commandLineParamName = "momentum",
+      commandLineParamSynopsis = "-momentum <double>",
+      displayOrder = 1
   )
   public double getMomentum() {
     return backend.getMomentum();
@@ -43,7 +43,7 @@ public class Nesterovs extends  Updater<org.nd4j.linalg.learning.config.Nesterov
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**

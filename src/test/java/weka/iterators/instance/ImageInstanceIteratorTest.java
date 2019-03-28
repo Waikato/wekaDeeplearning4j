@@ -1,6 +1,13 @@
 
 package weka.iterators.instance;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,16 +21,6 @@ import weka.core.InvalidInputDataException;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.util.DatasetLoader;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InvalidObjectException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * JUnit tests for the ImageInstanceIterator {@link ImageInstanceIterator}
  *
@@ -31,12 +28,18 @@ import java.util.stream.Collectors;
  */
 public class ImageInstanceIteratorTest {
 
-  /** Seed */
+  /**
+   * Seed
+   */
   private static final int SEED = 42;
-  /** ImageInstanceIterator object */
+  /**
+   * ImageInstanceIterator object
+   */
   private ImageInstanceIterator idi;
 
-  /** Initialize iterator */
+  /**
+   * Initialize iterator
+   */
   @Before
   public void init() {
     this.idi = new ImageInstanceIterator();
@@ -87,7 +90,9 @@ public class ImageInstanceIteratorTest {
     this.idi.validate(metaData);
   }
 
-  /** Test */
+  /**
+   * Test
+   */
   @Test
   public void testGetImageRecordReader() throws Exception {
     final Instances metaData = DatasetLoader.loadMiniMnistMeta();
@@ -109,7 +114,9 @@ public class ImageInstanceIteratorTest {
     Assert.assertTrue(irr.getLabels().containsAll(labels));
   }
 
-  /** Test getDataSetIterator */
+  /**
+   * Test getDataSetIterator
+   */
   @Test
   public void testGetIterator() throws Exception {
     final Instances metaData = DatasetLoader.loadMiniMnistMeta();
@@ -146,7 +153,7 @@ public class ImageInstanceIteratorTest {
     ImageInstanceIterator imgIter = DatasetLoader.loadMiniMnistImageIterator();
 
     final int seed = 1;
-    for (int batchSize : new int[] {1, 2, 5, 10}) {
+    for (int batchSize : new int[]{1, 2, 5, 10}) {
       final int actual = countIterations(data, imgIter, seed, batchSize);
       final int expected = data.numInstances() / batchSize;
       Assert.assertEquals(expected, actual);
@@ -161,7 +168,6 @@ public class ImageInstanceIteratorTest {
    * @param seed Seed
    * @param batchsize Size of the batch which is returned in {@see DataSetIterator#next}
    * @return Number of iterations
-   * @throws Exception
    */
   private int countIterations(
       Instances data, ImageInstanceIterator imgIter, int seed, int batchsize) throws Exception {

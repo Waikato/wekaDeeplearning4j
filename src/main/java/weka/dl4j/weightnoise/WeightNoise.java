@@ -6,10 +6,10 @@ import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
-import weka.dl4j.distribution.Distribution;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.distribution.Distribution;
 
 /**
  * Weight noise wrapper.
@@ -18,18 +18,19 @@ import weka.core.OptionMetadata;
  */
 @EqualsAndHashCode(callSuper = true)
 @ToString
-public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.weightnoise.WeightNoise>
+public class WeightNoise extends
+    AbstractWeightNoise<org.deeplearning4j.nn.conf.weightnoise.WeightNoise>
     implements OptionHandler, Serializable {
 
   private static final long serialVersionUID = 7880719223147030268L;
 
 
   @OptionMetadata(
-    displayName = "distribution",
-    description = "The weight noise distribution (default = NormalDistribution(0,1)).",
-    commandLineParamName = "distribution",
-    commandLineParamSynopsis = "-distribution <Distribution>",
-    displayOrder = 1
+      displayName = "distribution",
+      description = "The weight noise distribution (default = NormalDistribution(0,1)).",
+      commandLineParamName = "distribution",
+      commandLineParamSynopsis = "-distribution <Distribution>",
+      displayOrder = 1
   )
   public Distribution<? extends org.deeplearning4j.nn.conf.distribution.Distribution> getDistribution() {
     return Distribution.create(backend.getDistribution());
@@ -41,13 +42,12 @@ public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
   }
 
 
-
   @OptionMetadata(
-    displayName = "applyToBias",
-    description = "Whether to apply it to the bias as well (default = false).",
-    commandLineParamName = "applyToBias",
-    commandLineParamSynopsis = "-applyToBias <boolean>",
-    displayOrder = 2
+      displayName = "applyToBias",
+      description = "Whether to apply it to the bias as well (default = false).",
+      commandLineParamName = "applyToBias",
+      commandLineParamSynopsis = "-applyToBias <boolean>",
+      displayOrder = 2
   )
   public boolean isApplyToBias() {
     return backend.isApplyToBias();
@@ -58,11 +58,11 @@ public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
   }
 
   @OptionMetadata(
-    displayName = "isAdditive",
-    description = "Whether noise is added to weights or multiplied (default = true).",
-    commandLineParamName = "isAdditive",
-    commandLineParamSynopsis = "-isAdditive <boolean>",
-    displayOrder = 2
+      displayName = "isAdditive",
+      description = "Whether noise is added to weights or multiplied (default = true).",
+      commandLineParamName = "isAdditive",
+      commandLineParamSynopsis = "-isAdditive <boolean>",
+      displayOrder = 2
   )
   public boolean isAdditive() {
     return backend.isAdditive();
@@ -84,7 +84,7 @@ public class WeightNoise extends AbstractWeightNoise<org.deeplearning4j.nn.conf.
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
   }
 
   /**
