@@ -23,7 +23,7 @@ Author=Christopher Beckham, Eibe Frank, Mark Hall, Steven Lang and Felipe Bravo
 Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>
 
 # License (required)
-License=GPL 3.0
+License=None
 
 Description=Provides access to classifiers and filters using the Deeplearning4j library. Deep neural networks can be built using a multitude of different layers, activations, lossfunctions and more. See https://deeplearning.cms.waikato.ac.nz/install#add-gpu-support to add CUDA support.
 

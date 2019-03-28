@@ -5,7 +5,6 @@
 # WekaDeeplearning4j
 
 [![GitHub release](https://img.shields.io/github/release/Waikato/wekaDeeplearning4j.svg)](https://GitHub.com/Waikato/wekaDeeplearning4j/releases/)
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 [![Build Status](https://travis-ci.com/Waikato/wekaDeeplearning4j.svg?branch=master)](https://travis-ci.com/Waikato/wekaDeeplearning4j)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Waikato/wekaDeeplearning4j/issues)
 
