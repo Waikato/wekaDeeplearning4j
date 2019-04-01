@@ -33,6 +33,7 @@ import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -41,6 +42,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.factory.Nd4jBackend;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
@@ -71,6 +73,7 @@ import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -131,6 +134,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * The actual neural network model.
    */
   protected transient ComputationGraph model;
+  /** Used to leverage multiple GPUs (if available) */
+  protected transient ParallelWrapper parallelWrapper;
+
   /**
    * The model zoo model.
    */
@@ -226,10 +232,68 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected boolean resume;
 
   /**
-   * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching)
-   * when starting or resuming learning
+   * Whether to leave the filesystem data cache intact (if using FILESYSTEM
+   * caching) when starting or resuming learning
    */
   protected boolean doNotClearFilesystemCache;
+
+  /**
+   * Number of physical GPUs available. If greater than 1, then data-parallel
+   * training + parameter averaging is used to leverage multiple GPUs. Ignored
+   * entirely if there is no GPU backend available.
+   */
+  protected int numGPUs = 1;
+
+  /**
+   * Size of the prefetch buffer when leveraging multiple GPUs. Ignored if there
+   * is only one GPU, or there is no GPU backend available.
+   */
+  protected int prefetchBufferSize = 2;
+
+  /**
+   * How often (in epochs) to average model parameters when leveraging multiple
+   * GPUs. Ignored if there is only one GPU, or if there is no GPU backend
+   * available.
+   */
+  protected int averagingFrequency = 3;
+
+  /** True if the Cuda/GPU backend is available */
+  protected boolean gpuBackendAvailable;
+
+  protected static boolean s_cudaMultiGPUSet;
+
+  public Dl4jMlpClassifier() {
+    if (!s_cudaMultiGPUSet) {
+      try {
+        ClassLoader packageLoader = WekaPackageClassLoaderManager.getWekaPackageClassLoaderManager()
+          .getLoaderForClass(this.getClass().getCanonicalName());
+
+        Class<?> cudaEnvClass = Class
+          .forName("org.nd4j.jita.conf.CudaEnvironment", true, packageLoader);
+        Method m = cudaEnvClass.getMethod("getInstance");
+        Object result = m.invoke(null);
+        if (result == null) {
+          log.info("Unable to get CudaEnvironment instance");
+        } else {
+          m = result.getClass().getMethod("getConfiguration");
+          result = m.invoke(result);
+          if (result == null) {
+            log.info("Unable to get Configuration from CudaEnvironment");
+          } else {
+            log.info("Turning on multiple GPU support");
+            m = result.getClass().getMethod("allowMultiGPU", boolean.class);
+            m.invoke(result, true);
+
+            //TODO add allow cross device access
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        s_cudaMultiGPUSet = true;
+      }
+    }
+  }
 
   /**
    * Get the log configuration.
@@ -671,6 +735,50 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return doNotClearFilesystemCache;
   }
 
+  @OptionMetadata(
+    displayName = "Number of GPUs",
+    description = "Number of available GPUs (ignored if no GPU backend available)",
+    commandLineParamName = "numGPUs",
+    commandLineParamSynopsis = "-numGPUs <integer>",
+    displayOrder = 33)
+  public void setNumGPUs(int numGPUs) {
+    this.numGPUs = numGPUs;
+  }
+
+  public int getNumGPUs() {
+    return numGPUs;
+  }
+
+  @OptionMetadata(displayName = "Size of prefetch buffer for multiple GPUs",
+  description = "Size of the prefetch buffer that will be used for background "
+    + "data prefetching (0 = disable prefetch). Ignored if there is only one "
+    + "GPU, or no GPU backend available.",
+  commandLineParamName = "prefetchSize",
+  commandLineParamSynopsis = "-prefetchSize <integer>",
+  displayOrder = 34)
+  public void setPrefetchBufferSize(int prefetchBufferSize) {
+    this.prefetchBufferSize = prefetchBufferSize;
+  }
+
+  public int getPrefetchBufferSize() {
+    return prefetchBufferSize;
+  }
+
+  @OptionMetadata(displayName = "Model parameter averaging frequency",
+  description = "How often (in epochs) to average model parameters when leveraging "
+    + "multiple GPUs (ignored if there is only one GPU, or no GPU backend "
+    + "available).",
+    commandLineParamName = "averagingFrequency",
+  commandLineParamSynopsis = "-averagingFrequency <integer>",
+  displayOrder = 35)
+  public void setParameterAveragingFrequency(int frequency) {
+    averagingFrequency = frequency;
+  }
+
+  public int getParameterAveragingFrequency() {
+    return averagingFrequency;
+  }
+
   /**
    * The method used to train the classifier.
    *
@@ -679,6 +787,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   @Override
   public void buildClassifier(Instances data) throws Exception {
+    Nd4jBackend b = Nd4j.getBackend();
+    if (b != null) {
+      gpuBackendAvailable = b.getClass().getCanonicalName()
+        .toLowerCase().contains("jcublas");
+    }
     log.info("Building on {} training instances", data.numInstances());
 
     // Initialize classifier
@@ -698,6 +811,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     done();
   }
 
+  protected void initParallelWrapperIfApplicable() {
+
+    // only configure if the gpu backend is available and the user has requested
+    // more than one gpus
+    if (gpuBackendAvailable) {
+      log.info("GPU backend available");
+    }
+    if (gpuBackendAvailable && getNumGPUs() > 1) {
+      if (prefetchBufferSize > 0 &&  prefetchBufferSize < getNumGPUs()) {
+        prefetchBufferSize = getNumGPUs();
+      }
+
+      log.info("Initializing for parallel training on {} GPUs", getNumGPUs());
+      parallelWrapper = new ParallelWrapper.Builder(model)
+        .prefetchBuffer(getPrefetchBufferSize())
+        .workers(getNumGPUs())
+        .averagingFrequency(getParameterAveragingFrequency())
+        .build();
+    }
+  }
+
   /**
    * The method used to initialize the classifier.
    *
@@ -711,6 +845,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     if (trainData != null && trainData.numInstances() > 0) {
       // Resume run: only initialize iterator
       trainIterator = getDataSetIterator(trainData);
+      if (model  != null) {
+        initParallelWrapperIfApplicable();
+      }
       return;
     }
 
@@ -791,6 +928,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       // Set the iteration listener
       model.setListeners(getListener());
 
+      initParallelWrapperIfApplicable();
       isInitializationFinished = true;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
@@ -900,7 +1038,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         cacheDirSuffix.isEmpty() ? "" : "-" + cacheDirSuffix;
       final File cacheDir =
         Paths.get(tmpDir, "dataset-cache" + suffix).toFile();
-      if (cacheDir.exists() && cacheDir.isDirectory() && !getDoNotClearFilesystemCache()) {
+      if (cacheDir.exists() && cacheDir.isDirectory()
+        && !getDoNotClearFilesystemCache()) {
         // delete contents then directory
         File[] fs = cacheDir.listFiles();
         for (File f : fs) {
@@ -1321,7 +1460,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         this.getClass().getClassLoader());
       StopWatch sw = new StopWatch();
       sw.start();
-      model.fit(trainIterator);
+      if (parallelWrapper != null) {
+        parallelWrapper.fit(trainIterator);
+      } else {
+        model.fit(trainIterator);
+      }
       trainIterator.reset();
       sw.stop();
       numEpochsPerformed++;

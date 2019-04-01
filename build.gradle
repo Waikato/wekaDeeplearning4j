@@ -268,6 +268,7 @@ dependencies {
     implementation "org.deeplearning4j:deeplearning4j-core:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-nlp:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-zoo:$versions.dl4j"
+    implementation "org.deeplearning4j:deeplearning4j-parallel-wrapper_2.11:$versions.dl4j"
     implementation "org.nd4j:nd4j-jackson:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-platform:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-api:$versions.nd4j"
