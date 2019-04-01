@@ -88,6 +88,8 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
    */
   @Override
   public void initializeClassifier(Instances data) throws Exception {
+    // Set the logging configuration
+    logConfig.apply();
 
     // Can classifier handle the data?
     getCapabilities().testWithFail(data);
@@ -122,27 +124,22 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     }
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+
+    // Apply preprocessing
+    data = preProcessInput(data);
+    data = initEarlyStopping(data);
+    saveLabelSortIndex(data);
+
+    if (data != null) {
+      this.trainData = data;
+    }else{
+      return;
+    }
+
     try {
       Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
-      data = initEarlyStopping(data);
-      this.trainData = data;
-
-      instanceIterator.initialize();
-
-      // Could be null due to resuming from a previous run
-      if (model == null) {
-        createModel();
-      }
-
-      // Setup the datasetiterators (needs to be done after the model initialization)
-      trainIterator = getDataSetIterator(this.trainData);
-
-      // Set the iteration listener
-      model.setListeners(getListener());
-
-      numEpochsPerformedThisSession = 0;
-      maxEpochs += numEpochs; // set the current upper bound
+      finishClassifierInitialization();
 
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);

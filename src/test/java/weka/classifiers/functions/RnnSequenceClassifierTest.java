@@ -482,4 +482,50 @@ public class RnnSequenceClassifierTest {
 
     Files.delete(Paths.get(clfPath));
   }
+
+  @Test
+  public void testSerialization() throws Exception {
+    // Define layers
+    LSTM lstm1 = new LSTM();
+    lstm1.setNOut(5);
+    lstm1.setActivationFunction(new ActivationTanH());
+
+    RnnOutputLayer rnnOut = new RnnOutputLayer();
+    rnnOut.setLossFn(new LossMSE());
+    rnnOut.setActivationFunction(new ActivationIdentity());
+
+    // Network config
+    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+    nnc.setL2(1e-5);
+    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+    nnc.setGradientNormalizationThreshold(1.0);
+    Adam opt = new Adam();
+    opt.setLearningRate(0.02);
+    nnc.setUpdater(opt);
+
+    // Config classifier
+    clf.setLayers(lstm1, rnnOut);
+    clf.setNeuralNetConfiguration(nnc);
+    clf.settBPTTbackwardLength(2);
+    clf.settBPTTforwardLength(2);
+    int numEpochs = 5;
+    clf.setNumEpochs(numEpochs);
+
+    // Randomize data
+    data = DatasetLoader.loadAnger();
+    data.randomize(new Random(42));
+
+    // Build clf
+    clf.buildClassifier(data);
+
+    // Save classifier
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    String clfPath = Paths.get(tmpDir, "lstm-clf.ser").toString();
+    saveClf(clfPath, clf);
+
+    // Reload classifier
+    RnnSequenceClassifier clfLoaded = (RnnSequenceClassifier) readClf(clfPath);
+
+    clfLoaded.distributionsForInstances(data);
+  }
 }
