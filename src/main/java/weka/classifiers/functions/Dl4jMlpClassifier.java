@@ -713,6 +713,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   @Override
   public void initializeClassifier(Instances data) throws Exception {
+    // Set the logging configuration
     logConfig.apply();
 
     if (trainData != null && trainData.numInstances() > 0) {
@@ -771,37 +772,46 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       Thread.currentThread().setContextClassLoader(
           this.getClass().getClassLoader());
 
-      // Could be non-null due to resuming from a previous run
-      if (model == null || !resume) {
-        // If zoo model was set, use this model as internal MultiLayerNetwork
-        if (useZooModel()) {
-          createZooModel();
-        } else {
-          createModel();
-        }
-      }
-      // Initialize iterator
-      instanceIterator.initialize();
+      finishClassifierInitialization();
 
-      // Setup the datasetiterators (needs to be done after the model
-      // initialization)
-      trainIterator = getDataSetIterator(this.trainData);
-
-      // Print model architecture
-      if (getDebug()) {
-        log.info(model.conf().toYaml());
-      }
-
-      numEpochsPerformedThisSession = 0;
-      maxEpochs += numEpochs; // set the current upper bound
-
-      // Set the iteration listener
-      model.setListeners(getListener());
-
-      isInitializationFinished = true;
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  /**
+   * Finish the classifier initialization.
+   *
+   * Contains common execution parts for both, Dl4jMlpClassifier and RnnSequence Classifier.
+   *
+   * @throws Exception Could not create model or could not get the dataset iterator.
+   */
+  protected void finishClassifierInitialization() throws Exception {
+    // Could be non-null due to resuming from a previous run
+    if (model == null || !resume) {
+      // If zoo model was set, use this model as internal MultiLayerNetwork
+      if (useZooModel()) {
+        createZooModel();
+      } else {
+        createModel();
+      }
+    }
+    // Initialize iterator
+    instanceIterator.initialize();
+
+    // Setup the datasetiterators (needs to be done after the model
+    // initialization)
+    trainIterator = getDataSetIterator(this.trainData);
+
+    // Update epoch counter
+    numEpochsPerformedThisSession = 0;
+    maxEpochs += numEpochs; // set the current upper bound
+
+    // Set the iteration listener
+    model.setListeners(getListener());
+
+    // Flag initialization as finished
+    isInitializationFinished = true;
   }
 
   /**
