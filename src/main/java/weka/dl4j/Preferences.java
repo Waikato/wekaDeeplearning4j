@@ -26,6 +26,8 @@ import org.deeplearning4j.nn.conf.WorkspaceMode;
  * @author Steven Lang
  */
 public class Preferences {
-  /** Global workspace mode */
-  public static WorkspaceMode WORKSPACE_MODE = WorkspaceMode.ENABLED;
+    /**
+     * Global workspace mode
+     */
+    public static WorkspaceMode WORKSPACE_MODE = WorkspaceMode.ENABLED;
 }

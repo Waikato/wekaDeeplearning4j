@@ -28,32 +28,32 @@ import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
  * @author Steven Lang
  */
 public enum AlgoMode implements ApiWrapper<ConvolutionLayer.AlgoMode> {
-  NO_WORKSPACE, PREFER_FASTEST, USER_SPECIFIED;
+    NO_WORKSPACE, PREFER_FASTEST, USER_SPECIFIED;
 
-  @Override
-  public ConvolutionLayer.AlgoMode getBackend() {
-    return ConvolutionLayer.AlgoMode.valueOf(this.name());
-  }
+    /**
+     * Parse backend algo mode and return weka enum implementation.
+     *
+     * @param algoMode Convolution mode
+     * @return Weka convolution mode enum implementation
+     */
+    public static AlgoMode fromBackend(
+            ConvolutionLayer.AlgoMode algoMode) {
+        return valueOf(algoMode.name());
+    }
 
-  @Override
-  public void setBackend(ConvolutionLayer.AlgoMode newBackend) {
-    // Do nothing as this enum does not have a state
+    @Override
+    public ConvolutionLayer.AlgoMode getBackend() {
+        return ConvolutionLayer.AlgoMode.valueOf(this.name());
+    }
 
-  }
+    @Override
+    public void setBackend(ConvolutionLayer.AlgoMode newBackend) {
+        // Do nothing as this enum does not have a state
 
-  @Override
-  public void initializeBackend() {
-    // Do nothing as this enum does not have a state
-  }
+    }
 
-  /**
-   * Parse backend algo mode and return weka enum implementation.
-   *
-   * @param algoMode Convolution mode
-   * @return Weka convolution mode enum implementation
-   */
-  public static AlgoMode fromBackend(
-      ConvolutionLayer.AlgoMode algoMode) {
-    return valueOf(algoMode.name());
-  }
+    @Override
+    public void initializeBackend() {
+        // Do nothing as this enum does not have a state
+    }
 }

@@ -26,6 +26,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.util.Enumeration;
+
 import weka.core.OptionMetadata;
 
 /**
@@ -36,83 +37,85 @@ import weka.core.OptionMetadata;
  */
 @JsonTypeName("RReLU")
 public class ActivationRReLU extends Activation<org.nd4j.linalg.activations.impl.ActivationRReLU>
-    implements OptionHandler {
+        implements OptionHandler {
 
-  private static final long serialVersionUID = -6995697781151991845L;
+    private static final long serialVersionUID = -6995697781151991845L;
 
-  protected double lowerBound = DEFAULT_L;
-  protected double upperBound = DEFAULT_U;
-  @Override
-  public void initializeBackend() {
-    backend = new org.nd4j.linalg.activations.impl.ActivationRReLU();
-  }
-  @OptionMetadata(
-      displayName = "lowerBound",
-      description = "The lower bound (default = " + DEFAULT_L + ").",
-      commandLineParamName = "lowerBound",
-      commandLineParamSynopsis = "-lowerBound <double>",
-      displayOrder = 1
-  )
-  public double getLowerBound() {
-    return lowerBound;
-  }
+    protected double lowerBound = DEFAULT_L;
+    protected double upperBound = DEFAULT_U;
 
-  public void setLowerBound(double lowerBound) {
-    this.lowerBound = lowerBound;
-  }
+    @Override
+    public void initializeBackend() {
+        backend = new org.nd4j.linalg.activations.impl.ActivationRReLU();
+    }
 
-  @OptionMetadata(
-      displayName = "lowerBound",
-      description = "The lower bound (default = " + DEFAULT_U + ").",
-      commandLineParamName = "lowerBound",
-      commandLineParamSynopsis = "-lowerBound <double>",
-      displayOrder = 2
-  )
-  public double getUpperBound() {
-    return upperBound;
-  }
+    @OptionMetadata(
+            displayName = "lowerBound",
+            description = "The lower bound (default = " + DEFAULT_L + ").",
+            commandLineParamName = "lowerBound",
+            commandLineParamSynopsis = "-lowerBound <double>",
+            displayOrder = 1
+    )
+    public double getLowerBound() {
+        return lowerBound;
+    }
 
-  public void setUpperBound(double upperBound) {
-    this.upperBound = upperBound;
-  }
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
+    }
 
-  @Override
-  public void setBackend(org.nd4j.linalg.activations.impl.ActivationRReLU newBackend) {
-    super.setBackend(newBackend);
-    this.lowerBound = newBackend.getL();
-    this.upperBound = newBackend.getU();
-  }
+    @OptionMetadata(
+            displayName = "lowerBound",
+            description = "The lower bound (default = " + DEFAULT_U + ").",
+            commandLineParamName = "lowerBound",
+            commandLineParamSynopsis = "-lowerBound <double>",
+            displayOrder = 2
+    )
+    public double getUpperBound() {
+        return upperBound;
+    }
 
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  @Override
-  public Enumeration<Option> listOptions() {
+    public void setUpperBound(double upperBound) {
+        this.upperBound = upperBound;
+    }
 
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
+    @Override
+    public void setBackend(org.nd4j.linalg.activations.impl.ActivationRReLU newBackend) {
+        super.setBackend(newBackend);
+        this.lowerBound = newBackend.getL();
+        this.upperBound = newBackend.getU();
+    }
 
-  /**
-   * Gets the current settings of the Classifier.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  @Override
-  public String[] getOptions() {
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public Enumeration<Option> listOptions() {
 
-    return Option.getOptions(this, this.getClass());
-  }
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
 
-  /**
-   * Parses a given list of options.
-   *
-   * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
-   */
-  public void setOptions(String[] options) throws Exception {
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
 
-    Option.setOptions(options, this, this.getClass());
-  }
+        return Option.getOptions(this, this.getClass());
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
+
+        Option.setOptions(options, this, this.getClass());
+    }
 }

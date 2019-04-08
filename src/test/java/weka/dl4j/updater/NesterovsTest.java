@@ -24,16 +24,16 @@ import org.junit.Test;
 
 public class NesterovsTest extends AbstractUpdaterTest<Nesterovs> {
 
-  @Test
-  public void setMomentum() {
-    double value = 123.456;
-    wrapper.setMomentum(value);
+    @Test
+    public void setMomentum() {
+        double value = 123.456;
+        wrapper.setMomentum(value);
 
-    assertEquals(value, wrapper.getMomentum(), PRECISION);
-  }
+        assertEquals(value, wrapper.getMomentum(), PRECISION);
+    }
 
-  @Override
-  public Nesterovs getApiWrapper() {
-    return new Nesterovs();
-  }
+    @Override
+    public Nesterovs getApiWrapper() {
+        return new Nesterovs();
+    }
 }

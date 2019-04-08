@@ -27,12 +27,12 @@ import org.junit.Before;
  *
  * @author Steven Lang
  */
-public class DenseLayerTest extends AbstractFeedForwardLayerTest<DenseLayer>{
+public class DenseLayerTest extends AbstractFeedForwardLayerTest<DenseLayer> {
 
 
-  @Override
-  public DenseLayer getApiWrapper(){
-    return new  DenseLayer();
-  }
+    @Override
+    public DenseLayer getApiWrapper() {
+        return new DenseLayer();
+    }
 
 }

@@ -33,33 +33,33 @@ import weka.dl4j.schedules.StepSchedule;
 
 public class DropoutTest extends ApiWrapperTest<Dropout> {
 
-  @Test
-  public void setpSchedule() {
-    for (Schedule sched : new Schedule[]{
-        new ConstantSchedule(),
-        new ExponentialSchedule(),
-        new InverseSchedule(),
-        new MapSchedule(),
-        new PolySchedule(),
-        new SigmoidSchedule(),
-        new StepSchedule()
-    }) {
-      wrapper.setpSchedule(sched);
+    @Test
+    public void setpSchedule() {
+        for (Schedule sched : new Schedule[]{
+                new ConstantSchedule(),
+                new ExponentialSchedule(),
+                new InverseSchedule(),
+                new MapSchedule(),
+                new PolySchedule(),
+                new SigmoidSchedule(),
+                new StepSchedule()
+        }) {
+            wrapper.setpSchedule(sched);
 
-      assertEquals(sched, wrapper.getpSchedule());
+            assertEquals(sched, wrapper.getpSchedule());
+        }
     }
-  }
 
-  @Test
-  public void setP() {
-    double value = 123.456;
-    wrapper.setP(value);
+    @Test
+    public void setP() {
+        double value = 123.456;
+        wrapper.setP(value);
 
-    assertEquals(value, wrapper.getP(), PRECISION);
-  }
+        assertEquals(value, wrapper.getP(), PRECISION);
+    }
 
-  @Override
-  public Dropout getApiWrapper() {
-    return new  Dropout();
-  }
+    @Override
+    public Dropout getApiWrapper() {
+        return new Dropout();
+    }
 }

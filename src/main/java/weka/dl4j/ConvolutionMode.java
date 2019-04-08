@@ -26,32 +26,32 @@ package weka.dl4j;
  * @author Steven Lang
  */
 public enum ConvolutionMode implements ApiWrapper<org.deeplearning4j.nn.conf.ConvolutionMode> {
-  Strict, Truncate, Same;
+    Strict, Truncate, Same;
 
-  @Override
-  public org.deeplearning4j.nn.conf.ConvolutionMode getBackend() {
-    return org.deeplearning4j.nn.conf.ConvolutionMode.valueOf(this.name());
-  }
+    /**
+     * Parse backend convolution mode and return weka enum implementation.
+     *
+     * @param convolutionMode Convolution mode
+     * @return Weka convolution mode enum implementation
+     */
+    public static ConvolutionMode fromBackend(
+            org.deeplearning4j.nn.conf.ConvolutionMode convolutionMode) {
+        return valueOf(convolutionMode.name());
+    }
 
-  @Override
-  public void setBackend(org.deeplearning4j.nn.conf.ConvolutionMode newBackend) {
-    // Do nothing as this enum does not have a state
+    @Override
+    public org.deeplearning4j.nn.conf.ConvolutionMode getBackend() {
+        return org.deeplearning4j.nn.conf.ConvolutionMode.valueOf(this.name());
+    }
 
-  }
+    @Override
+    public void setBackend(org.deeplearning4j.nn.conf.ConvolutionMode newBackend) {
+        // Do nothing as this enum does not have a state
 
-  @Override
-  public void initializeBackend() {
-    // Do nothing as this enum does not have a state
-  }
+    }
 
-  /**
-   * Parse backend convolution mode and return weka enum implementation.
-   *
-   * @param convolutionMode Convolution mode
-   * @return Weka convolution mode enum implementation
-   */
-  public static ConvolutionMode fromBackend(
-      org.deeplearning4j.nn.conf.ConvolutionMode convolutionMode) {
-    return valueOf(convolutionMode.name());
-  }
+    @Override
+    public void initializeBackend() {
+        // Do nothing as this enum does not have a state
+    }
 }

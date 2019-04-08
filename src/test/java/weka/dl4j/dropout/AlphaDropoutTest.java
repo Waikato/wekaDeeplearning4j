@@ -33,49 +33,49 @@ import weka.dl4j.schedules.StepSchedule;
 
 public class AlphaDropoutTest extends ApiWrapperTest<AlphaDropout> {
 
-  @Test
-  public void setpSchedule() {
-    for (Schedule sched : new Schedule[]{
-        new ConstantSchedule(),
-        new ExponentialSchedule(),
-        new InverseSchedule(),
-        new MapSchedule(),
-        new PolySchedule(),
-        new SigmoidSchedule(),
-        new StepSchedule()
-    }) {
-      wrapper.setpSchedule(sched);
+    @Test
+    public void setpSchedule() {
+        for (Schedule sched : new Schedule[]{
+                new ConstantSchedule(),
+                new ExponentialSchedule(),
+                new InverseSchedule(),
+                new MapSchedule(),
+                new PolySchedule(),
+                new SigmoidSchedule(),
+                new StepSchedule()
+        }) {
+            wrapper.setpSchedule(sched);
 
-      assertEquals(sched, wrapper.getpSchedule());
+            assertEquals(sched, wrapper.getpSchedule());
+        }
     }
-  }
 
-  @Test
-  public void setP() {
-    double value = 123.456;
-    wrapper.setP(value);
+    @Test
+    public void setP() {
+        double value = 123.456;
+        wrapper.setP(value);
 
-    assertEquals(value, wrapper.getP(), PRECISION);
-  }
+        assertEquals(value, wrapper.getP(), PRECISION);
+    }
 
-  @Test
-  public void setAlpha() {
-    double value = 123.456;
-    wrapper.setAlpha(value);
+    @Test
+    public void setAlpha() {
+        double value = 123.456;
+        wrapper.setAlpha(value);
 
-    assertEquals(value, wrapper.getAlpha(), PRECISION);
-  }
+        assertEquals(value, wrapper.getAlpha(), PRECISION);
+    }
 
-  @Test
-  public void setLambda() {
-    double value = 123.456;
-    wrapper.setLambda(value);
+    @Test
+    public void setLambda() {
+        double value = 123.456;
+        wrapper.setLambda(value);
 
-    assertEquals(value, wrapper.getLambda(), PRECISION);
-  }
+        assertEquals(value, wrapper.getLambda(), PRECISION);
+    }
 
-  @Override
-  public AlphaDropout getApiWrapper() {
-    return new  AlphaDropout();
-  }
+    @Override
+    public AlphaDropout getApiWrapper() {
+        return new AlphaDropout();
+    }
 }

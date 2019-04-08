@@ -24,13 +24,13 @@ package weka.core;
  * @author Steven Lang
  */
 public class WrongIteratorException extends WekaException {
-  private static final long serialVersionUID = 1038306995981039092L;
+    private static final long serialVersionUID = 1038306995981039092L;
 
-  public WrongIteratorException(String message) {
-    super(message);
-  }
+    public WrongIteratorException(String message) {
+        super(message);
+    }
 
-  public WrongIteratorException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public WrongIteratorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

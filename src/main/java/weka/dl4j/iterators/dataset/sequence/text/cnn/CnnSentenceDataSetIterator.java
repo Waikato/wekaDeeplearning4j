@@ -71,6 +71,9 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
         this.stopwords = builder.stopwords;
     }
 
+    public static String getUnknownWordSentinel() {
+        return "UNKNOWN_WORD_SENTINEL";
+    }
 
     @Override
     public boolean hasNext() {
@@ -80,7 +83,6 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
         }
         return sentenceProvider.hasNext();
     }
-
 
     @Override
     public DataSet next(int num) {
@@ -95,7 +97,7 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
         // Get min and max token sizes in the current mini batch
         int maxTokenSizeBatch = Integer.MIN_VALUE;
         int minTokenSizeBatch = Integer.MAX_VALUE;
-        if (data.size() > 0){
+        if (data.size() > 0) {
             maxTokenSizeBatch = data.stream().mapToInt(Datum::numTokens).max().getAsInt();
             minTokenSizeBatch = data.stream().mapToInt(Datum::numTokens).min().getAsInt();
         }
@@ -295,11 +297,6 @@ public class CnnSentenceDataSetIterator extends org.deeplearning4j.iterator.CnnS
      */
     protected int[] getFeatureShape(int maxLength, int numSamples) {
         return new int[]{numSamples, 1, maxLength, getWordVectorSize()};
-    }
-
-
-    public static String getUnknownWordSentinel() {
-        return "UNKNOWN_WORD_SENTINEL";
     }
 
     public LabeledSentenceProvider getSentenceProvider() {

@@ -200,19 +200,6 @@ public class LogConfiguration implements Serializable, OptionHandler {
     }
 
     /**
-     * Update the weka dl4j log level.
-     */
-    protected void updateWekaDl4jLogLevel() {
-        LoggerContext context = getLoggerContext();
-        Collection<Logger> loggers = context.getLoggers();
-        for (Logger logger : loggers) {
-            if (logger.getName().startsWith("weka")) {
-                updateLogLevel(logger.getName(), wekaDl4jLogLevel);
-            }
-        }
-    }
-
-    /**
      * Set the WekaDeeplearning4j log level.
      *
      * @param wekaDl4jLogLevel The nd4j log level
@@ -226,6 +213,19 @@ public class LogConfiguration implements Serializable, OptionHandler {
     )
     public void setWekaDl4jLogLevel(LogLevel wekaDl4jLogLevel) {
         this.wekaDl4jLogLevel = wekaDl4jLogLevel;
+    }
+
+    /**
+     * Update the weka dl4j log level.
+     */
+    protected void updateWekaDl4jLogLevel() {
+        LoggerContext context = getLoggerContext();
+        Collection<Logger> loggers = context.getLoggers();
+        for (Logger logger : loggers) {
+            if (logger.getName().startsWith("weka")) {
+                updateLogLevel(logger.getName(), wekaDl4jLogLevel);
+            }
+        }
     }
 
     /**
@@ -255,7 +255,7 @@ public class LogConfiguration implements Serializable, OptionHandler {
 
 
         String fileAppenderName = "fileAppender";
-        if(!context.getRootLogger().getAppenders().containsKey(fileAppenderName)){
+        if (!context.getRootLogger().getAppenders().containsKey(fileAppenderName)) {
             // Get console appender layout
             Appender consoleAppender = context.getLogger(log.getName()).getAppenders().get("Console");
             Layout<? extends Serializable> layout = consoleAppender.getLayout();
@@ -305,8 +305,19 @@ public class LogConfiguration implements Serializable, OptionHandler {
      *
      * @return an enumeration of all the available options
      */
-    @Override public Enumeration<Option> listOptions() {
+    @Override
+    public Enumeration<Option> listOptions() {
         return Option.listOptionsForClass(this.getClass()).elements();
+    }
+
+    /**
+     * Gets the current settings of the log configuration
+     *
+     * @return return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
+        return Option.getOptions(this, this.getClass());
     }
 
     /**
@@ -315,17 +326,9 @@ public class LogConfiguration implements Serializable, OptionHandler {
      * @param options the list of options as an array of strings
      * @throws Exception if an option is not supported
      */
-    @Override public void setOptions(String[] options) throws Exception {
+    @Override
+    public void setOptions(String[] options) throws Exception {
         Option.setOptions(options, this, this.getClass());
-    }
-
-    /**
-     * Gets the current settings of the log configuration
-     *
-     * @return return an array of strings suitable for passing to setOptions
-     */
-    @Override public String[] getOptions() {
-        return Option.getOptions(this, this.getClass());
     }
 
     /**

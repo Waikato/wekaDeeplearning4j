@@ -37,42 +37,42 @@ import weka.dl4j.distribution.UniformDistribution;
 
 public class WeightNoiseTest extends ApiWrapperTest<WeightNoise> {
 
-  @Test
-  public void setDistribution() {
-    for (Distribution dist :
-        new Distribution[] {
-            new ConstantDistribution(),
-            new LogNormalDistribution(),
-            new OrthogonalDistribution(),
-            new TruncatedNormalDistribution(),
-            new BinomialDistribution(),
-            new NormalDistribution(),
-            new UniformDistribution()
-        }) {
-      wrapper.setDistribution(dist);
+    @Test
+    public void setDistribution() {
+        for (Distribution dist :
+                new Distribution[]{
+                        new ConstantDistribution(),
+                        new LogNormalDistribution(),
+                        new OrthogonalDistribution(),
+                        new TruncatedNormalDistribution(),
+                        new BinomialDistribution(),
+                        new NormalDistribution(),
+                        new UniformDistribution()
+                }) {
+            wrapper.setDistribution(dist);
 
-      assertEquals(dist, wrapper.getDistribution());
+            assertEquals(dist, wrapper.getDistribution());
+        }
     }
-  }
 
-  @Test
-  public void setApplyToBias() {
-    wrapper.setApplyToBias(true);
-    assertTrue(wrapper.isApplyToBias());
-    wrapper.setApplyToBias(false);
-    assertFalse(wrapper.isApplyToBias());
-  }
+    @Test
+    public void setApplyToBias() {
+        wrapper.setApplyToBias(true);
+        assertTrue(wrapper.isApplyToBias());
+        wrapper.setApplyToBias(false);
+        assertFalse(wrapper.isApplyToBias());
+    }
 
-  @Test
-  public void setAdditive() {
-    wrapper.setAdditive(true);
-    assertTrue(wrapper.isAdditive());
-    wrapper.setAdditive(false);
-    assertFalse(wrapper.isAdditive());
-  }
+    @Test
+    public void setAdditive() {
+        wrapper.setAdditive(true);
+        assertTrue(wrapper.isAdditive());
+        wrapper.setAdditive(false);
+        assertFalse(wrapper.isAdditive());
+    }
 
-  @Override
-  public WeightNoise getApiWrapper() {
-    return new WeightNoise();
-  }
+    @Override
+    public WeightNoise getApiWrapper() {
+        return new WeightNoise();
+    }
 }

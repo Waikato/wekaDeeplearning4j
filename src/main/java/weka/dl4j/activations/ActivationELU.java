@@ -25,6 +25,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 
 import java.util.Enumeration;
+
 import weka.core.OptionMetadata;
 
 /**
@@ -35,72 +36,74 @@ import weka.core.OptionMetadata;
  */
 @JsonTypeName("ELU")
 public class ActivationELU extends Activation<org.nd4j.linalg.activations.impl.ActivationELU>
-    implements OptionHandler {
+        implements OptionHandler {
 
-  private static final long serialVersionUID = -720206378421144717L;
+    private static final long serialVersionUID = -720206378421144717L;
 
 
-  protected double alpha = DEFAULT_ALPHA;
-  @Override
-  public void initializeBackend() {
-    backend = new org.nd4j.linalg.activations.impl.ActivationELU();
-  }
-  @OptionMetadata(
-      displayName = "alpha",
-      description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
-      commandLineParamName = "alpha",
-      commandLineParamSynopsis = "-alpha <double>",
-      displayOrder = 1
-  )
-  public double getAlpha() {
-    return alpha;
-  }
+    protected double alpha = DEFAULT_ALPHA;
 
-  public void setAlpha(double alpha) {
-    this.alpha = alpha;
-  }
+    @Override
+    public void initializeBackend() {
+        backend = new org.nd4j.linalg.activations.impl.ActivationELU();
+    }
 
-  @Override
-  public void setBackend(org.nd4j.linalg.activations.impl.ActivationELU newBackend) {
-    super.setBackend(newBackend);
-    this.alpha = newBackend.getAlpha();
-  }
+    @OptionMetadata(
+            displayName = "alpha",
+            description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
+            commandLineParamName = "alpha",
+            commandLineParamSynopsis = "-alpha <double>",
+            displayOrder = 1
+    )
+    public double getAlpha() {
+        return alpha;
+    }
 
-  @Override
-  public org.nd4j.linalg.activations.impl.ActivationELU getBackend() {
-    return new org.nd4j.linalg.activations.impl.ActivationELU(alpha);
-  }
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
 
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  @Override
-  public Enumeration<Option> listOptions() {
+    @Override
+    public org.nd4j.linalg.activations.impl.ActivationELU getBackend() {
+        return new org.nd4j.linalg.activations.impl.ActivationELU(alpha);
+    }
 
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
+    @Override
+    public void setBackend(org.nd4j.linalg.activations.impl.ActivationELU newBackend) {
+        super.setBackend(newBackend);
+        this.alpha = newBackend.getAlpha();
+    }
 
-  /**
-   * Gets the current settings of the Classifier.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  @Override
-  public String[] getOptions() {
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public Enumeration<Option> listOptions() {
 
-    return Option.getOptions(this, this.getClass());
-  }
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
 
-  /**
-   * Parses a given list of options.
-   *
-   * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
-   */
-  public void setOptions(String[] options) throws Exception {
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
 
-    Option.setOptions(options, this, this.getClass());
-  }
+        return Option.getOptions(this, this.getClass());
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
+
+        Option.setOptions(options, this, this.getClass());
+    }
 }

@@ -20,6 +20,7 @@ package weka.dl4j.schedules;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.nd4j.linalg.schedule.ISchedule;
@@ -34,7 +35,7 @@ import weka.gui.ProgrammaticProperty;
  * Default schedule interface that implements WEKA option handling. Each class that implements
  * Schedulers extending from this class must have a backing implementation of the referencing Dl4j
  * scheduler since the scheduler in Dl4j do not allow access to their class members (private final).
- *
+ * <p>
  * SigmoidSchedule, StepSchedule)
  *
  * @author Steven Lang
@@ -42,97 +43,103 @@ import weka.gui.ProgrammaticProperty;
 @EqualsAndHashCode
 @ToString
 public abstract class Schedule<T extends ISchedule>
-    implements OptionHandler, ApiWrapper<T>, Serializable {
+        implements OptionHandler, ApiWrapper<T>, Serializable {
 
-  private static final long serialVersionUID = 5588471135175058051L;
+    private static final long serialVersionUID = 5588471135175058051L;
 
-  /** Schedule type */
-  ScheduleType scheduleType = ScheduleType.EPOCH;
+    /**
+     * Schedule type
+     */
+    ScheduleType scheduleType = ScheduleType.EPOCH;
 
-  /** Initial value */
-  double initialValue = 1.0;
+    /**
+     * Initial value
+     */
+    double initialValue = 1.0;
 
-  /** Schedule that is backing the implementation */
-  T backend;
+    /**
+     * Schedule that is backing the implementation
+     */
+    T backend;
 
-  public Schedule() {
-    initializeBackend();
-  }
-
-  @OptionMetadata(
-    displayName = "scheduleType",
-    description = "The schedule type, one of {EPOCH,ITERATION} (default = EPOCH).",
-    commandLineParamName = "scheduleType",
-    commandLineParamSynopsis = "-scheduleType <string>",
-    displayOrder = 1
-  )
-  public ScheduleType getScheduleType() {
-    return scheduleType;
-  }
-
-  public void setScheduleType(ScheduleType scheduleType) {
-    this.scheduleType = scheduleType;
-  }
-
-  @ProgrammaticProperty
-  public double getInitialValue() {
-    return initialValue;
-  }
-
-  @ProgrammaticProperty
-  public void setInitialValue(double initialValue) {
-    this.initialValue = initialValue;
-  }
-
-  /**
-   * Create an API wrapped schedule from a given ISchedule object.
-   *
-   * @param newBackend Backend object
-   * @return API wrapped object
-   */
-  public static Schedule<? extends ISchedule> create(ISchedule newBackend) {
-    if (newBackend == null){
-      return new ConstantSchedule();
+    public Schedule() {
+        initializeBackend();
     }
-    return ApiWrapperUtil.getImplementingWrapper(Schedule.class, newBackend, "weka.dl4j.schedules");
-  }
 
-  @Override
-  public T getBackend() {
-    initializeBackend();
-    return backend;
-  }
+    /**
+     * Create an API wrapped schedule from a given ISchedule object.
+     *
+     * @param newBackend Backend object
+     * @return API wrapped object
+     */
+    public static Schedule<? extends ISchedule> create(ISchedule newBackend) {
+        if (newBackend == null) {
+            return new ConstantSchedule();
+        }
+        return ApiWrapperUtil.getImplementingWrapper(Schedule.class, newBackend, "weka.dl4j.schedules");
+    }
 
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  @Override
-  public Enumeration<Option> listOptions() {
+    @OptionMetadata(
+            displayName = "scheduleType",
+            description = "The schedule type, one of {EPOCH,ITERATION} (default = EPOCH).",
+            commandLineParamName = "scheduleType",
+            commandLineParamSynopsis = "-scheduleType <string>",
+            displayOrder = 1
+    )
+    public ScheduleType getScheduleType() {
+        return scheduleType;
+    }
 
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
+    }
 
-  /**
-   * Gets the current settings of the Classifier.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  @Override
-  public String[] getOptions() {
+    @ProgrammaticProperty
+    public double getInitialValue() {
+        return initialValue;
+    }
 
-    return Option.getOptions(this, this.getClass());
-  }
+    @ProgrammaticProperty
+    public void setInitialValue(double initialValue) {
+        this.initialValue = initialValue;
+    }
 
-  /**
-   * Parses a given list of options.
-   *
-   * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
-   */
-  public void setOptions(String[] options) throws Exception {
+    @Override
+    public T getBackend() {
+        initializeBackend();
+        return backend;
+    }
 
-    Option.setOptions(options, this, this.getClass());
-  }
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public Enumeration<Option> listOptions() {
+
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
+
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
+
+        return Option.getOptions(this, this.getClass());
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
+
+        Option.setOptions(options, this, this.getClass());
+    }
 }

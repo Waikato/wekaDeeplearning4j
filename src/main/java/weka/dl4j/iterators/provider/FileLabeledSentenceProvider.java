@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
@@ -36,59 +37,59 @@ import org.nd4j.linalg.primitives.Pair;
 @Log4j2
 public class FileLabeledSentenceProvider implements LabeledSentenceProvider {
 
-  private List<File> files;
-  private List<String> labels;
-  private List<String> allLabels;
-  private int numClasses;
-  private int cursor;
+    private List<File> files;
+    private List<String> labels;
+    private List<String> allLabels;
+    private int numClasses;
+    private int cursor;
 
-  public FileLabeledSentenceProvider(List<File> files, List<String> labels, int numClasses) {
-    this.files = files;
-    this.labels = labels;
-    this.allLabels = new ArrayList<>(new HashSet<>(labels));
-    this.numClasses = numClasses;
-    this.cursor = 0;
-  }
-
-  @Override
-  public boolean hasNext() {
-    return cursor < totalNumSentences();
-  }
-
-  @Override
-  public Pair<String, String> nextSentence() {
-    final String label = labels.get(cursor);
-    final File file = files.get(cursor);
-
-    String sentence;
-    try {
-      sentence = FileUtils.readFileToString(file);
-    } catch (IOException e) {
-      log.error("File not found: " + file, e);
-      throw new RuntimeException("File not found: " + file);
+    public FileLabeledSentenceProvider(List<File> files, List<String> labels, int numClasses) {
+        this.files = files;
+        this.labels = labels;
+        this.allLabels = new ArrayList<>(new HashSet<>(labels));
+        this.numClasses = numClasses;
+        this.cursor = 0;
     }
 
-    cursor++;
-    return new Pair<>(sentence, label);
-  }
+    @Override
+    public boolean hasNext() {
+        return cursor < totalNumSentences();
+    }
 
-  @Override
-  public void reset() {
-    cursor = 0;
-  }
+    @Override
+    public Pair<String, String> nextSentence() {
+        final String label = labels.get(cursor);
+        final File file = files.get(cursor);
 
-  @Override
-  public int totalNumSentences() {
-    return files.size();
-  }
+        String sentence;
+        try {
+            sentence = FileUtils.readFileToString(file);
+        } catch (IOException e) {
+            log.error("File not found: " + file, e);
+            throw new RuntimeException("File not found: " + file);
+        }
 
-  @Override
-  public List<String> allLabels() {
-    return allLabels;
-  }
+        cursor++;
+        return new Pair<>(sentence, label);
+    }
 
-  @Override
-  public int numLabelClasses() {
-    return numClasses;
-  }
+    @Override
+    public void reset() {
+        cursor = 0;
+    }
+
+    @Override
+    public int totalNumSentences() {
+        return files.size();
+    }
+
+    @Override
+    public List<String> allLabels() {
+        return allLabels;
+    }
+
+    @Override
+    public int numLabelClasses() {
+        return numClasses;
+    }
 }

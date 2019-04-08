@@ -24,10 +24,10 @@ package weka.dl4j.updater;
  * @author Steven Lang
  */
 public class NoOp extends Updater<org.nd4j.linalg.learning.config.NoOp> {
-  private static final long serialVersionUID = 3503205924392465662L;
+    private static final long serialVersionUID = 3503205924392465662L;
 
-  @Override
-  public void initializeBackend() {
-    backend = new org.nd4j.linalg.learning.config.NoOp();
-  }
+    @Override
+    public void initializeBackend() {
+        backend = new org.nd4j.linalg.learning.config.NoOp();
+    }
 }

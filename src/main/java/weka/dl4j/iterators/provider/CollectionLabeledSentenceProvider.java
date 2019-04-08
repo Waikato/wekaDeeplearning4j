@@ -27,18 +27,20 @@ import java.util.List;
  * @author Steven Lang
  */
 public class CollectionLabeledSentenceProvider
-    extends org.deeplearning4j.iterator.provider.CollectionLabeledSentenceProvider {
-  /** Number of classes */
-  private final int numClasses;
+        extends org.deeplearning4j.iterator.provider.CollectionLabeledSentenceProvider {
+    /**
+     * Number of classes
+     */
+    private final int numClasses;
 
-  public CollectionLabeledSentenceProvider(
-      List<String> sentences, List<String> labelsForSentences, int numClasses) {
-    super(sentences, labelsForSentences, null);
-    this.numClasses = numClasses;
-  }
+    public CollectionLabeledSentenceProvider(
+            List<String> sentences, List<String> labelsForSentences, int numClasses) {
+        super(sentences, labelsForSentences, null);
+        this.numClasses = numClasses;
+    }
 
-  @Override
-  public int numLabelClasses() {
-    return numClasses;
-  }
+    @Override
+    public int numLabelClasses() {
+        return numClasses;
+    }
 }

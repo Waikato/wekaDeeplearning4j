@@ -52,14 +52,14 @@ import static org.nd4j.linalg.indexing.NDArrayIndex.*;
 public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Serializable {
 
     private static final long serialVersionUID = 1682821361704251554L;
+    protected final Instances data;
     private final WordVectors wordVectors;
     private final int batchSize;
     private final int wordVectorSize;
     private final int truncateLength;
+    private final TokenizerFactory tokenizerFactory;
     protected AbstractStopwords stopWords;
     protected int cursor = 0;
-    protected final Instances data;
-    private final TokenizerFactory tokenizerFactory;
     private LabeledSentenceProvider sentenceProvider;
 
     /**
@@ -275,11 +275,6 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
     }
 
     @Override
-    public void setPreProcessor(DataSetPreProcessor preProcessor) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public List<String> getLabels() {
         return IntStream.range(0, data.numClasses())
                 .boxed()
@@ -304,5 +299,10 @@ public class RnnTextEmbeddingDataSetIterator implements DataSetIterator, Seriali
     @Override
     public DataSetPreProcessor getPreProcessor() {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void setPreProcessor(DataSetPreProcessor preProcessor) {
+        throw new UnsupportedOperationException();
     }
 }

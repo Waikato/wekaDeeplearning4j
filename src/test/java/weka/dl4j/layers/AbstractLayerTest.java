@@ -31,5 +31,4 @@ import weka.dl4j.ApiWrapperTest;
 public abstract class AbstractLayerTest<T extends Layer> extends ApiWrapperTest<T> {
 
 
-
 }

@@ -41,37 +41,37 @@ import weka.dl4j.activations.ActivationSoftmax;
  *
  * @author Steven Lang
  */
-public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer>{
+public class ActivationLayerTest extends AbstractLayerTest<ActivationLayer> {
 
 
-  @Override
-  public ActivationLayer getApiWrapper(){
-    return new  ActivationLayer();
-  }
-
-  @Test
-  public void testActivationFunction(){
-    Activation[] acts =
-        new Activation[] {
-            new ActivationCube(),
-            new ActivationELU(),
-            new ActivationHardSigmoid(),
-            new ActivationHardTanH(),
-            new ActivationIdentity(),
-            new ActivationLReLU(),
-            new ActivationRationalTanh(),
-            new ActivationReLU(),
-            new ActivationRReLU(),
-            new ActivationHardSigmoid(),
-            new ActivationSoftmax(),
-            new ActivationSoftPlus(),
-            new ActivationSoftSign(),
-            new ActivationHardTanH()
-        };
-    for (Activation act : acts) {
-      wrapper.setActivationFunction(act);
-
-      assertEquals(act, wrapper.getActivationFunction());
+    @Override
+    public ActivationLayer getApiWrapper() {
+        return new ActivationLayer();
     }
-  }
+
+    @Test
+    public void testActivationFunction() {
+        Activation[] acts =
+                new Activation[]{
+                        new ActivationCube(),
+                        new ActivationELU(),
+                        new ActivationHardSigmoid(),
+                        new ActivationHardTanH(),
+                        new ActivationIdentity(),
+                        new ActivationLReLU(),
+                        new ActivationRationalTanh(),
+                        new ActivationReLU(),
+                        new ActivationRReLU(),
+                        new ActivationHardSigmoid(),
+                        new ActivationSoftmax(),
+                        new ActivationSoftPlus(),
+                        new ActivationSoftSign(),
+                        new ActivationHardTanH()
+                };
+        for (Activation act : acts) {
+            wrapper.setActivationFunction(act);
+
+            assertEquals(act, wrapper.getActivationFunction());
+        }
+    }
 }

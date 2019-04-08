@@ -35,40 +35,41 @@ import org.junit.Test;
 public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer> {
 
 
-  @Override
-  public GlobalPoolingLayer getApiWrapper() {
-    return new  GlobalPoolingLayer();
-  }
-
-  @Test
-  public void testPoolingType() {
-    for (PoolingType type : PoolingType.values()){
-      wrapper.setPoolingType(type);
-
-      assertEquals(type, wrapper.getPoolingType());
+    @Override
+    public GlobalPoolingLayer getApiWrapper() {
+        return new GlobalPoolingLayer();
     }
-  }
 
-  @Test
-  public void testPoolingDimension(){
-    int[] dim = {25,25};
-    wrapper.setPoolingDimensions(dim);
+    @Test
+    public void testPoolingType() {
+        for (PoolingType type : PoolingType.values()) {
+            wrapper.setPoolingType(type);
 
-    assertArrayEquals(dim, wrapper.getPoolingDimensions());
-  }
-  @Test
-  public void testCollapseDimensions(){
-    wrapper.setCollapseDimensions(true);
-    assertTrue(wrapper.isCollapseDimensions());
-    wrapper.setCollapseDimensions(false);
-    assertFalse(wrapper.isCollapseDimensions());
-  }
+            assertEquals(type, wrapper.getPoolingType());
+        }
+    }
 
-  @Test
-  public void testPnorm(){
-    int p = 123;
-    wrapper.setPnorm(p);
+    @Test
+    public void testPoolingDimension() {
+        int[] dim = {25, 25};
+        wrapper.setPoolingDimensions(dim);
 
-    assertEquals(p, wrapper.getPnorm());
-  }
+        assertArrayEquals(dim, wrapper.getPoolingDimensions());
+    }
+
+    @Test
+    public void testCollapseDimensions() {
+        wrapper.setCollapseDimensions(true);
+        assertTrue(wrapper.isCollapseDimensions());
+        wrapper.setCollapseDimensions(false);
+        assertFalse(wrapper.isCollapseDimensions());
+    }
+
+    @Test
+    public void testPnorm() {
+        int p = 123;
+        wrapper.setPnorm(p);
+
+        assertEquals(p, wrapper.getPnorm());
+    }
 }

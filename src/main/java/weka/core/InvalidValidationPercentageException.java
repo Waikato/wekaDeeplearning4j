@@ -25,13 +25,13 @@ package weka.core;
  */
 public class InvalidValidationPercentageException extends WekaException {
 
-  private static final long serialVersionUID = 7595561274022725092L;
+    private static final long serialVersionUID = 7595561274022725092L;
 
-  public InvalidValidationPercentageException(String message) {
-    super(message);
-  }
+    public InvalidValidationPercentageException(String message) {
+        super(message);
+    }
 
-  public InvalidValidationPercentageException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public InvalidValidationPercentageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

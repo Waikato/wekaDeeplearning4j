@@ -29,18 +29,18 @@ import weka.dl4j.lossfunctions.LossBinaryXENT;
  *
  * @author Steven Lang
  */
-public class OutputLayerTest extends AbstractFeedForwardLayerTest<OutputLayer>{
+public class OutputLayerTest extends AbstractFeedForwardLayerTest<OutputLayer> {
 
-  @Override
-  public OutputLayer getApiWrapper(){
-    return new  OutputLayer();
-  }
+    @Override
+    public OutputLayer getApiWrapper() {
+        return new OutputLayer();
+    }
 
-  @Test
-  public void testLossFunction(){
-    LossBinaryXENT loss = new LossBinaryXENT();
-    wrapper.setLossFn(loss);
+    @Test
+    public void testLossFunction() {
+        LossBinaryXENT loss = new LossBinaryXENT();
+        wrapper.setLossFn(loss);
 
-    assertEquals(loss, wrapper.getLossFn());
-  }
+        assertEquals(loss, wrapper.getLossFn());
+    }
 }

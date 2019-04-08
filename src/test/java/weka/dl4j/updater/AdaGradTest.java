@@ -24,16 +24,16 @@ import org.junit.Test;
 
 public class AdaGradTest extends AbstractUpdaterTest<AdaGrad> {
 
-  @Test
-  public void setEpsilon() {
-    double value = 123.456;
-    wrapper.setEpsilon(value);
+    @Test
+    public void setEpsilon() {
+        double value = 123.456;
+        wrapper.setEpsilon(value);
 
-    assertEquals(value, wrapper.getEpsilon(), PRECISION);
-  }
+        assertEquals(value, wrapper.getEpsilon(), PRECISION);
+    }
 
-  @Override
-  public AdaGrad getApiWrapper() {
-    return new AdaGrad();
-  }
+    @Override
+    public AdaGrad getApiWrapper() {
+        return new AdaGrad();
+    }
 }

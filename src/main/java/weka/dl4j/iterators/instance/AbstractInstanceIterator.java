@@ -26,6 +26,7 @@ import weka.core.OptionHandler;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+
 import weka.core.OptionMetadata;
 
 /**
@@ -37,107 +38,111 @@ import weka.core.OptionMetadata;
  */
 public abstract class AbstractInstanceIterator implements OptionHandler, Serializable {
 
-  /** The ID used for serialization */
-  private static final long serialVersionUID = 7440584973810993954L;
+    /**
+     * The ID used for serialization
+     */
+    private static final long serialVersionUID = 7440584973810993954L;
 
-  /** The batch size for the mini batches */
-  protected int batchSize = 1;
+    /**
+     * The batch size for the mini batches
+     */
+    protected int batchSize = 1;
 
-  /**
-   * Returns the actual iterator.
-   *
-   * @param data the dataset to use
-   * @param seed the seed for the random number generator
-   * @return the iterator
-   * @throws Exception if the constructor cannot be constructed successfully
-   */
-  public DataSetIterator getDataSetIterator(Instances data, int seed) throws Exception {
+    /**
+     * Returns the actual iterator.
+     *
+     * @param data the dataset to use
+     * @param seed the seed for the random number generator
+     * @return the iterator
+     * @throws Exception if the constructor cannot be constructed successfully
+     */
+    public DataSetIterator getDataSetIterator(Instances data, int seed) throws Exception {
 
-    return getDataSetIterator(data, seed, getTrainBatchSize());
-  }
+        return getDataSetIterator(data, seed, getTrainBatchSize());
+    }
 
-  /**
-   * Returns the actual iterator.
-   *
-   * @param data the dataset to use
-   * @param seed the seed for the random number generator
-   * @param batchSize the batch size to use
-   * @return the iterator
-   * @throws Exception if the constructor cannot be constructed successfully
-   */
-  public abstract DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize)
-      throws Exception;
+    /**
+     * Returns the actual iterator.
+     *
+     * @param data      the dataset to use
+     * @param seed      the seed for the random number generator
+     * @param batchSize the batch size to use
+     * @return the iterator
+     * @throws Exception if the constructor cannot be constructed successfully
+     */
+    public abstract DataSetIterator getDataSetIterator(Instances data, int seed, int batchSize)
+            throws Exception;
 
-  /**
-   * Getting the training batch size
-   *
-   * @return the batch size
-   */
-  @OptionMetadata(
-      displayName = "size of mini batch",
-      description = "The mini batch size to use in the iterator (default = 1).",
-      commandLineParamName = "bs",
-      commandLineParamSynopsis = "-bs <int>",
-      displayOrder = 1
-  )
-  public int getTrainBatchSize() {
-    return batchSize;
-  }
+    /**
+     * Getting the training batch size
+     *
+     * @return the batch size
+     */
+    @OptionMetadata(
+            displayName = "size of mini batch",
+            description = "The mini batch size to use in the iterator (default = 1).",
+            commandLineParamName = "bs",
+            commandLineParamSynopsis = "-bs <int>",
+            displayOrder = 1
+    )
+    public int getTrainBatchSize() {
+        return batchSize;
+    }
 
-  /**
-   * Setting the training batch size
-   *
-   * @param trainBatchSize the batch size
-   */
-  public void setTrainBatchSize(int trainBatchSize) {
-    batchSize = trainBatchSize;
-  }
+    /**
+     * Setting the training batch size
+     *
+     * @param trainBatchSize the batch size
+     */
+    public void setTrainBatchSize(int trainBatchSize) {
+        batchSize = trainBatchSize;
+    }
 
-  /**
-   * Initialize the iterator
-   */
-  public void initialize(){
-    // Do nothing by default
-  }
+    /**
+     * Initialize the iterator
+     */
+    public void initialize() {
+        // Do nothing by default
+    }
 
-  /**
-   * Validates the input dataset
-   *
-   * @param data the input dataset
-   * @throws InvalidInputDataException if validation is unsuccessful
-   */
-  public abstract void validate(Instances data) throws InvalidInputDataException;
+    /**
+     * Validates the input dataset
+     *
+     * @param data the input dataset
+     * @throws InvalidInputDataException if validation is unsuccessful
+     */
+    public abstract void validate(Instances data) throws InvalidInputDataException;
 
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  @Override
-  public Enumeration<Option> listOptions() {
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public Enumeration<Option> listOptions() {
 
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
 
-  /**
-   * Gets the current settings of the Classifier.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  @Override
-  public String[] getOptions() {
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
 
-    return Option.getOptions(this, this.getClass());
-  }
+        return Option.getOptions(this, this.getClass());
+    }
 
-  /**
-   * Parses a given list of options.
-   *
-   * @param options the list of options as an array of strings
-   * @exception Exception if an option is not supported
-   */
-  public void setOptions(String[] options) throws Exception {
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
 
-    Option.setOptions(options, this, this.getClass());
-  }
+        Option.setOptions(options, this, this.getClass());
+    }
 }

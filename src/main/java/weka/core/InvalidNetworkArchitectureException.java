@@ -26,13 +26,13 @@ package weka.core;
 public class InvalidNetworkArchitectureException extends WekaException {
 
 
-  private static final long serialVersionUID = 4688147827308527299L;
+    private static final long serialVersionUID = 4688147827308527299L;
 
-  public InvalidNetworkArchitectureException(String message) {
-    super(message);
-  }
+    public InvalidNetworkArchitectureException(String message) {
+        super(message);
+    }
 
-  public InvalidNetworkArchitectureException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public InvalidNetworkArchitectureException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

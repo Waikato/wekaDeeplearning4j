@@ -27,6 +27,6 @@ import weka.dl4j.iterators.instance.AbstractInstanceIterator;
  *
  * @author Steven Lang
  */
-public abstract class AbstractSequenceInstanceIterator extends AbstractInstanceIterator{
-  private static final long serialVersionUID = 6449591540279265588L;
+public abstract class AbstractSequenceInstanceIterator extends AbstractInstanceIterator {
+    private static final long serialVersionUID = 6449591540279265588L;
 }

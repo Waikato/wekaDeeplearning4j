@@ -25,13 +25,13 @@ package weka.core;
  */
 public class EmptyIteratorException extends WekaException {
 
-  private static final long serialVersionUID = 7159773687653762115L;
+    private static final long serialVersionUID = 7159773687653762115L;
 
-  public EmptyIteratorException(String message) {
-    super(message);
-  }
+    public EmptyIteratorException(String message) {
+        super(message);
+    }
 
-  public EmptyIteratorException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public EmptyIteratorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

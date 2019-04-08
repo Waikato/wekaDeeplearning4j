@@ -41,37 +41,37 @@ import weka.dl4j.activations.ActivationSoftmax;
  *
  * @author Steven Lang
  */
-public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM>{
+public class LSTMTest extends AbstractFeedForwardLayerTest<LSTM> {
 
 
-  @Override
-  public LSTM getApiWrapper(){
-    return new  LSTM();
-  }
-
-  @Test
-  public void testGateActivationFunction(){
-    Activation[] acts =
-        new Activation[] {
-            new ActivationCube(),
-            new ActivationELU(),
-            new ActivationHardSigmoid(),
-            new ActivationHardTanH(),
-            new ActivationIdentity(),
-            new ActivationLReLU(),
-            new ActivationRationalTanh(),
-            new ActivationReLU(),
-            new ActivationRReLU(),
-            new ActivationHardSigmoid(),
-            new ActivationSoftmax(),
-            new ActivationSoftPlus(),
-            new ActivationSoftSign(),
-            new ActivationHardTanH()
-        };
-    for (Activation act : acts) {
-      wrapper.setGateActivationFn(act);
-
-      assertEquals(act, wrapper.getGateActivationFn());
+    @Override
+    public LSTM getApiWrapper() {
+        return new LSTM();
     }
-  }
+
+    @Test
+    public void testGateActivationFunction() {
+        Activation[] acts =
+                new Activation[]{
+                        new ActivationCube(),
+                        new ActivationELU(),
+                        new ActivationHardSigmoid(),
+                        new ActivationHardTanH(),
+                        new ActivationIdentity(),
+                        new ActivationLReLU(),
+                        new ActivationRationalTanh(),
+                        new ActivationReLU(),
+                        new ActivationRReLU(),
+                        new ActivationHardSigmoid(),
+                        new ActivationSoftmax(),
+                        new ActivationSoftPlus(),
+                        new ActivationSoftSign(),
+                        new ActivationHardTanH()
+                };
+        for (Activation act : acts) {
+            wrapper.setGateActivationFn(act);
+
+            assertEquals(act, wrapper.getGateActivationFn());
+        }
+    }
 }

@@ -25,6 +25,7 @@ import static org.nd4j.linalg.indexing.NDArrayIndex.point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
@@ -41,188 +42,201 @@ import weka.core.Instances;
  */
 public class RelationalDataSetIterator implements DataSetIterator {
 
-  private static final long serialVersionUID = 8353870921670443077L;
+    private static final long serialVersionUID = 8353870921670443077L;
 
-  /** Dataset */
-  protected final Instances data;
-  /** Batch size */
-  protected final int batchSize;
-  /** Cursor to current row */
-  protected int cursor;
-  /** Maximum sequence length */
-  protected final int truncateLength;
-  /** Number of features in the relational attribute */
-  protected final int numFeatures;
-  /** Relational attribute index */
-  protected final int relationalAttributeIndex;
+    /**
+     * Dataset
+     */
+    protected final Instances data;
+    /**
+     * Batch size
+     */
+    protected final int batchSize;
+    /**
+     * Maximum sequence length
+     */
+    protected final int truncateLength;
+    /**
+     * Number of features in the relational attribute
+     */
+    protected final int numFeatures;
+    /**
+     * Relational attribute index
+     */
+    protected final int relationalAttributeIndex;
+    /**
+     * Cursor to current row
+     */
+    protected int cursor;
 
-  /**
-   * Constructor.
-   *
-   * @param data Dataset
-   * @param batchSize Batch size
-   * @param truncateLength Maximum sequence length
-   * @param relationalAttributeIndex Relational attribute index
-   */
-  public RelationalDataSetIterator(
-      Instances data, int batchSize, int truncateLength, int relationalAttributeIndex) {
-    this.data = data;
-    this.batchSize = batchSize;
-    this.cursor = 0;
-    this.truncateLength = truncateLength;
-    this.relationalAttributeIndex = relationalAttributeIndex;
-    this.numFeatures = data.attribute(relationalAttributeIndex).relation().numAttributes();
-  }
-
-  @Override
-  public DataSet next(int num) {
-    List<Instances> currentBatch = new ArrayList<>(num);
-    List<Double> lbls = new ArrayList<>(num);
-
-    for (int i = 0; i < num && cursor + i < data.numInstances(); i++) {
-      currentBatch.add(data.get(cursor + i).relationalValue(relationalAttributeIndex));
-      lbls.add(data.get(cursor + i).classValue());
+    /**
+     * Constructor.
+     *
+     * @param data                     Dataset
+     * @param batchSize                Batch size
+     * @param truncateLength           Maximum sequence length
+     * @param relationalAttributeIndex Relational attribute index
+     */
+    public RelationalDataSetIterator(
+            Instances data, int batchSize, int truncateLength, int relationalAttributeIndex) {
+        this.data = data;
+        this.batchSize = batchSize;
+        this.cursor = 0;
+        this.truncateLength = truncateLength;
+        this.relationalAttributeIndex = relationalAttributeIndex;
+        this.numFeatures = data.attribute(relationalAttributeIndex).relation().numAttributes();
     }
 
-    final int currentBatchSize = currentBatch.size();
+    @Override
+    public DataSet next(int num) {
+        List<Instances> currentBatch = new ArrayList<>(num);
+        List<Double> lbls = new ArrayList<>(num);
 
-    int maxLength = 0;
-    for (Instances instances : currentBatch) {
-      maxLength = Math.max(maxLength, instances.numInstances());
-    }
+        for (int i = 0; i < num && cursor + i < data.numInstances(); i++) {
+            currentBatch.add(data.get(cursor + i).relationalValue(relationalAttributeIndex));
+            lbls.add(data.get(cursor + i).classValue());
+        }
 
-    // If longest instance exceeds 'truncateLength': only take the first 'truncateLength' instances
-    if (maxLength > truncateLength || maxLength == 0) maxLength = truncateLength;
+        final int currentBatchSize = currentBatch.size();
 
-    // Create data for training
-    INDArray features = Nd4j.create(new int[] {currentBatchSize, numFeatures, maxLength}, 'f');
-    INDArray labels = Nd4j.create(new int[] {currentBatchSize, data.numClasses(), maxLength}, 'f');
+        int maxLength = 0;
+        for (Instances instances : currentBatch) {
+            maxLength = Math.max(maxLength, instances.numInstances());
+        }
 
-    // Because we are dealing with instances of different lengths and only one output at the final
-    // time step: use padding arrays
-    // Mask arrays contain 1 if data is present at that time step for that example, or 0 if data is
-    // just padding
-    INDArray featuresMask = Nd4j.zeros(currentBatchSize, maxLength);
-    INDArray labelsMask = Nd4j.zeros(currentBatchSize, maxLength);
+        // If longest instance exceeds 'truncateLength': only take the first 'truncateLength' instances
+        if (maxLength > truncateLength || maxLength == 0) maxLength = truncateLength;
+
+        // Create data for training
+        INDArray features = Nd4j.create(new int[]{currentBatchSize, numFeatures, maxLength}, 'f');
+        INDArray labels = Nd4j.create(new int[]{currentBatchSize, data.numClasses(), maxLength}, 'f');
+
+        // Because we are dealing with instances of different lengths and only one output at the final
+        // time step: use padding arrays
+        // Mask arrays contain 1 if data is present at that time step for that example, or 0 if data is
+        // just padding
+        INDArray featuresMask = Nd4j.zeros(currentBatchSize, maxLength);
+        INDArray labelsMask = Nd4j.zeros(currentBatchSize, maxLength);
 
 
-    for (int i = 0; i < currentBatchSize; i++) {
-      Instances currInstances = currentBatch.get(i);
+        for (int i = 0; i < currentBatchSize; i++) {
+            Instances currInstances = currentBatch.get(i);
 
-      // Check for empty row
-      final int currNumInstances = currInstances.numInstances();
-      if (currNumInstances == 0) {
-        continue;
-      }
+            // Check for empty row
+            final int currNumInstances = currInstances.numInstances();
+            if (currNumInstances == 0) {
+                continue;
+            }
 
-      // Get the sequence length of row (i)
-      int lastIdx = Math.min(currNumInstances, maxLength);
+            // Get the sequence length of row (i)
+            int lastIdx = Math.min(currNumInstances, maxLength);
 
-      // Matrix that will represent the current row/instances object
-      INDArray currDataND = Nd4j.create(numFeatures, lastIdx);
+            // Matrix that will represent the current row/instances object
+            INDArray currDataND = Nd4j.create(numFeatures, lastIdx);
 
-      // Iterate over truncated number of instances for the current row
-      for (int j = 0; j < lastIdx; j++) {
-        // Get as double array
-        final double[] doubles = currInstances.get(j).toDoubleArray();
-        final INDArray indArray = Nd4j.create(doubles);
-        currDataND.putColumn(j, indArray);
-      }
+            // Iterate over truncated number of instances for the current row
+            for (int j = 0; j < lastIdx; j++) {
+                // Get as double array
+                final double[] doubles = currInstances.get(j).toDoubleArray();
+                final INDArray indArray = Nd4j.create(doubles);
+                currDataND.putColumn(j, indArray);
+            }
 
-      features.put(new INDArrayIndex[] {point(i), all(), interval(0, lastIdx)}, currDataND);
+            features.put(new INDArrayIndex[]{point(i), all(), interval(0, lastIdx)}, currDataND);
 
-      // Assign "1" to each position where a feature is present, that is, in the interval of
-      // [0, lastIdx)
-      featuresMask.get(new INDArrayIndex[] {point(i), interval(0, lastIdx)}).assign(1);
+            // Assign "1" to each position where a feature is present, that is, in the interval of
+            // [0, lastIdx)
+            featuresMask.get(new INDArrayIndex[]{point(i), interval(0, lastIdx)}).assign(1);
 
       /*
        Put the labels in the labels and labelsMask arrays
       */
 
-      // Differ between classification and regression task
-      if (data.numClasses() == 1) { // Regression
-        double val = lbls.get(i);
-        labels.putScalar(new int[] {i, 0, lastIdx - 1}, val);
-      } else if (data.numClasses() > 1) { // Classification
-        // One-Hot-Encoded class
-        int idx = lbls.get(i).intValue();
-        // Set label
-        labels.putScalar(new int[] {i, idx, lastIdx - 1}, 1.0);
-      } else {
-        throw new RuntimeException("Could not detect classification or regression task.");
-      }
+            // Differ between classification and regression task
+            if (data.numClasses() == 1) { // Regression
+                double val = lbls.get(i);
+                labels.putScalar(new int[]{i, 0, lastIdx - 1}, val);
+            } else if (data.numClasses() > 1) { // Classification
+                // One-Hot-Encoded class
+                int idx = lbls.get(i).intValue();
+                // Set label
+                labels.putScalar(new int[]{i, idx, lastIdx - 1}, 1.0);
+            } else {
+                throw new RuntimeException("Could not detect classification or regression task.");
+            }
 
-      // Specify that an output exists at the final time step for this example
-      labelsMask.putScalar(new int[] {i, lastIdx - 1}, 1.0);
+            // Specify that an output exists at the final time step for this example
+            labelsMask.putScalar(new int[]{i, lastIdx - 1}, 1.0);
+        }
+
+        // Cache the dataset
+        final DataSet ds = new DataSet(features, labels, featuresMask, labelsMask);
+
+        // Move cursor
+        cursor += ds.numExamples();
+        return ds;
     }
 
-    // Cache the dataset
-    final DataSet ds = new DataSet(features, labels, featuresMask, labelsMask);
+    @Override
+    public int inputColumns() {
+        return numFeatures;
+    }
 
-    // Move cursor
-    cursor += ds.numExamples();
-    return ds;
-  }
+    @Override
+    public int totalOutcomes() {
+        return data.numClasses();
+    }
 
-  @Override
-  public int inputColumns() {
-    return numFeatures;
-  }
+    @Override
+    public boolean resetSupported() {
+        return true;
+    }
 
-  @Override
-  public int totalOutcomes() {
-    return data.numClasses();
-  }
+    @Override
+    public boolean asyncSupported() {
+        return true;
+    }
 
-  @Override
-  public boolean resetSupported() {
-    return true;
-  }
+    @Override
+    public void reset() {
+        cursor = 0;
+    }
 
-  @Override
-  public boolean asyncSupported() {
-    return true;
-  }
+    @Override
+    public int batch() {
+        return batchSize;
+    }
 
-  @Override
-  public void reset() {
-    cursor = 0;
-  }
+    public int numExamples() {
+        return data.numInstances();
+    }
 
-  @Override
-  public int batch() {
-    return batchSize;
-  }
+    @Override
+    public DataSetPreProcessor getPreProcessor() {
+        return null;
+    }
 
-  public int numExamples() {
-    return data.numInstances();
-  }
+    @Override
+    public void setPreProcessor(DataSetPreProcessor preProcessor) {
+    }
 
-  @Override
-  public void setPreProcessor(DataSetPreProcessor preProcessor) {}
+    @Override
+    public List<String> getLabels() {
+        return data.stream()
+                .map(Instance::classValue)
+                .map(String::valueOf)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+    }
 
-  @Override
-  public DataSetPreProcessor getPreProcessor() {
-    return null;
-  }
+    @Override
+    public boolean hasNext() {
+        return cursor < numExamples();
+    }
 
-  @Override
-  public List<String> getLabels() {
-    return data.stream()
-        .map(Instance::classValue)
-        .map(String::valueOf)
-        .distinct()
-        .sorted()
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean hasNext() {
-    return cursor < numExamples();
-  }
-
-  @Override
-  public DataSet next() {
-    return next(batchSize);
-  }
+    @Override
+    public DataSet next() {
+        return next(batchSize);
+    }
 }

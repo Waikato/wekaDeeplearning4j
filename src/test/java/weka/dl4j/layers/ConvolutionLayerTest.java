@@ -34,54 +34,55 @@ import org.junit.Test;
 public class ConvolutionLayerTest extends AbstractFeedForwardLayerTest<ConvolutionLayer> {
 
 
-  @Override
-  public ConvolutionLayer getApiWrapper() {
-    return new  ConvolutionLayer();
-  }
-
-  @Test
-  public void testConvolutionMode() {
-    for (ConvolutionMode mode : ConvolutionMode.values()) {
-      getApiWrapper();
-      wrapper.setConvolutionMode(mode);
-
-      assertEquals(mode, wrapper.getConvolutionMode());
+    @Override
+    public ConvolutionLayer getApiWrapper() {
+        return new ConvolutionLayer();
     }
-  }
 
-  @Test
-  public void testCudnnAlgoMode() {
-    for (AlgoMode mode : AlgoMode.values()) {
-      getApiWrapper();
-      wrapper.setCudnnAlgoMode(mode);
+    @Test
+    public void testConvolutionMode() {
+        for (ConvolutionMode mode : ConvolutionMode.values()) {
+            getApiWrapper();
+            wrapper.setConvolutionMode(mode);
 
-      assertEquals(mode, wrapper.getCudnnAlgoMode());
+            assertEquals(mode, wrapper.getConvolutionMode());
+        }
     }
-  }
 
-  @Test
-  public void testKernelSize(){
-    int[] size = {20,20};
-    wrapper.setKernelSize(size);
+    @Test
+    public void testCudnnAlgoMode() {
+        for (AlgoMode mode : AlgoMode.values()) {
+            getApiWrapper();
+            wrapper.setCudnnAlgoMode(mode);
 
-    assertArrayEquals(size, wrapper.getKernelSize());
-  }
+            assertEquals(mode, wrapper.getCudnnAlgoMode());
+        }
+    }
 
-  @Test
-  public void testStrideSize(){
-    int[] size = {20,20};
-    wrapper.setStride(size);
+    @Test
+    public void testKernelSize() {
+        int[] size = {20, 20};
+        wrapper.setKernelSize(size);
 
-    assertArrayEquals(size, wrapper.getStride());
+        assertArrayEquals(size, wrapper.getKernelSize());
+    }
 
-  }
-  @Test
-  public void testPaddingSize(){
-    int[] size = {20,20};
-    wrapper.setPadding(size);
+    @Test
+    public void testStrideSize() {
+        int[] size = {20, 20};
+        wrapper.setStride(size);
 
-    assertArrayEquals(size, wrapper.getPadding());
+        assertArrayEquals(size, wrapper.getStride());
 
-  }
+    }
+
+    @Test
+    public void testPaddingSize() {
+        int[] size = {20, 20};
+        wrapper.setPadding(size);
+
+        assertArrayEquals(size, wrapper.getPadding());
+
+    }
 
 }

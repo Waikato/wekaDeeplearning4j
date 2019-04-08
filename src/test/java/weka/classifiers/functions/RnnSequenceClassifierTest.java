@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
+
 import lombok.extern.log4j.Log4j2;
 import weka.dl4j.GradientNormalization;
 import weka.dl4j.text.tokenization.preprocessor.TokenPreProcess;
@@ -84,47 +85,56 @@ import static weka.util.TestUtil.saveClf;
 @Log4j2
 public class RnnSequenceClassifierTest {
 
-  /** Current name */
-  @Rule public TestName name = new TestName();
-  /** Model path slim */
-  private static File modelSlim;
-  /** Classifier */
-  private RnnSequenceClassifier clf;
-  /** Dataset reuters */
-  private Instances data;
-
-  private static final int batchSize = 64;
-  private static final int epochs = 2;
-  private static final int truncateLength = 10;
-
-  private static RnnTextEmbeddingInstanceIterator tii;
-  private long startTime;
+    private static final int batchSize = 64;
+    private static final int epochs = 2;
+    private static final int truncateLength = 10;
+    /**
+     * Model path slim
+     */
+    private static File modelSlim;
+    private static RnnTextEmbeddingInstanceIterator tii;
+    /**
+     * Current name
+     */
+    @Rule
+    public TestName name = new TestName();
+    /**
+     * Classifier
+     */
+    private RnnSequenceClassifier clf;
+    /**
+     * Dataset reuters
+     */
+    private Instances data;
+    private long startTime;
 
 //  private FileStatsStorage fss;
 
-  /** Initialize the text instance iterator */
-  @BeforeClass
-  public static void init() throws IOException {
-    modelSlim = DatasetLoader.loadGoogleNewsVectors();
-    tii = new RnnTextEmbeddingInstanceIterator();
-    tii.setWordVectorLocation(modelSlim);
-    tii.setTruncateLength(truncateLength);
-    tii.setTrainBatchSize(batchSize);
-  }
+    /**
+     * Initialize the text instance iterator
+     */
+    @BeforeClass
+    public static void init() throws IOException {
+        modelSlim = DatasetLoader.loadGoogleNewsVectors();
+        tii = new RnnTextEmbeddingInstanceIterator();
+        tii.setWordVectorLocation(modelSlim);
+        tii.setTruncateLength(truncateLength);
+        tii.setTrainBatchSize(batchSize);
+    }
 
-  @Before
-  public void before() {
+    @Before
+    public void before() {
 
-    // Init mlp clf
-    clf = new RnnSequenceClassifier();
-    clf.setSeed(TestUtil.SEED);
-    clf.setDebug(false);
-    clf.setNumEpochs(epochs);
+        // Init mlp clf
+        clf = new RnnSequenceClassifier();
+        clf.setSeed(TestUtil.SEED);
+        clf.setDebug(false);
+        clf.setNumEpochs(epochs);
 
-    clf.setInstanceIterator(tii);
-    startTime = System.currentTimeMillis();
-    //    setupUi();
-  }
+        clf.setInstanceIterator(tii);
+        startTime = System.currentTimeMillis();
+        //    setupUi();
+    }
 
 //  private void setupUi() {
 //    String dir = System.getenv("WEKA_HOME");
@@ -141,338 +151,339 @@ public class RnnSequenceClassifierTest {
 //    TestUtil.startUiServer(fss);
 //  }
 
-  @After
-  public void after() {
-    double time = (System.currentTimeMillis() - startTime) / 1000.0;
-    log.info("Testmethod: " + name.getMethodName());
-    log.info("Time: " + time + "s");
-  }
+    @After
+    public void after() {
+        double time = (System.currentTimeMillis() - startTime) / 1000.0;
+        log.info("Testmethod: " + name.getMethodName());
+        log.info("Time: " + time + "s");
+    }
 
-  @Test
-  public void testImdbClassification() throws Exception {
+    @Test
+    public void testImdbClassification() throws Exception {
 
-    // Init data
-    data = DatasetLoader.loadImdb();
+        // Init data
+        data = DatasetLoader.loadImdb();
 
-    // Define layers
-    LSTM lstm1 = new LSTM();
-    lstm1.setNOut(3);
-    lstm1.setActivationFunction(new ActivationTanH());
+        // Define layers
+        LSTM lstm1 = new LSTM();
+        lstm1.setNOut(3);
+        lstm1.setActivationFunction(new ActivationTanH());
 
-    RnnOutputLayer rnnOut = new RnnOutputLayer();
+        RnnOutputLayer rnnOut = new RnnOutputLayer();
 
-    // Network config
-    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setL2(1e-5);
-    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
-    nnc.setGradientNormalizationThreshold(1.0);
-    Adam opt = new Adam();
-    opt.setLearningRate(0.02);
-    nnc.setUpdater(opt);
+        // Network config
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setL2(1e-5);
+        nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+        nnc.setGradientNormalizationThreshold(1.0);
+        Adam opt = new Adam();
+        opt.setLearningRate(0.02);
+        nnc.setUpdater(opt);
 
-    // Config classifier
-    clf.setLayers(lstm1, rnnOut);
-    clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(20);
-    clf.settBPTTforwardLength(20);
-    clf.setQueueSize(0);
+        // Config classifier
+        clf.setLayers(lstm1, rnnOut);
+        clf.setNeuralNetConfiguration(nnc);
+        clf.settBPTTbackwardLength(20);
+        clf.settBPTTforwardLength(20);
+        clf.setQueueSize(0);
 
-    // Randomize data
-    data.randomize(new Random(42));
+        // Randomize data
+        data.randomize(new Random(42));
 
-    // Reduce datasize
-    RemovePercentage rp = new RemovePercentage();
-    rp.setPercentage(95);
-    rp.setInputFormat(data);
-    data = Filter.useFilter(data, rp);
+        // Reduce datasize
+        RemovePercentage rp = new RemovePercentage();
+        rp.setPercentage(95);
+        rp.setInputFormat(data);
+        data = Filter.useFilter(data, rp);
 
-    TestUtil.holdout(clf, data, 5, tii);
-  }
+        TestUtil.holdout(clf, data, 5, tii);
+    }
 
-  @Test
-  public void testAngerRegression() throws Exception {
-    // Define layers
-    LSTM lstm1 = new LSTM();
-    lstm1.setNOut(5);
-    lstm1.setActivationFunction(new ActivationTanH());
+    @Test
+    public void testAngerRegression() throws Exception {
+        // Define layers
+        LSTM lstm1 = new LSTM();
+        lstm1.setNOut(5);
+        lstm1.setActivationFunction(new ActivationTanH());
 
-    RnnOutputLayer rnnOut = new RnnOutputLayer();
-    rnnOut.setLossFn(new LossMSE());
-    rnnOut.setActivationFunction(new ActivationIdentity());
+        RnnOutputLayer rnnOut = new RnnOutputLayer();
+        rnnOut.setLossFn(new LossMSE());
+        rnnOut.setActivationFunction(new ActivationIdentity());
 
-    // Network config
-    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setL2(1e-5);
-    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
-    nnc.setGradientNormalizationThreshold(1.0);
-    Adam opt = new Adam();
-    opt.setLearningRate(0.02);
-    nnc.setUpdater(opt);
+        // Network config
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setL2(1e-5);
+        nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+        nnc.setGradientNormalizationThreshold(1.0);
+        Adam opt = new Adam();
+        opt.setLearningRate(0.02);
+        nnc.setUpdater(opt);
 
-    // Config classifier
-    clf.setLayers(lstm1, rnnOut);
-    clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(2);
-    clf.settBPTTforwardLength(2);
-    clf.setNumEpochs(1);
+        // Config classifier
+        clf.setLayers(lstm1, rnnOut);
+        clf.setNeuralNetConfiguration(nnc);
+        clf.settBPTTbackwardLength(2);
+        clf.settBPTTforwardLength(2);
+        clf.setNumEpochs(1);
 
-    // Randomize data
-    data = DatasetLoader.loadAnger();
-    data.randomize(new Random(42));
+        // Randomize data
+        data = DatasetLoader.loadAnger();
+        data.randomize(new Random(42));
 
-    TestUtil.holdout(clf, data, 1);
-  }
+        TestUtil.holdout(clf, data, 1);
+    }
 
-  @Test
-  public void testAngerMetaRegression() throws Exception {
-    // Define layers
-    LSTM lstm1 = new LSTM();
-    lstm1.setNOut(32);
-    lstm1.setActivationFunction(new ActivationTanH());
+    @Test
+    public void testAngerMetaRegression() throws Exception {
+        // Define layers
+        LSTM lstm1 = new LSTM();
+        lstm1.setNOut(32);
+        lstm1.setActivationFunction(new ActivationTanH());
 
-    RnnOutputLayer rnnOut = new RnnOutputLayer();
-    rnnOut.setLossFn(new LossMSE());
-    rnnOut.setActivationFunction(new ActivationIdentity());
+        RnnOutputLayer rnnOut = new RnnOutputLayer();
+        rnnOut.setLossFn(new LossMSE());
+        rnnOut.setActivationFunction(new ActivationIdentity());
 
-    // Network config
-    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setL2(1e-5);
-    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
-    nnc.setGradientNormalizationThreshold(1.0);
-    Adam opt = new Adam();
-    opt.setLearningRate(0.02);
-    nnc.setUpdater(opt);
+        // Network config
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setL2(1e-5);
+        nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+        nnc.setGradientNormalizationThreshold(1.0);
+        Adam opt = new Adam();
+        opt.setLearningRate(0.02);
+        nnc.setUpdater(opt);
 
-    final RnnTextFilesEmbeddingInstanceIterator tfii = new RnnTextFilesEmbeddingInstanceIterator();
-    tfii.setTextsLocation(DatasetLoader.loadAngerFilesDir());
-    tfii.setTruncateLength(80);
-    tfii.setTrainBatchSize(64);
-    tfii.setWordVectorLocation(modelSlim);
-    clf.setInstanceIterator(tfii);
+        final RnnTextFilesEmbeddingInstanceIterator tfii = new RnnTextFilesEmbeddingInstanceIterator();
+        tfii.setTextsLocation(DatasetLoader.loadAngerFilesDir());
+        tfii.setTruncateLength(80);
+        tfii.setTrainBatchSize(64);
+        tfii.setWordVectorLocation(modelSlim);
+        clf.setInstanceIterator(tfii);
 
-    // Config classifier
-    clf.setLayers(lstm1, rnnOut);
-    clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(20);
-    clf.settBPTTforwardLength(20);
+        // Config classifier
+        clf.setLayers(lstm1, rnnOut);
+        clf.setNeuralNetConfiguration(nnc);
+        clf.settBPTTbackwardLength(20);
+        clf.settBPTTforwardLength(20);
 
-    data = DatasetLoader.loadAngerMeta();
-    // Randomize data
-    data.randomize(new Random(42));
-    TestUtil.holdout(clf, data, 3);
-  }
-  @Test
-  public void testRelationalDataset() throws Exception {
-    data = TestUtil
-        .makeTestDatasetRelational(TestUtil.SEED, 1000, 2, Attribute.NOMINAL, 1, 2, 2, 2, 100);
-    data.setClassIndex(data.numAttributes() - 1);
+        data = DatasetLoader.loadAngerMeta();
+        // Randomize data
+        data.randomize(new Random(42));
+        TestUtil.holdout(clf, data, 3);
+    }
 
-    // Define layers
-    LSTM lstm1 = new LSTM();
-    lstm1.setNOut(32);
-    lstm1.setActivationFunction(new ActivationTanH());
+    @Test
+    public void testRelationalDataset() throws Exception {
+        data = TestUtil
+                .makeTestDatasetRelational(TestUtil.SEED, 1000, 2, Attribute.NOMINAL, 1, 2, 2, 2, 100);
+        data.setClassIndex(data.numAttributes() - 1);
 
-    RnnOutputLayer rnnOut = new RnnOutputLayer();
-    rnnOut.setLossFn(new LossMSE());
+        // Define layers
+        LSTM lstm1 = new LSTM();
+        lstm1.setNOut(32);
+        lstm1.setActivationFunction(new ActivationTanH());
 
-    // Network config
-    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setL2(1e-5);
-    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
-    nnc.setGradientNormalizationThreshold(1.0);
-    Adam opt = new Adam();
-    opt.setLearningRate(0.02);
-    nnc.setUpdater(opt);
+        RnnOutputLayer rnnOut = new RnnOutputLayer();
+        rnnOut.setLossFn(new LossMSE());
 
-    final RelationalInstanceIterator rii = new RelationalInstanceIterator();
-    rii.setTruncateLength(80);
-    rii.setTrainBatchSize(64);
-    rii.setRelationalAttributeIndex(0);
-    clf.setInstanceIterator(rii);
+        // Network config
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setL2(1e-5);
+        nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+        nnc.setGradientNormalizationThreshold(1.0);
+        Adam opt = new Adam();
+        opt.setLearningRate(0.02);
+        nnc.setUpdater(opt);
 
-    // Config classifier
-    clf.setLayers(lstm1, rnnOut);
-    clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(20);
-    clf.settBPTTforwardLength(20);
+        final RelationalInstanceIterator rii = new RelationalInstanceIterator();
+        rii.setTruncateLength(80);
+        rii.setTrainBatchSize(64);
+        rii.setRelationalAttributeIndex(0);
+        clf.setInstanceIterator(rii);
 
-    TestUtil.holdout(clf, data, 3);
-  }
+        // Config classifier
+        clf.setLayers(lstm1, rnnOut);
+        clf.setNeuralNetConfiguration(nnc);
+        clf.settBPTTbackwardLength(20);
+        clf.settBPTTforwardLength(20);
 
-  @Test
-  public void testConfigRotation() throws Exception {
-    Map<String, String> failedConfigs = new HashMap<>();
+        TestUtil.holdout(clf, data, 3);
+    }
 
-    tii = new RnnTextEmbeddingInstanceIterator();
-    tii.setWordVectorLocation(modelSlim);
-    data = DatasetLoader.loadAnger();
+    @Test
+    public void testConfigRotation() throws Exception {
+        Map<String, String> failedConfigs = new HashMap<>();
 
-    // Reduce datasize
-    RemovePercentage rp = new RemovePercentage();
-    rp.setPercentage(98);
-    rp.setInputFormat(data);
-    data = Filter.useFilter(data, rp);
+        tii = new RnnTextEmbeddingInstanceIterator();
+        tii.setWordVectorLocation(modelSlim);
+        data = DatasetLoader.loadAnger();
 
-    RnnOutputLayer out = new RnnOutputLayer();
-    out.setLossFn(new LossMSE());
-    out.setActivationFunction(new ActivationIdentity());
+        // Reduce datasize
+        RemovePercentage rp = new RemovePercentage();
+        rp.setPercentage(98);
+        rp.setInputFormat(data);
+        data = Filter.useFilter(data, rp);
 
-    final Dl4jWordsFromFile wff = new Dl4jWordsFromFile();
-    wff.setStopwords(new File("src/test/resources/stopwords/english.txt"));
-    // Iterate stopwords
-    for (Dl4jAbstractStopwords sw :
-        new Dl4jAbstractStopwords[] {new Dl4jRainbow(), new Dl4jNull(), wff}) {
-      tii.setStopwords(sw);
+        RnnOutputLayer out = new RnnOutputLayer();
+        out.setLossFn(new LossMSE());
+        out.setActivationFunction(new ActivationIdentity());
 
-      final StemmingPreProcessor spp = new StemmingPreProcessor();
-      spp.setStemmer(new SnowballStemmer());
-      // Iterate TokenPreProcess
-      for (TokenPreProcess tpp :
-          new TokenPreProcess[] {
-            new CommonPreProcessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
-          }) {
-        tii.setTokenPreProcess(tpp);
+        final Dl4jWordsFromFile wff = new Dl4jWordsFromFile();
+        wff.setStopwords(new File("src/test/resources/stopwords/english.txt"));
+        // Iterate stopwords
+        for (Dl4jAbstractStopwords sw :
+                new Dl4jAbstractStopwords[]{new Dl4jRainbow(), new Dl4jNull(), wff}) {
+            tii.setStopwords(sw);
 
-        // Iterate tokenizer faktory
-        for (TokenizerFactory tf :
-            new TokenizerFactory[] {
-              new DefaultTokenizerFactory(),
-              new CharacterNGramTokenizerFactory(),
-              new TweetNLPTokenizerFactory(),
-            }) {
-          tii.setTokenizerFactory(tf);
+            final StemmingPreProcessor spp = new StemmingPreProcessor();
+            spp.setStemmer(new SnowballStemmer());
+            // Iterate TokenPreProcess
+            for (TokenPreProcess tpp :
+                    new TokenPreProcess[]{
+                            new CommonPreProcessor(), new EndingPreProcessor(), new LowCasePreProcessor(), spp
+                    }) {
+                tii.setTokenPreProcess(tpp);
 
-          // Create clean classifier
-          clf = new RnnSequenceClassifier();
-          clf.setNumEpochs(1);
-          clf.setLayers(out);
-          clf.setInstanceIterator(tii);
-          clf.settBPTTforwardLength(3);
-          clf.settBPTTbackwardLength(3);
+                // Iterate tokenizer faktory
+                for (TokenizerFactory tf :
+                        new TokenizerFactory[]{
+                                new DefaultTokenizerFactory(),
+                                new CharacterNGramTokenizerFactory(),
+                                new TweetNLPTokenizerFactory(),
+                        }) {
+                    tii.setTokenizerFactory(tf);
 
-          String conf =
-              "\n - TokenPreProcess: "
-                  + tpp.getClass().getSimpleName()
-                  + "\n - TokenizerFactory: "
-                  + tf.getClass().getSimpleName()
-                  + "\n - StopWords: "
-                  + sw.getClass().getSimpleName();
-          log.info(conf);
-          try {
-            clf.buildClassifier(data);
-          } catch (Exception e) {
-            failedConfigs.put(conf, e.toString());
-          }
+                    // Create clean classifier
+                    clf = new RnnSequenceClassifier();
+                    clf.setNumEpochs(1);
+                    clf.setLayers(out);
+                    clf.setInstanceIterator(tii);
+                    clf.settBPTTforwardLength(3);
+                    clf.settBPTTbackwardLength(3);
+
+                    String conf =
+                            "\n - TokenPreProcess: "
+                                    + tpp.getClass().getSimpleName()
+                                    + "\n - TokenizerFactory: "
+                                    + tf.getClass().getSimpleName()
+                                    + "\n - StopWords: "
+                                    + sw.getClass().getSimpleName();
+                    log.info(conf);
+                    try {
+                        clf.buildClassifier(data);
+                    } catch (Exception e) {
+                        failedConfigs.put(conf, e.toString());
+                    }
+                }
+            }
         }
-      }
+
+        // Check if anything failed
+        if (!failedConfigs.isEmpty()) {
+
+            final String err =
+                    failedConfigs
+                            .keySet()
+                            .stream()
+                            .map(s -> "Config failed: " + s + "\nException: " + failedConfigs.get(s))
+                            .collect(Collectors.joining("\n"));
+
+            Assert.fail("Some of the configs failed:\n" + err);
+        }
     }
 
-    // Check if anything failed
-    if (!failedConfigs.isEmpty()) {
+    @Test
+    public void testClassIndexAtPosZero() throws Exception {
+        data = DatasetLoader.loadAnger();
 
-      final String err =
-          failedConfigs
-              .keySet()
-              .stream()
-              .map(s -> "Config failed: " + s + "\nException: " + failedConfigs.get(s))
-              .collect(Collectors.joining("\n"));
+        RnnOutputLayer out = new RnnOutputLayer();
+        out.setLossFn(new LossMSE());
+        out.setActivationFunction(new ActivationIdentity());
+        clf.setLayers(out);
 
-      Assert.fail("Some of the configs failed:\n" + err);
+        // Create reversed attribute list
+        ArrayList<Attribute> attsReversed = new ArrayList<>();
+        for (int i = data.numAttributes() - 1; i >= 0; i--) {
+            attsReversed.add(data.attribute(i));
+        }
+
+        // Create copy with class at pos 0 and text at pos 1
+        Instances copy = new Instances("reversed", attsReversed, data.numInstances());
+        data.forEach(
+                d -> {
+                    Instance inst = new DenseInstance(2);
+                    inst.setDataset(copy);
+                    inst.setValue(0, d.classValue());
+                    inst.setValue(1, d.stringValue(0));
+                    copy.add(inst);
+                });
+
+        copy.setClassIndex(0);
+
+        TestUtil.holdout(clf, copy);
     }
-  }
 
-  @Test
-  public void testClassIndexAtPosZero() throws Exception {
-    data = DatasetLoader.loadAnger();
+    @Test
+    public void testResume() throws Exception {
+        // Define layers
+        LSTM lstm1 = new LSTM();
+        lstm1.setNOut(5);
+        lstm1.setActivationFunction(new ActivationTanH());
 
-    RnnOutputLayer out = new RnnOutputLayer();
-    out.setLossFn(new LossMSE());
-    out.setActivationFunction(new ActivationIdentity());
-    clf.setLayers(out);
+        RnnOutputLayer rnnOut = new RnnOutputLayer();
+        rnnOut.setLossFn(new LossMSE());
+        rnnOut.setActivationFunction(new ActivationIdentity());
 
-    // Create reversed attribute list
-    ArrayList<Attribute> attsReversed = new ArrayList<>();
-    for (int i = data.numAttributes() - 1; i >= 0; i--) {
-      attsReversed.add(data.attribute(i));
+        // Network config
+        NeuralNetConfiguration nnc = new NeuralNetConfiguration();
+        nnc.setL2(1e-5);
+        nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
+        nnc.setGradientNormalizationThreshold(1.0);
+        Adam opt = new Adam();
+        opt.setLearningRate(0.02);
+        nnc.setUpdater(opt);
+
+        // Config classifier
+        clf.setLayers(lstm1, rnnOut);
+        clf.setNeuralNetConfiguration(nnc);
+        clf.settBPTTbackwardLength(2);
+        clf.settBPTTforwardLength(2);
+        int numEpochs = 5;
+        clf.setNumEpochs(numEpochs);
+
+        // Randomize data
+        data = DatasetLoader.loadAnger();
+        data.randomize(new Random(42));
+
+        TestUtil.holdout(clf, data, 1);
+
+        assertEquals(numEpochs, clf.numEpochsPerformed);
+        assertEquals(numEpochs, clf.numEpochsPerformedThisSession);
+
+        // Save classifier
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        String clfPath = Paths.get(tmpDir, "lstm-clf.ser").toString();
+        saveClf(clfPath, clf);
+
+        // Reload classifier and run #numEpochs epochs again
+        Dl4jMlpClassifier clfLoaded = readClf(clfPath);
+        clfLoaded.buildClassifier(data);
+
+        // Check if epochs are correctly counted
+        assertEquals(numEpochs, clfLoaded.numEpochs);
+        assertEquals(numEpochs * 2, clfLoaded.numEpochsPerformed);
+        assertEquals(numEpochs, clfLoaded.numEpochsPerformedThisSession);
+
+        // Repeat procedure one more time and check again
+        saveClf(clfPath, clfLoaded);
+        Dl4jMlpClassifier clfLoaded2 = readClf(clfPath);
+        clfLoaded2.buildClassifier(data);
+
+        assertEquals(numEpochs, clfLoaded2.numEpochs);
+        assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
+        assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
+
+
+        Files.delete(Paths.get(clfPath));
     }
-
-    // Create copy with class at pos 0 and text at pos 1
-    Instances copy = new Instances("reversed", attsReversed, data.numInstances());
-    data.forEach(
-        d -> {
-          Instance inst = new DenseInstance(2);
-          inst.setDataset(copy);
-          inst.setValue(0, d.classValue());
-          inst.setValue(1, d.stringValue(0));
-          copy.add(inst);
-        });
-
-    copy.setClassIndex(0);
-
-    TestUtil.holdout(clf, copy);
-  }
-
-  @Test
-  public void testResume() throws Exception {
-    // Define layers
-    LSTM lstm1 = new LSTM();
-    lstm1.setNOut(5);
-    lstm1.setActivationFunction(new ActivationTanH());
-
-    RnnOutputLayer rnnOut = new RnnOutputLayer();
-    rnnOut.setLossFn(new LossMSE());
-    rnnOut.setActivationFunction(new ActivationIdentity());
-
-    // Network config
-    NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-    nnc.setL2(1e-5);
-    nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
-    nnc.setGradientNormalizationThreshold(1.0);
-    Adam opt = new Adam();
-    opt.setLearningRate(0.02);
-    nnc.setUpdater(opt);
-
-    // Config classifier
-    clf.setLayers(lstm1, rnnOut);
-    clf.setNeuralNetConfiguration(nnc);
-    clf.settBPTTbackwardLength(2);
-    clf.settBPTTforwardLength(2);
-    int numEpochs = 5;
-    clf.setNumEpochs(numEpochs);
-
-    // Randomize data
-    data = DatasetLoader.loadAnger();
-    data.randomize(new Random(42));
-
-    TestUtil.holdout(clf, data, 1);
-
-    assertEquals(numEpochs, clf.numEpochsPerformed);
-    assertEquals(numEpochs, clf.numEpochsPerformedThisSession);
-
-    // Save classifier
-    String tmpDir = System.getProperty("java.io.tmpdir");
-    String clfPath = Paths.get(tmpDir, "lstm-clf.ser").toString();
-    saveClf(clfPath, clf);
-
-    // Reload classifier and run #numEpochs epochs again
-    Dl4jMlpClassifier clfLoaded = readClf(clfPath);
-    clfLoaded.buildClassifier(data);
-
-    // Check if epochs are correctly counted
-    assertEquals(numEpochs, clfLoaded.numEpochs);
-    assertEquals(numEpochs * 2, clfLoaded.numEpochsPerformed);
-    assertEquals(numEpochs, clfLoaded.numEpochsPerformedThisSession);
-
-    // Repeat procedure one more time and check again
-    saveClf(clfPath, clfLoaded);
-    Dl4jMlpClassifier clfLoaded2 = readClf(clfPath);
-    clfLoaded2.buildClassifier(data);
-
-    assertEquals(numEpochs, clfLoaded2.numEpochs);
-    assertEquals(numEpochs * 3, clfLoaded2.numEpochsPerformed);
-    assertEquals(numEpochs, clfLoaded2.numEpochsPerformedThisSession);
-
-
-    Files.delete(Paths.get(clfPath));
-  }
 }

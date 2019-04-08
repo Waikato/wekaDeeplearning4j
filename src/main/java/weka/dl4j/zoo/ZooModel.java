@@ -30,6 +30,7 @@ import weka.core.OptionHandler;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.List;
+
 import weka.dl4j.Preferences;
 
 /**
@@ -38,93 +39,93 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public interface ZooModel extends Serializable, OptionHandler {
-  /**
-   * Initialize the ZooModel as MLP
-   *
-   * @param numLabels Number of labels to adjust the output
-   * @param seed Seed
-   * @param shape
-   * @return MultiLayerNetwork of the specified ZooModel
-   * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
-   */
-  ComputationGraph init(int numLabels, long seed, int[] shape)
-      throws UnsupportedOperationException;
+    /**
+     * Initialize the ZooModel as MLP
+     *
+     * @param numLabels Number of labels to adjust the output
+     * @param seed      Seed
+     * @param shape
+     * @return MultiLayerNetwork of the specified ZooModel
+     * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
+     */
+    ComputationGraph init(int numLabels, long seed, int[] shape)
+            throws UnsupportedOperationException;
 
-  /**
-   * Convert a MultiLayerConfiguration into a Computation graph
-   *
-   * @param mlc Layer-wise configuration
-   * @param shape Inputshape
-   * @return ComputationGraph based on the configuration in the MLC
-   */
-  default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[] shape) {
-    ComputationGraphConfiguration.GraphBuilder builder =
-        new NeuralNetConfiguration.Builder()
-            .trainingWorkspaceMode(Preferences.WORKSPACE_MODE)
-            .inferenceWorkspaceMode(Preferences.WORKSPACE_MODE)
-            .graphBuilder();
-    List<NeuralNetConfiguration> confs = mlc.getConfs();
+    /**
+     * Convert a MultiLayerConfiguration into a Computation graph
+     *
+     * @param mlc   Layer-wise configuration
+     * @param shape Inputshape
+     * @return ComputationGraph based on the configuration in the MLC
+     */
+    default ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[] shape) {
+        ComputationGraphConfiguration.GraphBuilder builder =
+                new NeuralNetConfiguration.Builder()
+                        .trainingWorkspaceMode(Preferences.WORKSPACE_MODE)
+                        .inferenceWorkspaceMode(Preferences.WORKSPACE_MODE)
+                        .graphBuilder();
+        List<NeuralNetConfiguration> confs = mlc.getConfs();
 
-    // Start with input
-    String currentInput = "input";
-    builder.addInputs(currentInput);
+        // Start with input
+        String currentInput = "input";
+        builder.addInputs(currentInput);
 
-    // Iterate MLN configurations layer-wise
-    for (NeuralNetConfiguration conf : confs) {
-      Layer l = conf.getLayer();
-      String lName = l.getLayerName();
+        // Iterate MLN configurations layer-wise
+        for (NeuralNetConfiguration conf : confs) {
+            Layer l = conf.getLayer();
+            String lName = l.getLayerName();
 
-      // Connect current layer with last layer
-      builder.addLayer(lName, l, currentInput);
-      currentInput = lName;
+            // Connect current layer with last layer
+            builder.addLayer(lName, l, currentInput);
+            currentInput = lName;
+        }
+        builder.setOutputs(currentInput);
+
+        // Configure inputs
+        builder.setInputTypes(InputType.convolutional(shape[1], shape[2], shape[0]));
+
+        // Build
+        ComputationGraphConfiguration cgc = builder.build();
+        return new ComputationGraph(cgc);
     }
-    builder.setOutputs(currentInput);
 
-    // Configure inputs
-    builder.setInputTypes(InputType.convolutional(shape[1], shape[2], shape[0]));
+    /**
+     * Get the input shape of this zoomodel
+     *
+     * @return Input shape of this zoomodel
+     */
+    int[][] getShape();
 
-    // Build
-    ComputationGraphConfiguration cgc = builder.build();
-    return new ComputationGraph(cgc);
-  }
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public default Enumeration<Option> listOptions() {
 
-  /**
-   * Get the input shape of this zoomodel
-   *
-   * @return Input shape of this zoomodel
-   */
-  int[][] getShape();
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
 
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  @Override
-  public default Enumeration<Option> listOptions() {
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public default String[] getOptions() {
 
-    return Option.listOptionsForClass(this.getClass()).elements();
-  }
+        return Option.getOptions(this, this.getClass());
+    }
 
-  /**
-   * Gets the current settings of the Classifier.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  @Override
-  public default String[] getOptions() {
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public default void setOptions(String[] options) throws Exception {
 
-    return Option.getOptions(this, this.getClass());
-  }
-
-  /**
-   * Parses a given list of options.
-   *
-   * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
-   */
-  public default void setOptions(String[] options) throws Exception {
-
-    Option.setOptions(options, this, this.getClass());
-  }
+        Option.setOptions(options, this, this.getClass());
+    }
 }

@@ -33,33 +33,33 @@ import weka.dl4j.schedules.StepSchedule;
 
 public class GaussianNoiseTest extends ApiWrapperTest<GaussianNoise> {
 
-  @Test
-  public void setStdDev() {
-    double value = 123.456;
-    wrapper.setStdDev(value);
+    @Test
+    public void setStdDev() {
+        double value = 123.456;
+        wrapper.setStdDev(value);
 
-    assertEquals(value, wrapper.getStdDev(), PRECISION);
-  }
-
-  @Test
-  public void setRateSchedule() {
-    for (Schedule sched : new Schedule[]{
-        new ConstantSchedule(),
-        new ExponentialSchedule(),
-        new InverseSchedule(),
-        new MapSchedule(),
-        new PolySchedule(),
-        new SigmoidSchedule(),
-        new StepSchedule()
-    }) {
-      wrapper.setRateSchedule(sched);
-
-      assertEquals(sched, wrapper.getRateSchedule());
+        assertEquals(value, wrapper.getStdDev(), PRECISION);
     }
-  }
 
-  @Override
-  public GaussianNoise getApiWrapper() {
-    return new GaussianNoise();
-  }
+    @Test
+    public void setRateSchedule() {
+        for (Schedule sched : new Schedule[]{
+                new ConstantSchedule(),
+                new ExponentialSchedule(),
+                new InverseSchedule(),
+                new MapSchedule(),
+                new PolySchedule(),
+                new SigmoidSchedule(),
+                new StepSchedule()
+        }) {
+            wrapper.setRateSchedule(sched);
+
+            assertEquals(sched, wrapper.getRateSchedule());
+        }
+    }
+
+    @Override
+    public GaussianNoise getApiWrapper() {
+        return new GaussianNoise();
+    }
 }

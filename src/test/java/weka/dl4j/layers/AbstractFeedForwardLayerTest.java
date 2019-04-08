@@ -31,19 +31,19 @@ import weka.dl4j.activations.ActivationReLU;
  */
 public abstract class AbstractFeedForwardLayerTest<T extends FeedForwardLayer> extends AbstractLayerTest<T> {
 
-  @Test
-  public void testActivation() {
-    ActivationReLU relu = new ActivationReLU();
-    wrapper.setActivationFunction(relu);
+    @Test
+    public void testActivation() {
+        ActivationReLU relu = new ActivationReLU();
+        wrapper.setActivationFunction(relu);
 
-    assertEquals(relu, wrapper.getActivationFunction());
-  }
+        assertEquals(relu, wrapper.getActivationFunction());
+    }
 
-  @Test
-  public void testSetNumOut(){
-    int nOut = 123;
-    wrapper.setNOut(nOut);
+    @Test
+    public void testSetNumOut() {
+        int nOut = 123;
+        wrapper.setNOut(nOut);
 
-    assertEquals(nOut, wrapper.getNOut());
-  }
+        assertEquals(nOut, wrapper.getNOut());
+    }
 }

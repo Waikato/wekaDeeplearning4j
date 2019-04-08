@@ -24,24 +24,24 @@ import org.junit.Test;
 
 public class AdaDeltaTest extends AbstractUpdaterTest<AdaDelta> {
 
-  @Test
-  public void setRho() {
-    double value = 123.456;
-    wrapper.setRho(value);
+    @Test
+    public void setRho() {
+        double value = 123.456;
+        wrapper.setRho(value);
 
-    assertEquals(value, wrapper.getRho(), PRECISION);
-  }
+        assertEquals(value, wrapper.getRho(), PRECISION);
+    }
 
-  @Test
-  public void setEpsilon() {
-    double value = 123.456;
-    wrapper.setEpsilon(value);
+    @Test
+    public void setEpsilon() {
+        double value = 123.456;
+        wrapper.setEpsilon(value);
 
-    assertEquals(value, wrapper.getEpsilon(), PRECISION);
-  }
+        assertEquals(value, wrapper.getEpsilon(), PRECISION);
+    }
 
-  @Override
-  public AdaDelta getApiWrapper() {
-    return new AdaDelta();
-  }
+    @Override
+    public AdaDelta getApiWrapper() {
+        return new AdaDelta();
+    }
 }
