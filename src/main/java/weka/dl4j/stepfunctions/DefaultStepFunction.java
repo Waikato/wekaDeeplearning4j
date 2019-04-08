@@ -18,10 +18,12 @@
 
 package weka.dl4j.stepfunctions;
 
-import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.util.Enumeration;
+import weka.dl4j.ApiWrapper;
 
 /**
  * A version of DeepLearning4j's DefaultStepFunction that implements WEKA option handling.
@@ -30,8 +32,7 @@ import weka.core.OptionHandler;
  */
 @JsonTypeName("default")
 public class DefaultStepFunction
-    extends StepFunction<org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction> implements
-    OptionHandler {
+    extends StepFunction<org.deeplearning4j.nn.conf.stepfunctions.DefaultStepFunction> implements OptionHandler {
 
   private static final long serialVersionUID = -5500643918837817474L;
 
@@ -61,7 +62,7 @@ public class DefaultStepFunction
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

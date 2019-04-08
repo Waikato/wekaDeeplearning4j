@@ -86,6 +86,8 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   }
 
 
+
+
   @Override
   public String globalInfo() {
     return null;
@@ -98,7 +100,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
 
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
-    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile))) {
+    try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile))){
       model = (Dl4jMlpClassifier) ois.readObject();
       return model.getActivationsAtLayer(transformationLayerName, inputFormat);
     } catch (IOException e) {
@@ -120,7 +122,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
    */
   public Enumeration<Option> listOptions() {
 
-    return Option.listOptionsForClassHierarchy(this.getClass(), Filter.class).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),Filter.class).elements();
   }
 
   /**
@@ -137,10 +139,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 
-    Option.setOptionsForHierarchy(options, this, Filter.class);
+    Option.setOptionsForHierarchy(options,this, Filter.class);
   }
 }

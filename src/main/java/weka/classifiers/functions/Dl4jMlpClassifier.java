@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -57,6 +59,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.factory.Nd4jBackend;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
@@ -77,6 +80,7 @@ import weka.core.OptionMetadata;
 import weka.core.SelectedTag;
 import weka.core.Tag;
 import weka.core.WekaException;
+import weka.core.WekaPackageClassLoaderManager;
 import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.ConvolutionMode;
@@ -160,6 +164,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * The actual neural network model.
    */
   protected transient ComputationGraph model;
+  /** Used to leverage multiple GPUs (if available) */
+  protected transient ParallelWrapper parallelWrapper;
+
   /**
    * The model zoo model.
    */
@@ -261,6 +268,68 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * or resuming learning
    */
   protected boolean doNotClearFilesystemCache;
+
+  /**
+   * Number of physical GPUs available. If greater than 1, then data-parallel
+   * training + parameter averaging is used to leverage multiple GPUs. Ignored
+   * entirely if there is no GPU backend available.
+   */
+  protected int numGPUs = 1;
+
+  /**
+   * Size of the prefetch buffer when leveraging multiple GPUs. Ignored if there
+   * is only one GPU, or there is no GPU backend available.
+   */
+  protected int prefetchBufferSize = 24;
+
+  /**
+   * How often (in iterations, not epochs) to average model parameters when leveraging multiple
+   * GPUs. Ignored if there is only one GPU, or if there is no GPU backend
+   * available.
+   */
+  protected int averagingFrequency = 10;
+
+  /** True if the Cuda/GPU backend is available */
+  protected boolean gpuBackendAvailable;
+
+  /** True once multi-gpu is set on CudaEnvironment.Configuration */
+  protected static boolean s_cudaMultiGPUSet;
+
+  public Dl4jMlpClassifier() {
+    if (!s_cudaMultiGPUSet) {
+      try {
+        ClassLoader packageLoader = WekaPackageClassLoaderManager.getWekaPackageClassLoaderManager()
+          .getLoaderForClass(this.getClass().getCanonicalName());
+
+        Class<?> cudaEnvClass = Class
+          .forName("org.nd4j.jita.conf.CudaEnvironment", true, packageLoader);
+        Method m = cudaEnvClass.getMethod("getInstance");
+        Object result = m.invoke(null);
+        if (result == null) {
+          log.info("Unable to get CudaEnvironment instance");
+        } else {
+          m = result.getClass().getMethod("getConfiguration");
+          result = m.invoke(result);
+          if (result == null) {
+            log.info("Unable to get Configuration from CudaEnvironment");
+          } else {
+            log.info("Turning on multiple GPU support");
+            m = result.getClass().getMethod("allowMultiGPU", boolean.class);
+            m.invoke(result, true);
+
+            m = result.getClass().getMethod("allowCrossDeviceAccess",
+              boolean.class);
+            m.invoke(result, true);
+          }
+        }
+      } catch (Exception e) {
+        // don't make a fuss if no cuda
+      } finally {
+        // we only want to set it once (or try once).
+        s_cudaMultiGPUSet = true;
+      }
+    }
+  }
 
   /**
    * The main method for running this class.
@@ -683,7 +752,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return doNotClearFilesystemCache;
   }
 
-  @OptionMetadata(displayName = "preserve filesystem cache",
+  @OptionMetadata(displayName = "Preserve filesystem cache",
       description = "If true, the filesystem cache will not be cleared when "
           + "starting or resuming training of a model. This can save time on data "
           + "preparation for a given problem, but will cause errors if a dataset "
@@ -693,6 +762,52 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       commandLineParamIsFlag = true, displayOrder = 32)
   public void setDoNotClearFilesystemCache(boolean clear) {
     doNotClearFilesystemCache = clear;
+  }
+
+  @OptionMetadata(
+    displayName = "Number of GPUs",
+    description = "Number of available GPUs (ignored if no GPU backend available)",
+    commandLineParamName = "numGPUs",
+    commandLineParamSynopsis = "-numGPUs <integer>",
+    displayOrder = 33)
+  public void setNumGPUs(int numGPUs) {
+    this.numGPUs = numGPUs;
+  }
+
+  public int getNumGPUs() {
+    return numGPUs;
+  }
+
+  @OptionMetadata(displayName = "Size of prefetch buffer for multiple GPUs",
+    description = "Size of the prefetch buffer that will be used for background "
+      + "data prefetching (0 = disable prefetch). Ignored if there is only one "
+      + "GPU, or no GPU backend available.",
+    commandLineParamName = "prefetchSize",
+    commandLineParamSynopsis = "-prefetchSize <integer>",
+    displayOrder = 34)
+  public void setPrefetchBufferSize(int prefetchBufferSize) {
+    this.prefetchBufferSize = prefetchBufferSize;
+  }
+
+  public int getPrefetchBufferSize() {
+    return prefetchBufferSize;
+  }
+
+  @OptionMetadata(displayName = "Model parameter averaging frequency",
+    description = "How often (in iterations, not epochs) to average model "
+      + "parameters when leveraging "
+      + "multiple GPUs (ignored if there is only one GPU, or no GPU backend "
+      + "available). Set no greater than num instances/num GPUs or no averaging "
+      + "will occur!",
+    commandLineParamName = "averagingFrequency",
+    commandLineParamSynopsis = "-averagingFrequency <integer>",
+    displayOrder = 35)
+  public void setParameterAveragingFrequency(int frequency) {
+    averagingFrequency = frequency;
+  }
+
+  public int getParameterAveragingFrequency() {
+    return averagingFrequency;
   }
 
   /**
@@ -797,6 +912,43 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
+   * Wrap the model in a ParallelWrapper for data parallel training on multiple
+   * GPUs (if available).
+   */
+  protected void initParallelWrapperIfApplicable() {
+
+    Nd4jBackend b = Nd4j.getBackend();
+    if (b != null) {
+      gpuBackendAvailable = b.getClass().getCanonicalName()
+        .toLowerCase().contains("jcublas");
+    }
+
+    // only configure if the gpu backend is available and the user has requested
+    // more than one gpus
+    if (gpuBackendAvailable) {
+      log.info("GPU backend available");
+    }
+    if (gpuBackendAvailable && getNumGPUs() > 1) {
+
+      if (getNumGPUs() > Nd4j.getAffinityManager().getNumberOfDevices()) {
+        log.warn("Number of requested GPUs {}, is greater than number "
+          + "available {}", getNumGPUs(), Nd4j.getAffinityManager().getNumberOfDevices());
+      }
+
+      if (prefetchBufferSize > 0 &&  prefetchBufferSize < getNumGPUs()) {
+        prefetchBufferSize = getNumGPUs();
+      }
+
+      log.info("Initializing for parallel training on {} workers", getNumGPUs());
+      parallelWrapper = new ParallelWrapper.Builder(model)
+        .prefetchBuffer(getPrefetchBufferSize())
+        .workers(getNumGPUs())
+        .averagingFrequency(getParameterAveragingFrequency())
+        .build();
+    }
+  }
+
+  /**
    * Finish the classifier initialization.
    *
    * Contains common execution parts for both, Dl4jMlpClassifier and RnnSequence Classifier.
@@ -826,6 +978,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Set the iteration listener
     model.setListeners(getListener());
+
+    // Configure for parallel training on multiple GPUs (if applicable)
+    initParallelWrapperIfApplicable();
 
     // Flag initialization as finished
     isInitializationFinished = true;
@@ -1349,7 +1504,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
           this.getClass().getClassLoader());
       StopWatch sw = new StopWatch();
       sw.start();
-      model.fit(trainIterator);
+      if (parallelWrapper != null) {
+        parallelWrapper.fit(trainIterator);
+
+        // invoke this directly because (for some reason) ParallelWrapper does
+        // not seem to inform listeners after completing a call to fit()
+        if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
+          ((weka.dl4j.listener.EpochListener) iterationListener).onEpochEnd(model);
+        }
+      } else {
+        model.fit(trainIterator);
+      }
       trainIterator.reset();
       sw.stop();
       numEpochsPerformed++;

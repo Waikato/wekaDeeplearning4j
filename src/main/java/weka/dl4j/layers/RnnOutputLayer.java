@@ -33,18 +33,13 @@ import weka.dl4j.lossfunctions.LossMCXENT;
  *
  * @author Steven Lang
  */
-public class RnnOutputLayer extends
-    FeedForwardLayer<org.deeplearning4j.nn.conf.layers.RnnOutputLayer>
+public class RnnOutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.RnnOutputLayer>
     implements OptionHandler, Serializable {
 
-  /**
-   * SerialVersionUID
-   */
+  /** SerialVersionUID */
   private static final long serialVersionUID = 6333123285853131216L;
 
-  /**
-   * Constructor for setting some defaults.
-   */
+  /** Constructor for setting some defaults. */
   public RnnOutputLayer() {
     super();
     setLayerName("RnnOutput layer");
@@ -89,7 +84,7 @@ public class RnnOutputLayer extends
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

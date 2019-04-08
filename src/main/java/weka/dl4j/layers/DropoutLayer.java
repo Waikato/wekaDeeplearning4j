@@ -19,7 +19,8 @@
 package weka.dl4j.layers;
 
 import java.io.Serializable;
-import java.util.Enumeration;
+import java.util.*;
+
 import org.deeplearning4j.nn.conf.dropout.Dropout;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
@@ -42,9 +43,7 @@ public class DropoutLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.la
 
   private static final long serialVersionUID = 6776278263117585400L;
 
-  /**
-   * Constructor for setting some defaults.
-   */
+  /** Constructor for setting some defaults. */
   public DropoutLayer() {
     super();
     setLayerName("Dropout layer");
@@ -54,7 +53,7 @@ public class DropoutLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.la
   @Override
   public void initializeBackend() {
     Utils.runWithLocalClassloader(getClass(), () -> {
-      backend = new org.deeplearning4j.nn.conf.layers.DropoutLayer();
+      backend= new org.deeplearning4j.nn.conf.layers.DropoutLayer();
       Dropout dropout = new Dropout(0.8);
       dropout.setPSchedule(new ConstantScheduleImpl());
       backend.setIDropout(dropout);

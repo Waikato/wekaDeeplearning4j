@@ -18,7 +18,7 @@
 
 package weka.filters.unsupervised.attribute;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static weka.util.TestUtil.saveClf;
 
 import java.io.File;

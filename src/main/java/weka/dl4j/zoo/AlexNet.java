@@ -19,7 +19,10 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer.AlgoMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.model.AlexNet.AlexNetBuilder;
+import org.nd4j.linalg.learning.config.Adam;
 import weka.dl4j.Preferences;
 
 /**

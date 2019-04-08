@@ -25,6 +25,7 @@ import org.nd4j.linalg.schedule.ISchedule;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.schedules.ConstantSchedule;
+import weka.dl4j.schedules.ConstantSchedule.ConstantScheduleImpl;
 import weka.dl4j.schedules.Schedule;
 
 /**
@@ -89,7 +90,7 @@ public class GaussianNoise
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

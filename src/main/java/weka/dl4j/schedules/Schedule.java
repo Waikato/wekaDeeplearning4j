@@ -33,9 +33,8 @@ import weka.gui.ProgrammaticProperty;
 /**
  * Default schedule interface that implements WEKA option handling. Each class that implements
  * Schedulers extending from this class must have a backing implementation of the referencing Dl4j
- * scheduler since the scheduler in Dl4j do not allow access to their class members (private
- * final).
- * <p>
+ * scheduler since the scheduler in Dl4j do not allow access to their class members (private final).
+ *
  * SigmoidSchedule, StepSchedule)
  *
  * @author Steven Lang
@@ -47,44 +46,25 @@ public abstract class Schedule<T extends ISchedule>
 
   private static final long serialVersionUID = 5588471135175058051L;
 
-  /**
-   * Schedule type
-   */
+  /** Schedule type */
   ScheduleType scheduleType = ScheduleType.EPOCH;
 
-  /**
-   * Initial value
-   */
+  /** Initial value */
   double initialValue = 1.0;
 
-  /**
-   * Schedule that is backing the implementation
-   */
+  /** Schedule that is backing the implementation */
   T backend;
 
   public Schedule() {
     initializeBackend();
   }
 
-  /**
-   * Create an API wrapped schedule from a given ISchedule object.
-   *
-   * @param newBackend Backend object
-   * @return API wrapped object
-   */
-  public static Schedule<? extends ISchedule> create(ISchedule newBackend) {
-    if (newBackend == null) {
-      return new ConstantSchedule();
-    }
-    return ApiWrapperUtil.getImplementingWrapper(Schedule.class, newBackend, "weka.dl4j.schedules");
-  }
-
   @OptionMetadata(
-      displayName = "scheduleType",
-      description = "The schedule type, one of {EPOCH,ITERATION} (default = EPOCH).",
-      commandLineParamName = "scheduleType",
-      commandLineParamSynopsis = "-scheduleType <string>",
-      displayOrder = 1
+    displayName = "scheduleType",
+    description = "The schedule type, one of {EPOCH,ITERATION} (default = EPOCH).",
+    commandLineParamName = "scheduleType",
+    commandLineParamSynopsis = "-scheduleType <string>",
+    displayOrder = 1
   )
   public ScheduleType getScheduleType() {
     return scheduleType;
@@ -102,6 +82,19 @@ public abstract class Schedule<T extends ISchedule>
   @ProgrammaticProperty
   public void setInitialValue(double initialValue) {
     this.initialValue = initialValue;
+  }
+
+  /**
+   * Create an API wrapped schedule from a given ISchedule object.
+   *
+   * @param newBackend Backend object
+   * @return API wrapped object
+   */
+  public static Schedule<? extends ISchedule> create(ISchedule newBackend) {
+    if (newBackend == null){
+      return new ConstantSchedule();
+    }
+    return ApiWrapperUtil.getImplementingWrapper(Schedule.class, newBackend, "weka.dl4j.schedules");
   }
 
   @Override

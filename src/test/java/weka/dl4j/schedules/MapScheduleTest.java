@@ -18,10 +18,12 @@
 
 package weka.dl4j.schedules;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 import org.junit.Test;
+import weka.dl4j.ApiWrapperTest;
 
 public class MapScheduleTest extends AbstractScheduleTest<MapSchedule> {
 

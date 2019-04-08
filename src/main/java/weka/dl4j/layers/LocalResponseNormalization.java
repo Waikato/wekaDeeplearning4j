@@ -19,11 +19,12 @@
 package weka.dl4j.layers;
 
 import java.util.Enumeration;
+import org.deeplearning4j.nn.conf.layers.PoolingType;
 import weka.core.Option;
+import weka.core.OptionMetadata;
 
 /**
- * A version of DeepLearning4j's LocalResponseNormalization layer that implements WEKA option
- * handling.
+ * A version of DeepLearning4j's LocalResponseNormalization layer that implements WEKA option handling.
  *
  * @author Steven Lang
  */
@@ -32,9 +33,7 @@ public class LocalResponseNormalization extends
 
   private static final long serialVersionUID = 1846770958541767815L;
 
-  /**
-   * Constructor for setting some defaults.
-   */
+  /** Constructor for setting some defaults. */
   public LocalResponseNormalization() {
     super();
     setLayerName("LocalResponseNormalization layer");

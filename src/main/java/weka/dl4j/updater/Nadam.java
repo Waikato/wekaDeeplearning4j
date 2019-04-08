@@ -25,6 +25,7 @@ import static org.nd4j.linalg.learning.config.Nadam.DEFAULT_NADAM_EPSILON;
 import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionMetadata;
+import weka.gui.ProgrammaticProperty;
 
 /**
  * A WEKA version of DeepLearning4j's Nadam.
@@ -32,56 +33,55 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 public class Nadam extends Updater<org.nd4j.linalg.learning.config.Nadam> {
-
   private static final long serialVersionUID = 4997617718703358847L;
 
   @OptionMetadata(
-      displayName = "beta1MeanDecay",
-      description = "The mean decay (default = " + DEFAULT_NADAM_BETA1_MEAN_DECAY + ").",
-      commandLineParamName = "beta1MeanDecay",
-      commandLineParamSynopsis = "-beta1MeanDecay <double>",
-      displayOrder = 1
+    displayName = "beta1MeanDecay",
+    description = "The mean decay (default = " + DEFAULT_NADAM_BETA1_MEAN_DECAY + ").",
+    commandLineParamName = "beta1MeanDecay",
+    commandLineParamSynopsis = "-beta1MeanDecay <double>",
+    displayOrder = 1
   )
-
+  
   public double getBeta1() {
     return backend.getBeta1();
   }
 
-
+  
   public void setBeta1(double beta1) {
     backend.setBeta1(beta1);
   }
 
   @OptionMetadata(
-      displayName = "beta2VarDecay",
-      description = "The var decay (default = " + DEFAULT_NADAM_BETA2_VAR_DECAY + ").",
-      commandLineParamName = "beta2VarDecay",
-      commandLineParamSynopsis = "-beta2VarDecay <double>",
-      displayOrder = 2
+    displayName = "beta2VarDecay",
+    description = "The var decay (default = " + DEFAULT_NADAM_BETA2_VAR_DECAY + ").",
+    commandLineParamName = "beta2VarDecay",
+    commandLineParamSynopsis = "-beta2VarDecay <double>",
+    displayOrder = 2
   )
-
+  
   public double getBeta2() {
     return backend.getBeta2();
   }
 
-
+  
   public void setBeta2(double beta2) {
     backend.setBeta2(beta2);
   }
 
   @OptionMetadata(
-      displayName = "epsilon",
-      description = "The epsilon parameter (default = " + DEFAULT_NADAM_EPSILON + ").",
-      commandLineParamName = "epsilon",
-      commandLineParamSynopsis = "-epsilon <double>",
-      displayOrder = 3
+    displayName = "epsilon",
+    description = "The epsilon parameter (default = " + DEFAULT_NADAM_EPSILON + ").",
+    commandLineParamName = "epsilon",
+    commandLineParamSynopsis = "-epsilon <double>",
+    displayOrder = 3
   )
-
+  
   public double getEpsilon() {
     return backend.getEpsilon();
   }
 
-
+  
   public void setEpsilon(double epsilon) {
     backend.setEpsilon(epsilon);
   }
@@ -98,7 +98,7 @@ public class Nadam extends Updater<org.nd4j.linalg.learning.config.Nadam> {
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

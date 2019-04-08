@@ -20,11 +20,14 @@ package weka.classifiers.functions;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import weka.dl4j.layers.Layer;
+import org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge;
 import weka.classifiers.AbstractClassifierTest;
 import weka.classifiers.Classifier;
 import weka.dl4j.earlystopping.EarlyStopping;
+import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.RnnOutputLayer;
-
 /**
  * Abstract classifier test for the {@link RnnSequenceClassifier}.
  *

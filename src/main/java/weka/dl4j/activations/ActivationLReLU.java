@@ -40,18 +40,16 @@ public class ActivationLReLU
   private static final long serialVersionUID = -8964799878986489846L;
 
   protected double alpha = DEFAULT_ALPHA;
-
   @Override
   public void initializeBackend() {
     backend = new org.nd4j.linalg.activations.impl.ActivationLReLU();
   }
-
   @OptionMetadata(
-      displayName = "alpha",
-      description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
-      commandLineParamName = "alpha",
-      commandLineParamSynopsis = "-alpha <double>",
-      displayOrder = 1
+    displayName = "alpha",
+    description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
+    commandLineParamName = "alpha",
+    commandLineParamSynopsis = "-alpha <double>",
+    displayOrder = 1
   )
   public double getAlpha() {
     return alpha;
@@ -92,7 +90,7 @@ public class ActivationLReLU
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

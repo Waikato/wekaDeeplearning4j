@@ -18,7 +18,7 @@
 
 package weka.dl4j.distribution;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -43,6 +43,6 @@ public class LogNormalDistributionTest extends ApiWrapperTest<LogNormalDistribut
 
   @Override
   public LogNormalDistribution getApiWrapper() {
-    return new LogNormalDistribution();
+    return new  LogNormalDistribution();
   }
 }

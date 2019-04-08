@@ -22,7 +22,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.deeplearning4j.nn.conf.dropout.Dropout;
 import weka.dl4j.dropout.Disabled.DisabledDropoutImpl;
-
 /**
  * Disabled dropout.
  *
@@ -42,10 +41,8 @@ public class Disabled extends AbstractDropout<DisabledDropoutImpl> {
   /**
    * Dummy dropout implementation.
    */
-  protected class DisabledDropoutImpl extends Dropout {
-
+  protected class DisabledDropoutImpl extends Dropout{
     private static final long serialVersionUID = 5933930276882455322L;
-
     public DisabledDropoutImpl(double activationRetainProbability) {
       super(activationRetainProbability);
     }

@@ -33,19 +33,17 @@ import weka.core.OptionMetadata;
  */
 @JsonTypeName("constant")
 @EqualsAndHashCode(callSuper = true)
-public class ConstantDistribution extends
-    Distribution<org.deeplearning4j.nn.conf.distribution.ConstantDistribution> implements
-    OptionHandler {
+public class ConstantDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.ConstantDistribution> implements OptionHandler {
 
 
   private static final long serialVersionUID = -822639410912329551L;
 
   @OptionMetadata(
-      displayName = "value",
-      description = "Constant distribution value (default = 1.0).",
-      commandLineParamName = "value",
-      commandLineParamSynopsis = "-value <double>",
-      displayOrder = 1
+    displayName = "value",
+    description = "Constant distribution value (default = 1.0).",
+    commandLineParamName = "value",
+    commandLineParamSynopsis = "-value <double>",
+    displayOrder = 1
   )
   public double getValue() {
     return backend.getValue();
@@ -54,7 +52,6 @@ public class ConstantDistribution extends
   public void setValue(double value) {
     backend.setValue(value);
   }
-
   /**
    * Returns an enumeration describing the available options.
    *
@@ -81,7 +78,7 @@ public class ConstantDistribution extends
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

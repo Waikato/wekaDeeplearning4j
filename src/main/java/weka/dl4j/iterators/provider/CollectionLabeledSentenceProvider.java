@@ -28,10 +28,7 @@ import java.util.List;
  */
 public class CollectionLabeledSentenceProvider
     extends org.deeplearning4j.iterator.provider.CollectionLabeledSentenceProvider {
-
-  /**
-   * Number of classes
-   */
+  /** Number of classes */
   private final int numClasses;
 
   public CollectionLabeledSentenceProvider(

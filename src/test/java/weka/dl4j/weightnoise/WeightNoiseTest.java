@@ -18,12 +18,14 @@
 
 package weka.dl4j.weightnoise;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import org.deeplearning4j.nn.conf.layers.BaseLayer;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.junit.Assert;
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
+import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.distribution.BinomialDistribution;
 import weka.dl4j.distribution.ConstantDistribution;
 import weka.dl4j.distribution.Distribution;
@@ -38,7 +40,7 @@ public class WeightNoiseTest extends ApiWrapperTest<WeightNoise> {
   @Test
   public void setDistribution() {
     for (Distribution dist :
-        new Distribution[]{
+        new Distribution[] {
             new ConstantDistribution(),
             new LogNormalDistribution(),
             new OrthogonalDistribution(),

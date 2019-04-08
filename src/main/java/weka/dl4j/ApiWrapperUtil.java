@@ -32,9 +32,7 @@ import org.reflections.Reflections;
 @Log4j2
 public class ApiWrapperUtil {
 
-  /**
-   * Return the implementing wrapper class of a given backend object.
-   */
+  /** Return the implementing wrapper class of a given backend object. */
   public static <T extends ApiWrapper<V>, V> T getImplementingWrapper(
       Class<T> cls, V newBackend, String packageName) {
     try {
@@ -70,9 +68,7 @@ public class ApiWrapperUtil {
     }
   }
 
-  /**
-   * Instantiate the given wrapper object.
-   */
+  /** Instantiate the given wrapper object. */
   private static <T extends ApiWrapper<V>, V> T createWrapperObject(
       V newBackend, Class<? extends T> cl) throws InstantiationException, IllegalAccessException {
     T obj = cl.newInstance();
@@ -80,18 +76,14 @@ public class ApiWrapperUtil {
     return obj;
   }
 
-  /**
-   * Given a wrapping class, get the backend (to be wrapped) class.
-   */
+  /** Given a wrapping class, get the backend (to be wrapped) class. */
   private static <T extends ApiWrapper<V>, V> Class<? extends V> getBackendClass(
       Class<? extends T> cl) {
     return (Class<? extends V>)
         ((ParameterizedType) cl.getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
-  /**
-   * Get all subclasses of the given class.
-   */
+  /** Get all subclasses of the given class. */
   private static <T extends ApiWrapper<V>, V> Set<Class<? extends T>> getSubclassesOf(
       Class<T> cls, String packageName) {
     Reflections reflections = new Reflections(packageName);

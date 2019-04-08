@@ -36,7 +36,7 @@ public class Disabled extends AbstractWeightNoise implements OptionHandler, Seri
 
   @Override
   public void initializeBackend() {
-    backend = null;
+    backend=null;
   }
 
 }

@@ -18,7 +18,7 @@
 
 package weka.dl4j.distribution;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -36,6 +36,6 @@ public class OrthogonalDistributionTest extends ApiWrapperTest<OrthogonalDistrib
 
   @Override
   public OrthogonalDistribution getApiWrapper() {
-    return new OrthogonalDistribution();
+    return new  OrthogonalDistribution();
   }
 }

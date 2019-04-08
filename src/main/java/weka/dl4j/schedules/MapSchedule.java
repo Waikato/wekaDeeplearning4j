@@ -89,7 +89,7 @@ public class MapSchedule extends Schedule<org.nd4j.linalg.schedule.MapSchedule> 
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

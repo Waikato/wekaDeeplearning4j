@@ -18,9 +18,6 @@
 
 package weka.dl4j.zoo;
 
-import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.List;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -29,6 +26,10 @@ import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.List;
 import weka.dl4j.Preferences;
 
 /**
@@ -37,12 +38,12 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public interface ZooModel extends Serializable, OptionHandler {
-
   /**
    * Initialize the ZooModel as MLP
    *
    * @param numLabels Number of labels to adjust the output
    * @param seed Seed
+   * @param shape
    * @return MultiLayerNetwork of the specified ZooModel
    * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
    */

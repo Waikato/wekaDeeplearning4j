@@ -61,7 +61,7 @@ public class LossMultiLabel extends LossFunction<org.nd4j.linalg.lossfunctions.i
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

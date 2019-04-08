@@ -43,30 +43,18 @@ public class RelationalDataSetIterator implements DataSetIterator {
 
   private static final long serialVersionUID = 8353870921670443077L;
 
-  /**
-   * Dataset
-   */
+  /** Dataset */
   protected final Instances data;
-  /**
-   * Batch size
-   */
+  /** Batch size */
   protected final int batchSize;
-  /**
-   * Maximum sequence length
-   */
-  protected final int truncateLength;
-  /**
-   * Number of features in the relational attribute
-   */
-  protected final int numFeatures;
-  /**
-   * Relational attribute index
-   */
-  protected final int relationalAttributeIndex;
-  /**
-   * Cursor to current row
-   */
+  /** Cursor to current row */
   protected int cursor;
+  /** Maximum sequence length */
+  protected final int truncateLength;
+  /** Number of features in the relational attribute */
+  protected final int numFeatures;
+  /** Relational attribute index */
+  protected final int relationalAttributeIndex;
 
   /**
    * Constructor.
@@ -104,13 +92,11 @@ public class RelationalDataSetIterator implements DataSetIterator {
     }
 
     // If longest instance exceeds 'truncateLength': only take the first 'truncateLength' instances
-    if (maxLength > truncateLength || maxLength == 0) {
-      maxLength = truncateLength;
-    }
+    if (maxLength > truncateLength || maxLength == 0) maxLength = truncateLength;
 
     // Create data for training
-    INDArray features = Nd4j.create(new int[]{currentBatchSize, numFeatures, maxLength}, 'f');
-    INDArray labels = Nd4j.create(new int[]{currentBatchSize, data.numClasses(), maxLength}, 'f');
+    INDArray features = Nd4j.create(new int[] {currentBatchSize, numFeatures, maxLength}, 'f');
+    INDArray labels = Nd4j.create(new int[] {currentBatchSize, data.numClasses(), maxLength}, 'f');
 
     // Because we are dealing with instances of different lengths and only one output at the final
     // time step: use padding arrays
@@ -118,6 +104,7 @@ public class RelationalDataSetIterator implements DataSetIterator {
     // just padding
     INDArray featuresMask = Nd4j.zeros(currentBatchSize, maxLength);
     INDArray labelsMask = Nd4j.zeros(currentBatchSize, maxLength);
+
 
     for (int i = 0; i < currentBatchSize; i++) {
       Instances currInstances = currentBatch.get(i);
@@ -142,11 +129,11 @@ public class RelationalDataSetIterator implements DataSetIterator {
         currDataND.putColumn(j, indArray);
       }
 
-      features.put(new INDArrayIndex[]{point(i), all(), interval(0, lastIdx)}, currDataND);
+      features.put(new INDArrayIndex[] {point(i), all(), interval(0, lastIdx)}, currDataND);
 
       // Assign "1" to each position where a feature is present, that is, in the interval of
       // [0, lastIdx)
-      featuresMask.get(new INDArrayIndex[]{point(i), interval(0, lastIdx)}).assign(1);
+      featuresMask.get(new INDArrayIndex[] {point(i), interval(0, lastIdx)}).assign(1);
 
       /*
        Put the labels in the labels and labelsMask arrays
@@ -155,18 +142,18 @@ public class RelationalDataSetIterator implements DataSetIterator {
       // Differ between classification and regression task
       if (data.numClasses() == 1) { // Regression
         double val = lbls.get(i);
-        labels.putScalar(new int[]{i, 0, lastIdx - 1}, val);
+        labels.putScalar(new int[] {i, 0, lastIdx - 1}, val);
       } else if (data.numClasses() > 1) { // Classification
         // One-Hot-Encoded class
         int idx = lbls.get(i).intValue();
         // Set label
-        labels.putScalar(new int[]{i, idx, lastIdx - 1}, 1.0);
+        labels.putScalar(new int[] {i, idx, lastIdx - 1}, 1.0);
       } else {
         throw new RuntimeException("Could not detect classification or regression task.");
       }
 
       // Specify that an output exists at the final time step for this example
-      labelsMask.putScalar(new int[]{i, lastIdx - 1}, 1.0);
+      labelsMask.putScalar(new int[] {i, lastIdx - 1}, 1.0);
     }
 
     // Cache the dataset
@@ -212,12 +199,11 @@ public class RelationalDataSetIterator implements DataSetIterator {
   }
 
   @Override
-  public DataSetPreProcessor getPreProcessor() {
-    return null;
-  }
+  public void setPreProcessor(DataSetPreProcessor preProcessor) {}
 
   @Override
-  public void setPreProcessor(DataSetPreProcessor preProcessor) {
+  public DataSetPreProcessor getPreProcessor() {
+    return null;
   }
 
   @Override

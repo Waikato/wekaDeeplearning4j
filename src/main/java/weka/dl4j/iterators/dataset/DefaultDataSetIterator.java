@@ -18,13 +18,14 @@
 
 package weka.dl4j.iterators.dataset;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An nd4j mini-batch iterator that iterates a given dataset.
@@ -33,29 +34,19 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
  */
 public class DefaultDataSetIterator implements DataSetIterator, Serializable {
 
-  /**
-   * The ID used to serialize this class
-   */
+  /** The ID used to serialize this class */
   private static final long serialVersionUID = 5571114918884888578L;
 
-  /**
-   * The dataset to operate on
-   */
+  /** The dataset to operate on */
   protected DataSet data = null;
 
-  /**
-   * The batch size
-   */
+  /** The batch size */
   protected int batchSize = 1;
 
-  /**
-   * The cursor
-   */
+  /** The cursor */
   protected int cursor = 0;
 
-  /**
-   * An optional dataset preprocessor
-   */
+  /** An optional dataset preprocessor */
   protected DataSetPreProcessor preProcessor;
 
   /**
@@ -112,9 +103,7 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
   public DataSet next(int num) {
 
     // Apply preprocessor
-    if (preProcessor != null) {
-      preProcessor.preProcess(data);
-    }
+    if (preProcessor != null) preProcessor.preProcess(data);
 
     // Special case: getRange() does not work as expected if there is just a single example
     if ((cursor == 0) && (num == 1) && (data.numExamples() == 1)) {
@@ -147,9 +136,7 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
     return data.get(0).getLabels().columns();
   }
 
-  /**
-   * Resets the cursor.
-   */
+  /** Resets the cursor. */
   @Override
   public void reset() {
     cursor = 0;
@@ -222,9 +209,7 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
     return labels;
   }
 
-  /**
-   * Enables removing of a mini-batch.
-   */
+  /** Enables removing of a mini-batch. */
   @Override
   public void remove() {
     throw new UnsupportedOperationException();

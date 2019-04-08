@@ -18,10 +18,11 @@
 
 package weka.dl4j.lossfunctions;
 
-import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's LossMSE that implements WEKA option handling.
@@ -29,8 +30,7 @@ import weka.core.OptionHandler;
  * @author Eibe Frank
  */
 @JsonTypeName("MSE")
-public class LossMSE extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMSE> implements
-    OptionHandler {
+public class LossMSE extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossMSE> implements OptionHandler {
 
   private static final long serialVersionUID = 5195053337568658281L;
 
@@ -60,7 +60,7 @@ public class LossMSE extends LossFunction<org.nd4j.linalg.lossfunctions.impl.Los
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

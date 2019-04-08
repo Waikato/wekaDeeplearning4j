@@ -36,6 +36,16 @@ public abstract class LossFunction<T extends ILossFunction>
   private static final long serialVersionUID = 7293731657945995479L;
   T backend;
 
+  @Override
+  public void setBackend(T newBackend) {
+    backend = newBackend;
+  }
+
+  @Override
+  public T getBackend() {
+    return backend;
+  }
+
   public LossFunction() {
     initializeBackend();
   }
@@ -48,18 +58,7 @@ public abstract class LossFunction<T extends ILossFunction>
    */
   public static LossFunction<? extends ILossFunction> create(ILossFunction newBackend) {
     return (LossFunction<? extends ILossFunction>)
-        ApiWrapperUtil
-            .getImplementingWrapper(LossFunction.class, newBackend, "weka.dl4j.lossfunctions");
-  }
-
-  @Override
-  public T getBackend() {
-    return backend;
-  }
-
-  @Override
-  public void setBackend(T newBackend) {
-    backend = newBackend;
+        ApiWrapperUtil.getImplementingWrapper(LossFunction.class, newBackend, "weka.dl4j.lossfunctions");
   }
 
   /**

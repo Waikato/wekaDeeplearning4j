@@ -19,14 +19,12 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
-
 /**
  * A dummy ZooModel which is empty.
  *
  * @author Steven Lang
  */
 public class CustomNet implements ZooModel {
-
   private static final long serialVersionUID = 7131900848379752732L;
 
   @Override

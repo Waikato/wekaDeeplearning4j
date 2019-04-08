@@ -30,8 +30,8 @@ import weka.dl4j.ApiWrapperUtil;
 
 /**
  * Abstract weight noise class.
- *
  * @param <T> Weight noise implementation
+ *
  * @author Steven Lang
  */
 @EqualsAndHashCode
@@ -46,17 +46,6 @@ public abstract class AbstractWeightNoise<T extends IWeightNoise> implements Api
     initializeBackend();
   }
 
-  /**
-   * Create an API wrapped updater from a given updater object.
-   *
-   * @param newBackend Backend object
-   * @return API wrapped object
-   */
-  public static AbstractWeightNoise<? extends IWeightNoise> create(IWeightNoise newBackend) {
-    return ApiWrapperUtil
-        .getImplementingWrapper(AbstractWeightNoise.class, newBackend, "weka.dl4j.updater");
-  }
-
   @Override
   public T getBackend() {
     return backend;
@@ -65,6 +54,16 @@ public abstract class AbstractWeightNoise<T extends IWeightNoise> implements Api
   @Override
   public void setBackend(T newBackend) {
     backend = newBackend;
+  }
+
+  /**
+   * Create an API wrapped updater from a given updater object.
+   *
+   * @param newBackend Backend object
+   * @return API wrapped object
+   */
+  public static AbstractWeightNoise<? extends IWeightNoise> create(IWeightNoise newBackend) {
+    return ApiWrapperUtil.getImplementingWrapper(AbstractWeightNoise.class, newBackend, "weka.dl4j.updater");
   }
 
   /**

@@ -18,15 +18,19 @@
 
 package weka.dl4j.earlystopping;
 
-import java.io.Serializable;
-import java.util.Enumeration;
 import lombok.extern.log4j.Log4j2;
+import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+
+import java.io.Serializable;
+import java.util.Enumeration;
 
 /**
  * Early stopping implementation to stop training after N epochs without loss improvement on a
@@ -37,34 +41,22 @@ import weka.core.OptionMetadata;
 @Log4j2
 public class EarlyStopping implements OptionHandler, Serializable {
 
-  /**
-   * SerialVersionUID
-   */
+  /** SerialVersionUID */
   private static final long serialVersionUID = 5248828973394650102L;
 
-  /**
-   * Maximum of epochs without improvement
-   */
+  /** Maximum of epochs without improvement */
   private int maxEpochsNoImprovement = 0;
 
-  /**
-   * Counter for the number of epochs without improvement
-   */
+  /** Counter for the number of epochs without improvement */
   private int countEpochsNoImprovement = 0;
 
-  /**
-   * Last best score
-   */
+  /** Last best score */
   private double lastBestScore = Double.MAX_VALUE;
 
-  /**
-   * Percentage of the training data to use as validation set
-   */
+  /** Percentage of the training data to use as validation set */
   private double validationSetPercentage = 0;
 
-  /**
-   * Validation dataset
-   */
+  /** Validation dataset */
   private transient DataSetIterator valDataSetIterator;
 
   public EarlyStopping() {
@@ -90,9 +82,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
     this.valDataSetIterator = dsIt;
   }
 
-  /**
-   * Reset the counter
-   */
+  /** Reset the counter */
   private void resetEpochCounter() {
     countEpochsNoImprovement = 0;
   }
@@ -135,17 +125,18 @@ public class EarlyStopping implements OptionHandler, Serializable {
   }
 
 
+
   public int getMaxEpochsNoImprovement() {
     return maxEpochsNoImprovement;
   }
 
   @OptionMetadata(
-      displayName = "max epochs with no improvement",
-      description =
-          "Terminate after N epochs in which the model has shown no improvement (default = 0).",
-      commandLineParamName = "maxEpochsNoImprovement",
-      commandLineParamSynopsis = "-maxEpochsNoImprovement <int>",
-      displayOrder = 0
+    displayName = "max epochs with no improvement",
+    description =
+        "Terminate after N epochs in which the model has shown no improvement (default = 0).",
+    commandLineParamName = "maxEpochsNoImprovement",
+    commandLineParamSynopsis = "-maxEpochsNoImprovement <int>",
+    displayOrder = 0
   )
   public void setMaxEpochsNoImprovement(int maxEpochsNoIMprovement) {
     if (maxEpochsNoIMprovement < 0) {
@@ -161,11 +152,11 @@ public class EarlyStopping implements OptionHandler, Serializable {
   }
 
   @OptionMetadata(
-      displayName = "validation set percentage",
-      description = "Percentage of training set to use for validation (default = 0).",
-      commandLineParamName = "valPercentage",
-      commandLineParamSynopsis = "-valPercentage <float>",
-      displayOrder = 1
+    displayName = "validation set percentage",
+    description = "Percentage of training set to use for validation (default = 0).",
+    commandLineParamName = "valPercentage",
+    commandLineParamSynopsis = "-valPercentage <float>",
+    displayOrder = 1
   )
   public void setValidationSetPercentage(double p) {
     if (Double.compare(p, 100) >= 0 || p < 0) {
@@ -176,7 +167,6 @@ public class EarlyStopping implements OptionHandler, Serializable {
 
   /**
    * Get the validation dataset iterator
-   *
    * @return DataSetIterator for the validation set
    */
   public DataSetIterator getValDataSetIterator() {
@@ -219,7 +209,7 @@ public class EarlyStopping implements OptionHandler, Serializable {
    * Returns a string describing this search method
    *
    * @return a description of the search method suitable for displaying in the explorer/experimenter
-   * gui
+   *     gui
    */
   public String globalInfo() {
     return "This options allows to stop the training process"

@@ -18,9 +18,10 @@
 
 package weka.dl4j.schedules;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
+import weka.dl4j.ApiWrapperTest;
 
 public class ExponentialScheduleTest extends AbstractScheduleTest<ExponentialSchedule> {
 

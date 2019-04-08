@@ -18,11 +18,12 @@
 
 package weka.dl4j.distribution;
 
-import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+
+import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's UniformDistribution that implements WEKA option handling.
@@ -31,19 +32,17 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 @JsonTypeName("uniform")
-public class UniformDistribution extends
-    Distribution<org.deeplearning4j.nn.conf.distribution.UniformDistribution> implements
-    OptionHandler {
+public class UniformDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.UniformDistribution> implements OptionHandler {
 
 
   private static final long serialVersionUID = -822639410912329551L;
 
   @OptionMetadata(
-      displayName = "lower limit",
-      description = "The lower limit (default = -1.0).",
-      commandLineParamName = "lower",
-      commandLineParamSynopsis = "-lower <double>",
-      displayOrder = 1
+    displayName = "lower limit",
+    description = "The lower limit (default = -1.0).",
+    commandLineParamName = "lower",
+    commandLineParamSynopsis = "-lower <double>",
+    displayOrder = 1
   )
   public double getLower() {
     return backend.getLower();
@@ -54,11 +53,11 @@ public class UniformDistribution extends
   }
 
   @OptionMetadata(
-      displayName = "upper limit",
-      description = "The upper limit (default = 1.0).",
-      commandLineParamName = "upper",
-      commandLineParamSynopsis = "-upper <double>",
-      displayOrder = 2
+    displayName = "upper limit",
+    description = "The upper limit (default = 1.0).",
+    commandLineParamName = "upper",
+    commandLineParamSynopsis = "-upper <double>",
+    displayOrder = 2
   )
   public double getUpper() {
     return backend.getUpper();
@@ -94,7 +93,7 @@ public class UniformDistribution extends
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

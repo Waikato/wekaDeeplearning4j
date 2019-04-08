@@ -42,13 +42,13 @@ public abstract class ApiWrapperTest<T extends ApiWrapper> {
   public abstract T getApiWrapper();
 
   @Before
-  public void setup() {
+  public void setup(){
     wrapper = getApiWrapper();
   }
 
   @Test
   public void testOptions() throws Exception {
-    if (wrapper instanceof OptionHandler) {
+    if (wrapper instanceof OptionHandler){
       OptionHandler optionHandler = ((OptionHandler) wrapper);
       String[] options = optionHandler.getOptions();
       String[] optionsCopy = Arrays.copyOf(options, options.length);
@@ -60,7 +60,7 @@ public abstract class ApiWrapperTest<T extends ApiWrapper> {
   }
 
   @Test
-  public void testSettingBackends() {
+  public void testSettingBackends(){
     T apiWrapper1 = getApiWrapper();
     T apiWrapper2 = getApiWrapper();
 

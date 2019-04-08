@@ -18,11 +18,6 @@
 
 package weka.iterators.instance;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +29,12 @@ import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
 import weka.util.DatasetLoader;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * JUnit tests for the {@link ResizeImageInstanceIterator}
  *
@@ -41,30 +42,18 @@ import weka.util.DatasetLoader;
  */
 public class ResizeImageInstanceIteratorTest {
 
-  /**
-   * Seed
-   */
+  /** Seed */
   private static final int SEED = 42;
-  /**
-   * Resized height
-   */
+  /** Resized height */
   private static final int NEW_HEIGHT = 100;
-  /**
-   * Resized width
-   */
+  /** Resized width */
   private static final int NEW_WIDTH = 100;
-  /**
-   * ResizeImageInstanceIterator object
-   */
+  /** ResizeImageInstanceIterator object */
   private ResizeImageInstanceIterator rii;
-  /**
-   * ImageInstanceIterator object
-   */
+  /** ImageInstanceIterator object */
   private ImageInstanceIterator iii;
 
-  /**
-   * Initialize iterator
-   */
+  /** Initialize iterator */
   @Before
   public void init() {
     this.iii = new ImageInstanceIterator();
@@ -76,9 +65,7 @@ public class ResizeImageInstanceIteratorTest {
     this.rii = new ResizeImageInstanceIterator(iii, NEW_WIDTH, NEW_HEIGHT);
   }
 
-  /**
-   * Test getDataSetIterator
-   */
+  /** Test getDataSetIterator */
   @Test
   public void testGetIterator() throws Exception {
     final Instances metaData = DatasetLoader.loadMiniMnistMeta();

@@ -30,8 +30,8 @@ import weka.dl4j.ApiWrapperUtil;
 
 /**
  * Abstract layer class.
- *
  * @param <T> Layer implementation
+ *
  * @author Steven Lang
  */
 @EqualsAndHashCode
@@ -68,11 +68,11 @@ public abstract class Layer<T extends org.deeplearning4j.nn.conf.layers.Layer>
   }
 
   @OptionMetadata(
-      displayName = "layer name",
-      description = "The name of the layer (default = Batch normalization Layer).",
-      commandLineParamName = "name",
-      commandLineParamSynopsis = "-name <string>",
-      displayOrder = 0
+    displayName = "layer name",
+    description = "The name of the layer (default = Batch normalization Layer).",
+    commandLineParamName = "name",
+    commandLineParamSynopsis = "-name <string>",
+    displayOrder = 0
   )
   public String getLayerName() {
     return backend.getLayerName();

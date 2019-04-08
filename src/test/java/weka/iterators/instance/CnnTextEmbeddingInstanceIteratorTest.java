@@ -49,18 +49,12 @@ import weka.util.TestUtil;
 @Log4j2
 public class CnnTextEmbeddingInstanceIteratorTest {
 
-  /**
-   * Seed
-   */
+  /** Seed */
   private static final int SEED = 42;
-  /**
-   * Iterator object
-   */
+  /** Iterator object */
   private CnnTextEmbeddingInstanceIterator cteii;
 
-  /**
-   * Initialize iterator
-   */
+  /** Initialize iterator */
   @Before
   public void init() throws IOException {
     this.cteii = new CnnTextEmbeddingInstanceIterator();
@@ -93,9 +87,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     this.cteii.validate(metaData);
   }
 
-  /**
-   * Test getDataSetIterator
-   */
+  /** Test getDataSetIterator */
   @Test
   public void testGetIteratorNominalClass() throws Exception {
     final Instances data = DatasetLoader.loadReutersMinimal();
@@ -130,14 +122,13 @@ public class CnnTextEmbeddingInstanceIteratorTest {
         1,
         false);
 
-    WordVectors wordVectors = WordVectorSerializer
-        .loadStaticModel(DatasetLoader.loadGoogleNewsVectors());
+    WordVectors wordVectors = WordVectorSerializer.loadStaticModel(DatasetLoader.loadGoogleNewsVectors());
     String[] words = (String[]) wordVectors.vocab().words().toArray(new String[0]);
 
     Random rand = new Random(42);
     for (Instance inst : data) {
       StringBuilder sentence = new StringBuilder();
-      for (int i = 0; i < 10; i++) {
+      for(int i = 0; i < 10; i++){
         final int idx = rand.nextInt(words.length);
         sentence.append(" ").append(words[idx]);
       }
@@ -146,9 +137,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     return data;
   }
 
-  /**
-   * Test getDataSetIterator
-   */
+  /** Test getDataSetIterator */
   @Test
   public void testGetIteratorNumericClass() throws Exception {
     final Instances data = makeData();
@@ -179,7 +168,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     data.setClassIndex(data.numAttributes() - 1);
 
     final int seed = 1;
-    for (int batchSize : new int[]{1, 2, 5, 10}) {
+    for (int batchSize : new int[] {1, 2, 5, 10}) {
       final int actual = countIterations(data, cteii, seed, batchSize);
       final int expected = (int) Math.ceil(data.numInstances() / ((double) batchSize));
       Assert.assertEquals(expected, actual);
@@ -194,6 +183,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
    * @param seed Seed
    * @param batchsize Size of the batch which is returned in {@see DataSetIterator#next}
    * @return Number of iterations
+   * @throws Exception
    */
   private int countIterations(
       Instances data, AbstractInstanceIterator iter, int seed, int batchsize) throws Exception {

@@ -25,7 +25,6 @@ import weka.core.InvalidInputDataException;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.sequence.RelationalDataSetIterator;
-
 /**
  * Converts the given Instances containing a single relational attribute into a DataSet.
  *
@@ -34,13 +33,9 @@ import weka.dl4j.iterators.dataset.sequence.RelationalDataSetIterator;
 public class RelationalInstanceIterator extends AbstractSequenceInstanceIterator {
 
   private static final long serialVersionUID = 3713170652162476693L;
-  /**
-   * Maximum sequence length
-   */
+  /** Maximum sequence length */
   protected int truncateLength = 100;
-  /**
-   * Index of the relational attribute
-   */
+  /** Index of the relational attribute */
   protected int relationalAttributeIndex = 0;
 
   @Override
@@ -52,18 +47,18 @@ public class RelationalInstanceIterator extends AbstractSequenceInstanceIterator
 
   @Override
   public void validate(Instances data) throws InvalidInputDataException {
-    if (!data.attribute(relationalAttributeIndex).isRelationValued()) {
+    if (!data.attribute(relationalAttributeIndex).isRelationValued()){
       throw new InvalidInputDataException("The attribute at index <"
           + relationalAttributeIndex + " is not relational.");
     }
   }
 
   @OptionMetadata(
-      displayName = "truncation length",
-      description = "The maximum number of instances per row (default = 100).",
-      commandLineParamName = "truncationLength",
-      commandLineParamSynopsis = "-truncationLength <int>",
-      displayOrder = 2
+    displayName = "truncation length",
+    description = "The maximum number of instances per row (default = 100).",
+    commandLineParamName = "truncationLength",
+    commandLineParamSynopsis = "-truncationLength <int>",
+    displayOrder = 2
   )
   public int getTruncateLength() {
     return truncateLength;
@@ -74,11 +69,11 @@ public class RelationalInstanceIterator extends AbstractSequenceInstanceIterator
   }
 
   @OptionMetadata(
-      displayName = "relational attribute index",
-      description = "Set the relational attribute's index (default = 0)",
-      commandLineParamName = "relationalAttributeIndex",
-      commandLineParamSynopsis = "-relationalAttributeIndex <int>",
-      displayOrder = 2
+    displayName = "relational attribute index",
+    description = "Set the relational attribute's index (default = 0)",
+    commandLineParamName = "relationalAttributeIndex",
+    commandLineParamSynopsis = "-relationalAttributeIndex <int>",
+    displayOrder = 2
   )
   public int getRelationalAttributeIndex() {
     return relationalAttributeIndex;
@@ -95,7 +90,7 @@ public class RelationalInstanceIterator extends AbstractSequenceInstanceIterator
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

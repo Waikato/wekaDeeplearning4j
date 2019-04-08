@@ -41,11 +41,11 @@ public class GaussianDropout
   private Schedule<? extends ISchedule> rateSchedule;
 
   @OptionMetadata(
-      displayName = "schedule",
-      description = "The rate schedule (default = ConstantScheduleImpl).",
-      commandLineParamName = "schedule",
-      commandLineParamSynopsis = "-schedule <Schedule>",
-      displayOrder = 2
+    displayName = "schedule",
+    description = "The rate schedule (default = ConstantScheduleImpl).",
+    commandLineParamName = "schedule",
+    commandLineParamSynopsis = "-schedule <Schedule>",
+    displayOrder = 2
   )
   public Schedule<? extends ISchedule> getRateSchedule() {
     return rateSchedule;
@@ -63,8 +63,7 @@ public class GaussianDropout
   @Override
   public void initializeBackend() {
     rateSchedule = new ConstantSchedule();
-    this.backend = new org.deeplearning4j.nn.conf.dropout.GaussianDropout(
-        rateSchedule.getBackend());
+    this.backend = new org.deeplearning4j.nn.conf.dropout.GaussianDropout(rateSchedule.getBackend());
   }
 
   /**
@@ -74,7 +73,7 @@ public class GaussianDropout
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

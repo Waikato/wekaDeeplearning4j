@@ -39,7 +39,7 @@ public class DropoutLayerTest extends AbstractFeedForwardLayerTest<DropoutLayer>
 
   @Override
   public DropoutLayer getApiWrapper() {
-    return new DropoutLayer();
+    return new  DropoutLayer();
   }
 
   @Test

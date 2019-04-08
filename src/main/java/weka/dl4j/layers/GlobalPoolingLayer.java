@@ -19,9 +19,9 @@
 package weka.dl4j.layers;
 
 import java.util.Enumeration;
+import weka.dl4j.PoolingType;
 import weka.core.Option;
 import weka.core.OptionMetadata;
-import weka.dl4j.PoolingType;
 
 /**
  * A version of DeepLearning4j's GlobalPooling that implements WEKA option handling.
@@ -32,10 +32,7 @@ public class GlobalPoolingLayer extends
     Layer<org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer> {
 
   private static final long serialVersionUID = 2882286002911860559L;
-
-  /**
-   * Constructor for setting some defaults.
-   */
+  /** Constructor for setting some defaults. */
   public GlobalPoolingLayer() {
     super();
     setLayerName("GlobalPooling layer");
@@ -49,11 +46,11 @@ public class GlobalPoolingLayer extends
   }
 
   @OptionMetadata(
-      displayName = "pooling type",
-      description = "The type of pooling to use (default = MAX; options: MAX, AVG, SUM, NONE).",
-      commandLineParamName = "poolingType",
-      commandLineParamSynopsis = "-poolingType <string>",
-      displayOrder = 10
+    displayName = "pooling type",
+    description = "The type of pooling to use (default = MAX; options: MAX, AVG, SUM, NONE).",
+    commandLineParamName = "poolingType",
+    commandLineParamSynopsis = "-poolingType <string>",
+    displayOrder = 10
   )
   public PoolingType getPoolingType() {
     return PoolingType.fromBackend(backend.getPoolingType());
@@ -64,11 +61,11 @@ public class GlobalPoolingLayer extends
   }
 
   @OptionMetadata(
-      displayName = "pooling dimensions",
-      description = "The pooling dimensions (default = [2,2]).",
-      commandLineParamName = "poolDimensions",
-      commandLineParamSynopsis = "-poolDimensions <int>",
-      displayOrder = 4
+    displayName = "pooling dimensions",
+    description = "The pooling dimensions (default = [2,2]).",
+    commandLineParamName = "poolDimensions",
+    commandLineParamSynopsis = "-poolDimensions <int>",
+    displayOrder = 4
   )
   public int[] getPoolingDimensions() {
     return backend.getPoolingDimensions();
@@ -79,11 +76,11 @@ public class GlobalPoolingLayer extends
   }
 
   @OptionMetadata(
-      displayName = "pnorm",
-      description = "The value of the pnorm parameter (default = 2).",
-      commandLineParamName = "pnorm",
-      commandLineParamSynopsis = "-pnorm <int>",
-      displayOrder = 3
+    displayName = "pnorm",
+    description = "The value of the pnorm parameter (default = 2).",
+    commandLineParamName = "pnorm",
+    commandLineParamSynopsis = "-pnorm <int>",
+    displayOrder = 3
   )
   public int getPnorm() {
     return backend.getPnorm();
@@ -94,11 +91,11 @@ public class GlobalPoolingLayer extends
   }
 
   @OptionMetadata(
-      displayName = "collapse dimensions",
-      description = "Wether to collapse dimensions (default = true).",
-      commandLineParamName = "collapseDimensions",
-      commandLineParamSynopsis = "-collapseDimensions <boolean>",
-      displayOrder = 11
+    displayName = "collapse dimensions",
+    description = "Wether to collapse dimensions (default = true).",
+    commandLineParamName = "collapseDimensions",
+    commandLineParamSynopsis = "-collapseDimensions <boolean>",
+    displayOrder = 11
   )
   public boolean isCollapseDimensions() {
     return backend.isCollapseDimensions();

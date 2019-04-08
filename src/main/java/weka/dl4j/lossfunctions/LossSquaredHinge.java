@@ -29,8 +29,7 @@ import weka.core.OptionHandler;
  * @author Eibe Frank
  */
 @JsonTypeName("SquaredHinge")
-public class LossSquaredHinge extends
-    LossFunction<org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge>
+public class LossSquaredHinge extends LossFunction<org.nd4j.linalg.lossfunctions.impl.LossSquaredHinge>
     implements OptionHandler {
 
   private static final long serialVersionUID = -7605038282659194883L;
@@ -61,7 +60,7 @@ public class LossSquaredHinge extends
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

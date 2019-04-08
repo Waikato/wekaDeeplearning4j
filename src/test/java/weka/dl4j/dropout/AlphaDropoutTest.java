@@ -18,7 +18,7 @@
 
 package weka.dl4j.dropout;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -76,6 +76,6 @@ public class AlphaDropoutTest extends ApiWrapperTest<AlphaDropout> {
 
   @Override
   public AlphaDropout getApiWrapper() {
-    return new AlphaDropout();
+    return new  AlphaDropout();
   }
 }

@@ -25,6 +25,7 @@ import org.nd4j.linalg.schedule.ISchedule;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.schedules.ConstantSchedule;
+import weka.dl4j.schedules.ConstantSchedule.ConstantScheduleImpl;
 import weka.dl4j.schedules.Schedule;
 
 /**
@@ -44,12 +45,13 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
   protected double lambda;
 
 
+
   @OptionMetadata(
-      displayName = "schedule",
-      description = "The dropout probability schedule (default = ConstantScheduleImpl).",
-      commandLineParamName = "schedule",
-      commandLineParamSynopsis = "-schedule <Schedule>",
-      displayOrder = 1
+    displayName = "schedule",
+    description = "The dropout probability schedule (default = ConstantScheduleImpl).",
+    commandLineParamName = "schedule",
+    commandLineParamSynopsis = "-schedule <Schedule>",
+    displayOrder = 1
   )
   public Schedule<? extends ISchedule> getpSchedule() {
     return pSchedule;
@@ -60,11 +62,11 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
   }
 
   @OptionMetadata(
-      displayName = "p",
-      description = "The dropout probability (default = 0.5).",
-      commandLineParamName = "p",
-      commandLineParamSynopsis = "-p <double>",
-      displayOrder = 2
+    displayName = "p",
+    description = "The dropout probability (default = 0.5).",
+    commandLineParamName = "p",
+    commandLineParamSynopsis = "-p <double>",
+    displayOrder = 2
   )
   public double getP() {
     return p;
@@ -75,14 +77,14 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
   }
 
   @OptionMetadata(
-      displayName = "alpha",
-      description =
-          "The alpha value that weight randomly are assigned to (default = "
-              + org.deeplearning4j.nn.conf.dropout.AlphaDropout.DEFAULT_ALPHA
-              + ").",
-      commandLineParamName = "alpha",
-      commandLineParamSynopsis = "-alpha <double>",
-      displayOrder = 3
+    displayName = "alpha",
+    description =
+        "The alpha value that weight randomly are assigned to (default = "
+            + org.deeplearning4j.nn.conf.dropout.AlphaDropout.DEFAULT_ALPHA
+            + ").",
+    commandLineParamName = "alpha",
+    commandLineParamSynopsis = "-alpha <double>",
+    displayOrder = 3
   )
   public double getAlpha() {
     return alpha;
@@ -93,14 +95,14 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
   }
 
   @OptionMetadata(
-      displayName = "lambda",
-      description =
-          "The lambda value (default = "
-              + org.deeplearning4j.nn.conf.dropout.AlphaDropout.DEFAULT_LAMBDA
-              + ").",
-      commandLineParamName = "lambda",
-      commandLineParamSynopsis = "-lambda <double>",
-      displayOrder = 4
+    displayName = "lambda",
+    description =
+        "The lambda value (default = "
+            + org.deeplearning4j.nn.conf.dropout.AlphaDropout.DEFAULT_LAMBDA
+            + ").",
+    commandLineParamName = "lambda",
+    commandLineParamSynopsis = "-lambda <double>",
+    displayOrder = 4
   )
   public double getLambda() {
     return lambda;
@@ -112,7 +114,7 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
 
   @Override
   public org.deeplearning4j.nn.conf.dropout.AlphaDropout getBackend() {
-    if (pSchedule instanceof ConstantSchedule) {
+    if (pSchedule instanceof ConstantSchedule){
       return new org.deeplearning4j.nn.conf.dropout.AlphaDropout(p);
     } else {
       return new org.deeplearning4j.nn.conf.dropout.AlphaDropout(pSchedule.getBackend());
@@ -135,7 +137,7 @@ public class AlphaDropout extends AbstractDropout<org.deeplearning4j.nn.conf.dro
    */
   @Override
   public Enumeration<Option> listOptions() {
-    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+    return Option.listOptionsForClassHierarchy(this.getClass(),super.getClass()).elements();
   }
 
   /**

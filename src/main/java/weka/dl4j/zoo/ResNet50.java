@@ -19,6 +19,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
+import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.dl4j.Preferences;
 
@@ -28,7 +29,6 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public class ResNet50 implements ZooModel {
-
   private static final long serialVersionUID = -520668505548861661L;
 
   @Override

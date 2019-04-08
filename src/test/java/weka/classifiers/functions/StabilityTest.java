@@ -19,12 +19,12 @@
 package weka.classifiers.functions;
 
 import lombok.extern.log4j.Log4j2;
+import weka.dl4j.PoolingType;
 import org.junit.Assert;
 import org.junit.Test;
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.PoolingType;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
@@ -72,8 +72,7 @@ public class StabilityTest {
     log.info("Success: " + success);
 
     log.info(clf.getModel().conf().toYaml());
-    Assert.assertTrue("Performance was < " + minPerfomance + ". TestPctCorrect: " + testPctCorrect
-        + ", TrainPctCorrect: " + trainPctCorrect, success);
+    Assert.assertTrue("Performance was < " + minPerfomance + ". TestPctCorrect: " + testPctCorrect +", TrainPctCorrect: " + trainPctCorrect, success);
   }
 
   @Test
@@ -359,26 +358,27 @@ public class StabilityTest {
     clf.setNumEpochs(20);
     clf.setInstanceIterator(cii);
 
+
     weka.dl4j.layers.ConvolutionLayer cl = new weka.dl4j.layers.ConvolutionLayer();
     cl.setNOut(20);
-    cl.setStride(new int[]{1, 1});
-    cl.setKernelSize(new int[]{5, 5});
+    cl.setStride(new int[]{1,1});
+    cl.setKernelSize(new int[]{5,5});
     cl.setActivationFunction(new ActivationIdentity());
 
     weka.dl4j.layers.SubsamplingLayer ssl = new weka.dl4j.layers.SubsamplingLayer();
-    ssl.setKernelSize(new int[]{2, 2});
-    ssl.setStride(new int[]{2, 2});
+    ssl.setKernelSize(new int[]{2,2});
+    ssl.setStride(new int[]{2,2});
     ssl.setPoolingType(PoolingType.MAX);
 
     weka.dl4j.layers.ConvolutionLayer cl2 = new weka.dl4j.layers.ConvolutionLayer();
     cl2.setNOut(50);
-    cl2.setStride(new int[]{1, 1});
-    cl2.setKernelSize(new int[]{5, 5});
+    cl2.setStride(new int[]{1,1});
+    cl2.setKernelSize(new int[]{5,5});
     cl2.setActivationFunction(new ActivationIdentity());
 
     weka.dl4j.layers.SubsamplingLayer ssl2 = new weka.dl4j.layers.SubsamplingLayer();
-    ssl2.setKernelSize(new int[]{2, 2});
-    ssl2.setStride(new int[]{2, 2});
+    ssl2.setKernelSize(new int[]{2,2});
+    ssl2.setStride(new int[]{2,2});
     ssl2.setPoolingType(PoolingType.MAX);
 
     weka.dl4j.layers.DenseLayer dl = new weka.dl4j.layers.DenseLayer();
@@ -394,7 +394,7 @@ public class StabilityTest {
     updater.setLearningRate(0.001);
     conf.setUpdater(updater);
     clf.setNeuralNetConfiguration(conf);
-    clf.setLayers(cl, ssl, cl2, ssl2, dl, ol);
+    clf.setLayers(cl,ssl,cl2,ssl2,dl,ol);
 
     evaluate(clf, DatasetLoader.loadMiniMnistArff(), 80);
   }

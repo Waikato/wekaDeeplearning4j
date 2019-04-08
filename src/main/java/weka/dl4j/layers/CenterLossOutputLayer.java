@@ -32,8 +32,7 @@ import weka.dl4j.lossfunctions.LossMCXENT;
  *
  * @author Steven Lang
  */
-public class CenterLossOutputLayer extends
-    FeedForwardLayer<org.deeplearning4j.nn.conf.layers.CenterLossOutputLayer>
+public class CenterLossOutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.layers.CenterLossOutputLayer>
     implements OptionHandler, Serializable {
 
 
@@ -73,11 +72,11 @@ public class CenterLossOutputLayer extends
       commandLineParamSynopsis = "-gradientCheck <boolean>",
       displayOrder = 1
   )
-  public boolean getGradientCheck() {
+  public boolean getGradientCheck(){
     return backend.getGradientCheck();
   }
 
-  public void setGradientCheck(boolean gradientCheck) {
+  public void setGradientCheck(boolean gradientCheck){
     backend.setGradientCheck(gradientCheck);
   }
 

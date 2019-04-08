@@ -18,16 +18,17 @@
 
 package weka.iterators.instance;
 
+import java.util.ArrayList;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
+import weka.core.TestInstances;
 import weka.util.TestUtil;
 
 public class UtilTest {
-
   @Test
   public void testInstancesToDataSet() throws Exception {
     final Instances data = TestUtil.makeTestDataset(
@@ -48,7 +49,7 @@ public class UtilTest {
     final INDArray labels = dataSet.getLabels();
     final INDArray features = dataSet.getFeatures();
 
-    for (int i = 0; i < data.numInstances(); i++) {
+    for(int i = 0; i < data.numInstances(); i++){
 
     }
   }

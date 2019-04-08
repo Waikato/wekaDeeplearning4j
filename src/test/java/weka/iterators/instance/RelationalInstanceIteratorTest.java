@@ -21,17 +21,32 @@ package weka.iterators.instance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
+import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import weka.core.Attribute;
+import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.InvalidInputDataException;
+import weka.core.converters.ArffLoader;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.sequence.RelationalInstanceIterator;
+import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
+import weka.util.DatasetLoader;
 import weka.util.TestUtil;
 
 /**
@@ -42,10 +57,10 @@ import weka.util.TestUtil;
 @Log4j2
 public class RelationalInstanceIteratorTest {
 
-  /**
-   * Seed
-   */
+  /** Seed */
   private static final int SEED = 42;
+  /** Iterator object */
+  private RelationalInstanceIterator rii;
   private static Instances data;
 
   // Init test dataset
@@ -59,14 +74,7 @@ public class RelationalInstanceIteratorTest {
     }
   }
 
-  /**
-   * Iterator object
-   */
-  private RelationalInstanceIterator rii;
-
-  /**
-   * Initialize iterator
-   */
+  /** Initialize iterator */
   @Before
   public void init() {
     this.rii = new RelationalInstanceIterator();
@@ -97,8 +105,8 @@ public class RelationalInstanceIteratorTest {
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
         final long[] shapeFeats = next.getFeatures().shape();
         final long[] expShapeFeats = {bs, 6, tl};
-        assertEquals(expShapeFeats[0], shapeFeats[0]);
-        assertEquals(expShapeFeats[1], shapeFeats[1]);
+        assertEquals(expShapeFeats[0],shapeFeats[0]);
+        assertEquals(expShapeFeats[1],shapeFeats[1]);
         assertTrue(expShapeFeats[2] >= shapeFeats[2]);
 
         // Check label shape, expect: (batchsize x numclasses x sequencelength)
@@ -120,7 +128,7 @@ public class RelationalInstanceIteratorTest {
   @Test
   public void testBatches() throws Exception {
     final int seed = 1;
-    for (int batchSize : new int[]{1, 2, 5, 10}) {
+    for (int batchSize : new int[] {1, 2, 5, 10}) {
       final int actual = countIterations(data, rii, seed, batchSize);
       final int expected = (int) Math.ceil(data.numInstances() / ((double) batchSize));
       Assert.assertEquals(expected, actual);
@@ -135,6 +143,7 @@ public class RelationalInstanceIteratorTest {
    * @param seed Seed
    * @param batchsize Size of the batch which is returned in {@see DataSetIterator#next}
    * @return Number of iterations
+   * @throws Exception
    */
   private int countIterations(
       Instances data, AbstractInstanceIterator iter, int seed, int batchsize) throws Exception {

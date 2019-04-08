@@ -18,13 +18,12 @@
 
 package weka.dl4j.distribution;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
 
 public class TruncatedNormalDistributionTest extends ApiWrapperTest<TruncatedNormalDistribution> {
-
   @Test
   public void setMean() {
     double value = 123.456;
@@ -43,6 +42,6 @@ public class TruncatedNormalDistributionTest extends ApiWrapperTest<TruncatedNor
 
   @Override
   public TruncatedNormalDistribution getApiWrapper() {
-    return new TruncatedNormalDistribution();
+    return new  TruncatedNormalDistribution();
   }
 }

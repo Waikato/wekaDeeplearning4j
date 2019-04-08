@@ -62,14 +62,14 @@ public abstract class TokenizerFactory<T extends org.deeplearning4j.text.tokeniz
   }
 
   @Override
-  public T getBackend() {
-    initializeBackend();
-    return backend;
+  public void setBackend(T newBackend) {
+    backend = newBackend;
   }
 
   @Override
-  public void setBackend(T newBackend) {
-    backend = newBackend;
+  public T getBackend() {
+    initializeBackend();
+    return backend;
   }
 
   /**

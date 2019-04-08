@@ -31,18 +31,17 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 @JsonTypeName("lognormal")
-public class LogNormalDistribution extends
-    Distribution<org.deeplearning4j.nn.conf.distribution.LogNormalDistribution>
+public class LogNormalDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.LogNormalDistribution>
     implements OptionHandler {
 
   private static final long serialVersionUID = 1244534661808099971L;
 
   @OptionMetadata(
-      displayName = "mean",
-      description = "The mean (default = 1e-3).",
-      commandLineParamName = "mean",
-      commandLineParamSynopsis = "-mean <double>",
-      displayOrder = 1
+    displayName = "mean",
+    description = "The mean (default = 1e-3).",
+    commandLineParamName = "mean",
+    commandLineParamSynopsis = "-mean <double>",
+    displayOrder = 1
   )
   public double getMean() {
     return backend.getMean();
@@ -53,11 +52,11 @@ public class LogNormalDistribution extends
   }
 
   @OptionMetadata(
-      displayName = "standard deviation",
-      description = "The standard deviation (default = 1).",
-      commandLineParamName = "std",
-      commandLineParamSynopsis = "-std <double>",
-      displayOrder = 2
+    displayName = "standard deviation",
+    description = "The standard deviation (default = 1).",
+    commandLineParamName = "std",
+    commandLineParamSynopsis = "-std <double>",
+    displayOrder = 2
   )
   public double getStd() {
     return backend.getStd();
@@ -93,7 +92,7 @@ public class LogNormalDistribution extends
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

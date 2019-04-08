@@ -33,7 +33,6 @@ import weka.util.DatasetLoader;
  * @author Steven Lang
  */
 public class ActivationTest {
-
   /**
    * Run dummy network with give activationfunction for the first layer
    *
@@ -56,11 +55,10 @@ public class ActivationTest {
     clf.setLayers(denseLayer, outputLayer);
 
     final Instances data = DatasetLoader.loadIris();
-    try {
+    try{
       clf.buildClassifier(data);
-    } catch (Exception e) {
-      Assert.fail(String.format("Failed for activiation <%s>. Exception was: %s. Stacktrace:%s\n",
-          act.getClass().getSimpleName(), e.toString(),
+    } catch (Exception e){
+      Assert.fail(String.format("Failed for activiation <%s>. Exception was: %s. Stacktrace:%s\n", act.getClass().getSimpleName(), e.toString(),
           Arrays.toString(e.getStackTrace())));
     }
     clf.distributionsForInstances(data);
@@ -68,25 +66,27 @@ public class ActivationTest {
 
   /**
    * Test all activation functions with a dummy network
+   *
+   * @throws Exception
    */
   @Test
   public void testActivations() throws Exception {
     Activation[] acts =
-        new Activation[]{
-            new ActivationCube(),
-            new ActivationELU(),
-            new ActivationHardSigmoid(),
-            new ActivationHardTanH(),
-            new ActivationIdentity(),
-            new ActivationLReLU(),
-            new ActivationRationalTanh(),
-            new ActivationReLU(),
-            new ActivationRReLU(),
-            new ActivationHardSigmoid(),
-            new ActivationSoftmax(),
-            new ActivationSoftPlus(),
-            new ActivationSoftSign(),
-            new ActivationHardTanH()
+        new Activation[] {
+          new ActivationCube(),
+          new ActivationELU(),
+          new ActivationHardSigmoid(),
+          new ActivationHardTanH(),
+          new ActivationIdentity(),
+          new ActivationLReLU(),
+          new ActivationRationalTanh(),
+          new ActivationReLU(),
+          new ActivationRReLU(),
+          new ActivationHardSigmoid(),
+          new ActivationSoftmax(),
+          new ActivationSoftPlus(),
+          new ActivationSoftSign(),
+          new ActivationHardTanH()
         };
     for (Activation act : acts) {
       runClf(act);

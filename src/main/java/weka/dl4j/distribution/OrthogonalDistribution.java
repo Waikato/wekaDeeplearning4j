@@ -31,18 +31,17 @@ import weka.core.OptionMetadata;
  * @author Steven Lang
  */
 @JsonTypeName("orthogonal")
-public class OrthogonalDistribution extends
-    Distribution<org.deeplearning4j.nn.conf.distribution.OrthogonalDistribution>
+public class OrthogonalDistribution extends Distribution<org.deeplearning4j.nn.conf.distribution.OrthogonalDistribution>
     implements OptionHandler {
 
   private static final long serialVersionUID = 1244534661808099971L;
 
   @OptionMetadata(
-      displayName = "gain",
-      description = "The distribution gain (default = 1.0).",
-      commandLineParamName = "gain",
-      commandLineParamSynopsis = "-gain <double>",
-      displayOrder = 1
+    displayName = "gain",
+    description = "The distribution gain (default = 1.0).",
+    commandLineParamName = "gain",
+    commandLineParamSynopsis = "-gain <double>",
+    displayOrder = 1
   )
   public double getGain() {
     return backend.getGain();
@@ -78,7 +77,7 @@ public class OrthogonalDistribution extends
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

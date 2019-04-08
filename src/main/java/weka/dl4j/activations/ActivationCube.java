@@ -18,10 +18,11 @@
 
 package weka.dl4j.activations;
 
-import java.util.Enumeration;
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
+
+import java.util.Enumeration;
 
 /**
  * A version of DeepLearning4j's ActivationCube that implements WEKA option handling.
@@ -65,7 +66,7 @@ public class ActivationCube extends Activation<org.nd4j.linalg.activations.impl.
    * Parses a given list of options.
    *
    * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
+   * @exception Exception if an option is not supported
    */
   public void setOptions(String[] options) throws Exception {
 

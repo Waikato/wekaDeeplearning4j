@@ -34,17 +34,6 @@ public enum GradientNormalization implements
   ClipL2PerLayer,
   ClipL2PerParamType;
 
-  /**
-   * Parse backend gradient normalization and return weka enum implementation.
-   *
-   * @param gradientNormalization GradientNormalization
-   * @return Weka gradient normalization enum implementation
-   */
-  public static GradientNormalization fromBackend(
-      org.deeplearning4j.nn.conf.GradientNormalization gradientNormalization) {
-    return valueOf(gradientNormalization.name());
-  }
-
   public org.deeplearning4j.nn.conf.GradientNormalization getBackend() {
     return org.deeplearning4j.nn.conf.GradientNormalization.valueOf(this.name());
   }
@@ -57,5 +46,16 @@ public enum GradientNormalization implements
   @Override
   public void initializeBackend() {
     // Do nothing as this enum does not have a state
+  }
+
+  /**
+   * Parse backend gradient normalization and return weka enum implementation.
+   *
+   * @param gradientNormalization GradientNormalization
+   * @return Weka gradient normalization enum implementation
+   */
+  public static GradientNormalization fromBackend(
+      org.deeplearning4j.nn.conf.GradientNormalization gradientNormalization) {
+    return valueOf(gradientNormalization.name());
   }
 }

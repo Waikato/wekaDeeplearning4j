@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.learning.config.Adam;
 import weka.dl4j.Preferences;
 
 /**
@@ -28,7 +29,6 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  */
 public class LeNet implements ZooModel {
-
   private static final long serialVersionUID = 7790142171346455139L;
 
   @Override

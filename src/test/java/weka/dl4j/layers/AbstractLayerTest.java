@@ -18,6 +18,8 @@
 
 package weka.dl4j.layers;
 
+import org.junit.Before;
+import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
 
 /**
@@ -27,6 +29,7 @@ import weka.dl4j.ApiWrapperTest;
  * @author Steven Lang
  */
 public abstract class AbstractLayerTest<T extends Layer> extends ApiWrapperTest<T> {
+
 
 
 }
