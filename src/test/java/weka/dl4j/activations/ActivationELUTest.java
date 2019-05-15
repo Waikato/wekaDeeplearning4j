@@ -18,23 +18,23 @@
 
 package weka.dl4j.activations;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
 
 public class ActivationELUTest extends ApiWrapperTest<ActivationELU> {
 
-    @Test
-    public void setAlpha() {
-        double alpha = 123.456;
-        wrapper.setAlpha(alpha);
+  @Test
+  public void setAlpha() {
+    double alpha = 123.456;
+    wrapper.setAlpha(alpha);
 
-        assertEquals(alpha, wrapper.getAlpha(), PRECISION);
-    }
+    assertEquals(alpha, wrapper.getAlpha(), PRECISION);
+  }
 
-    @Override
-    public ActivationELU getApiWrapper() {
-        return new ActivationELU();
-    }
+  @Override
+  public ActivationELU getApiWrapper() {
+    return new ActivationELU();
+  }
 }

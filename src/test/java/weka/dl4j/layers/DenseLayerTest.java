@@ -18,10 +18,6 @@
 
 package weka.dl4j.layers;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Before;
-
 /**
  * A dense layer test.
  *
@@ -30,9 +26,9 @@ import org.junit.Before;
 public class DenseLayerTest extends AbstractFeedForwardLayerTest<DenseLayer> {
 
 
-    @Override
-    public DenseLayer getApiWrapper() {
-        return new DenseLayer();
-    }
+  @Override
+  public DenseLayer getApiWrapper() {
+    return new DenseLayer();
+  }
 
 }

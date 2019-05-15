@@ -25,13 +25,13 @@ package weka.core;
  */
 public class InvalidInputDataException extends WekaException {
 
-    private static final long serialVersionUID = -388372062851727428L;
+  private static final long serialVersionUID = -388372062851727428L;
 
-    public InvalidInputDataException(String message) {
-        super(message);
-    }
+  public InvalidInputDataException(String message) {
+    super(message);
+  }
 
-    public InvalidInputDataException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public InvalidInputDataException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

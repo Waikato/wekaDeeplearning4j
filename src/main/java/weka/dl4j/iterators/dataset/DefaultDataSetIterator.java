@@ -18,14 +18,13 @@
 
 package weka.dl4j.iterators.dataset;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An nd4j mini-batch iterator that iterates a given dataset.
@@ -34,198 +33,200 @@ import java.util.List;
  */
 public class DefaultDataSetIterator implements DataSetIterator, Serializable {
 
-    /**
-     * The ID used to serialize this class
-     */
-    private static final long serialVersionUID = 5571114918884888578L;
+  /**
+   * The ID used to serialize this class
+   */
+  private static final long serialVersionUID = 5571114918884888578L;
 
-    /**
-     * The dataset to operate on
-     */
-    protected DataSet data = null;
+  /**
+   * The dataset to operate on
+   */
+  protected DataSet data = null;
 
-    /**
-     * The batch size
-     */
-    protected int batchSize = 1;
+  /**
+   * The batch size
+   */
+  protected int batchSize = 1;
 
-    /**
-     * The cursor
-     */
-    protected int cursor = 0;
+  /**
+   * The cursor
+   */
+  protected int cursor = 0;
 
-    /**
-     * An optional dataset preprocessor
-     */
-    protected DataSetPreProcessor preProcessor;
+  /**
+   * An optional dataset preprocessor
+   */
+  protected DataSetPreProcessor preProcessor;
 
-    /**
-     * Constructs a new dataset iterator.
-     *
-     * @param data      The dataset to operate on
-     * @param batchSize The batch size
-     */
-    public DefaultDataSetIterator(DataSet data, int batchSize) {
+  /**
+   * Constructs a new dataset iterator.
+   *
+   * @param data The dataset to operate on
+   * @param batchSize The batch size
+   */
+  public DefaultDataSetIterator(DataSet data, int batchSize) {
 
-        this.data = data;
-        this.batchSize = Math.min(batchSize, data.numExamples());
+    this.data = data;
+    this.batchSize = Math.min(batchSize, data.numExamples());
+  }
+
+  /**
+   * Whether another batch of data is still available.
+   *
+   * @return true if another batch is still available
+   */
+  @Override
+  public boolean hasNext() {
+    return (cursor + batchSize <= data.numExamples());
+  }
+
+  /**
+   * Returns the next mini batch of data.
+   *
+   * @return the dataset corresponding to the mini batch
+   */
+  @Override
+  public DataSet next() {
+    // Apply preprocessor
+    if (preProcessor != null) {
+      preProcessor.preProcess(data);
     }
 
-    /**
-     * Whether another batch of data is still available.
-     *
-     * @return true if another batch is still available
-     */
-    @Override
-    public boolean hasNext() {
-        return (cursor + batchSize <= data.numExamples());
+    // Special case: getRange() does not work as expected if there is just a single example
+    if ((cursor == 0) && (batchSize == 1) && (data.numExamples() == 1)) {
+      cursor += batchSize;
+      return data;
+    }
+    DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + batchSize);
+    cursor += batchSize;
+    return thisBatch;
+  }
+
+  /**
+   * Returns a batch of the given size
+   *
+   * @param num the size of the batch to return
+   * @return a mini-batch of the given size
+   */
+  @Override
+  public DataSet next(int num) {
+
+    // Apply preprocessor
+    if (preProcessor != null) {
+      preProcessor.preProcess(data);
     }
 
-    /**
-     * Returns the next mini batch of data.
-     *
-     * @return the dataset corresponding to the mini batch
-     */
-    @Override
-    public DataSet next() {
-        // Apply preprocessor
-        if (preProcessor != null) {
-            preProcessor.preProcess(data);
-        }
-
-        // Special case: getRange() does not work as expected if there is just a single example
-        if ((cursor == 0) && (batchSize == 1) && (data.numExamples() == 1)) {
-            cursor += batchSize;
-            return data;
-        }
-        DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + batchSize);
-        cursor += batchSize;
-        return thisBatch;
+    // Special case: getRange() does not work as expected if there is just a single example
+    if ((cursor == 0) && (num == 1) && (data.numExamples() == 1)) {
+      return data;
     }
 
-    /**
-     * Returns a batch of the given size
-     *
-     * @param num the size of the batch to return
-     * @return a mini-batch of the given size
-     */
-    @Override
-    public DataSet next(int num) {
+    DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + num);
+    cursor += num;
+    return thisBatch;
+  }
 
-        // Apply preprocessor
-        if (preProcessor != null) preProcessor.preProcess(data);
+  /**
+   * Returns the number of input columns.
+   *
+   * @return the number of input columns
+   */
+  @Override
+  public int inputColumns() {
+    return data.get(0).getFeatures().columns();
+  }
 
-        // Special case: getRange() does not work as expected if there is just a single example
-        if ((cursor == 0) && (num == 1) && (data.numExamples() == 1)) {
-            return data;
-        }
+  /**
+   * Returns the total number of labels.
+   *
+   * @return the total number of labels
+   */
+  @Override
+  public int totalOutcomes() {
 
-        DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + num);
-        cursor += num;
-        return thisBatch;
+    return data.get(0).getLabels().columns();
+  }
+
+  /**
+   * Resets the cursor.
+   */
+  @Override
+  public void reset() {
+    cursor = 0;
+  }
+
+  /**
+   * Whether the iterator can be reset.
+   *
+   * @return true
+   */
+  @Override
+  public boolean resetSupported() {
+    return true;
+  }
+
+  /**
+   * Whether the iterator can be used asynchronously.
+   *
+   * @return false
+   */
+  @Override
+  public boolean asyncSupported() {
+    return false;
+  }
+
+  /**
+   * The size of the mini batches.
+   *
+   * @return the size of the mini batches
+   */
+  @Override
+  public int batch() {
+    return batchSize;
+  }
+
+
+  /**
+   * Gets the preprocessor.
+   *
+   * @return preProcessor
+   */
+  @Override
+  public DataSetPreProcessor getPreProcessor() {
+    return preProcessor;
+  }
+
+  /**
+   * Sets the preprocessor.
+   *
+   * @param preProcessor A DataSet preprocessor.
+   */
+  @Override
+  public void setPreProcessor(DataSetPreProcessor preProcessor) {
+    this.preProcessor = preProcessor;
+  }
+
+  /**
+   * Gets the labels.
+   *
+   * @return the labels
+   */
+  @Override
+  public List<String> getLabels() {
+    INDArray labelsINDArray = this.data.getLabels();
+    List<String> labels = new ArrayList<>();
+    for (int i = 0; i < labelsINDArray.shape()[0]; i++) {
+      int label = labelsINDArray.getRow(i).argMax().getInt(0);
+      labels.add(String.valueOf(label));
     }
+    return labels;
+  }
 
-    /**
-     * Returns the number of input columns.
-     *
-     * @return the number of input columns
-     */
-    @Override
-    public int inputColumns() {
-        return data.get(0).getFeatures().columns();
-    }
-
-    /**
-     * Returns the total number of labels.
-     *
-     * @return the total number of labels
-     */
-    @Override
-    public int totalOutcomes() {
-
-        return data.get(0).getLabels().columns();
-    }
-
-    /**
-     * Resets the cursor.
-     */
-    @Override
-    public void reset() {
-        cursor = 0;
-    }
-
-    /**
-     * Whether the iterator can be reset.
-     *
-     * @return true
-     */
-    @Override
-    public boolean resetSupported() {
-        return true;
-    }
-
-    /**
-     * Whether the iterator can be used asynchronously.
-     *
-     * @return false
-     */
-    @Override
-    public boolean asyncSupported() {
-        return false;
-    }
-
-    /**
-     * The size of the mini batches.
-     *
-     * @return the size of the mini batches
-     */
-    @Override
-    public int batch() {
-        return batchSize;
-    }
-
-
-    /**
-     * Gets the preprocessor.
-     *
-     * @return preProcessor
-     */
-    @Override
-    public DataSetPreProcessor getPreProcessor() {
-        return preProcessor;
-    }
-
-    /**
-     * Sets the preprocessor.
-     *
-     * @param preProcessor A DataSet preprocessor.
-     */
-    @Override
-    public void setPreProcessor(DataSetPreProcessor preProcessor) {
-        this.preProcessor = preProcessor;
-    }
-
-    /**
-     * Gets the labels.
-     *
-     * @return the labels
-     */
-    @Override
-    public List<String> getLabels() {
-        INDArray labelsINDArray = this.data.getLabels();
-        List<String> labels = new ArrayList<>();
-        for (int i = 0; i < labelsINDArray.shape()[0]; i++) {
-            int label = labelsINDArray.getRow(i).argMax().getInt(0);
-            labels.add(String.valueOf(label));
-        }
-        return labels;
-    }
-
-    /**
-     * Enables removing of a mini-batch.
-     */
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
+  /**
+   * Enables removing of a mini-batch.
+   */
+  @Override
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
 }

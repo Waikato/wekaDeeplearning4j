@@ -25,21 +25,21 @@ import weka.dl4j.ApiWrapperTest;
 
 public abstract class AbstractScheduleTest<T extends Schedule> extends ApiWrapperTest<T> {
 
-    @Test
-    public void setScheduleType() {
-        for (ScheduleType type : ScheduleType.values()) {
-            wrapper.setScheduleType(type);
+  @Test
+  public void setScheduleType() {
+    for (ScheduleType type : ScheduleType.values()) {
+      wrapper.setScheduleType(type);
 
-            assertEquals(type, wrapper.getScheduleType());
-        }
+      assertEquals(type, wrapper.getScheduleType());
     }
+  }
 
-    @Test
-    public void setInitialValue() {
-        double value = 123.456;
-        wrapper.setInitialValue(value);
+  @Test
+  public void setInitialValue() {
+    double value = 123.456;
+    wrapper.setInitialValue(value);
 
-        assertEquals(value, wrapper.getInitialValue(), PRECISION);
-    }
+    assertEquals(value, wrapper.getInitialValue(), PRECISION);
+  }
 
 }

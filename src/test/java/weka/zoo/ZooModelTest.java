@@ -18,16 +18,9 @@
 
 package weka.zoo;
 
-import java.util.Arrays;
-
+import java.util.ArrayList;
+import javax.naming.OperationNotSupportedException;
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.nn.conf.GradientNormalization;
-import org.junit.Ignore;
-import weka.classifiers.functions.RnnSequenceClassifier;
-import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
-import weka.dl4j.updater.Adam;
-import weka.dl4j.zoo.ResNet50;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
@@ -36,11 +29,17 @@ import weka.core.Instances;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
-import weka.dl4j.zoo.*;
+import weka.dl4j.zoo.AlexNet;
+import weka.dl4j.zoo.CustomNet;
+import weka.dl4j.zoo.Darknet19;
+import weka.dl4j.zoo.FaceNetNN4Small2;
+import weka.dl4j.zoo.InceptionResNetV1;
+import weka.dl4j.zoo.LeNet;
+import weka.dl4j.zoo.ResNet50;
+import weka.dl4j.zoo.VGG16;
+import weka.dl4j.zoo.VGG19;
+import weka.dl4j.zoo.ZooModel;
 import weka.util.DatasetLoader;
-
-import javax.naming.OperationNotSupportedException;
-import java.util.ArrayList;
 
 /**
  * JUnit tests for the ModelZoo ({@link weka.zoo}). Mainly checks out whether the initialization of
@@ -51,86 +50,86 @@ import java.util.ArrayList;
 @Log4j2
 public class ZooModelTest {
 
-    @Test
-    public void testLeNetMnist() throws Exception {
-        buildModel(new LeNet());
+  @Test
+  public void testLeNetMnist() throws Exception {
+    buildModel(new LeNet());
+  }
+
+  @Test
+  public void testAlexNetMnist() throws Exception {
+    buildModel(new AlexNet());
+  }
+
+  @Test
+  public void testVGG16() throws Exception {
+    buildModel(new VGG16());
+  }
+
+  @Test
+  public void testVGG19() throws Exception {
+    buildModel(new VGG19());
+  }
+
+  @Test
+  public void testResNet50() throws Exception {
+    buildModel(new ResNet50());
+  }
+
+  @Test
+  public void testDarknet19() throws Exception {
+    buildModel(new Darknet19());
+  }
+
+  @Test
+  public void testFaceNetNN4Small2() throws Exception {
+    buildModel(new FaceNetNN4Small2());
+  }
+
+  @Test
+  public void testInceptionResNetV1() throws Exception {
+    buildModel(new InceptionResNetV1());
+  }
+
+
+  private void buildModel(ZooModel model) throws Exception {
+    // CLF
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    clf.setSeed(1);
+
+    // Data
+    Instances data = DatasetLoader.loadMiniMnistMeta();
+
+    ArrayList<Attribute> atts = new ArrayList<>();
+    for (int i = 0; i < data.numAttributes(); i++) {
+      atts.add(data.attribute(i));
+    }
+    Instances shrinkedData = new Instances("shrinked", atts, 10);
+    shrinkedData.setClassIndex(1);
+    for (int i = 0; i < 10; i++) {
+      Instance inst = data.get(i);
+      inst.setClassValue(i % 10);
+      inst.setDataset(shrinkedData);
+      shrinkedData.add(inst);
     }
 
-    @Test
-    public void testAlexNetMnist() throws Exception {
-        buildModel(new AlexNet());
-    }
-
-    @Test
-    public void testVGG16() throws Exception {
-        buildModel(new VGG16());
-    }
-
-    @Test
-    public void testVGG19() throws Exception {
-        buildModel(new VGG19());
-    }
-
-    @Test
-    public void testResNet50() throws Exception {
-        buildModel(new ResNet50());
-    }
-
-    @Test
-    public void testDarknet19() throws Exception {
-        buildModel(new Darknet19());
-    }
-
-    @Test
-    public void testFaceNetNN4Small2() throws Exception {
-        buildModel(new FaceNetNN4Small2());
-    }
-
-    @Test
-    public void testInceptionResNetV1() throws Exception {
-        buildModel(new InceptionResNetV1());
-    }
+    ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+    iterator.setTrainBatchSize(10);
+    clf.setInstanceIterator(iterator);
+    clf.setZooModel(model);
+    clf.setNumEpochs(1);
+    final EpochListener epochListener = new EpochListener();
+    epochListener.setN(1);
+    clf.setIterationListener(epochListener);
+    clf.setEarlyStopping(new EarlyStopping(5, 0));
+    clf.buildClassifier(shrinkedData);
+  }
 
 
-    private void buildModel(ZooModel model) throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
-
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-
-        ArrayList<Attribute> atts = new ArrayList<>();
-        for (int i = 0; i < data.numAttributes(); i++) {
-            atts.add(data.attribute(i));
-        }
-        Instances shrinkedData = new Instances("shrinked", atts, 10);
-        shrinkedData.setClassIndex(1);
-        for (int i = 0; i < 10; i++) {
-            Instance inst = data.get(i);
-            inst.setClassValue(i % 10);
-            inst.setDataset(shrinkedData);
-            shrinkedData.add(inst);
-        }
-
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(10);
-        clf.setInstanceIterator(iterator);
-        clf.setZooModel(model);
-        clf.setNumEpochs(1);
-        final EpochListener epochListener = new EpochListener();
-        epochListener.setN(1);
-        clf.setIterationListener(epochListener);
-        clf.setEarlyStopping(new EarlyStopping(5, 0));
-        clf.buildClassifier(shrinkedData);
-    }
-
-
-    /**
-     * Test CustomNet init
-     */
-    @Test(expected = UnsupportedOperationException.class)
-    public void testCustomNetInit() throws OperationNotSupportedException {
-        new CustomNet().init(0, 0, null);
-    }
+  /**
+   * Test CustomNet init
+   */
+  @Test(expected = UnsupportedOperationException.class)
+  public void testCustomNetInit() throws OperationNotSupportedException {
+    new CustomNet().init(0, 0, null);
+  }
 }

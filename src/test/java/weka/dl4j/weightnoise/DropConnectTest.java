@@ -18,7 +18,7 @@
 
 package weka.dl4j.weightnoise;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
@@ -33,33 +33,33 @@ import weka.dl4j.schedules.StepSchedule;
 
 public class DropConnectTest extends ApiWrapperTest<DropConnect> {
 
-    @Test
-    public void setWeightRetainProbability() {
-        double value = 123.456;
-        wrapper.setWeightRetainProbability(value);
+  @Test
+  public void setWeightRetainProbability() {
+    double value = 123.456;
+    wrapper.setWeightRetainProbability(value);
 
-        assertEquals(value, wrapper.getWeightRetainProbability(), PRECISION);
+    assertEquals(value, wrapper.getWeightRetainProbability(), PRECISION);
+  }
+
+  @Test
+  public void setWeightRetainProbabilitySchedule() {
+    for (Schedule sched : new Schedule[]{
+        new ConstantSchedule(),
+        new ExponentialSchedule(),
+        new InverseSchedule(),
+        new MapSchedule(),
+        new PolySchedule(),
+        new SigmoidSchedule(),
+        new StepSchedule()
+    }) {
+      wrapper.setWeightRetainProbabilitySchedule(sched);
+
+      assertEquals(sched, wrapper.getWeightRetainProbabilitySchedule());
     }
+  }
 
-    @Test
-    public void setWeightRetainProbabilitySchedule() {
-        for (Schedule sched : new Schedule[]{
-                new ConstantSchedule(),
-                new ExponentialSchedule(),
-                new InverseSchedule(),
-                new MapSchedule(),
-                new PolySchedule(),
-                new SigmoidSchedule(),
-                new StepSchedule()
-        }) {
-            wrapper.setWeightRetainProbabilitySchedule(sched);
-
-            assertEquals(sched, wrapper.getWeightRetainProbabilitySchedule());
-        }
-    }
-
-    @Override
-    public DropConnect getApiWrapper() {
-        return new DropConnect();
-    }
+  @Override
+  public DropConnect getApiWrapper() {
+    return new DropConnect();
+  }
 }

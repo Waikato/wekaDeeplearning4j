@@ -21,7 +21,6 @@ package weka.dl4j.activations;
 import static org.nd4j.linalg.activations.impl.ActivationLReLU.DEFAULT_ALPHA;
 
 import java.util.Enumeration;
-
 import org.nd4j.shade.jackson.annotation.JsonTypeName;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -35,68 +34,68 @@ import weka.core.OptionMetadata;
  */
 @JsonTypeName("LReLU")
 public class ActivationLReLU
-        extends Activation<org.nd4j.linalg.activations.impl.ActivationLReLU>
-        implements OptionHandler {
+    extends Activation<org.nd4j.linalg.activations.impl.ActivationLReLU>
+    implements OptionHandler {
 
-    private static final long serialVersionUID = -8964799878986489846L;
+  private static final long serialVersionUID = -8964799878986489846L;
 
-    protected double alpha = DEFAULT_ALPHA;
+  protected double alpha = DEFAULT_ALPHA;
 
-    @Override
-    public void initializeBackend() {
-        backend = new org.nd4j.linalg.activations.impl.ActivationLReLU();
-    }
+  @Override
+  public void initializeBackend() {
+    backend = new org.nd4j.linalg.activations.impl.ActivationLReLU();
+  }
 
-    @OptionMetadata(
-            displayName = "alpha",
-            description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
-            commandLineParamName = "alpha",
-            commandLineParamSynopsis = "-alpha <double>",
-            displayOrder = 1
-    )
-    public double getAlpha() {
-        return alpha;
-    }
+  @OptionMetadata(
+      displayName = "alpha",
+      description = "The alpha value (default = " + DEFAULT_ALPHA + ").",
+      commandLineParamName = "alpha",
+      commandLineParamSynopsis = "-alpha <double>",
+      displayOrder = 1
+  )
+  public double getAlpha() {
+    return alpha;
+  }
 
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
-    }
+  public void setAlpha(double alpha) {
+    this.alpha = alpha;
+  }
 
-    @Override
-    public org.nd4j.linalg.activations.impl.ActivationLReLU getBackend() {
-        return new org.nd4j.linalg.activations.impl.ActivationLReLU(alpha);
-    }
+  @Override
+  public org.nd4j.linalg.activations.impl.ActivationLReLU getBackend() {
+    return new org.nd4j.linalg.activations.impl.ActivationLReLU(alpha);
+  }
 
-    /**
-     * Returns an enumeration describing the available options.
-     *
-     * @return an enumeration of all the available options.
-     */
-    @Override
-    public Enumeration<Option> listOptions() {
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
 
-        return Option.listOptionsForClass(this.getClass()).elements();
-    }
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
-    /**
-     * Gets the current settings of the Classifier.
-     *
-     * @return an array of strings suitable for passing to setOptions
-     */
-    @Override
-    public String[] getOptions() {
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
 
-        return Option.getOptions(this, this.getClass());
-    }
+    return Option.getOptions(this, this.getClass());
+  }
 
-    /**
-     * Parses a given list of options.
-     *
-     * @param options the list of options as an array of strings
-     * @throws Exception if an option is not supported
-     */
-    public void setOptions(String[] options) throws Exception {
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
 
-        Option.setOptions(options, this, this.getClass());
-    }
+    Option.setOptions(options, this, this.getClass());
+  }
 }

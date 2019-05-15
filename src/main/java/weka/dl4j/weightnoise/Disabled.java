@@ -19,7 +19,6 @@
 package weka.dl4j.weightnoise;
 
 import java.io.Serializable;
-
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import weka.core.OptionHandler;
@@ -33,11 +32,11 @@ import weka.core.OptionHandler;
 @ToString
 public class Disabled extends AbstractWeightNoise implements OptionHandler, Serializable {
 
-    private static final long serialVersionUID = 4568626187488846101L;
+  private static final long serialVersionUID = 4568626187488846101L;
 
-    @Override
-    public void initializeBackend() {
-        backend = null;
-    }
+  @Override
+  public void initializeBackend() {
+    backend = null;
+  }
 
 }

@@ -24,5 +24,6 @@ package weka.classifiers.functions.dl4j;
  * @author Steven Lang
  */
 public interface VoidCallable {
-    void call();
+
+  void call();
 }

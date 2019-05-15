@@ -26,17 +26,18 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
  * @author Steven Lang
  */
 public class CustomNet implements ZooModel {
-    private static final long serialVersionUID = 7131900848379752732L;
 
-    @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape)
-            throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(
-                "This model cannot be initialized as a MultiLayerNetwork.");
-    }
+  private static final long serialVersionUID = 7131900848379752732L;
 
-    @Override
-    public int[][] getShape() {
-        return new int[0][0];
-    }
+  @Override
+  public ComputationGraph init(int numLabels, long seed, int[] shape)
+      throws UnsupportedOperationException {
+    throw new UnsupportedOperationException(
+        "This model cannot be initialized as a MultiLayerNetwork.");
+  }
+
+  @Override
+  public int[][] getShape() {
+    return new int[0][0];
+  }
 }

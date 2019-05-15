@@ -20,7 +20,6 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -32,104 +31,104 @@ import weka.gui.ProgrammaticProperty;
  * @author Steven Lang
  */
 public class ZeroPaddingLayer extends Layer<org.deeplearning4j.nn.conf.layers.ZeroPaddingLayer>
-        implements OptionHandler, Serializable {
+    implements OptionHandler, Serializable {
 
 
-    private static final long serialVersionUID = 847105027603786222L;
+  private static final long serialVersionUID = 847105027603786222L;
 
-    /**
-     * Constructor for setting some defaults.
-     */
-    public ZeroPaddingLayer() {
-        super();
-        setPadding(new int[]{0, 0});
-        setLayerName("ZeroPadding layer");
-    }
+  /**
+   * Constructor for setting some defaults.
+   */
+  public ZeroPaddingLayer() {
+    super();
+    setPadding(new int[]{0, 0});
+    setLayerName("ZeroPadding layer");
+  }
 
-    @OptionMetadata(
-            displayName = "number of rows in padding",
-            description = "The number of rows in the padding (default = 0).",
-            commandLineParamName = "paddingRows",
-            commandLineParamSynopsis = "-paddingRows <int>",
-            displayOrder = 8
-    )
-    public int getPaddingRows() {
-        return backend.getPadding()[0];
-    }
+  @OptionMetadata(
+      displayName = "number of rows in padding",
+      description = "The number of rows in the padding (default = 0).",
+      commandLineParamName = "paddingRows",
+      commandLineParamSynopsis = "-paddingRows <int>",
+      displayOrder = 8
+  )
+  public int getPaddingRows() {
+    return backend.getPadding()[0];
+  }
 
-    public void setPaddingRows(int padding) {
-        int[] pad = new int[]{padding, getPaddingColumns()};
-        backend.setPadding(pad);
-    }
+  public void setPaddingRows(int padding) {
+    int[] pad = new int[]{padding, getPaddingColumns()};
+    backend.setPadding(pad);
+  }
 
-    @ProgrammaticProperty
-    public int[] getPadding() {
-        return backend.getPadding();
-    }
+  @ProgrammaticProperty
+  public int[] getPadding() {
+    return backend.getPadding();
+  }
 
-    public void setPadding(int[] padding) {
-        backend.setPadding(padding);
-    }
+  public void setPadding(int[] padding) {
+    backend.setPadding(padding);
+  }
 
-    @OptionMetadata(
-            displayName = "number of columns in padding",
-            description = "The number of columns in the padding (default = 0).",
-            commandLineParamName = "paddingColumns",
-            commandLineParamSynopsis = "-paddingColumns <int>",
-            displayOrder = 9
-    )
-    public int getPaddingColumns() {
-        return backend.getPadding()[1];
-    }
+  @OptionMetadata(
+      displayName = "number of columns in padding",
+      description = "The number of columns in the padding (default = 0).",
+      commandLineParamName = "paddingColumns",
+      commandLineParamSynopsis = "-paddingColumns <int>",
+      displayOrder = 9
+  )
+  public int getPaddingColumns() {
+    return backend.getPadding()[1];
+  }
 
-    public void setPaddingColumns(int padding) {
-        int[] pad = new int[]{getPaddingRows(), padding};
-        backend.setPadding(pad);
-    }
-
-
-    /**
-     * Global info.
-     *
-     * @return string describing this class.
-     */
-    public String globalInfo() {
-        return "A ZeroPadding layer from DeepLearning4J.";
-    }
+  public void setPaddingColumns(int padding) {
+    int[] pad = new int[]{getPaddingRows(), padding};
+    backend.setPadding(pad);
+  }
 
 
-    /**
-     * Returns an enumeration describing the available options.
-     *
-     * @return an enumeration of all the available options.
-     */
-    @Override
-    public Enumeration<Option> listOptions() {
-        return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
-    }
+  /**
+   * Global info.
+   *
+   * @return string describing this class.
+   */
+  public String globalInfo() {
+    return "A ZeroPadding layer from DeepLearning4J.";
+  }
 
-    /**
-     * Gets the current settings of the Classifier.
-     *
-     * @return an array of strings suitable for passing to setOptions
-     */
-    @Override
-    public String[] getOptions() {
-        return Option.getOptionsForHierarchy(this, super.getClass());
-    }
 
-    /**
-     * Parses a given list of options.
-     *
-     * @param options the list of options as an array of strings
-     * @throws Exception if an option is not supported
-     */
-    public void setOptions(String[] options) throws Exception {
-        Option.setOptionsForHierarchy(options, this, super.getClass());
-    }
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
+    return Option.listOptionsForClassHierarchy(this.getClass(), super.getClass()).elements();
+  }
 
-    @Override
-    public void initializeBackend() {
-        this.backend = new org.deeplearning4j.nn.conf.layers.ZeroPaddingLayer();
-    }
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
+    return Option.getOptionsForHierarchy(this, super.getClass());
+  }
+
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
+    Option.setOptionsForHierarchy(options, this, super.getClass());
+  }
+
+  @Override
+  public void initializeBackend() {
+    this.backend = new org.deeplearning4j.nn.conf.layers.ZeroPaddingLayer();
+  }
 }

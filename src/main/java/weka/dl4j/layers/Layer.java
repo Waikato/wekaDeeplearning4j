@@ -20,7 +20,6 @@ package weka.dl4j.layers;
 
 import java.io.Serializable;
 import java.util.Enumeration;
-
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import weka.core.Option;
@@ -38,81 +37,81 @@ import weka.dl4j.ApiWrapperUtil;
 @EqualsAndHashCode
 @ToString
 public abstract class Layer<T extends org.deeplearning4j.nn.conf.layers.Layer>
-        implements ApiWrapper<T>, OptionHandler, Serializable {
+    implements ApiWrapper<T>, OptionHandler, Serializable {
 
-    private static final long serialVersionUID = 2802598550880773277L;
-    T backend;
+  private static final long serialVersionUID = 2802598550880773277L;
+  T backend;
 
-    public Layer() {
-        initializeBackend();
-    }
+  public Layer() {
+    initializeBackend();
+  }
 
-    /**
-     * Create an API wrapped layer from a given layer object.
-     *
-     * @param newBackend Backend object
-     * @return API wrapped object
-     */
-    public static Layer<? extends org.deeplearning4j.nn.conf.layers.Layer> create(
-            org.deeplearning4j.nn.conf.layers.Layer newBackend) {
-        return ApiWrapperUtil.getImplementingWrapper(Layer.class, newBackend, "weka.dl4j.layers");
-    }
+  /**
+   * Create an API wrapped layer from a given layer object.
+   *
+   * @param newBackend Backend object
+   * @return API wrapped object
+   */
+  public static Layer<? extends org.deeplearning4j.nn.conf.layers.Layer> create(
+      org.deeplearning4j.nn.conf.layers.Layer newBackend) {
+    return ApiWrapperUtil.getImplementingWrapper(Layer.class, newBackend, "weka.dl4j.layers");
+  }
 
-    @Override
-    public T getBackend() {
-        return backend;
-    }
+  @Override
+  public T getBackend() {
+    return backend;
+  }
 
-    @Override
-    public void setBackend(T newBackend) {
-        this.backend = newBackend;
-    }
+  @Override
+  public void setBackend(T newBackend) {
+    this.backend = newBackend;
+  }
 
-    @OptionMetadata(
-            displayName = "layer name",
-            description = "The name of the layer (default = Batch normalization Layer).",
-            commandLineParamName = "name",
-            commandLineParamSynopsis = "-name <string>",
-            displayOrder = 0
-    )
-    public String getLayerName() {
-        return backend.getLayerName();
-    }
+  @OptionMetadata(
+      displayName = "layer name",
+      description = "The name of the layer (default = Batch normalization Layer).",
+      commandLineParamName = "name",
+      commandLineParamSynopsis = "-name <string>",
+      displayOrder = 0
+  )
+  public String getLayerName() {
+    return backend.getLayerName();
+  }
 
-    public void setLayerName(String layerName) {
-        backend.setLayerName(layerName);
-    }
+  public void setLayerName(String layerName) {
+    backend.setLayerName(layerName);
+  }
 
-    /**
-     * Returns an enumeration describing the available options.
-     *
-     * @return an enumeration of all the available options.
-     */
-    @Override
-    public Enumeration<Option> listOptions() {
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration<Option> listOptions() {
 
-        return Option.listOptionsForClass(this.getClass()).elements();
-    }
+    return Option.listOptionsForClass(this.getClass()).elements();
+  }
 
-    /**
-     * Gets the current settings of the Classifier.
-     *
-     * @return an array of strings suitable for passing to setOptions
-     */
-    @Override
-    public String[] getOptions() {
+  /**
+   * Gets the current settings of the Classifier.
+   *
+   * @return an array of strings suitable for passing to setOptions
+   */
+  @Override
+  public String[] getOptions() {
 
-        return Option.getOptions(this, this.getClass());
-    }
+    return Option.getOptions(this, this.getClass());
+  }
 
-    /**
-     * Parses a given list of options.
-     *
-     * @param options the list of options as an array of strings
-     * @throws Exception if an option is not supported
-     */
-    public void setOptions(String[] options) throws Exception {
+  /**
+   * Parses a given list of options.
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  public void setOptions(String[] options) throws Exception {
 
-        Option.setOptions(options, this, this.getClass());
-    }
+    Option.setOptions(options, this, this.getClass());
+  }
 }

@@ -37,24 +37,24 @@ import weka.dl4j.dropout.GaussianNoise;
 public class DropoutLayerTest extends AbstractFeedForwardLayerTest<DropoutLayer> {
 
 
-    @Override
-    public DropoutLayer getApiWrapper() {
-        return new DropoutLayer();
-    }
+  @Override
+  public DropoutLayer getApiWrapper() {
+    return new DropoutLayer();
+  }
 
-    @Test
-    public void testDropout() {
-        for (AbstractDropout dropout :
-                new AbstractDropout[]{
-                        new AlphaDropout(),
-                        new Dropout(),
-                        new GaussianDropout(),
-                        new GaussianNoise()
-                }) {
-            wrapper.setDropout(dropout);
+  @Test
+  public void testDropout() {
+    for (AbstractDropout dropout :
+        new AbstractDropout[]{
+            new AlphaDropout(),
+            new Dropout(),
+            new GaussianDropout(),
+            new GaussianNoise()
+        }) {
+      wrapper.setDropout(dropout);
 
-            assertEquals(dropout, wrapper.getDropout());
-        }
+      assertEquals(dropout, wrapper.getDropout());
     }
+  }
 
 }

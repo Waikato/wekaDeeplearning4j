@@ -20,7 +20,6 @@ package weka.dl4j.text.tokenization.tokenizer.factory.impl;
 
 import java.io.InputStream;
 import java.io.Serializable;
-
 import org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess;
 import org.deeplearning4j.text.tokenization.tokenizer.Tokenizer;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
@@ -33,78 +32,78 @@ import weka.dl4j.text.tokenization.tokenizer.WekaTokenizer;
  * @author Felipe Bravo-Marquez
  */
 public class CharacterNGramTokenizerFactoryImpl
-        implements TokenizerFactory, Serializable {
+    implements TokenizerFactory, Serializable {
 
-    /**
-     * For Serialization
-     */
-    private static final long serialVersionUID = 4694868790645893109L;
-    /**
-     * the maximum number of N
-     */
-    protected int nMax = 3;
-    /**
-     * the minimum number of N
-     */
-    protected int nMin = 1;
-    /**
-     * The TokenPreProcess object
-     */
-    private TokenPreProcess tokenPreProcess;
-    private CharacterNGramTokenizer wekaTokenizer;
+  /**
+   * For Serialization
+   */
+  private static final long serialVersionUID = 4694868790645893109L;
+  /**
+   * the maximum number of N
+   */
+  protected int nMax = 3;
+  /**
+   * the minimum number of N
+   */
+  protected int nMin = 1;
+  /**
+   * The TokenPreProcess object
+   */
+  private TokenPreProcess tokenPreProcess;
+  private CharacterNGramTokenizer wekaTokenizer;
 
-    /* (non-Javadoc)
-     * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
-     */
-    @Override
-    public Tokenizer create(String toTokenize) {
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.lang.String)
+   */
+  @Override
+  public Tokenizer create(String toTokenize) {
 
-        this.wekaTokenizer = new CharacterNGramTokenizer();
-        this.wekaTokenizer.setNGramMinSize(this.nMin);
-        this.wekaTokenizer.setNGramMaxSize(this.nMax);
+    this.wekaTokenizer = new CharacterNGramTokenizer();
+    this.wekaTokenizer.setNGramMinSize(this.nMin);
+    this.wekaTokenizer.setNGramMaxSize(this.nMax);
 
-        WekaTokenizer t = new WekaTokenizer(toTokenize, wekaTokenizer);
-        t.setTokenPreProcessor(tokenPreProcess);
-        return t;
-    }
+    WekaTokenizer t = new WekaTokenizer(toTokenize, wekaTokenizer);
+    t.setTokenPreProcessor(tokenPreProcess);
+    return t;
+  }
 
-    /* (non-Javadoc)
-     * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
-     */
-    @Override
-    public Tokenizer create(InputStream toTokenize) {
-        return null;
-    }
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#create(java.io.InputStream)
+   */
+  @Override
+  public Tokenizer create(InputStream toTokenize) {
+    return null;
+  }
 
-    /* (non-Javadoc)
-     * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
-     */
-    @Override
-    public TokenPreProcess getTokenPreProcessor() {
-        return tokenPreProcess;
-    }
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#getTokenPreProcessor()
+   */
+  @Override
+  public TokenPreProcess getTokenPreProcessor() {
+    return tokenPreProcess;
+  }
 
-    /* (non-Javadoc)
-     * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
-     */
-    @Override
-    public void setTokenPreProcessor(TokenPreProcess preProcessor) {
-        this.tokenPreProcess = preProcessor;
-    }
+  /* (non-Javadoc)
+   * @see org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory#setTokenPreProcessor(org.deeplearning4j.text.tokenization.tokenizer.TokenPreProcess)
+   */
+  @Override
+  public void setTokenPreProcessor(TokenPreProcess preProcessor) {
+    this.tokenPreProcess = preProcessor;
+  }
 
-    public int getNMax() {
-        return nMax;
-    }
+  public int getNMax() {
+    return nMax;
+  }
 
-    public void setNMax(int nMax) {
-        this.nMax = nMax;
-    }
+  public void setNMax(int nMax) {
+    this.nMax = nMax;
+  }
 
-    public int getNMin() {
-        return nMin;
-    }
+  public int getNMin() {
+    return nMin;
+  }
 
-    public void setNMin(int nMin) {
-        this.nMin = nMin;
-    }
+  public void setNMin(int nMin) {
+    this.nMin = nMin;
+  }
 }

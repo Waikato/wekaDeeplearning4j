@@ -18,8 +18,6 @@
 
 package weka.dl4j.layers;
 
-import org.junit.Before;
-import org.junit.Test;
 import weka.dl4j.ApiWrapperTest;
 
 /**

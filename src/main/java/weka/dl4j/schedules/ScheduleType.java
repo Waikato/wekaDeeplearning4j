@@ -28,38 +28,38 @@ import weka.dl4j.ApiWrapper;
  * @author Steven Lang
  */
 public enum ScheduleType implements ApiWrapper<org.nd4j.linalg.schedule.ScheduleType> {
-    ITERATION,
-    EPOCH;
+  ITERATION,
+  EPOCH;
 
-    /**
-     * Parse backend schedule type and return weka enum implementation.
-     *
-     * @param scheduleType Schedule type
-     * @return Weka schedule type implementation
-     */
-    public static ScheduleType fromBackend(org.nd4j.linalg.schedule.ScheduleType scheduleType) {
-        return valueOf(scheduleType.name());
-    }
+  /**
+   * Parse backend schedule type and return weka enum implementation.
+   *
+   * @param scheduleType Schedule type
+   * @return Weka schedule type implementation
+   */
+  public static ScheduleType fromBackend(org.nd4j.linalg.schedule.ScheduleType scheduleType) {
+    return valueOf(scheduleType.name());
+  }
 
-    public org.nd4j.linalg.schedule.ScheduleType getBackend() {
-        switch (this) {
-            case EPOCH:
-                return org.nd4j.linalg.schedule.ScheduleType.EPOCH;
-            case ITERATION:
-                return org.nd4j.linalg.schedule.ScheduleType.ITERATION;
-            default:
-                throw new RuntimeException(
-                        "GradientNormalization method: " + this + " not found in Deeplearning4j backend.");
-        }
+  public org.nd4j.linalg.schedule.ScheduleType getBackend() {
+    switch (this) {
+      case EPOCH:
+        return org.nd4j.linalg.schedule.ScheduleType.EPOCH;
+      case ITERATION:
+        return org.nd4j.linalg.schedule.ScheduleType.ITERATION;
+      default:
+        throw new RuntimeException(
+            "GradientNormalization method: " + this + " not found in Deeplearning4j backend.");
     }
+  }
 
-    @Override
-    public void setBackend(org.nd4j.linalg.schedule.ScheduleType newBackend) {
-        // Do nothing as this enum does not have a state
-    }
+  @Override
+  public void setBackend(org.nd4j.linalg.schedule.ScheduleType newBackend) {
+    // Do nothing as this enum does not have a state
+  }
 
-    @Override
-    public void initializeBackend() {
-        // Do nothing as this enum does not have a state
-    }
+  @Override
+  public void initializeBackend() {
+    // Do nothing as this enum does not have a state
+  }
 }

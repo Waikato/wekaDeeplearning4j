@@ -21,10 +21,9 @@ package weka.dl4j.layers;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.PoolingType;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * A subsampling layer test.
@@ -33,71 +32,71 @@ import org.junit.Test;
  */
 public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
 
-    @Override
-    public SubsamplingLayer getApiWrapper() {
-        return new SubsamplingLayer();
+  @Override
+  public SubsamplingLayer getApiWrapper() {
+    return new SubsamplingLayer();
+  }
+
+  @Test
+  public void testConvolutionMode() {
+    for (ConvolutionMode mode : ConvolutionMode.values()) {
+      getApiWrapper();
+      wrapper.setConvolutionMode(mode);
+
+      assertEquals(mode, wrapper.getConvolutionMode());
     }
+  }
 
-    @Test
-    public void testConvolutionMode() {
-        for (ConvolutionMode mode : ConvolutionMode.values()) {
-            getApiWrapper();
-            wrapper.setConvolutionMode(mode);
+  @Test
+  public void testPoolingType() {
+    for (PoolingType type : PoolingType.values()) {
+      wrapper.setPoolingType(type);
 
-            assertEquals(mode, wrapper.getConvolutionMode());
-        }
+      assertEquals(type, wrapper.getPoolingType());
     }
+  }
 
-    @Test
-    public void testPoolingType() {
-        for (PoolingType type : PoolingType.values()) {
-            wrapper.setPoolingType(type);
+  @Test
+  public void testKernelSize() {
+    int[] size = {20, 20};
+    wrapper.setKernelSize(size);
 
-            assertEquals(type, wrapper.getPoolingType());
-        }
-    }
+    assertArrayEquals(size, wrapper.getKernelSize());
+  }
 
-    @Test
-    public void testKernelSize() {
-        int[] size = {20, 20};
-        wrapper.setKernelSize(size);
+  @Test
+  public void testStrideSize() {
+    int[] size = {20, 20};
+    wrapper.setStride(size);
 
-        assertArrayEquals(size, wrapper.getKernelSize());
-    }
+    assertArrayEquals(size, wrapper.getStride());
 
-    @Test
-    public void testStrideSize() {
-        int[] size = {20, 20};
-        wrapper.setStride(size);
+  }
 
-        assertArrayEquals(size, wrapper.getStride());
+  @Test
+  public void testPaddingSize() {
+    int[] size = {20, 20};
+    wrapper.setPadding(size);
 
-    }
+    assertArrayEquals(size, wrapper.getPadding());
 
-    @Test
-    public void testPaddingSize() {
-        int[] size = {20, 20};
-        wrapper.setPadding(size);
+  }
 
-        assertArrayEquals(size, wrapper.getPadding());
+  @Test
+  public void testPnorm() {
+    int p = 123;
+    wrapper.setPnorm(p);
 
-    }
-
-    @Test
-    public void testPnorm() {
-        int p = 123;
-        wrapper.setPnorm(p);
-
-        assertEquals(p, wrapper.getPnorm());
-    }
+    assertEquals(p, wrapper.getPnorm());
+  }
 
 
-    @Test
-    public void testEps() {
-        double eps = 123.456;
-        wrapper.setEps(eps);
+  @Test
+  public void testEps() {
+    double eps = 123.456;
+    wrapper.setEps(eps);
 
-        assertEquals(eps, wrapper.getEps(), PRECISION);
-    }
+    assertEquals(eps, wrapper.getEps(), PRECISION);
+  }
 
 }

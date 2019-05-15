@@ -29,21 +29,23 @@ import weka.dl4j.Preferences;
  */
 public class FaceNetNN4Small2 implements ZooModel {
 
-    private static final long serialVersionUID = -520668505548861661L;
+  private static final long serialVersionUID = -520668505548861661L;
 
-    @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
-        org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder()
-                .cacheMode(CacheMode.NONE)
-                .workspaceMode(Preferences.WORKSPACE_MODE)
-                .inputShape(shape)
-                .numClasses(numLabels)
-                .build();
-        return net.init();
-    }
+  @Override
+  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2
+        .builder()
+        .cacheMode(CacheMode.NONE)
+        .workspaceMode(Preferences.WORKSPACE_MODE)
+        .inputShape(shape)
+        .numClasses(numLabels)
+        .build();
+    return net.init();
+  }
 
-    @Override
-    public int[][] getShape() {
-        return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData().getInputShape();
-    }
+  @Override
+  public int[][] getShape() {
+    return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
+        .getInputShape();
+  }
 }
