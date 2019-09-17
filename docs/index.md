@@ -25,7 +25,7 @@ Further configurations can be found in the [Getting Started](user-guide/getting-
 
 Please cite the following paper if using this package in an academic publication:
 
-S. Lang, F. Bravo-Marquez, C. Beckham, M. Hall, and E. Frank  [WekaDeeplearning4j: a Deep Learning Package for Weka based on  DeepLearning4j](https://www.sciencedirect.com/science/article/pii/S0950705119301789),  In *Knowledge-Based Systems*, 2019. DOI: 10.1016/j.knosys.2019.04.013  ([author version](https://felipebravom.com/publications/WDL4J_KBS2019.pdf))
+S. Lang, F. Bravo-Marquez, C. Beckham, M. Hall, and E. Frank  [WekaDeeplearning4j: a Deep Learning Package for Weka based on  DeepLearning4j](https://www.sciencedirect.com/science/article/pii/S0950705119301789),  In *Knowledge-Based Systems*, Volume 178, 15 August 2019, Pages 48-50. DOI: 10.1016/j.knosys.2019.04.013  ([author version](https://felipebravom.com/publications/WDL4J_KBS2019.pdf))
 
 BibTex:
 
@@ -34,7 +34,12 @@ BibTex:
   title={WekaDeeplearning4j: A deep learning package for Weka based on Deeplearning4j},
   author={Lang, Steven and Bravo-Marquez, Felipe and Beckham, Christopher and Hall, Mark and Frank, Eibe},
   journal={Knowledge-Based Systems},
-  year={2019},
+  volume = "178",
+  pages = "48 - 50",
+  year = "2019",
+  issn = "0950-7051",
+  doi = "https://doi.org/10.1016/j.knosys.2019.04.013",
+  url = "http://www.sciencedirect.com/science/article/pii/S0950705119301789",
   publisher={Elsevier}
 }
 
