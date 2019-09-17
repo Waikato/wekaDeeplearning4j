@@ -36,13 +36,19 @@ import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
+import org.deeplearning4j.nn.weights.IWeightInit;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.nn.weights.WeightInitDistribution;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.nd4j.linalg.learning.regularization.L1Regularization;
+import org.nd4j.linalg.learning.regularization.L2Regularization;
+import org.nd4j.linalg.learning.regularization.Regularization;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.dl4j.distribution.BinomialDistribution;
 import weka.dl4j.distribution.ConstantDistribution;
@@ -306,6 +312,9 @@ public class NeuralNetConfigurationTest {
     }
   }
 
+  // TODO: Should be fixed when
+  //       https://github.com/eclipse/deeplearning4j/pull/8243
+  //       gets merged.
   @Test
   public void testUpdater() throws Exception {
     for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
@@ -315,18 +324,23 @@ public class NeuralNetConfigurationTest {
     }
   }
 
+  // TODO: Should be fixed when
+  //       https://github.com/eclipse/deeplearning4j/pull/8243
+  //       gets merged.
   @Test
   public void testWeightInit() throws Exception {
     List<WeightInit> skipWeightInits = new ArrayList<>();
     skipWeightInits.add(WeightInit.IDENTITY);
+    skipWeightInits.add(WeightInit.DISTRIBUTION);
     for (WeightInit wi : WeightInit.values()) {
       if (skipWeightInits.contains(wi)) {
         continue;
       }
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setWeightInit(wi);
-      checkAppliedParameters(conf, wi, BaseLayer::getWeightInit);
+      checkAppliedParameters(conf, wi.getWeightInitFunction(), BaseLayer::getWeightInitFn);
     }
+
   }
 
   @Test
@@ -346,7 +360,29 @@ public class NeuralNetConfigurationTest {
     for (double l1 : new double[]{0.0, 0.1, 1.0, 10}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setL1(l1);
-      checkAppliedParameters(conf, l1, BaseLayer::getL1);
+
+      final List<BaseLayer> layers = getConfiguredLayers(conf);
+
+      for (BaseLayer layer : layers) {
+        List<Regularization> regs= layer.getRegularization();
+
+        // If l1 was 0, check that list is empty
+        if (l1 < 1e-7){
+          if (regs.size() > 0){
+            failMessage.append(
+                String.format("expected=%s, actual=%s, BaseLayer=%s\n", l1, ((L1Regularization) regs.get(0)).getL1().valueAt(0, 0), layer));
+          }
+          continue;
+        }
+
+        L1Regularization reg = (L1Regularization) regs.get(0);
+
+        double actual = reg.getL1().valueAt(0, 0);
+        if (!((actual - l1 < 1e-7))) {
+          failMessage.append(
+              String.format("expected=%s, actual=%s, BaseLayer=%s\n", l1, actual, layer));
+        }
+      }
     }
   }
 
@@ -355,7 +391,29 @@ public class NeuralNetConfigurationTest {
     for (double l2 : new double[]{0.0, 0.2, 2.0, 20}) {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setL2(l2);
-      checkAppliedParameters(conf, l2, BaseLayer::getL2);
+      final List<BaseLayer> layers = getConfiguredLayers(conf);
+
+      for (BaseLayer layer : layers) {
+        List<Regularization> regs= layer.getRegularization();
+
+        // If l2 was 0, check that list is empty
+        if (l2 < 1e-7){
+          if (regs.size() > 0){
+            failMessage.append(
+                String.format("expected=%s, actual=%s, BaseLayer=%s\n", l2, ((L2Regularization) regs.get(0)).getL2().valueAt(0, 0), layer));
+          }
+          continue;
+        }
+
+
+        L2Regularization reg = (L2Regularization) regs.get(0);
+
+        double actual = reg.getL2().valueAt(0, 0);
+        if (!((actual - l2 < 1e-7))) {
+          failMessage.append(
+              String.format("expected=%s, actual=%s, BaseLayer=%s\n", l2, actual, layer));
+        }
+      }
     }
   }
 
@@ -368,6 +426,7 @@ public class NeuralNetConfigurationTest {
     }
   }
 
+// Since 1.0.0-beta5, getDist does not exist anymore
   @Test
   public void testDistribution() throws Exception {
     for (Distribution dist :
@@ -383,7 +442,19 @@ public class NeuralNetConfigurationTest {
       NeuralNetConfiguration conf = new NeuralNetConfiguration();
       conf.setDist(dist);
       conf.setWeightInit(WeightInit.DISTRIBUTION);
-      checkAppliedParameters(conf, dist, BaseLayer::getDist);
+
+      final List<BaseLayer> layers = getConfiguredLayers(conf);
+
+      for (BaseLayer layer : layers) {
+        WeightInitDistribution actual = (WeightInitDistribution) layer.getWeightInitFn();
+        WeightInitDistribution expected = new WeightInitDistribution(dist.getBackend());
+        if (!expected.equals(actual)) {
+          failMessage.append(
+              String.format("expected=%s, actual=%s, BaseLayer=%s\n", expected, actual, layer));
+        }
+      }
+
+
     }
   }
 

@@ -83,7 +83,7 @@ public class StabilityTest {
     ii.setTrainBatchSize(16);
     clf.setInstanceIterator(ii);
 
-    clf.setNumEpochs(100);
+    clf.setNumEpochs(3);
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setL2(0.0005);
     Adam opt = new Adam();
@@ -113,7 +113,7 @@ public class StabilityTest {
     ii.setTrainBatchSize(16);
     clf.setInstanceIterator(ii);
 
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     Adam opt = new Adam();
     opt.setLearningRate(0.01);
@@ -136,7 +136,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -161,7 +161,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -188,7 +188,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -216,7 +216,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -245,7 +245,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -273,7 +273,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -304,7 +304,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -330,7 +330,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
@@ -356,7 +356,7 @@ public class StabilityTest {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     ConvolutionInstanceIterator cii = new ConvolutionInstanceIterator();
     cii.setTrainBatchSize(16);
-    clf.setNumEpochs(20);
+    clf.setNumEpochs(3);
     clf.setInstanceIterator(cii);
 
     weka.dl4j.layers.ConvolutionLayer cl = new weka.dl4j.layers.ConvolutionLayer();

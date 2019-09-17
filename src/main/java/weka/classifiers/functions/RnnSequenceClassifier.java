@@ -186,7 +186,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
     gb.setOutputs(currentInput);
     gb.setInputTypes(InputType.inferInputType(features));
 
-    ComputationGraphConfiguration conf = gb.pretrain(false).backprop(true).build();
+    ComputationGraphConfiguration conf = gb.build();
     ComputationGraph model = new ComputationGraph(conf);
     model.init();
     this.model = model;

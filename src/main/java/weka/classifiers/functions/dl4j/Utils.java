@@ -30,6 +30,8 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Attribute;
@@ -180,10 +182,10 @@ public class Utils {
     }
     Instances instances = new Instances("Transformed", atts, batchsize);
     for (int i = 0; i < batchsize; i++) {
-      INDArray row = ndArray.getRow(i);
+      INDArray row = ndArray.get(NDArrayIndex.point(i));
       INDArray flattenedRow = Nd4j.toFlattened(row);
       Instance inst = new DenseInstance(atts.size());
-      for (int j = 0; j < flattenedRow.size(1); j++) {
+      for (int j = 0; j < flattenedRow.size(0); j++) {
         inst.setValue(j, flattenedRow.getDouble(j));
       }
       inst.setDataset(instances);
@@ -209,8 +211,8 @@ public class Utils {
       return field;
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
-      throw new RuntimeException("Could not access private field " + fieldName + " of " +
-          "CnnSentenceDataSetIterator");
+      throw new RuntimeException("Could not access private field " + fieldName + " of " + obj.getClass()
+          );
     }
   }
 
@@ -229,8 +231,7 @@ public class Utils {
       f.set(obj, value);
     } catch (NoSuchFieldException | IllegalAccessException e) {
       e.printStackTrace();
-      throw new RuntimeException("Could not access private field " + fieldName + " of " +
-          "CnnSentenceDataSetIterator");
+      throw new RuntimeException("Could not access private field " + fieldName + " of " + obj.getClass());
     }
   }
 

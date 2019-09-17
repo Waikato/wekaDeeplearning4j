@@ -50,6 +50,7 @@ public class RnnOutputLayer extends
     setLayerName("RnnOutput layer");
     setActivationFunction(new ActivationSoftmax());
     setLossFn(new LossMCXENT());
+    setNOut(2);
   }
 
   @Override

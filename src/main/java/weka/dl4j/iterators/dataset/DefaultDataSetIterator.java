@@ -97,7 +97,8 @@ public class DefaultDataSetIterator implements DataSetIterator, Serializable {
       cursor += batchSize;
       return data;
     }
-    DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + batchSize);
+    int size = Math.min(batchSize, data.numExamples() - cursor);
+    DataSet thisBatch = (DataSet) data.getRange(cursor, cursor + size);
     cursor += batchSize;
     return thisBatch;
   }

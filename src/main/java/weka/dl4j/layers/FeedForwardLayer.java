@@ -36,8 +36,6 @@ public abstract class FeedForwardLayer<T extends org.deeplearning4j.nn.conf.laye
 
   public FeedForwardLayer() {
     super();
-    backend.setL1(Double.NaN);
-    backend.setL2(Double.NaN);
     backend.setGradientNormalizationThreshold(Double.NaN);
     backend.setGradientNormalization(null);
     backend.setBiasInit(Double.NaN);

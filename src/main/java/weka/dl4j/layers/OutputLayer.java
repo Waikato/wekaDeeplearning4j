@@ -48,6 +48,7 @@ public class OutputLayer extends FeedForwardLayer<org.deeplearning4j.nn.conf.lay
     setLayerName("Output layer");
     setActivationFunction(new ActivationSoftmax());
     setLossFn(new LossMCXENT());
+    setNOut(2);
   }
 
   @Override

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
+import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
@@ -73,6 +74,20 @@ public class CnnSentenceDataSetIterator extends
   protected CnnSentenceDataSetIterator(CnnSentenceDataSetIterator.Builder builder) {
     super(builder);
     this.stopwords = builder.stopwords;
+    setUnknownWordHandling(UnknownWordHandling.UseUnknownVector);
+
+    // Set unknown word
+    WordVectors wordVectors = getWordVectors();
+    wordVectors.setUNK("UNKNOWN");
+
+    // Initialize unknown word manually
+    INDArray unknown;
+    if (getUseNormalizedWordVectors()) {
+      unknown = wordVectors.getWordVectorMatrixNormalized(wordVectors.getUNK());
+    } else {
+      unknown = wordVectors.getWordVectorMatrix(wordVectors.getUNK());
+    }
+    setUnknown(unknown);
   }
 
   public static String getUnknownWordSentinel() {
@@ -325,8 +340,13 @@ public class CnnSentenceDataSetIterator extends
     return getFieldValue(this, "numClasses");
   }
 
-  public INDArray getUnknown() {
-    return getFieldValue(this, "unknown");
+
+  public boolean getUseNormalizedWordVectors() {
+    return getFieldValue(this, "useNormalizedWordVectors");
+  }
+
+  public void setUseNormalizedWordVectors(boolean value) {
+    setFieldValue(this, "useNormalizedWordVectors", value);
   }
 
   public int getCursor() {
@@ -336,6 +356,32 @@ public class CnnSentenceDataSetIterator extends
   public void setCursor(int value) {
     setFieldValue(this, "cursor", value);
   }
+
+  public INDArray getUnknown() {
+    return getFieldValue(this, "unknown");
+  }
+
+  public void setUnknown(INDArray value) {
+    setFieldValue(this, "unknown", value);
+  }
+
+  public WordVectors getWordVectors() {
+    return getFieldValue(this, "wordVectors");
+  }
+
+  public void setWordVectors(WordVectors value) {
+    setFieldValue(this, "wordVectors", value);
+  }
+
+
+  public UnknownWordHandling getUnknownWordHandling() {
+    return getFieldValue(this, "unknownWordHandling");
+  }
+
+  public void setUnknownWordHandling(UnknownWordHandling value) {
+    setFieldValue(this, "unknownWordHandling", value);
+  }
+
 
   protected void incrementCursor(int n) {
     int oldCurser = getCursor();

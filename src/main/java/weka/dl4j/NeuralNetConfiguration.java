@@ -68,7 +68,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
   protected boolean useDropConnect = false;
   protected AbstractWeightNoise weightNoise = new weka.dl4j.weightnoise.Disabled();
   protected boolean minimize = true;
-  protected boolean pretrain = false;
   protected GradientNormalization gradientNormalization = GradientNormalization.None;
   protected double gradientNormalizationThreshold = 1.0;
   protected WorkspaceMode inferenceWorkspaceMode = Preferences.WORKSPACE_MODE;
@@ -97,8 +96,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
         .l2(l2)
         .optimizationAlgo(optimizationAlgo)
         .seed(seed)
-        .weightInit(weightInit)
-        .dist(dist.getBackend())
         .biasInit(biasInit)
         .updater(updater.getBackend())
         .biasUpdater(biasUpdater.getBackend())
@@ -111,7 +108,13 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
         .inferenceWorkspaceMode(inferenceWorkspaceMode)
         .trainingWorkspaceMode(trainingWorkspaceMode);
 
-    builder.setPretrain(pretrain);
+
+    if (!(dist instanceof Disabled)){
+        builder.weightInit(dist.getBackend());
+    } else {
+        builder.weightInit(weightInit);
+    }
+
     return builder;
   }
 
@@ -333,15 +336,6 @@ public class NeuralNetConfiguration implements Serializable, OptionHandler {
 
   public void setMiniBatch(boolean b) {
     miniBatch = b;
-  }
-
-  @ProgrammaticProperty
-  public boolean isPretrain() {
-    return pretrain;
-  }
-
-  public void setPretrain(boolean b) {
-    pretrain = b;
   }
 
   /**

@@ -119,31 +119,26 @@ public abstract class AbstractTextEmbeddingIterator extends AbstractSequenceInst
    */
   private void loadGZipped() {
     try {
-      wordVectors = WordVectorSerializer.loadStaticModel(wordVectorLocation);
-    } catch (RuntimeException re) {
-      // Dl4j format not found, continue with decompression by hand
-      try {
-        GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(wordVectorLocation));
-        File tmpFile =
-            Paths.get(System.getProperty("java.io.tmpdir"), "wordmodel-tmp.csv").toFile();
-        tmpFile.delete();
-        FileOutputStream fos = new FileOutputStream(tmpFile);
-        int length;
-        byte[] buffer = new byte[1024];
-        while ((length = gzis.read(buffer)) > 0) {
-          fos.write(buffer, 0, length);
-        }
-        fos.close();
-        gzis.close();
-
-        // Try loading decompressed CSV file
-        boolean success = loadEmbeddingFromCSV(tmpFile);
-        if (!success) {
-          throw new RuntimeException("Could not load the word vector file.");
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
+      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(wordVectorLocation));
+      File tmpFile =
+          Paths.get(System.getProperty("java.io.tmpdir"), "wordmodel-tmp.csv").toFile();
+      tmpFile.delete();
+      FileOutputStream fos = new FileOutputStream(tmpFile);
+      int length;
+      byte[] buffer = new byte[1024];
+      while ((length = gzis.read(buffer)) > 0) {
+        fos.write(buffer, 0, length);
       }
+      fos.close();
+      gzis.close();
+
+      // Try loading decompressed CSV file
+      boolean success = loadEmbeddingFromCSV(tmpFile);
+      if (!success) {
+        throw new RuntimeException("Could not load the word vector file.");
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 

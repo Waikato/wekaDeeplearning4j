@@ -22,13 +22,16 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.junit.Assert;
 import org.junit.Test;
+import org.nd4j.linalg.activations.Activation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.PoolingType;
+import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.lossfunctions.LossMSE;
 import weka.util.DatasetLoader;
 
 /**
@@ -84,6 +87,8 @@ public class LayerTest {
   public void testOutputLayer() throws Exception {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     OutputLayer out = new OutputLayer();
+    out.setActivationFunction(new ActivationIdentity());
+    out.setLossFn(new LossMSE());
     clf.setLayers(out);
     Instances data = DatasetLoader.loadDiabetes();
 

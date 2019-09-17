@@ -331,7 +331,6 @@ public class Dl4jMlpTest {
 
     NeuralNetConfiguration nnc = new NeuralNetConfiguration();
     nnc.setOptimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-    nnc.setPretrain(false);
     nnc.setSeed(TestUtil.SEED);
 
     clf.setNeuralNetConfiguration(nnc);
@@ -633,6 +632,8 @@ public class Dl4jMlpTest {
 
     GlobalPoolingLayer gpl = new GlobalPoolingLayer();
     OutputLayer out = new OutputLayer();
+    out.setLossFn(new LossMSE());
+    out.setActivationFunction(new ActivationIdentity());
 
     clf.setLayers(conv1, gpl, out);
     clf.setCacheMode(CacheMode.MEMORY);

@@ -1310,7 +1310,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     gb.setInputTypes(InputType.inferInputType(features));
     ComputationGraphConfiguration conf =
-        gb.pretrain(false).backprop(true).build();
+        gb.build();
     ComputationGraph model = new ComputationGraph(conf);
     model.init();
     this.model = model;

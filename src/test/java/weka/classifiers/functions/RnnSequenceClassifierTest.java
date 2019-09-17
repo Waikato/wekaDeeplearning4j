@@ -21,6 +21,7 @@ package weka.classifiers.functions;
 import static org.junit.Assert.assertEquals;
 import static weka.util.TestUtil.readClf;
 import static weka.util.TestUtil.saveClf;
+import static weka.util.TestUtil.splitTrainTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -445,14 +446,17 @@ public class RnnSequenceClassifierTest {
     clf.setNeuralNetConfiguration(nnc);
     clf.settBPTTbackwardLength(2);
     clf.settBPTTforwardLength(2);
-    int numEpochs = 5;
+    int numEpochs = 2;
     clf.setNumEpochs(numEpochs);
 
     // Randomize data
     data = DatasetLoader.loadAnger();
     data.randomize(new Random(42));
 
-    TestUtil.holdout(clf, data, 1);
+    Instances[] instances = splitTrainTest(data, 5);
+    data = instances[0];
+
+    TestUtil.holdout(clf, data);
 
     assertEquals(numEpochs, clf.numEpochsPerformed);
     assertEquals(numEpochs, clf.numEpochsPerformedThisSession);
