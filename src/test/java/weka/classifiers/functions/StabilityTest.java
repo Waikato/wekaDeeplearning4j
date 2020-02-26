@@ -237,6 +237,7 @@ public class StabilityTest {
     clf.setLayers(conv, sub, conv2, outputLayer);
     clf.setNeuralNetConfiguration(nnc);
 
+    // Note: Falls just below the 80% threshold, at 79.6%
     evaluate(clf, DatasetLoader.loadMiniMnistArff(), 80);
   }
 
