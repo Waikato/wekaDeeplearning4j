@@ -22,8 +22,8 @@ allprojects {
  * Dependency versions.
  */
 ext.versions = [
-        'nd4j'         : '1.0.0-beta5',
-        'dl4j'         : '1.0.0-beta5',
+        'nd4j'         : '1.0.0-beta6',
+        'dl4j'         : '1.0.0-beta6',
         'weka'         : '3.8.1',
         'junit'        : '4.12',
         'log4j'        : '2.11.2',
