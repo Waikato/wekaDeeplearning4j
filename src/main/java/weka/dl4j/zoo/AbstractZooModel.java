@@ -71,11 +71,8 @@ public abstract class AbstractZooModel implements ZooModel {
         } catch (Exception ex) {
             log.error("Couldn't load up weights for model");
             log.error(pretrainedModel.summary());
-            return null;
-        }
-
-        if (transferGraph == null)
             return defaultNet;
+        };
 
         return transferGraph;
     }
