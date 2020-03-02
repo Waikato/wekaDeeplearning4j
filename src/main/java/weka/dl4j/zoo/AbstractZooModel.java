@@ -41,6 +41,45 @@ public abstract class AbstractZooModel implements ZooModel {
         m_featureExtractionLayer = featureExtractionLayer;
     }
 
+    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
+                                                 ComputationGraph defaultNet,
+                                                 long seed,
+                                                 int numLabels) {
+        // If no pretrained weights specified, simply return the standard model
+        if (m_pretrainedType == null)
+            return defaultNet;
+
+        // If the specified pretrained weights aren't available, return the standard model
+        if (!checkPretrained(zooModel)) {
+            m_pretrainedType = null;
+            return defaultNet;
+        }
+
+        // If downloading the weights fails, return the standard model
+        ComputationGraph pretrainedModel = downloadWeights(zooModel);
+        if (pretrainedModel == null)
+            return defaultNet;
+
+        // Finally, create the transfer learning graph
+        ComputationGraph transferGraph;
+        try {
+            transferGraph = new TransferLearning.GraphBuilder(pretrainedModel)
+                    .fineTuneConfiguration(getFineTuneConfig(seed))
+                    .removeVertexKeepConnections(m_layerToRemove)
+                    .addLayer(m_predictionLayerName, createOutputLayer(numLabels), m_featureExtractionLayer)
+                    .setOutputs(m_predictionLayerName).build();
+        } catch (Exception ex) {
+            log.error("Couldn't load up weights for model");
+            log.error(pretrainedModel.summary());
+            return null;
+        }
+
+        if (transferGraph == null)
+            return defaultNet;
+
+        return transferGraph;
+    }
+
     protected FineTuneConfiguration getFineTuneConfig(long seed) {
         return new FineTuneConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -57,20 +96,6 @@ public abstract class AbstractZooModel implements ZooModel {
             return cmpGraph;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return null;
-        }
-    }
-
-    protected ComputationGraph createTransferLearningGraph(ComputationGraph pretrainedModel, long seed, int numClasses) {
-        try {
-            return new TransferLearning.GraphBuilder(pretrainedModel)
-                    .fineTuneConfiguration(getFineTuneConfig(seed))
-                    .removeVertexKeepConnections(m_layerToRemove)
-                    .addLayer(m_predictionLayerName, createOutputLayer(numClasses), m_featureExtractionLayer)
-                    .setOutputs(m_predictionLayerName).build();
-        } catch (Exception ex) {
-            log.error("Couldn't load up weights for model");
-            log.error(pretrainedModel.summary());
             return null;
         }
     }

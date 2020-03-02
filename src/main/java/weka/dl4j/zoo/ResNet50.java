@@ -46,9 +46,7 @@ import java.io.IOException;
  */
 public class ResNet50 extends AbstractZooModel {
 
-    private static final long serialVersionUID = -520668515548861661L;
-
-    protected final Logger log = LoggerFactory.getLogger(ResNet50.class);
+    private static final long serialVersionUID = -5206662436148861661L;
 
     public ResNet50() {
         super();
@@ -68,27 +66,8 @@ public class ResNet50 extends AbstractZooModel {
                 .build();
 
         ComputationGraph defaultNet = net.init();
-        // If no pretrained weights specified, simply return the standard model
-        if (m_pretrainedType == null)
-            return defaultNet;
 
-        // If the specified pretrained weights aren't available, return the standard model
-        if (!checkPretrained(net)) {
-            m_pretrainedType = null;
-            return defaultNet;
-        }
-
-        // If downloading the weights fails, return the standard model
-        ComputationGraph resnet50 = downloadWeights(net);
-        if (resnet50 == null)
-            return defaultNet;
-
-        // Finally, create the transfer learning graph
-        ComputationGraph transferGraph = createTransferLearningGraph(resnet50, seed, numLabels);
-        if (transferGraph == null)
-            return defaultNet;
-
-        return transferGraph;
+        return attemptToLoadWeights(net, defaultNet, seed, numLabels);
     }
 
 
