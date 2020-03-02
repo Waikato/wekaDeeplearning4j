@@ -18,32 +18,82 @@
 
 package weka.dl4j.zoo;
 
+import org.deeplearning4j.nn.api.Layer;
+import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.CacheMode;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
+import org.deeplearning4j.nn.transferlearning.TransferLearning;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.zoo.PretrainedType;
+import org.deeplearning4j.zoo.ZooModel;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Nesterovs;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import weka.dl4j.Preferences;
+
+import java.io.IOException;
 
 /**
  * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
  *
  * @author Steven Lang
  */
-public class ResNet50 implements ZooModel {
+public class ResNet50 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -520668505548861661L;
+    private static final long serialVersionUID = -520668515548861661L;
 
-  @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
-    org.deeplearning4j.zoo.model.ResNet50 net = org.deeplearning4j.zoo.model.ResNet50.builder()
-        .cacheMode(CacheMode.NONE)
-        .workspaceMode(Preferences.WORKSPACE_MODE)
-        .inputShape(shape)
-        .numClasses(numLabels)
-        .build();
-    return net.init();
-  }
+    protected final Logger log = LoggerFactory.getLogger(ResNet50.class);
 
-  @Override
-  public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
-  }
+    public ResNet50() {
+        super();
+    }
+
+    public ResNet50(PretrainedType pretrainedType) {
+        super(pretrainedType, 2048, "fc1000", "flatten_1");
+    }
+
+    @Override
+    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+        org.deeplearning4j.zoo.model.ResNet50 net = org.deeplearning4j.zoo.model.ResNet50.builder()
+                .cacheMode(CacheMode.NONE)
+                .workspaceMode(Preferences.WORKSPACE_MODE)
+                .inputShape(shape)
+                .numClasses(numLabels)
+                .build();
+
+        ComputationGraph defaultNet = net.init();
+        // If no pretrained weights specified, simply return the standard model
+        if (m_pretrainedType == null)
+            return defaultNet;
+
+        // If the specified pretrained weights aren't available, return the standard model
+        if (!checkPretrained(net)) {
+            m_pretrainedType = null;
+            return defaultNet;
+        }
+
+        // If downloading the weights fails, return the standard model
+        ComputationGraph resnet50 = downloadWeights(net);
+        if (resnet50 == null)
+            return defaultNet;
+
+        // Finally, create the transfer learning graph
+        ComputationGraph transferGraph = createTransferLearningGraph(resnet50, seed, numLabels);
+        if (transferGraph == null)
+            return defaultNet;
+
+        return transferGraph;
+    }
+
+
+    @Override
+    public int[][] getShape() {
+        return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
+    }
 }
