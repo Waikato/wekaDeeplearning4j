@@ -34,11 +34,11 @@ public class AlexNet implements ZooModel {
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     org.deeplearning4j.zoo.model.AlexNet net = org.deeplearning4j.zoo.model.AlexNet.builder()
-        .cacheMode(CacheMode.NONE)
-        .workspaceMode(Preferences.WORKSPACE_MODE)
-        .inputShape(shape)
-        .numClasses(numLabels)
-        .build();
+            .cacheMode(CacheMode.NONE)
+            .workspaceMode(Preferences.WORKSPACE_MODE)
+            .inputShape(shape)
+            .numClasses(numLabels)
+            .build();
     org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
     return mlpToCG(conf, shape);
   }
