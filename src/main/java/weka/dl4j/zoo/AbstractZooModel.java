@@ -1,6 +1,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -9,9 +10,11 @@ import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.deeplearning4j.zoo.PretrainedType;
+import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
@@ -108,11 +111,13 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
         return new ComputationGraph(cgc);
     }
 
-
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
-                                                 int numLabels) {
+                                                 int numLabels,
+                                                 MultiLayerConfiguration conf,
+                                                 int[] shape) {
+
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == null)
             return defaultNet;
@@ -124,7 +129,7 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
         }
 
         // If downloading the weights fails, return the standard model
-        ComputationGraph pretrainedModel = downloadWeights(zooModel);
+        ComputationGraph pretrainedModel = downloadWeights(zooModel, conf, shape);
         if (pretrainedModel == null)
             return defaultNet;
 
@@ -145,6 +150,14 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
         return transferGraph;
     }
 
+
+    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
+                                                 ComputationGraph defaultNet,
+                                                 long seed,
+                                                 int numLabels) {
+        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, null, null);
+    }
+
     public boolean isPretrained() {
         return m_pretrainedType != null;
     }
@@ -157,15 +170,21 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
                 .build();
     }
 
-    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net) {
-        ComputationGraph cmpGraph;
+    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net,
+                                               MultiLayerConfiguration conf,
+                                               int[] shape) {
+        ComputationGraph cmpGraph = null;
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
+//            Object pretrained = net.initPretrained(m_pretrainedType); TODO add support for MultiLayerNetwork models
+//            if (pretrained instanceof MultiLayerNetwork) {
+//                ComputationGraph thisGraph = mlpToCG(, shape);
+//            }
             cmpGraph = (ComputationGraph) net.initPretrained(m_pretrainedType);
             return cmpGraph;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+            return cmpGraph;
         }
     }
 

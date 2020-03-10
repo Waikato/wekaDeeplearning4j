@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
 
 /**
@@ -27,9 +28,16 @@ import weka.dl4j.Preferences;
  *
  * @author Steven Lang
  */
-public class LeNet implements ZooModel {
+public class LeNet extends AbstractZooModel {
 
-  private static final long serialVersionUID = 7790142171346455139L;
+  private static final long serialVersionUID = 79837621346455139L;
+
+  public LeNet() { super(); }
+
+  public LeNet(PretrainedType pretrainedType) {
+    // Returns pretrained model as
+    super(pretrainedType, -1, "", "");
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
@@ -39,8 +47,11 @@ public class LeNet implements ZooModel {
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
+
     org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
-    return mlpToCG(conf, shape);
+    ComputationGraph defaultNet = mlpToCG(conf, shape);
+
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, conf, shape);
   }
 
   @Override
