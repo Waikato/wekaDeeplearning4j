@@ -32,9 +32,8 @@ class ResnetTest {
         clf.setNumEpochs(5);
         clf.setZooModel(new ResNet50(PretrainedType.IMAGENET));
 
-
         // Load the arff file
-        Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.tiny.arff"));
+        Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
 
         data.setClassIndex(data.numAttributes() - 1);
 
@@ -43,7 +42,7 @@ class ResnetTest {
         imgIter.setHeight(224);
         imgIter.setWidth(224);
         imgIter.setNumChannels(3);
-        imgIter.setTrainBatchSize(1);
+        imgIter.setTrainBatchSize(16);
         clf.setInstanceIterator(imgIter);
 
         // Set up the network configuration
