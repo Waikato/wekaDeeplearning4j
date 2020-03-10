@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
 
 /**
@@ -27,9 +28,16 @@ import weka.dl4j.Preferences;
  *
  * @author Steven Lang
  */
-public class SimpleCNN implements ZooModel {
+public class SimpleCNN extends AbstractZooModel {
 
-  private static final long serialVersionUID = 4217466716595669736L;
+  private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
+
+  public SimpleCNN() { super(); }
+
+  public SimpleCNN(PretrainedType pretrainedType) {
+    // Note there aren't any pretrained weights currently available, values below are simply placeholders.
+    super(pretrainedType, -1, "", "");
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
@@ -40,7 +48,9 @@ public class SimpleCNN implements ZooModel {
         .numClasses(numLabels)
         .build();
     org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
-    return mlpToCG(conf, shape);
+    ComputationGraph defaultNet = mlpToCG(conf, shape);
+
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }
 
   @Override
