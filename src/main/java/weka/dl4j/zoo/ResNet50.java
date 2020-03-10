@@ -46,7 +46,7 @@ import java.io.IOException;
  */
 public class ResNet50 extends AbstractZooModel {
 
-    private static final long serialVersionUID = -5206662436148861661L;
+    private static final long serialVersionUID = -5206947378361661L;
 
     public ResNet50() {
         super();
