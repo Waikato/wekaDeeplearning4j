@@ -1241,6 +1241,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Get the new width/heigth/channels from the iterator
     ImageInstanceIterator iii = (ImageInstanceIterator) it;
+
+    boolean isPretrained = getZooModel().isPretrained();
+
+    if (isPretrained) {
+      iii.setNumChannels(3);
+    }
+
     int newWidth = iii.getWidth();
     int newHeight = iii.getHeight();
     int channels = iii.getNumChannels();
