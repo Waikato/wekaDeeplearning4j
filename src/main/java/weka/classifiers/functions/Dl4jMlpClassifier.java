@@ -100,7 +100,9 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.TrainingListener;
+import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.CustomNet;
+import weka.dl4j.zoo.ResNet50;
 import weka.dl4j.zoo.ZooModel;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
@@ -175,7 +177,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * The model zoo model.
    */
-  protected ZooModel zooModel = new CustomNet();
+  protected AbstractZooModel zooModel = new ResNet50(); // TODO change back to CustomNet
   /**
    * The size of the serialized network model in bytes.
    */
@@ -1568,7 +1570,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       description = "The model-architecture to choose from the modelzoo "
           + "(default = no model).", commandLineParamName = "zooModel",
       commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
-  public void setZooModel(ZooModel zooModel) {
+  public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -1588,7 +1590,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
               .toArray(new Layer[tmpCg.getLayers().length]);
 
     } catch (Exception e) {
-      if (!(zooModel instanceof CustomNet)) {
+      if (!(zooModel instanceof ResNet50)) { //TODO change back to CustomNet
         log.error("Could not set layers from zoomodel.", e);
       }
     } finally {
