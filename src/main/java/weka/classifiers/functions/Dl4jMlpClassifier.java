@@ -1244,7 +1244,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     boolean isPretrained = getZooModel().isPretrained();
 
-    if (isPretrained) {
+    if (isPretrained && iii.getNumChannels() != 3) {
+      log.warn("ImageInstanceIterator not using 3 channels, but using pretrained weights. Setting numChannels to 3");
       iii.setNumChannels(3);
     }
 
