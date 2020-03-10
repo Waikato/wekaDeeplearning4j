@@ -144,7 +144,7 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
 
         return transferGraph;
     }
-    
+
     public boolean isPretrained() {
         return m_pretrainedType != null;
     }

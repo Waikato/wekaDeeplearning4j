@@ -48,6 +48,7 @@ import weka.core.OptionMetadata;
 import weka.core.WekaException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.layers.Layer;
+import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.CustomNet;
 import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
@@ -336,14 +337,14 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   @Override
   @Deprecated
   @ProgrammaticProperty
-  public ZooModel getZooModel() {
+  public AbstractZooModel getZooModel() {
     return new CustomNet();
   }
 
   @Override
   @Deprecated
   @ProgrammaticProperty
-  public void setZooModel(ZooModel zooModel) {
+  public void setZooModel(AbstractZooModel zooModel) {
     // Do nothing
   }
 

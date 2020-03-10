@@ -177,7 +177,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * The model zoo model.
    */
-  protected AbstractZooModel zooModel = new ResNet50(); // TODO change back to CustomNet
+  protected AbstractZooModel zooModel = new CustomNet();
   /**
    * The size of the serialized network model in bytes.
    */
@@ -1564,7 +1564,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    *
    * @return The modelzoo model object
    */
-  public ZooModel getZooModel() {
+  public AbstractZooModel getZooModel() {
     return zooModel;
   }
 
@@ -1597,7 +1597,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
               .toArray(new Layer[tmpCg.getLayers().length]);
 
     } catch (Exception e) {
-      if (!(zooModel instanceof ResNet50)) { //TODO change back to CustomNet
+      if (!(zooModel instanceof CustomNet)) {
         log.error("Could not set layers from zoomodel.", e);
       }
     } finally {

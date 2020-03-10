@@ -25,7 +25,7 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
  *
  * @author Steven Lang
  */
-public class CustomNet implements ZooModel {
+public class CustomNet extends AbstractZooModel {
 
   private static final long serialVersionUID = 7131900848379752732L;
 
