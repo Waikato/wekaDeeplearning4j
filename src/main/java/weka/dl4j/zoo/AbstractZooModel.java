@@ -106,6 +106,10 @@ public abstract class AbstractZooModel implements ZooModel {
 
     protected boolean checkPretrained(org.deeplearning4j.zoo.ZooModel dl4jModelType) {
         Set<PretrainedType> availableTypes = getAvailablePretrainedWeights(dl4jModelType);
+        if (availableTypes.isEmpty()) {
+            log.error("Sorry, no pretrained weights are available for this model");
+            return false;
+        }
         if (!availableTypes.contains(m_pretrainedType)){
             log.error(String.format("%s weights are not available for this model, " +
                     "please try one of: %s", m_pretrainedType, availableTypes.toString()));
