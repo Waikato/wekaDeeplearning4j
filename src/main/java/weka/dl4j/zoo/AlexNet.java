@@ -21,6 +21,7 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.PretrainedType;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.dl4j.Preferences;
 
 /**
@@ -31,13 +32,6 @@ import weka.dl4j.Preferences;
 public class AlexNet extends AbstractZooModel {
 
   private static final long serialVersionUID = -52066063848861661L;
-
-  public AlexNet() {super();}
-
-  public AlexNet(PretrainedType pretrainedType) {
-    // Note there aren't any pretrained weights currently available, values below are simply placeholders.
-    super(pretrainedType, -1, "", "");
-  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {

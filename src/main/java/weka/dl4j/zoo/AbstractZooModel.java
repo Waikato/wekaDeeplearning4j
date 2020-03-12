@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractZooModel implements Serializable, OptionHandler {
+public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected PretrainedType m_pretrainedType = null;
 
@@ -43,16 +43,8 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
 
     protected int m_numFExtractOutputs;
 
-    public AbstractZooModel() {}
-
-    public AbstractZooModel(PretrainedType pretrainedType,
-                            int numFExtractOutputs,
-                            String layerToRemove,
-                            String featureExtractionLayer) {
-        m_pretrainedType = pretrainedType;
-        m_numFExtractOutputs = numFExtractOutputs;
-        m_layerToRemove = layerToRemove;
-        m_featureExtractionLayer = featureExtractionLayer;
+    public String getFeatureExtractionLayer() {
+        return m_featureExtractionLayer;
     }
 
     /**
@@ -162,6 +154,25 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
         return m_pretrainedType != null;
     }
 
+    public PretrainedType getPretrainedType() {
+        return m_pretrainedType;
+    }
+
+    public AbstractZooModel setPretrainedType(PretrainedType pretrainedType) {
+        throw new NotImplementedException();
+    }
+
+    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
+                                  int numFExtractOutputs,
+                                  String layerToRemove,
+                                  String featureExtractionLayer) {
+        m_pretrainedType = pretrainedType;
+        m_numFExtractOutputs = numFExtractOutputs;
+        m_layerToRemove = layerToRemove;
+        m_featureExtractionLayer = featureExtractionLayer;
+        return this;
+    }
+
     protected FineTuneConfiguration getFineTuneConfig(long seed) {
         return new FineTuneConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -226,7 +237,6 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
      */
     @Override
     public Enumeration<Option> listOptions() {
-
         return Option.listOptionsForClass(this.getClass()).elements();
     }
 
@@ -237,7 +247,6 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
      */
     @Override
     public String[] getOptions() {
-
         return Option.getOptions(this, this.getClass());
     }
 
@@ -248,7 +257,6 @@ public abstract class AbstractZooModel implements Serializable, OptionHandler {
      * @throws Exception if an option is not supported
      */
     public void setOptions(String[] options) throws Exception {
-
         Option.setOptions(options, this, this.getClass());
     }
 }

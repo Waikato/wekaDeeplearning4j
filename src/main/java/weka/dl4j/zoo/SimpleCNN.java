@@ -32,13 +32,6 @@ public class SimpleCNN extends AbstractZooModel {
 
   private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
 
-  public SimpleCNN() { super(); }
-
-  public SimpleCNN(PretrainedType pretrainedType) {
-    // Note there aren't any pretrained weights currently available, values below are simply placeholders.
-    super(pretrainedType, -1, "", "");
-  }
-
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()

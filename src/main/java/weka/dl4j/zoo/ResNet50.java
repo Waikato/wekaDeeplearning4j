@@ -48,12 +48,11 @@ public class ResNet50 extends AbstractZooModel {
 
     private static final long serialVersionUID = -5206947378361661L;
 
-    public ResNet50() {
-        super();
-    }
+    public ResNet50() {}
 
-    public ResNet50(PretrainedType pretrainedType) {
-        super(pretrainedType, 2048, "fc1000", "flatten_1");
+    @Override
+    public ResNet50 setPretrainedType(PretrainedType pretrainedType) {
+        return (ResNet50) setPretrainedType(pretrainedType, 2048, "fc1000", "flatten_1");
     }
 
     @Override

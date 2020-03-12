@@ -32,13 +32,6 @@ public class LeNet extends AbstractZooModel {
 
   private static final long serialVersionUID = 79837621346455139L;
 
-  public LeNet() { super(); }
-
-  public LeNet(PretrainedType pretrainedType) {
-    // Returns pretrained model as
-    super(pretrainedType, -1, "", "");
-  }
-
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     org.deeplearning4j.zoo.model.LeNet net = org.deeplearning4j.zoo.model.LeNet.builder()

@@ -32,13 +32,6 @@ public class FaceNetNN4Small2 extends AbstractZooModel {
 
   private static final long serialVersionUID = -5206685097658861661L;
 
-  public FaceNetNN4Small2() { super(); }
-
-  public FaceNetNN4Small2(PretrainedType pretrainedType) {
-    // Note there aren't any pretrained weights currently available, values below are simply placeholders.
-    super(pretrainedType, -1, "", "");
-  }
-
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2

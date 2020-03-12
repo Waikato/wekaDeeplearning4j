@@ -19,6 +19,8 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A dummy ZooModel which is empty.

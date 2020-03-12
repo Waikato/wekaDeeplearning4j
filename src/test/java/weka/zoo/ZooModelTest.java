@@ -29,16 +29,7 @@ import weka.core.Instances;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
-import weka.dl4j.zoo.AlexNet;
-import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.Darknet19;
-import weka.dl4j.zoo.FaceNetNN4Small2;
-import weka.dl4j.zoo.InceptionResNetV1;
-import weka.dl4j.zoo.LeNet;
-import weka.dl4j.zoo.ResNet50;
-import weka.dl4j.zoo.VGG16;
-import weka.dl4j.zoo.VGG19;
-import weka.dl4j.zoo.ZooModel;
+import weka.dl4j.zoo.*;
 import weka.util.DatasetLoader;
 
 /**
@@ -91,7 +82,7 @@ public class ZooModelTest {
   }
 
 
-  private void buildModel(ZooModel model) throws Exception {
+  private void buildModel(AbstractZooModel model) throws Exception {
     // CLF
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
     clf.setSeed(1);
