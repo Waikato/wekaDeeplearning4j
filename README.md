@@ -113,6 +113,11 @@ The java documentation can be found [here](https://waikato.github.io/wekaDeeplea
 
 If you want to contribute to the project, check out the [contributing guide](https://github.com/Waikato/wekaDeeplearning4j/blob/master/CONTRIBUTING.md).
 
+## Development 
+
+Check out [DEVELOPMENT.md](https://github.com/Waikato/wekaDeeplearning4j/blob/master/DEVELOPMENT.md) for further information.
+
+
 ## Citation
 
 Please cite the following paper if using this package in an academic publication:
