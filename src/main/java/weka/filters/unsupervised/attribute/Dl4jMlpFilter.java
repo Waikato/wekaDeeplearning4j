@@ -46,7 +46,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   /**
    * The classifier model this filter is based on.
    */
-  protected File modelFile = new File(WekaPackageManager.getPackageHome().toURI());
+  protected File serializedModelFile = new File(WekaPackageManager.getPackageHome().toURI());
 
   protected Dl4jMlpClassifier model;
 
@@ -77,12 +77,12 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
       commandLineParamSynopsis = "-model <File>",
       displayOrder = 1
   )
-  public File getModelFile() {
-    return modelFile;
+  public File getSerializedModelFile() {
+    return serializedModelFile;
   }
 
-  public void setModelFile(File modelPath) {
-    this.modelFile = modelPath;
+  public void setSerializedModelFile(File modelPath) {
+    this.serializedModelFile = modelPath;
   }
 
 

@@ -43,7 +43,7 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang
  */
-public class Dl4jMlpFilterTest {
+public class Dl4JMlpFilterTest {
 
   @Test
   public void testProcessIris() throws Exception {
@@ -115,7 +115,7 @@ public class Dl4jMlpFilterTest {
       String clfPath) throws Exception {
     Instances activationsExpected = clf.getActivationsAtLayer(transformationLayerName, iris);
     Dl4jMlpFilter filter = new Dl4jMlpFilter();
-    filter.setModelFile(new File(clfPath));
+    filter.setSerializedModelFile(new File(clfPath));
     filter.setTransformationLayerName(transformationLayerName);
     filter.setInputFormat(iris);
 
