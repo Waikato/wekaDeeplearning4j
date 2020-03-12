@@ -1,7 +1,6 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -10,26 +9,23 @@ import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
+import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.zoo.PretrainedType;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.dl4j.Preferences;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
@@ -125,21 +121,18 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         if (pretrainedModel == null)
             return defaultNet;
 
-        // Finally, create the transfer learning graph
-        ComputationGraph transferGraph;
         try {
-            transferGraph = new TransferLearning.GraphBuilder(pretrainedModel)
+            // Finally, create the transfer learning graph
+            return new TransferLearning.GraphBuilder(pretrainedModel)
                     .fineTuneConfiguration(getFineTuneConfig(seed))
                     .removeVertexKeepConnections(m_layerToRemove)
                     .addLayer(m_predictionLayerName, createOutputLayer(numLabels), m_featureExtractionLayer)
                     .setOutputs(m_predictionLayerName).build();
         } catch (Exception ex) {
-            log.error("Couldn't load up weights for model");
+            ex.printStackTrace();
             log.error(pretrainedModel.summary());
             return defaultNet;
-        };
-
-        return transferGraph;
+        }
     }
 
 
