@@ -176,8 +176,8 @@ public class Utils {
    * @return Instances object
    * @throws WekaException Invalid input
    */
-  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
-    int batchsize = (int) ndArray.size(0);
+  public static Instances ndArrayToInstances(INDArray ndArray, Instances inputFormat) throws WekaException {
+    int numInstances = (int) ndArray.size(0);
     long[] shape = ndArray.shape();
     int dims = shape.length;
     if (dims < 2) {
@@ -186,14 +186,27 @@ public class Utils {
     }
 
     long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
-    prod = prod / batchsize;
+    prod = prod / numInstances;
+    int classI = -1;
+    if (inputFormat != null) {
+      classI = (int) (prod - 1);
+    }
 
     ArrayList<Attribute> atts = new ArrayList<>();
     for (int i = 0; i < prod; i++) {
-      atts.add(new Attribute("transformedAttribute" + i));
+      if (i == classI && inputFormat != null) {
+        if (inputFormat.classAttribute().isNominal())
+          atts.add(copyNominalAttribute(inputFormat.classAttribute()));
+        else
+          atts.add(new Attribute(inputFormat.classAttribute().name()));
+      } else {
+        atts.add(new Attribute("transformedAttribute" + i));
+      }
     }
-    Instances instances = new Instances("Transformed", atts, batchsize);
-    for (int i = 0; i < batchsize; i++) {
+
+    Instances instances = new Instances("Transformed", atts, numInstances);
+    instances.setClassIndex(classI);
+    for (int i = 0; i < numInstances; i++) {
       INDArray row = ndArray.get(NDArrayIndex.point(i));
       INDArray flattenedRow = Nd4j.toFlattened(row);
       Instance inst = new DenseInstance(atts.size());
