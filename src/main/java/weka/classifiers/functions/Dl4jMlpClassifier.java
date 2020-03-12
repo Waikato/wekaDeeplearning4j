@@ -1242,11 +1242,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // Get the new width/heigth/channels from the iterator
     ImageInstanceIterator iii = (ImageInstanceIterator) it;
 
-    boolean isPretrained = getZooModel().isPretrained();
-
-    if (isPretrained && iii.getNumChannels() != 3) {
-      log.warn("ImageInstanceIterator not using 3 channels, but using pretrained weights. Setting numChannels to 3");
-      iii.setNumChannels(3);
+    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
+    if (getZooModel().isPretrained()) {
+      int[] pretrainedShape = getZooModel().getShape()[0];
+      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
+              pretrainedShape[0], pretrainedShape[1], pretrainedShape[2]));
+      iii.setNumChannels(pretrainedShape[0]);
+      iii.setHeight(pretrainedShape[1]);
+      iii.setWidth(pretrainedShape[2]);
     }
 
     int newWidth = iii.getWidth();
