@@ -157,6 +157,18 @@ public class Utils {
     return score;
   }
 
+  public static Attribute copyNominalAttribute(Attribute oldAttribute) {
+    String[] classValues = new String[oldAttribute.numValues()];
+    for (int classValI = 0; classValI < oldAttribute.numValues(); classValI++) {
+      classValues[classValI] = oldAttribute.value(classValI);
+    }
+    return new Attribute(oldAttribute.name(), Arrays.asList(classValues));
+  }
+
+  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
+    return ndArrayToInstances(ndArray, null);
+  }
+
   /**
    * Convert an arbitrary NDArray to Weka instances
    *
