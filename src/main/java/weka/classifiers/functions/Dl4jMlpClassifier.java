@@ -50,9 +50,11 @@ import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
 import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -1790,37 +1792,64 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return !(zooModel instanceof CustomNet);
   }
 
+  public Instances getActivationsAtLayer(String layerName, Instances input) throws Exception {
+    return getActivationsAtLayer(layerName, input, false);
+  }
+
   /**
    * Returns the activations at a certain
    *
    * @param layerName Layer name to get the activations from
    * @return Activations in form of instances
    */
-  public Instances getActivationsAtLayer(String layerName, Instances input)
+  public Instances getActivationsAtLayer(String layerName, Instances input, boolean isZooModel)
       throws Exception {
     DataSetIterator iter = getDataSetIterator(input);
     iter.reset();
     DataSet next;
-    INDArray acts = null;
+    INDArray result = null;
+    TransferLearningHelper transferLearningHelper = null;
+    if (isZooModel) {
+      transferLearningHelper = new TransferLearningHelper(getModel(), layerName);
+    }
+
     while (iter.hasNext()) {
       next = iter.next();
-      INDArray features = next.getFeatures();
-      int layerIdx = model.getLayer(layerName).getIndex() - 1;
-      Map<String, INDArray> activations =
-          model.feedForward(features, layerIdx, false);
-      INDArray activationAtLayer = activations.get(layerName);
-
-      if (acts == null) {
-        acts = activationAtLayer;
+      INDArray activationAtLayer;
+      if (!isZooModel) {
+        // TODO remove legacy mode of featurizing dataset
+        // Use the classic way of getting features, if using a serialized model
+        INDArray features = next.getFeatures();
+        int layerIdx = model.getLayer(layerName).getIndex() - 1;
+        Map<String, INDArray> activations =
+            model.feedForward(features, layerIdx, false);
+        activationAtLayer = activations.get(layerName);
       } else {
-        acts = Nd4j.concat(0, acts, activationAtLayer);
+        // Use the DL4J way of featurizing data if using a model zoo model
+        DataSet currentFeaturized = transferLearningHelper.featurize(iter.next());
+        activationAtLayer = currentFeaturized.getFeatures();
+      }
+      if (result == null) {
+        result = activationAtLayer;
+      } else {
+        result = Nd4j.concat(0, result, activationAtLayer);
       }
     }
 
-    if (acts == null) {
+    // TODO figure out why not using all instances
+    // Append the class value to the ndarray
+    NDArray classes = (NDArray) Nd4j.zeros(result.shape()[0], 1);
+    for (int i = 0; i < classes.length(); i++) {
+      Instance inst = input.instance(i);
+      classes.putScalar(i, inst.classValue());
+    }
+    result = Nd4j.concat(1, result, classes);
+
+    // Finally convert the NDArray into an instances object
+    if (result == null) {
       return new Instances(input, 0);
     } else {
-      return Utils.ndArrayToInstances(acts);
+      return Utils.ndArrayToInstances(result, input);
     }
   }
 }
