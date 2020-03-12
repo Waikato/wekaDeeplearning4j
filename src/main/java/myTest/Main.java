@@ -18,7 +18,11 @@ class ResnetTest {
     public ResnetTest() {}
 
     public void filterTest(String[] args) {
-        Filter.runFilter(new Dl4jMlpFilter(), args);
+        Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+        ImageInstanceIterator imgIter = new ImageInstanceIterator();
+        imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
+        myFilter.setImageInstanceIterator(imgIter);
+        Filter.runFilter(myFilter, args);
     }
 
     public void train() throws Exception {
