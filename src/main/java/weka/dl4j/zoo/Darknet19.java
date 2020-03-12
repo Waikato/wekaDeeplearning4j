@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
 
 /**
@@ -27,9 +28,9 @@ import weka.dl4j.Preferences;
  *
  * @author Steven Lang
  */
-public class Darknet19 implements ZooModel {
+public class Darknet19 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -520668505548861661L;
+  private static final long serialVersionUID = -52066850554864161L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
@@ -39,7 +40,10 @@ public class Darknet19 implements ZooModel {
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
-    return net.init();
+
+    ComputationGraph defaultNet = net.init();
+
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }
 
   @Override
