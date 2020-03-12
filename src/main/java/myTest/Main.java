@@ -1,36 +1,38 @@
 package myTest;
 
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.activations.ActivationReLU;
-import weka.dl4j.activations.ActivationSoftmax;
-import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.layers.DenseLayer;
-import weka.dl4j.layers.OutputLayer;
+import weka.dl4j.listener.EpochListener;
 import weka.dl4j.updater.Adam;
-import weka.dl4j.zoo.AlexNet;
-import weka.dl4j.zoo.ResNet50;
-import weka.dl4j.zoo.VGG16;
 import weka.filters.Filter;
-import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
 import java.io.File;
 import java.io.FileReader;
-import java.nio.file.Paths;
 import java.util.Random;
 
 class ResnetTest {
     public ResnetTest() {}
 
-    public void run() throws Exception {
+    public void filterTest(String[] args) {
+        Filter.runFilter(new Dl4jMlpFilter(), args);
+    }
+
+    public void train() throws Exception {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setNumEpochs(5);
-        clf.setZooModel(new ResNet50(PretrainedType.IMAGENET));
+        clf.setNumEpochs(10);
+//        clf.setZooModel(new ResNet50(PretrainedType.IMAGENET));
+//        clf.setZooModel(new GenericKerasModel(
+//                new ClassPathResource("vgg16.h5").getFile().getPath(),
+//                new ClassPathResource("resnet50.json").getFile().getPath()));
+
+        final EpochListener epochListener = new EpochListener();
+        epochListener.setN(1);
+        clf.setIterationListener(epochListener);
 
         // Load the arff file
         Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
@@ -69,7 +71,8 @@ class ResnetTest {
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        ResnetTest test = new ResnetTest();
-        test.run();
+//        ResnetTest test = new ResnetTest();
+//        test.train();
+        new ResnetTest().filterTest(args);
     }
 }
