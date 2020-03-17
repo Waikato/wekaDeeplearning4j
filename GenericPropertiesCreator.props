@@ -25,6 +25,9 @@ weka.dl4j.iterators.instance.ImageInstanceIterator =\
 weka.dl4j.activations.Activation =\
  weka.dl4j.activations
 
+weka.dl4j.zoo.AbstractZooModel =\
+ weka.dl4j.zoo
+
 weka.dl4j.zoo.ZooModel =\
  weka.dl4j.zoo
 
