@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
 
@@ -40,8 +41,8 @@ public class SimpleCNN extends AbstractZooModel {
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
-    org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
-    ComputationGraph defaultNet = mlpToCG(conf, shape);
+
+    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }

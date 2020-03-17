@@ -58,44 +58,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     public abstract int[][] getShape();
 
-    /**
-     * Convert a MultiLayerConfiguration into a Computation graph
-     *
-     * @param mlc Layer-wise configuration
-     * @param shape Inputshape
-     * @return ComputationGraph based on the configuration in the MLC
-     */
-    public ComputationGraph mlpToCG(MultiLayerConfiguration mlc, int[] shape) {
-        ComputationGraphConfiguration.GraphBuilder builder =
-                new NeuralNetConfiguration.Builder()
-                        .trainingWorkspaceMode(Preferences.WORKSPACE_MODE)
-                        .inferenceWorkspaceMode(Preferences.WORKSPACE_MODE)
-                        .graphBuilder();
-        List<NeuralNetConfiguration> confs = mlc.getConfs();
-
-        // Start with input
-        String currentInput = "input";
-        builder.addInputs(currentInput);
-
-        // Iterate MLN configurations layer-wise
-        for (NeuralNetConfiguration conf : confs) {
-            Layer l = conf.getLayer();
-            String lName = l.getLayerName();
-
-            // Connect current layer with last layer
-            builder.addLayer(lName, l, currentInput);
-            currentInput = lName;
-        }
-        builder.setOutputs(currentInput);
-
-        // Configure inputs
-        builder.setInputTypes(InputType.convolutional(shape[1], shape[2], shape[0]));
-
-        // Build
-        ComputationGraphConfiguration cgc = builder.build();
-        return new ComputationGraph(cgc);
-    }
-
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,

@@ -41,9 +41,7 @@ public class AlexNet extends AbstractZooModel {
             .inputShape(shape)
             .numClasses(numLabels)
             .build();
-    org.deeplearning4j.nn.conf.MultiLayerConfiguration conf = net.conf();
-
-    ComputationGraph defaultNet = mlpToCG(conf, shape);
+    ComputationGraph defaultNet = net.init().toComputationGraph();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }
