@@ -35,6 +35,7 @@ import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 
 import java.io.IOException;
@@ -48,7 +49,9 @@ public class ResNet50 extends AbstractZooModel {
 
     private static final long serialVersionUID = -5206947378361661L;
 
-    public ResNet50() {}
+    public ResNet50() {
+        setPretrainedType(PretrainedType.IMAGENET);
+    }
 
     @Override
     public ResNet50 setPretrainedType(PretrainedType pretrainedType) {
