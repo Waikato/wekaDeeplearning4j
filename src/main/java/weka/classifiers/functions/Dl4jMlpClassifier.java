@@ -1826,7 +1826,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         activationAtLayer = activations.get(layerName);
       } else {
         // Use the DL4J way of featurizing data if using a model zoo model
-        DataSet currentFeaturized = transferLearningHelper.featurize(iter.next());
+        DataSet currentFeaturized = transferLearningHelper.featurize(next);
         activationAtLayer = currentFeaturized.getFeatures();
       }
       if (result == null) {
