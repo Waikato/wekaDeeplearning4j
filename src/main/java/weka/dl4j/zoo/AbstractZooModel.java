@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.core.Option;
 import weka.core.OptionHandler;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 
 import java.io.Serializable;
@@ -38,10 +39,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     protected String m_layerToRemove, m_featureExtractionLayer, m_predictionLayerName = "predictions";
 
     protected int m_numFExtractOutputs;
-
-    public String getFeatureExtractionLayer() {
-        return m_featureExtractionLayer;
-    }
 
     /**
      * Initialize the ZooModel as MLP
@@ -147,25 +144,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return m_pretrainedType != null;
     }
 
-    public PretrainedType getPretrainedType() {
-        return m_pretrainedType;
-    }
-
-    public AbstractZooModel setPretrainedType(PretrainedType pretrainedType) {
-        throw new NotImplementedException();
-    }
-
-    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
-                                  int numFExtractOutputs,
-                                  String layerToRemove,
-                                  String featureExtractionLayer) {
-        m_pretrainedType = pretrainedType;
-        m_numFExtractOutputs = numFExtractOutputs;
-        m_layerToRemove = layerToRemove;
-        m_featureExtractionLayer = featureExtractionLayer;
-        return this;
-    }
-
     protected FineTuneConfiguration getFineTuneConfig(long seed) {
         return new FineTuneConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -221,6 +199,40 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             }
         }
         return availableTypes;
+    }
+
+    public PretrainedType getPretrainedType() {
+        return m_pretrainedType;
+    }
+
+    public AbstractZooModel setPretrainedType(PretrainedType pretrainedType) {
+        throw new NotImplementedException();
+    }
+
+    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
+                                                 int numFExtractOutputs,
+                                                 String layerToRemove,
+                                                 String featureExtractionLayer) {
+        m_pretrainedType = pretrainedType;
+        m_numFExtractOutputs = numFExtractOutputs;
+        m_layerToRemove = layerToRemove;
+        m_featureExtractionLayer = featureExtractionLayer;
+        return this;
+    }
+
+    @OptionMetadata(
+            description = "The name of the feature extraction layer in the model.",
+            displayName = "Feature extraction layer",
+            commandLineParamName = "extrac",
+            commandLineParamSynopsis = "-extrac <String>",
+            displayOrder = 0
+    )
+    public String getFeatureExtractionLayer() {
+        return m_featureExtractionLayer;
+    }
+
+    public void setFeatureExtractionLayer(String featureExtractionLayer) {
+        this.m_featureExtractionLayer = m_featureExtractionLayer;
     }
 
     /**
