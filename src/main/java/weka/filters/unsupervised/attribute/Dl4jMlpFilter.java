@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.util.Enumeration;
 
 import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
-import org.deeplearning4j.zoo.PretrainedType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -33,6 +32,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.ResNet50;
@@ -57,7 +57,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   /**
    * The zoo model to use, if we're not loading from the serialized model file
    */
-  protected AbstractZooModel zooModelType = new ResNet50().setPretrainedType(PretrainedType.IMAGENET);
+  protected AbstractZooModel zooModelType = new ResNet50();
 
   /**
    * The image instance iterator to use

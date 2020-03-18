@@ -20,8 +20,8 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's VGG16 ZooModel.
@@ -32,9 +32,13 @@ public class VGG16 extends AbstractZooModel {
 
   private static final long serialVersionUID = -6728816089752609851L;
 
+  public VGG16() {
+    setPretrainedType(PretrainedType.IMAGENET);
+  }
+
   @Override
-  public VGG16 setPretrainedType(PretrainedType pretrainedType) {
-    return (VGG16) setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
+  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
   }
 
   public ComputationGraph init(int numLabels, long seed, int[] shape) {

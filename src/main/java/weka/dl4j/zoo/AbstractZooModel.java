@@ -9,10 +9,10 @@ import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
-import org.deeplearning4j.zoo.PretrainedType;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.learning.config.Nesterovs;
@@ -23,13 +23,14 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.dl4j.PretrainedType;
 
 import java.io.Serializable;
 import java.util.*;
 
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
-    protected PretrainedType m_pretrainedType = null;
+    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.IMAGENET;
 
     private org.deeplearning4j.zoo.ZooModel m_zooModelType;
 
@@ -121,7 +122,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net) {
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
-            Object pretrained = net.initPretrained(m_pretrainedType);
+            Object pretrained = net.initPretrained(m_pretrainedType.getBackend());
             if (pretrained instanceof MultiLayerNetwork) {
                 return ((MultiLayerNetwork) pretrained).toComputationGraph();
             } else {
@@ -157,19 +158,44 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     private Set<PretrainedType> getAvailablePretrainedWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         Set<PretrainedType> availableTypes = new HashSet<>();
         for (PretrainedType pretrainedType : PretrainedType.values()) {
-            if (zooModel.pretrainedAvailable(pretrainedType)) {
+            if (zooModel.pretrainedAvailable(pretrainedType.getBackend())) {
                 availableTypes.add(pretrainedType);
             }
         }
         return availableTypes;
     }
 
+    @OptionMetadata(
+            description = "The name of the feature extraction layer in the model.",
+            displayName = "Feature extraction layer",
+            commandLineParamName = "extrac",
+            commandLineParamSynopsis = "-extrac <String>",
+            displayOrder = 0
+    )
+    public String getFeatureExtractionLayer() {
+        return m_featureExtractionLayer;
+    }
+
+    public void setFeatureExtractionLayer(String featureExtractionLayer) {
+        this.m_featureExtractionLayer = m_featureExtractionLayer;
+    }
+
+    @OptionMetadata(
+            description =
+                    "Pretrained Weights (LINE_GRADIENT_DESCENT,"
+                            + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
+                            + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
+            displayName = "Pretrained Type",
+            commandLineParamName = "pretrained",
+            commandLineParamSynopsis = "-pretrained <string>",
+            displayOrder = 1
+    )
     public PretrainedType getPretrainedType() {
         return m_pretrainedType;
     }
 
-    public AbstractZooModel setPretrainedType(PretrainedType pretrainedType) {
-        throw new NotImplementedException();
+    public void setPretrainedType(PretrainedType pretrainedType) {
+        setPretrainedType(pretrainedType, m_numFExtractOutputs, m_featureExtractionLayer, m_outputLayer, m_extraLayersToRemove);
     }
 
     protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
@@ -194,21 +220,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         m_featureExtractionLayer = featureExtractionLayer;
         m_extraLayersToRemove = extraLayersToRemove;
         return this;
-    }
-
-    @OptionMetadata(
-            description = "The name of the feature extraction layer in the model.",
-            displayName = "Feature extraction layer",
-            commandLineParamName = "extrac",
-            commandLineParamSynopsis = "-extrac <String>",
-            displayOrder = 0
-    )
-    public String getFeatureExtractionLayer() {
-        return m_featureExtractionLayer;
-    }
-
-    public void setFeatureExtractionLayer(String featureExtractionLayer) {
-        this.m_featureExtractionLayer = m_featureExtractionLayer;
     }
 
     /**
