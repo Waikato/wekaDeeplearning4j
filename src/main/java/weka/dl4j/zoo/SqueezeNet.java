@@ -20,8 +20,8 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
@@ -34,18 +34,18 @@ public class SqueezeNet extends AbstractZooModel {
 
     private static final long serialVersionUID = -5206943146661L;
 
-    @Override
-    public SqueezeNet setPretrainedType(PretrainedType pretrainedType) {
-        return (SqueezeNet) setPretrainedType(pretrainedType,
-                512,
-                "drop9",
-                "conv10",
-                new String[] {
-                        "relu10",
-                        "global_average_pooling2d_5",
-                        "loss"
-                });
-    }
+//    @Override
+//    public SqueezeNet setPretrainedType(PretrainedType pretrainedType) {
+//        return (SqueezeNet) setPretrainedType(pretrainedType,
+//                512,
+//                "drop9",
+//                "conv10",
+//                new String[] {
+//                        "relu10",
+//                        "global_average_pooling2d_5",
+//                        "loss"
+//                });
+//    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape) {
