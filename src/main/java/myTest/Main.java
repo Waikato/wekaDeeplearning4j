@@ -1,10 +1,10 @@
 package myTest;
 
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.updater.Adam;
@@ -25,6 +25,7 @@ class WekaTests {
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         imgIter.setTrainBatchSize(16);
         myFilter.setImageInstanceIterator(imgIter);
+        myFilter.setZooModelType(new VGG16());
         Filter.runFilter(myFilter, args);
     }
 
@@ -32,7 +33,9 @@ class WekaTests {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
         clf.setNumEpochs(10);
-        clf.setZooModel(new VGG16().setPretrainedType(PretrainedType.IMAGENET));
+        Darknet19 zooModel = new Darknet19();
+        zooModel.setPretrainedType(PretrainedType.IMAGENET);
+        clf.setZooModel(zooModel);
 
         // Load the arff file
         Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
@@ -70,6 +73,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
 //        ResnetTest test = new ResnetTest();
 //        test.train();
-        new WekaTests().train();
+        new WekaTests().filterTest(args);
     }
 }

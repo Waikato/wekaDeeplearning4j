@@ -44,9 +44,9 @@ public class GenericKerasModel extends AbstractZooModel {
 //              .enforceTrainingConfig(false)
 ////              .inputShape(shape)
 //              .weightsHdf5FilenameNoRoot(modelWeightsPath).enforceTrainingConfig(true).buildModel();
-      MultiLayerNetwork kerasModel = KerasModelImport.importKerasSequentialModelAndWeights(modelWeightsPath);
-      kerasModel.toComputationGraph();
-      MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights(modelWeightsPath);
+//      MultiLayerNetwork kerasModel = KerasModelImport.importKerasSequentialModelAndWeights(modelWeightsPath);
+//      kerasModel.toComputationGraph();
+      MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights("");
       NDArray inputArray = (NDArray) Nd4j.zeros(shape);
       model.setInput(inputArray);
       return model.toComputationGraph();
