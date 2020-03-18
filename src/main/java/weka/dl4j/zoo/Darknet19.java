@@ -30,7 +30,14 @@ import weka.dl4j.Preferences;
  */
 public class Darknet19 extends AbstractZooModel {
 
+  // TODO get pretrained weights working
+
   private static final long serialVersionUID = -52066850554864161L;
+
+  @Override
+  public Darknet19 setPretrainedType(PretrainedType pretrainedType) {
+    return (Darknet19) setPretrainedType(pretrainedType, 1048, "conv2d_19", "leaky_re_lu_18");
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
