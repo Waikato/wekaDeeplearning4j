@@ -1836,7 +1836,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
     }
 
-    // TODO figure out why not using all instances
     // Append the class value to the ndarray
     NDArray classes = (NDArray) Nd4j.zeros(result.shape()[0], 1);
     for (int i = 0; i < classes.length(); i++) {

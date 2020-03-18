@@ -19,18 +19,14 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
-import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.deeplearning4j.zoo.PretrainedType;
-import org.deeplearning4j.zoo.ZooModel;
 import weka.dl4j.Preferences;
 
 /**
  * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
  *
- * @author Steven Lang
+ * @author Rhys Compton
  */
 public class NASNet extends AbstractZooModel {
 

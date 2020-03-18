@@ -1,5 +1,6 @@
 package myTest;
 
+import org.deeplearning4j.zoo.PretrainedType;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
@@ -7,6 +8,7 @@ import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.updater.Adam;
+import weka.dl4j.zoo.*;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -14,13 +16,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Random;
 
-class ResnetTest {
-    public ResnetTest() {}
+class WekaTests {
+    public WekaTests() {}
 
     public void filterTest(String[] args) {
         Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
         ImageInstanceIterator imgIter = new ImageInstanceIterator();
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
+        imgIter.setTrainBatchSize(16);
         myFilter.setImageInstanceIterator(imgIter);
         Filter.runFilter(myFilter, args);
     }
@@ -29,14 +32,7 @@ class ResnetTest {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
         clf.setNumEpochs(10);
-//        clf.setZooModel(new ResNet50(PretrainedType.IMAGENET));
-//        clf.setZooModel(new GenericKerasModel(
-//                new ClassPathResource("vgg16.h5").getFile().getPath(),
-//                new ClassPathResource("resnet50.json").getFile().getPath()));
-
-        final EpochListener epochListener = new EpochListener();
-        epochListener.setN(1);
-        clf.setIterationListener(epochListener);
+        clf.setZooModel(new VGG16().setPretrainedType(PretrainedType.IMAGENET));
 
         // Load the arff file
         Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
@@ -45,10 +41,7 @@ class ResnetTest {
 
         ImageInstanceIterator imgIter = new ImageInstanceIterator();
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-        imgIter.setHeight(224);
-        imgIter.setWidth(224);
-        imgIter.setNumChannels(3);
-        imgIter.setTrainBatchSize(16);
+//        imgIter.setTrainBatchSize(16);
         clf.setInstanceIterator(imgIter);
 
         // Set up the network configuration
@@ -77,6 +70,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
 //        ResnetTest test = new ResnetTest();
 //        test.train();
-        new ResnetTest().filterTest(args);
+        new WekaTests().train();
     }
 }

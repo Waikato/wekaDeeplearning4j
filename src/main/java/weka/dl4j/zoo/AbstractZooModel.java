@@ -23,7 +23,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.dl4j.Preferences;
 
 import java.io.Serializable;
 import java.util.*;
