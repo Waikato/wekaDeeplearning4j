@@ -20,8 +20,8 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's Darknet19 ZooModel.
@@ -34,9 +34,13 @@ public class Darknet19 extends AbstractZooModel {
 
   private static final long serialVersionUID = -52066850554864161L;
 
+  public Darknet19() { setPretrainedType(PretrainedType.IMAGENET); }
+
   @Override
-  public Darknet19 setPretrainedType(PretrainedType pretrainedType) {
-    return (Darknet19) setPretrainedType(pretrainedType, 1048, "conv2d_19", "leaky_re_lu_18");
+  public void setPretrainedType(PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType, 1000,
+            "globalpooling", "softmax",
+            new String[]{"loss"});
   }
 
   @Override
