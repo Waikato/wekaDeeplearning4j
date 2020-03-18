@@ -35,7 +35,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected final Logger log = LoggerFactory.getLogger(AbstractZooModel.class);
 
-    protected String m_layerToRemove, m_featureExtractionLayer, m_predictionLayerName = "predictions";
+    protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "predictions";
+
+    protected String[] m_extraLayersToRemove;
 
     protected int m_numFExtractOutputs;
 
@@ -60,9 +62,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
-                                                 int numLabels,
-                                                 MultiLayerConfiguration conf,
-                                                 int[] shape) {
+                                                 int numLabels) {
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == null)
@@ -75,17 +75,23 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         }
 
         // If downloading the weights fails, return the standard model
-        ComputationGraph pretrainedModel = downloadWeights(zooModel, conf, shape);
+        ComputationGraph pretrainedModel = downloadWeights(zooModel);
         if (pretrainedModel == null)
             return defaultNet;
 
+        System.out.println(pretrainedModel.summary());
+
         try {
-            // Finally, create the transfer learning graph
-            return new TransferLearning.GraphBuilder(pretrainedModel)
+            TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(pretrainedModel)
                     .fineTuneConfiguration(getFineTuneConfig(seed))
-                    .removeVertexKeepConnections(m_layerToRemove)
+                    .removeVertexKeepConnections(m_outputLayer)
                     .addLayer(m_predictionLayerName, createOutputLayer(numLabels), m_featureExtractionLayer)
-                    .setOutputs(m_predictionLayerName).build();
+                    .setOutputs(m_predictionLayerName);
+
+            ComputationGraph finalOne = removeExtraConnections(graphBuilder).build();
+            System.out.println(finalOne.summary());
+            // Finally, create the transfer learning graph
+            return finalOne;
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error(pretrainedModel.summary());
@@ -93,12 +99,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         }
     }
 
-
-    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
-                                                 ComputationGraph defaultNet,
-                                                 long seed,
-                                                 int numLabels) {
-        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, null, null);
+    private TransferLearning.GraphBuilder removeExtraConnections(TransferLearning.GraphBuilder builder) {
+        for (String layer : m_extraLayersToRemove) {
+            builder = builder.removeVertexAndConnections(layer);
+        }
+        return builder;
     }
 
     public boolean isPretrained() {
@@ -113,21 +118,18 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .build();
     }
 
-    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net,
-                                               MultiLayerConfiguration conf,
-                                               int[] shape) {
-        ComputationGraph cmpGraph = null;
+    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net) {
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
-//            Object pretrained = net.initPretrained(m_pretrainedType); TODO add support for MultiLayerNetwork models
-//            if (pretrained instanceof MultiLayerNetwork) {
-//                ComputationGraph thisGraph = mlpToCG(, shape);
-//            }
-            cmpGraph = (ComputationGraph) net.initPretrained(m_pretrainedType);
-            return cmpGraph;
+            Object pretrained = net.initPretrained(m_pretrainedType);
+            if (pretrained instanceof MultiLayerNetwork) {
+                return ((MultiLayerNetwork) pretrained).toComputationGraph();
+            } else {
+                return (ComputationGraph) pretrained;
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return cmpGraph;
+            return null;
         }
     }
 
@@ -172,12 +174,25 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
                                                  int numFExtractOutputs,
-                                                 String layerToRemove,
-                                                 String featureExtractionLayer) {
+                                                 String featureExtractionLayer,
+                                                 String outputLayer) {
+        return setPretrainedType(pretrainedType,
+                numFExtractOutputs,
+                featureExtractionLayer,
+                outputLayer,
+                new String[]{});
+    }
+
+    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
+                                                 int numFExtractOutputs,
+                                                 String featureExtractionLayer,
+                                                 String outputLayer,
+                                                 String[] extraLayersToRemove) {
         m_pretrainedType = pretrainedType;
         m_numFExtractOutputs = numFExtractOutputs;
-        m_layerToRemove = layerToRemove;
+        m_outputLayer = outputLayer;
         m_featureExtractionLayer = featureExtractionLayer;
+        m_extraLayersToRemove = extraLayersToRemove;
         return this;
     }
 
