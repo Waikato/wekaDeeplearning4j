@@ -33,8 +33,8 @@ public class VGG16 extends AbstractZooModel {
   private static final long serialVersionUID = -6728816089752609851L;
 
   @Override
-  public ResNet50 setPretrainedType(PretrainedType pretrainedType) {
-    return (ResNet50) setPretrainedType(pretrainedType, 4096, "predictions", "fc2");
+  public VGG16 setPretrainedType(PretrainedType pretrainedType) {
+    return (VGG16) setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
   }
 
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
