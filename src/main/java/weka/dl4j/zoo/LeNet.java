@@ -32,7 +32,18 @@ import weka.dl4j.Preferences;
  */
 public class LeNet extends AbstractZooModel {
 
+  // TODO get pretrained weights working
+
   private static final long serialVersionUID = 79837621346455139L;
+
+  @Override
+  public LeNet setPretrainedType(PretrainedType pretrainedType) {
+    return (LeNet) setPretrainedType(pretrainedType,
+            500,
+            "7",
+            "8",
+            new String[] {"9"});
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
