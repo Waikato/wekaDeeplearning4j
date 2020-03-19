@@ -21,15 +21,26 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
- * A WEKA version of DeepLearning4j's VGGN19 ZooModel.
+ * A WEKA version of DeepLearning4j's VGG19 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class VGG19 extends AbstractZooModel {
 
   private static final long serialVersionUID = -4452023767749633607L;
+
+  public VGG19() {
+    setPretrainedType(PretrainedType.IMAGENET);
+  }
+
+  @Override
+  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
@@ -39,8 +50,10 @@ public class VGG19 extends AbstractZooModel {
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
-    org.deeplearning4j.nn.conf.ComputationGraphConfiguration conf = net.conf();
-    return new ComputationGraph(conf);
+
+    ComputationGraph defaultNet = net.init();
+
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }
 
   @Override
