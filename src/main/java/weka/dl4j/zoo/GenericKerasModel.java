@@ -18,15 +18,11 @@
 
 package weka.dl4j.zoo;
 
-import com.sun.tools.javac.jvm.Gen;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModel;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.zoo.PretrainedType;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import weka.core.OptionMetadata;
 
 /**
  *
@@ -37,23 +33,42 @@ public class GenericKerasModel extends AbstractZooModel {
 
   private static final long serialVersionUID = 79654176542732L;
 
+  protected String kerasH5File = "", kerasJsonFile = "";
+
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     try {
-//      KerasModel kerasModel = new KerasModel().modelBuilder().modelJsonFilename(modelJsonPath)
-//              .enforceTrainingConfig(false)
-////              .inputShape(shape)
-//              .weightsHdf5FilenameNoRoot(modelWeightsPath).enforceTrainingConfig(true).buildModel();
-//      MultiLayerNetwork kerasModel = KerasModelImport.importKerasSequentialModelAndWeights(modelWeightsPath);
-//      kerasModel.toComputationGraph();
-      MultiLayerNetwork model = KerasModelImport.importKerasSequentialModelAndWeights("");
-      NDArray inputArray = (NDArray) Nd4j.zeros(shape);
-      model.setInput(inputArray);
-      return model.toComputationGraph();
+      ComputationGraph model = KerasModelImport.importKerasModelAndWeights(kerasJsonFile, kerasH5File);
+//      return model.toComputationGraph();
+      return model;
     } catch (Exception ex) {
       ex.printStackTrace();
       return null;
     }
+  }
+
+  @OptionMetadata(
+          displayName = "Keras Model File",
+          description = "Location of the keras model weights"
+  )
+  public String getKerasH5File() {
+    return kerasH5File;
+  }
+
+  public void setKerasH5File(String kerasH5File) {
+    this.kerasH5File = kerasH5File;
+  }
+
+  @OptionMetadata(
+          displayName = "Keras Config File",
+          description = "Location of the keras config file"
+  )
+  public String getKerasJsonFile() {
+    return kerasJsonFile;
+  }
+
+  public void setKerasJsonFile(String kerasJsonFile) {
+    this.kerasJsonFile = kerasJsonFile;
   }
 
   @Override
