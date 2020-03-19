@@ -27,8 +27,13 @@ import weka.dl4j.PretrainedType;
  * A WEKA version of DeepLearning4j's VGG16 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class VGG16 extends AbstractZooModel {
+
+  // Pretrained weights notes:
+  // CIFAR10 -  Download link possibly broken on DL4J end?
+  //            The downloaded zip for these weights is only 10mb vs 513mb for Imagenet
 
   private static final long serialVersionUID = -6728816089752609851L;
 
@@ -38,7 +43,12 @@ public class VGG16 extends AbstractZooModel {
 
   @Override
   public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
+    if (pretrainedType == PretrainedType.VGGFACE) {
+      // VGGFace pretrained has slightly different network structure to Imagenet pretrained
+      setPretrainedType(pretrainedType, 4096, "fc7", "fc8");
+    } else {
+      setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
+    }
   }
 
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
@@ -48,8 +58,8 @@ public class VGG16 extends AbstractZooModel {
             .inputShape(shape)
             .numClasses(numLabels)
             .build();
-    org.deeplearning4j.nn.conf.ComputationGraphConfiguration conf = net.conf();
-    ComputationGraph defaultNet = new ComputationGraph(conf);
+
+    ComputationGraph defaultNet = net.init();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels);
   }
