@@ -29,16 +29,19 @@ import weka.dl4j.PretrainedType;
  * A WEKA version of DeepLearning4j's LeNet ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class LeNet extends AbstractZooModel {
 
-  // TODO get pretrained weights working
-
   private static final long serialVersionUID = 79837621346455139L;
 
+  public LeNet() {
+    setPretrainedType(PretrainedType.MNIST);
+  }
+
   @Override
-  public LeNet setPretrainedType(PretrainedType pretrainedType) {
-    return (LeNet) setPretrainedType(pretrainedType,
+  public void setPretrainedType(PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType,
             500,
             "7",
             "8",
