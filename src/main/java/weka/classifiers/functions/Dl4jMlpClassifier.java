@@ -1303,6 +1303,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
           "ZooModel was not set (CustomNet), but createZooModel could be called. Invalid situation",
           e);
     } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
+      e.printStackTrace();
+      return false;
+    } catch (Exception e) {
+      e.printStackTrace();
       return false;
     }
   }

@@ -25,16 +25,17 @@ class WekaTests {
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         imgIter.setTrainBatchSize(16);
         myFilter.setImageInstanceIterator(imgIter);
-        myFilter.setZooModelType(new VGG16());
+        AbstractZooModel zooModel = new XCeption();
+//        zooModel.setPretrainedType(PretrainedType.CIFAR10);
+        myFilter.setZooModelType(zooModel);
         Filter.runFilter(myFilter, args);
     }
 
-    public void train() throws Exception {
+    public void train(String[] args) throws Exception {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
         clf.setNumEpochs(10);
-        Darknet19 zooModel = new Darknet19();
-        zooModel.setPretrainedType(PretrainedType.IMAGENET);
+        ResNet50 zooModel = new ResNet50();
         clf.setZooModel(zooModel);
 
         // Load the arff file
@@ -44,7 +45,7 @@ class WekaTests {
 
         ImageInstanceIterator imgIter = new ImageInstanceIterator();
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-//        imgIter.setTrainBatchSize(16);
+        imgIter.setTrainBatchSize(16);
         clf.setInstanceIterator(imgIter);
 
         // Set up the network configuration

@@ -28,6 +28,7 @@ import weka.dl4j.Preferences;
  * A WEKA version of DeepLearning4j's InceptionResNetV1 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class InceptionResNetV1 extends AbstractZooModel {
 

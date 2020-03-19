@@ -27,6 +27,7 @@ import weka.dl4j.Preferences;
  * A WEKA version of DeepLearning4j's FaceNetNN4Small2 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class FaceNetNN4Small2 extends AbstractZooModel {
 

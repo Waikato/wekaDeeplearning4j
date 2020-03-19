@@ -44,6 +44,7 @@ import java.io.IOException;
  * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class ResNet50 extends AbstractZooModel {
 

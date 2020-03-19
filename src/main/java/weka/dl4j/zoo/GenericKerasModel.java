@@ -29,9 +29,9 @@ import org.nd4j.linalg.factory.Nd4j;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- * A dummy ZooModel which is empty.
  *
- * @author Steven Lang
+ *
+ * @author Rhys Compton
  */
 public class GenericKerasModel extends AbstractZooModel {
 

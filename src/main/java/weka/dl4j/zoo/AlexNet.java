@@ -28,6 +28,7 @@ import weka.dl4j.Preferences;
  * A WEKA version of DeepLearning4j's LeNet ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class AlexNet extends AbstractZooModel {
 

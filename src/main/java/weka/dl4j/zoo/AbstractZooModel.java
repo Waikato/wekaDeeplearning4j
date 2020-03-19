@@ -28,6 +28,10 @@ import weka.dl4j.PretrainedType;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ *
+ * @author Rhys Compton
+ */
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.IMAGENET;

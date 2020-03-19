@@ -27,10 +27,9 @@ import weka.dl4j.PretrainedType;
  * A WEKA version of DeepLearning4j's Darknet19 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class Darknet19 extends AbstractZooModel {
-
-  // TODO get pretrained weights working
 
   private static final long serialVersionUID = -52066850554864161L;
 
