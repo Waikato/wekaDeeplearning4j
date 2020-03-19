@@ -49,7 +49,6 @@ RnnOutputLayer rnnOut = new RnnOutputLayer();
 // Network config
 NeuralNetConfiguration nnc = new NeuralNetConfiguration();
 nnc.setL2(l2);
-nnc.setUseRegularization(true);
 nnc.setGradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue);
 nnc.setGradientNormalizationThreshold(gradientThreshold);
 nnc.setLearningRate(learningRate);
