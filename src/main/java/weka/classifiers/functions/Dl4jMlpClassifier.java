@@ -87,6 +87,7 @@ import weka.core.WrongIteratorException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.ConvolutionMode;
 import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
@@ -102,10 +103,7 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.TrainingListener;
-import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.ResNet50;
-import weka.dl4j.zoo.ZooModel;
+import weka.dl4j.zoo.*;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -1244,14 +1242,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // Get the new width/heigth/channels from the iterator
     ImageInstanceIterator iii = (ImageInstanceIterator) it;
 
+    AbstractZooModel tmpZooModel = getZooModel();
     // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
-    if (getZooModel().isPretrained()) {
-      int[] pretrainedShape = getZooModel().getShape()[0];
+    if (tmpZooModel.isPretrained()) {
+      if (tmpZooModel instanceof LeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+        iii.setNumChannels(1);
+        iii.setHeight(28);
+        iii.setWidth(28);
+      } else {
+        int[] pretrainedShape = tmpZooModel.getShape()[0];
+        iii.setNumChannels(pretrainedShape[0]);
+        iii.setHeight(pretrainedShape[1]);
+        iii.setWidth(pretrainedShape[2]);
+      }
       log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
-              pretrainedShape[0], pretrainedShape[1], pretrainedShape[2]));
-      iii.setNumChannels(pretrainedShape[0]);
-      iii.setHeight(pretrainedShape[1]);
-      iii.setWidth(pretrainedShape[2]);
+              iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
     }
 
     int newWidth = iii.getWidth();
