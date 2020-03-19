@@ -27,6 +27,7 @@ import weka.dl4j.PretrainedType;
  * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 public class SqueezeNet extends AbstractZooModel {
 
@@ -34,18 +35,17 @@ public class SqueezeNet extends AbstractZooModel {
 
     private static final long serialVersionUID = -5206943146661L;
 
-//    @Override
-//    public SqueezeNet setPretrainedType(PretrainedType pretrainedType) {
-//        return (SqueezeNet) setPretrainedType(pretrainedType,
-//                512,
-//                "drop9",
-//                "conv10",
-//                new String[] {
-//                        "relu10",
-//                        "global_average_pooling2d_5",
-//                        "loss"
-//                });
-//    }
+    public SqueezeNet() {
+        setPretrainedType(PretrainedType.IMAGENET);
+    }
+
+    @Override
+    public void setPretrainedType(PretrainedType pretrainedType) {
+        setPretrainedType(pretrainedType,
+                1000,
+                "global_average_pooling2d_5",
+                "loss");
+    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape) {
