@@ -24,7 +24,7 @@ import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 
 /**
- * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
+ * A WEKA version of DeepLearning4j's NASNet ZooModel.
  *
  * @author Rhys Compton
  */
@@ -33,11 +33,6 @@ public class NASNet extends AbstractZooModel {
     // TODO get pretrained working
 
     private static final long serialVersionUID = -5206943146661L;
-
-//    @Override
-//    public NASNet setPretrainedType(PretrainedType pretrainedType) {
-//        return (NASNet) setPretrainedType(pretrainedType, 2048, "fc1000", "flatten_1");
-//    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape) {
