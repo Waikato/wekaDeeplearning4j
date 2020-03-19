@@ -34,7 +34,7 @@ import java.util.*;
  */
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
-    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.IMAGENET;
+    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
 
     private org.deeplearning4j.zoo.ZooModel m_zooModelType;
 
@@ -70,12 +70,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                                                  int numLabels) {
 
         // If no pretrained weights specified, simply return the standard model
-        if (m_pretrainedType == null)
+        if (m_pretrainedType == PretrainedType.NONE)
             return defaultNet;
 
         // If the specified pretrained weights aren't available, return the standard model
         if (!checkPretrained(zooModel)) {
-            m_pretrainedType = null;
+            m_pretrainedType = PretrainedType.NONE;
             return defaultNet;
         }
 
@@ -112,7 +112,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     public boolean isPretrained() {
-        return m_pretrainedType != null;
+        return m_pretrainedType != PretrainedType.NONE;
     }
 
     protected FineTuneConfiguration getFineTuneConfig(long seed) {
@@ -151,7 +151,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             log.error("Sorry, no pretrained weights are available for this model");
             return false;
         }
-        if (!availableTypes.contains(m_pretrainedType)){
+        if (!availableTypes.contains(m_pretrainedType) && m_pretrainedType != PretrainedType.NONE){
             log.error(String.format("%s weights are not available for this model, " +
                     "please try one of: %s", m_pretrainedType, availableTypes.toString()));
             return false;
@@ -162,6 +162,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     private Set<PretrainedType> getAvailablePretrainedWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         Set<PretrainedType> availableTypes = new HashSet<>();
         for (PretrainedType pretrainedType : PretrainedType.values()) {
+            if (pretrainedType == PretrainedType.NONE)
+                continue;
+
             if (zooModel.pretrainedAvailable(pretrainedType.getBackend())) {
                 availableTypes.add(pretrainedType);
             }
