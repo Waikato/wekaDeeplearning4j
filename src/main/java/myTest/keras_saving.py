@@ -1,22 +1,34 @@
-from keras.applications.resnet50 import ResNet50
-from keras.preprocessing import image
-from keras import Sequential
-from keras.applications.resnet50 import preprocess_input, decode_predictions
-import numpy as np
+# # from keras.applications.resnet import ResNet152V2 as model_create
+# import keras_applications
+# from keras.models import Sequential
 from os import path
-import keras
+# import keras
 
-save_path = "/home/rhys/Documents/git/wekaDeeplearning4j/src/main/resources/"
 
-this_model = "mobilenetv2"
-vgg_model = keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet')
+save_path = "."
+# model_name = 'effNetB0'
+# keras_model = model_create()
+# print(keras_model.summary())
 # # vgg_model.summary()
-# model = Sequential()
-# for layer in vgg_model.layers:
-#     model.add(layer)
+# # model = Sequential()
 
-# model.compile(loss='categorical_crossentropy',optimizer='sgd', metrics=['accuracy'])
+# # for layer in vgg_model.layers:
+# #     model.add(layer)
 
-vgg_model.save(path.join(save_path, this_model + ".h5"))
-with open(path.join(save_path, this_model + ".json"), mode='w') as f:
-    f.write(vgg_model.to_json())
+# print("Finished loading in")
+# # print(model.input)
+# # print(model.summary())
+
+# keras_model.save(path.join(save_path, model_name + ".h5"))
+# # with open(path.join(save_path, this_model + ".json"), mode='w') as f:
+#     # f.write(vgg_model.to_json())
+
+# NOTE: org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException: Model configuration attribute missing from
+
+import efficientnet.keras as efn 
+
+model = efn.EfficientNetB0(weights='imagenet')
+model_name = 'efficientnet-b0'
+
+# model.save(path.join(save_path, model_name + ".h5"))
+print(model.summary())
