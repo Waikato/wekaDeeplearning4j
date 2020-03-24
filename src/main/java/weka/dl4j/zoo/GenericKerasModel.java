@@ -21,8 +21,11 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModel;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
+import org.deeplearning4j.nn.modelimport.keras.KerasSequentialModel;
+import org.deeplearning4j.nn.modelimport.keras.utils.KerasModelBuilder;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import weka.core.OptionMetadata;
+import weka.dl4j.PretrainedType;
 
 /**
  *
@@ -31,16 +34,17 @@ import weka.core.OptionMetadata;
  */
 public class GenericKerasModel extends AbstractZooModel {
 
-  private static final long serialVersionUID = 79654176542732L;
+  private static final long serialVersionUID = 549852142732L;
 
-  protected String kerasH5File = "", kerasJsonFile = "";
+  // TODO change to file as in AbstractZooModel
+  protected String kerasH5File = "";
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     try {
-      ComputationGraph model = KerasModelImport.importKerasModelAndWeights(kerasJsonFile, kerasH5File);
-//      return model.toComputationGraph();
-      return model;
+      ComputationGraph computationGraph = KerasModelImport.importKerasModelAndWeights(kerasH5File);
+
+      return finishLoadingKerasModel(computationGraph, seed, numLabels);
     } catch (Exception ex) {
       ex.printStackTrace();
       return null;
