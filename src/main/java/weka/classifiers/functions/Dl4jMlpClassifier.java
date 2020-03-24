@@ -663,9 +663,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
-    if (!config.equals(netConfig)) {
-      setCustomNet();
-    }
+//    if (!config.equals(netConfig)) { Removed: 23/3 - Rhys Compton
+//      setCustomNet();
+//    }
     netConfig = config;
   }
 
