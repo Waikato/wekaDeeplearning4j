@@ -63,18 +63,6 @@ public class GenericKerasModel extends AbstractZooModel {
     this.kerasH5File = kerasH5File;
   }
 
-  @OptionMetadata(
-          displayName = "Keras Config File",
-          description = "Location of the keras config file"
-  )
-  public String getKerasJsonFile() {
-    return kerasJsonFile;
-  }
-
-  public void setKerasJsonFile(String kerasJsonFile) {
-    this.kerasJsonFile = kerasJsonFile;
-  }
-
   @Override
   public int[][] getShape() {
     int[][] shape = new int[1][];
