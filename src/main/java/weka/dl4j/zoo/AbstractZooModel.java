@@ -187,6 +187,22 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         this.m_featureExtractionLayer = m_featureExtractionLayer;
     }
 
+    public String getOutputLayer() {
+        return m_outputLayer;
+    }
+
+    public void setOutputLayer(String m_outputLayer) {
+        this.m_outputLayer = m_outputLayer;
+    }
+
+    public int getNumFExtractOutputs() {
+        return m_numFExtractOutputs;
+    }
+
+    public void setNumFExtractOutputs(int m_numFExtractOutputs) {
+        this.m_numFExtractOutputs = m_numFExtractOutputs;
+    }
+
     @OptionMetadata(
             description =
                     "Pretrained Weights (LINE_GRADIENT_DESCENT,"
