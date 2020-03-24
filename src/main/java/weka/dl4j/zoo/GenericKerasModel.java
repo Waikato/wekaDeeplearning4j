@@ -44,7 +44,7 @@ public class GenericKerasModel extends AbstractZooModel {
     try {
       ComputationGraph computationGraph = KerasModelImport.importKerasModelAndWeights(kerasH5File);
 
-      return finishLoadingKerasModel(computationGraph, seed, numLabels);
+      return addFinalOutputLayer(computationGraph, seed, numLabels);
     } catch (Exception ex) {
       ex.printStackTrace();
       return null;

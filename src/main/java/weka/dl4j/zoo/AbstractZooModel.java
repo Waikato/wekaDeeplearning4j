@@ -91,22 +91,30 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
         System.out.println(pretrainedModel.summary());
 
+        return addFinalOutputLayer(pretrainedModel);
+    }
+
+    protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph, long seed, int numLabels) {
+        this.seed = seed;
+        this.numLabels = numLabels;
+        return addFinalOutputLayer(computationGraph);
+    }
+
+    protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph) {
         try {
-            TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(pretrainedModel)
-                    .fineTuneConfiguration(getFineTuneConfig(seed))
+            TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
+                    .fineTuneConfiguration(getFineTuneConfig())
                     .removeVertexKeepConnections(m_outputLayer)
-                    .addLayer(m_predictionLayerName, createOutputLayer(numLabels), m_featureExtractionLayer)
+                    .addLayer(m_predictionLayerName, createOutputLayer(), m_featureExtractionLayer)
                     .setOutputs(m_predictionLayerName);
 
-            ComputationGraph finalOne = removeExtraConnections(graphBuilder).build();
-            System.out.println(finalOne.summary());
-            // Finally, create the transfer learning graph
-            return finalOne;
+            return removeExtraConnections(graphBuilder).build();
         } catch (Exception ex) {
             ex.printStackTrace();
-            log.error(pretrainedModel.summary());
-            return defaultNet;
+            log.error(computationGraph.summary());
+            return computationGraph;
         }
+
     }
 
     private TransferLearning.GraphBuilder removeExtraConnections(TransferLearning.GraphBuilder builder) {
