@@ -46,6 +46,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected int m_numFExtractOutputs;
 
+    private long seed, numLabels;
+
     /**
      * Initialize the ZooModel as MLP
      *
@@ -68,6 +70,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                                                  ComputationGraph defaultNet,
                                                  long seed,
                                                  int numLabels) {
+
+        this.seed = seed;
+        this.numLabels = numLabels;
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == PretrainedType.NONE)
@@ -115,7 +120,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return m_pretrainedType != PretrainedType.NONE;
     }
 
-    protected FineTuneConfiguration getFineTuneConfig(long seed) {
+    protected FineTuneConfiguration getFineTuneConfig() {
         return new FineTuneConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .updater(new Nesterovs(5e-5))
@@ -138,7 +143,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         }
     }
 
-    protected OutputLayer createOutputLayer(int numLabels) {
+    protected OutputLayer createOutputLayer() {
         return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                 .nIn(m_numFExtractOutputs).nOut(numLabels)
                 .weightInit(new NormalDistribution(0, 0.2 * (2.0 / (4096 + numLabels)))) //This weight init dist gave better results than Xavier
