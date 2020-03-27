@@ -42,7 +42,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "predictions";
 
-    protected String[] m_extraLayersToRemove;
+    protected String[] m_extraLayersToRemove = new String[0];
 
     protected int m_numFExtractOutputs;
 
@@ -89,8 +89,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         if (pretrainedModel == null)
             return defaultNet;
 
-        System.out.println(pretrainedModel.summary());
-
         return addFinalOutputLayer(pretrainedModel);
     }
 
@@ -108,7 +106,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                     .addLayer(m_predictionLayerName, createOutputLayer(), m_featureExtractionLayer)
                     .setOutputs(m_predictionLayerName);
 
-            return removeExtraConnections(graphBuilder).build();
+//            return removeExtraConnections(graphBuilder).build();
+            return graphBuilder.build();
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error(computationGraph.summary());
@@ -136,10 +135,10 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .build();
     }
 
-    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel net) {
+    protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
-            Object pretrained = net.initPretrained(m_pretrainedType.getBackend());
+            Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
             if (pretrained instanceof MultiLayerNetwork) {
                 return ((MultiLayerNetwork) pretrained).toComputationGraph();
             } else {
@@ -197,15 +196,15 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     public void setFeatureExtractionLayer(String featureExtractionLayer) {
-        this.m_featureExtractionLayer = m_featureExtractionLayer;
+        this.m_featureExtractionLayer = featureExtractionLayer;
     }
 
     public String getOutputLayer() {
         return m_outputLayer;
     }
 
-    public void setOutputLayer(String m_outputLayer) {
-        this.m_outputLayer = m_outputLayer;
+    public void setOutputLayer(String outputLayer) {
+        this.m_outputLayer = outputLayer;
     }
 
     public int getNumFExtractOutputs() {
