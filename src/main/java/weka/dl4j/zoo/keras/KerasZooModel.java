@@ -24,7 +24,7 @@ public abstract class KerasZooModel extends ZooModel {
 
     protected int[] inputShape;
 
-    public abstract String modelName();
+    public abstract String modelFamily();
 
     public abstract String modelPrettyName();
 
@@ -66,7 +66,7 @@ public abstract class KerasZooModel extends ZooModel {
 
         String localFilename = modelPrettyName() + ".h5";
 
-        File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelName());
+        File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelFamily());
         File cachedFile = new File(rootCacheDir, localFilename);
 
         if (!cachedFile.exists()) {

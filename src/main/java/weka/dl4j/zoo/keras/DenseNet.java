@@ -11,8 +11,6 @@ public class DenseNet extends KerasZooModel {
 
     protected VARIATION m_variation = VARIATION.DENSENET121;
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
     public DenseNet() {
         setVariation(VARIATION.DENSENET121);
     }
@@ -23,7 +21,7 @@ public class DenseNet extends KerasZooModel {
     }
 
     @Override
-    public String modelName() {
+    public String modelFamily() {
         return "keras_densenet";
     }
 
@@ -39,10 +37,5 @@ public class DenseNet extends KerasZooModel {
             default:
                 return null;
         }
-    }
-
-    @Override
-    public ModelMetaData metaData() {
-        return null;
     }
 }
