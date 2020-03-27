@@ -28,12 +28,17 @@ public class KerasDenseNet extends AbstractZooModel {
 
     @Override
     public void setPretrainedType(PretrainedType pretrainedType) {
-        if (variation == DenseNet.VARIATION.DENSENET121)
-            setPretrainedType(pretrainedType, 1024, "avg_pool", "fc1000");
-        else if (variation == DenseNet.VARIATION.DENSENET169)
-            setPretrainedType(pretrainedType, 1664, "avg_pool", "fc1000");
-        else
-            setPretrainedType(pretrainedType, 1920, "avg_pool", "fc1000");
+        int numFExtractOutputs = -1;
+        switch (variation) {
+            case DENSENET121:
+                numFExtractOutputs = 1024;
+            case DENSENET169:
+                numFExtractOutputs = 1664;
+            case DENSENET201:
+                numFExtractOutputs = 1920;
+        }
+
+        setPretrainedType(pretrainedType, numFExtractOutputs, "avg_pool", "fc1000");
     }
 
     @Override
