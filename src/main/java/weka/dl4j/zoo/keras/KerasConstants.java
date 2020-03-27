@@ -44,7 +44,12 @@ public class KerasConstants {
         checksums.put("EfficientNetB6", 3557280118L);
         checksums.put("EfficientNetB7", 1866748858L);
 
-        
+        // #################
+        // InceptionResNetV2
+        // #################
+        locations.put("InceptionResNetV2", "https://drive.google.com/uc?export=download&id=1pXfR8UQnDjvEE5QVg6RDAkwtQ9nHH0cx");
+        checksums.put("InceptionResNetV2", 0L);
+
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
