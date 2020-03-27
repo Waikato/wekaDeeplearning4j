@@ -1,34 +1,53 @@
-# # from keras.applications.resnet import ResNet152V2 as model_create
-# import keras_applications
-# from keras.models import Sequential
 from os import path
-# import keras
-
-
+import efficientnet.keras as efn
+import keras
+import efficientnet
+from multiprocessing.pool import ThreadPool
 save_path = "."
-# model_name = 'effNetB0'
-# keras_model = model_create()
-# print(keras_model.summary())
-# # vgg_model.summary()
-# # model = Sequential()
 
-# # for layer in vgg_model.layers:
-# #     model.add(layer)
+models = [
+    (keras.applications.xception.Xception, 'Xception'),
+    (keras.applications.vgg16.VGG16, 'VGG16'),
+    (keras.applications.vgg19.VGG19, 'VGG19'),
+    (keras.applications.resnet.ResNet50, 'ResNet50'),
+    (keras.applications.resnet.ResNet101, 'ResNet101'),
+    (keras.applications.resnet.ResNet152, 'ResNet152'),
+    (keras.applications.resnet_v2.ResNet50V2, 'ResNet50V2'),
+    (keras.applications.resnet_v2.ResNet101V2, 'ResNet101V2'),
+    (keras.applications.resnet_v2.ResNet152V2, 'ResNet152V2'),
+    (keras.applications.inception_v3.InceptionV3, 'InceptionV3'),
+    (keras.applications.inception_resnet_v2.InceptionResNetV2, 'InceptionResNetV2'),
+    (keras.applications.mobilenet.MobileNet, 'MobileNet'),
+    (keras.applications.mobilenet_v2.MobileNetV2, 'MobileNetV2'),
+    (keras.applications.densenet.DenseNet121, 'DenseNet121'),
+    (keras.applications.densenet.DenseNet169, 'DenseNet169'),
+    (keras.applications.densenet.DenseNet201, 'DenseNet201'),
+    (keras.applications.nasnet.NASNetLarge, 'NASNetLarge'),
+    (keras.applications.nasnet.NASNetMobile, 'NASNetMobile'),
+    (efn.EfficientNetB0, 'EfficientNetB0'),
+    (efn.EfficientNetB1, 'EfficientNetB1'),
+    (efn.EfficientNetB2, 'EfficientNetB2'),
+    (efn.EfficientNetB3, 'EfficientNetB3'),
+    (efn.EfficientNetB4, 'EfficientNetB4'),
+    (efn.EfficientNetB5, 'EfficientNetB5'),
+    (efn.EfficientNetB6, 'EfficientNetB6'),
+    (efn.EfficientNetB7, 'EfficientNetB7'),
+]
 
-# print("Finished loading in")
-# # print(model.input)
-# # print(model.summary())
+def download_and_save_model(model_def):
+    model_fn = model_def[0]
+    model_name = model_def[1]
 
-# keras_model.save(path.join(save_path, model_name + ".h5"))
-# # with open(path.join(save_path, this_model + ".json"), mode='w') as f:
-#     # f.write(vgg_model.to_json())
+    keras_model = model_fn()
 
-# NOTE: org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException: Model configuration attribute missing from
+    with open(path.join(save_path, model_name + ".txt"), mode='w') as fh:
+        keras_model.summary(print_fn=lambda x: fh.write(x + '\n'))
 
-import efficientnet.keras as efn 
+    keras_model.save(path.join(save_path, model_name + ".h5"))
 
-model = efn.EfficientNetB0(weights='imagenet')
-model_name = 'efficientnet-b0'
+    return model_name
 
-# model.save(path.join(save_path, model_name + ".h5"))
-print(model.summary())
+results = ThreadPool(8).imap_unordered(download_and_save_model, models)
+
+for name in results:
+    print("\n\n", name, "saved\n\n")
