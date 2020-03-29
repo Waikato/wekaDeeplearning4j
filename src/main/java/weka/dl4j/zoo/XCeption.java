@@ -31,8 +31,6 @@ import weka.dl4j.PretrainedType;
  */
 public class XCeption extends AbstractZooModel {
 
-  // TODO get pretrained working
-
   private static final long serialVersionUID = -4452023767749633607L;
 
   public XCeption() {
@@ -41,7 +39,7 @@ public class XCeption extends AbstractZooModel {
 
   @Override
   public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 2048, "avg_pool", "predictions");
+    setPretrainedType(pretrainedType, 1000, "predictions", "");
   }
 
   @Override
