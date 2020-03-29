@@ -1,25 +1,17 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
-import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
-import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -40,7 +32,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected final Logger log = LoggerFactory.getLogger(AbstractZooModel.class);
 
-    protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "predictions";
+    protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "weka_predictions";
 
     protected String[] m_extraLayersToRemove = new String[0];
 
@@ -65,6 +57,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @return Input shape of this zoomodel
      */
     public abstract int[][] getShape();
+
+    public void setVariation(Enum var) {}
 
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
@@ -102,11 +96,17 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         try {
             TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
                     .fineTuneConfiguration(getFineTuneConfig())
-                    .removeVertexKeepConnections(m_outputLayer)
                     .addLayer(m_predictionLayerName, createOutputLayer(), m_featureExtractionLayer)
                     .setOutputs(m_predictionLayerName);
 
-//            return removeExtraConnections(graphBuilder).build();
+            // Remove the old output layer, but keep the connections
+            graphBuilder.removeVertexKeepConnections(m_outputLayer);
+            // Remove any layers we don't want
+            for (String layer : m_extraLayersToRemove) {
+                graphBuilder.removeVertexAndConnections(layer);
+            }
+
+            System.out.println(graphBuilder.build().summary());
             return graphBuilder.build();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -114,13 +114,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             return computationGraph;
         }
 
-    }
-
-    private TransferLearning.GraphBuilder removeExtraConnections(TransferLearning.GraphBuilder builder) {
-        for (String layer : m_extraLayersToRemove) {
-            builder = builder.removeVertexAndConnections(layer);
-        }
-        return builder;
     }
 
     public boolean isPretrained() {
