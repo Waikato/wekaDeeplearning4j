@@ -23,16 +23,8 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Enumeration;
 
-import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
-import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.ResNet50;

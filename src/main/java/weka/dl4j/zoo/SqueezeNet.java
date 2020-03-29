@@ -31,8 +31,6 @@ import weka.dl4j.PretrainedType;
  */
 public class SqueezeNet extends AbstractZooModel {
 
-    // TODO get pretrained working
-
     private static final long serialVersionUID = -5206943146661L;
 
     public SqueezeNet() {
