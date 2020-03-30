@@ -29,11 +29,11 @@ import weka.dl4j.PretrainedType;
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class XCeption extends AbstractZooModel {
+public class Xception extends AbstractZooModel {
 
   private static final long serialVersionUID = -4452023767749633607L;
 
-  public XCeption() {
+  public Xception() {
     setPretrainedType(PretrainedType.IMAGENET);
   }
 
