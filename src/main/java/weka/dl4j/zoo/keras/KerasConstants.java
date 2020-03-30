@@ -95,6 +95,13 @@ public class KerasConstants {
         locations.put("VGG19", "https://drive.google.com/uc?export=download&id=1MHSUfWyhMzj3oId49aJTXGj5WRJS8Qb5");
         checksums.put("VGG16", 1055892086L);
         checksums.put("VGG19", 1129296369L);
+
+        // ########
+        // Xception
+        // ########
+        locations.put("Xception", "https://drive.google.com/uc?export=download&id=1ZBZYXz6UKeUjtCIfrxoBG7YHhlNisBlq");
+        checksums.put("Xception", 775702932L);
+
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
