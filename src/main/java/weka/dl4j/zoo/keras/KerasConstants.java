@@ -87,6 +87,14 @@ public class KerasConstants {
         checksums.put("ResNet101V2", 1889483812L);
         checksums.put("ResNet152", 503735698L);
         checksums.put("ResNet152V2", 4255384576L);
+
+        // ###
+        // VGG
+        // ###
+        locations.put("VGG16", "https://drive.google.com/uc?export=download&id=1tJ5OfX4lCGeJYEwll_VYzGfiCwDGmRid");
+        locations.put("VGG19", "https://drive.google.com/uc?export=download&id=1MHSUfWyhMzj3oId49aJTXGj5WRJS8Qb5");
+        checksums.put("VGG16", 1055892086L);
+        checksums.put("VGG19", 1129296369L);
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
