@@ -1,17 +1,13 @@
 package myTest;
 
-import org.nd4j.linalg.io.ClassPathResource;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
-import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.listener.EpochListener;
-import weka.dl4j.updater.Adam;
-import weka.dl4j.updater.RmsProp;
-import weka.dl4j.updater.Updater;
 import weka.dl4j.zoo.*;
+import weka.dl4j.zoo.keras.*;
+import weka.dl4j.zoo.keras.NASNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -22,14 +18,17 @@ import java.util.Random;
 class WekaTests {
     public WekaTests() {}
 
-    public void filterTest(String[] args) {
+    public void filterTest(String[] args) throws Exception {
         Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
         ImageInstanceIterator imgIter = new ImageInstanceIterator();
-        imgIter.setImagesLocation(new File("/home/rhys/Downloads/test"));
+        imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         imgIter.setTrainBatchSize(16);
+        imgIter.setNumChannels(3); // TODO auto set for keras model
         myFilter.setImageInstanceIterator(imgIter);
-        AbstractZooModel zooModel = new ResNet50();
-//        zooModel.setPretrainedType(PretrainedType.CIFAR10);
+        KerasNASNet zooModel = new KerasNASNet();
+        zooModel.setVariation(NASNet.VARIATION.LARGE);
+//        zooModel.setPretrainedType(PretrainedType.VGGFACE);
+//        zooModel.setVariation(InceptionResNetV2.VARIATION.STANDARD);
         myFilter.setZooModelType(zooModel);
         Filter.runFilter(myFilter, args);
     }
@@ -57,9 +56,10 @@ class WekaTests {
 //        nnc.setUpdater(updater);
 //        clf.setNeuralNetConfiguration(nnc);
 
-        GenericKerasModel zooModel = new GenericKerasModel();
-        zooModel.setKerasH5File(new ClassPathResource("mobilenetv2.h5").getFile().getPath());
-        zooModel.setKerasJsonFile(new ClassPathResource("mobilenetv2.json").getFile().getPath());
+        ResNet50 zooModel = new ResNet50();
+        zooModel.setPretrainedType(PretrainedType.IMAGENET);
+//        zooModel.setKerasH5File(new ClassPathResource("mobilenetv2.h5").getFile().getPath());
+//        zooModel.setKerasJsonFile(new ClassPathResource("mobilenetv2.json").getFile().getPath());
         clf.setZooModel(zooModel);
 
         Random rand = new Random(0);
@@ -83,6 +83,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
 //        ResnetTest test = new ResnetTest();
 //        test.train();
-        new WekaTests().train(args);
+        new WekaTests().filterTest(args);
     }
 }

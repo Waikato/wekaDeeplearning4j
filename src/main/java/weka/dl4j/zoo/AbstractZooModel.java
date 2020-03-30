@@ -1,5 +1,6 @@
 package weka.dl4j.zoo;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
@@ -58,7 +59,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     public abstract int[][] getShape();
 
-    public void setVariation(Enum var) {}
+    public void setVariation(Enum var) {
+        throw new NotImplementedException();
+    }
 
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
@@ -82,6 +85,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         ComputationGraph pretrainedModel = downloadWeights(zooModel);
         if (pretrainedModel == null)
             return defaultNet;
+
+        System.out.println(pretrainedModel.summary());
 
         return addFinalOutputLayer(pretrainedModel);
     }

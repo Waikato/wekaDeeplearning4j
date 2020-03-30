@@ -19,7 +19,7 @@ public class KerasDenseNet extends AbstractZooModel {
     public DenseNet.VARIATION getVariation() {
         return variation;
     }
-    
+
     public void setVariation(DenseNet.VARIATION var) {
         variation = var;
         // We may need to update the pretrained values based on the new variation
