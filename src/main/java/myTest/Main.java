@@ -8,6 +8,7 @@ import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.*;
 import weka.dl4j.zoo.keras.NASNet;
+import weka.dl4j.zoo.keras.Xception;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -25,10 +26,8 @@ class WekaTests {
         imgIter.setTrainBatchSize(16);
         imgIter.setNumChannels(3); // TODO auto set for keras model
         myFilter.setImageInstanceIterator(imgIter);
-        KerasNASNet zooModel = new KerasNASNet();
-        zooModel.setVariation(NASNet.VARIATION.LARGE);
-//        zooModel.setPretrainedType(PretrainedType.VGGFACE);
-//        zooModel.setVariation(InceptionResNetV2.VARIATION.STANDARD);
+        KerasXception zooModel = new KerasXception();
+        zooModel.setVariation(Xception.VARIATION.STANDARD);
         myFilter.setZooModelType(zooModel);
         Filter.runFilter(myFilter, args);
     }

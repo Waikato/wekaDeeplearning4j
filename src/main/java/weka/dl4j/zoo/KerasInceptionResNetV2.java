@@ -4,6 +4,7 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.InceptionResNetV2;
 
+// TODO write custom lambda layers for block35, block17, block8: https://github.com/keras-team/keras-applications/blob/master/keras_applications/inception_resnet_v2.py#L168
 public class KerasInceptionResNetV2 extends AbstractZooModel {
 //    private static final long serialVersionUID = -947378361661L;
 

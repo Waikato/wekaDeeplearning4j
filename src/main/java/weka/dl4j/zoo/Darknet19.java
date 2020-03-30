@@ -30,6 +30,7 @@ import weka.dl4j.PretrainedType;
  * @author Rhys Compton
  */
 public class Darknet19 extends AbstractZooModel {
+  // TODO check that 448x448 input size works
 
   private static final long serialVersionUID = -52066850554864161L;
 

@@ -36,7 +36,7 @@ public class VGG16 extends AbstractZooModel {
   //            The downloaded zip for these weights is only 10mb vs 513mb for Imagenet
 
   private static final long serialVersionUID = -6728816089752609851L;
-
+  // TODO merge VGG19 and 16 modules
   public VGG16() {
     setPretrainedType(PretrainedType.IMAGENET);
   }
