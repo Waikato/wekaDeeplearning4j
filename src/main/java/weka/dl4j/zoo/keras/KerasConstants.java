@@ -64,6 +64,14 @@ public class KerasConstants {
         checksums.put("MobileNet", 1615806516L);
         checksums.put("MobileNetV2", 1015291493L);
 
+        // ######
+        // NASNet
+        // ######
+        locations.put("NASNetMobile", "https://drive.google.com/uc?export=download&id=1bDkDO-UUvYxZENg5CTwJPAAs1jaGly6z");
+        locations.put("NASNetLarge", "https://drive.google.com/uc?export=download&id=1_lDpE9U9Y7y4_Tqjc-RvACT9Gf372j_z");
+        checksums.put("NASNetMobile", 2888382958L);
+        checksums.put("NASNetLarge", 914859199L);
+
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
