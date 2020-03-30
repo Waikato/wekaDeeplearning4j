@@ -48,7 +48,7 @@ public class KerasConstants {
         // InceptionResNetV2
         // #################
         locations.put("InceptionResNetV2", "https://drive.google.com/uc?export=download&id=1pXfR8UQnDjvEE5QVg6RDAkwtQ9nHH0cx");
-        checksums.put("InceptionResNetV2", 10L);
+        checksums.put("InceptionResNetV2", 2782798852L);
 
         // ###########
         // InceptionV3
