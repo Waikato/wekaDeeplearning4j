@@ -55,6 +55,15 @@ public class KerasConstants {
         // ###########
         locations.put("InceptionV3", "https://drive.google.com/uc?export=download&id=19BxOrIFjUMyu_IQv6AKAufTxdnPIXrQ5");
         checksums.put("InceptionV3", 2734012442L);
+
+        // #########
+        // MobileNet
+        // #########
+        locations.put("MobileNet", "https://drive.google.com/uc?export=download&id=1knZxjDsF6uWSMJNGRrY8eAcRZZyqB8Ar");
+        locations.put("MobileNetV2", "https://drive.google.com/uc?export=download&id=14_YGMGndsbTpcFdmlWw84dwSqHHZIo4a");
+        checksums.put("MobileNet", 1615806516L);
+        checksums.put("MobileNetV2", 1015291493L);
+
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
