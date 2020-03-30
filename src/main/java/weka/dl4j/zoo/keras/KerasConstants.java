@@ -72,6 +72,21 @@ public class KerasConstants {
         checksums.put("NASNetMobile", 2888382958L);
         checksums.put("NASNetLarge", 914859199L);
 
+        // ######
+        // ResNet
+        // ######
+        locations.put("ResNet50", "https://drive.google.com/uc?export=download&id=1VkHHHgWtH0rZf00kajhd46KB08L50yng");
+        locations.put("ResNet50V2", "https://drive.google.com/uc?export=download&id=112HAXAg_FXk6mfwsWrnJ4d1lzZ3aFhgk");
+        locations.put("ResNet101", "https://drive.google.com/uc?export=download&id=1tc-EZvCvddYGDB0RyJVhcHscvWy5dabE");
+        locations.put("ResNet101V2", "https://drive.google.com/uc?export=download&id=1amU0nCXEI79tRF1qH1MTKTiOUPJkHzaB");
+        locations.put("ResNet152", "https://drive.google.com/uc?export=download&id=1j48X1YQBMpozT6LQz0PI_VyCjKmA60DJ");
+        locations.put("ResNet152V2", "https://drive.google.com/uc?export=download&id=1hF42bWVH0qGaTannNJXbMO_NON_rOvBN");
+        checksums.put("ResNet50", 3696145880L);
+        checksums.put("ResNet50V2", 2441552962L);
+        checksums.put("ResNet101", 1250607721L);
+        checksums.put("ResNet101V2", 1889483812L);
+        checksums.put("ResNet152", 503735698L);
+        checksums.put("ResNet152V2", 4255384576L);
         Locations = Collections.unmodifiableMap(locations);
         Checksums = Collections.unmodifiableMap(checksums);
     }
