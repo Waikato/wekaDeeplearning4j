@@ -1245,7 +1245,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     AbstractZooModel tmpZooModel = getZooModel();
     // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
     if (tmpZooModel.isPretrained()) {
-      if (tmpZooModel instanceof LeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+      // Allow using Darknet with input size 448x448
+      if (tmpZooModel instanceof Darknet19 && iii.getHeight() == 448 && iii.getWidth() == 448){
+        log.info("Using Darknet with input size 448x448, not resetting to 224x224");
+      } else if (tmpZooModel instanceof LeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
         iii.setNumChannels(1);
         iii.setHeight(28);
         iii.setWidth(28);
