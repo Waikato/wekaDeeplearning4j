@@ -31,20 +31,28 @@ public class KerasEfficientNet extends AbstractZooModel {
         switch (variation) {
             case EFFICIENTNET_B0:
                 numFExtractOutputs = 1280;
+                break;
             case EFFICIENTNET_B1:
                 numFExtractOutputs = 1280;
+                break;
             case EFFICIENTNET_B2:
                 numFExtractOutputs = 1408;
+                break;
             case EFFICIENTNET_B3:
                 numFExtractOutputs = 1536;
+                break;
             case EFFICIENTNET_B4:
                 numFExtractOutputs = 1792;
+                break;
             case EFFICIENTNET_B5:
                 numFExtractOutputs = 2048;
+                break;
             case EFFICIENTNET_B6:
                 numFExtractOutputs = 2304;
+                break;
             case EFFICIENTNET_B7:
                 numFExtractOutputs = 2560;
+                break;
         }
 
         setPretrainedType(pretrainedType, numFExtractOutputs, "top_dropout", "probs");

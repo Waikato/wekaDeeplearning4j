@@ -31,7 +31,7 @@ public class KerasNASNet extends AbstractZooModel {
         switch (variation) {
             case MOBILE:
                 numFExtractOutputs = 1056;
-                break; //TODO ensure all cases have breaks
+                break;
             case LARGE:
                 numFExtractOutputs = 4032;
                 break;

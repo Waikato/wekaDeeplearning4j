@@ -30,8 +30,10 @@ public class KerasMobileNet extends AbstractZooModel {
         switch (variation) {
             case V1:
                 setPretrainedType(pretrainedType, 1000, "reshape_2", "act_softmax");
+                break;
             case V2:
                 setPretrainedType(pretrainedType, 1280, "global_average_pooling2d_1", "Logits");
+                break;
         }
     }
 

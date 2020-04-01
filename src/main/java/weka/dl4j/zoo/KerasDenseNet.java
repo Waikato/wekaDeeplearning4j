@@ -32,10 +32,13 @@ public class KerasDenseNet extends AbstractZooModel {
         switch (variation) {
             case DENSENET121:
                 numFExtractOutputs = 1024;
+                break;
             case DENSENET169:
                 numFExtractOutputs = 1664;
+                break;
             case DENSENET201:
                 numFExtractOutputs = 1920;
+                break;
         }
 
         setPretrainedType(pretrainedType, numFExtractOutputs, "avg_pool", "fc1000");

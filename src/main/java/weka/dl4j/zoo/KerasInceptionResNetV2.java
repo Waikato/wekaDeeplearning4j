@@ -31,6 +31,7 @@ public class KerasInceptionResNetV2 extends AbstractZooModel {
         switch (variation) {
             case STANDARD:
                 numFExtractOutputs = 1536;
+                break;
         }
 
         setPretrainedType(pretrainedType, numFExtractOutputs, "avg_pool", "predictions");
