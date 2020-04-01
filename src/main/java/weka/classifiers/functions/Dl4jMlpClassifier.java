@@ -1248,6 +1248,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       // Allow using Darknet with input size 448x448
       if (tmpZooModel instanceof Darknet19 && iii.getHeight() == 448 && iii.getWidth() == 448){
         log.info("Using Darknet with input size 448x448, not resetting to 224x224");
+        // Ensure we're using 3 channels, won't work otherwise
+        iii.setNumChannels(3);
       } else if (tmpZooModel instanceof LeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
         iii.setNumChannels(1);
         iii.setHeight(28);
