@@ -5,7 +5,7 @@ public class InceptionResNetV2 extends KerasZooModel {
         STANDARD
     };
 
-    public static int[] inputShape = new int[] {3, 299, 299}; //TODO ensure that ImageInstanceIterator adheres to this
+    public static int[] inputShape = new int[] {3, 299, 299};
 
     protected VARIATION m_variation = VARIATION.STANDARD;
 

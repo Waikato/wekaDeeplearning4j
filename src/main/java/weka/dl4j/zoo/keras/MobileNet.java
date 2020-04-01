@@ -1,7 +1,5 @@
 package weka.dl4j.zoo.keras;
 
-// TODO check all models download properly
-
 public class MobileNet extends KerasZooModel {
     public enum VARIATION {
         V1,

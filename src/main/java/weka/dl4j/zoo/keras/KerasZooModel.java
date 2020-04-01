@@ -86,8 +86,7 @@ public abstract class KerasZooModel extends ZooModel {
 
             if (expectedChecksum != localChecksum) {
                 log.error("Checksums do not match. Cleaning up files and failing...");
-                System.exit(0);
-//                cachedFile.delete(); TODO remove later
+                cachedFile.delete();
                 throw new IllegalStateException(
                         "Pretrained model file failed checksum. If this error persists, please open an issue at https://github.com/deeplearning4j/deeplearning4j.");
             }
