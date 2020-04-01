@@ -86,8 +86,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         if (pretrainedModel == null)
             return defaultNet;
 
-        System.out.println(pretrainedModel.summary());
-
         return addFinalOutputLayer(pretrainedModel);
     }
 
@@ -111,6 +109,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 graphBuilder.removeVertexAndConnections(layer);
             }
 
+            System.out.println(computationGraph.summary());
             System.out.println(graphBuilder.build().summary());
             return graphBuilder.build();
         } catch (Exception ex) {
@@ -185,9 +184,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     @OptionMetadata(
             description = "The name of the feature extraction layer in the model.",
             displayName = "Feature extraction layer",
-            commandLineParamName = "extrac",
-            commandLineParamSynopsis = "-extrac <String>",
-            displayOrder = 0
+            commandLineParamName = "layer-features",
+            commandLineParamSynopsis = "-layer-features <String>"
     )
     public String getFeatureExtractionLayer() {
         return m_featureExtractionLayer;
@@ -197,6 +195,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         this.m_featureExtractionLayer = featureExtractionLayer;
     }
 
+    @OptionMetadata(
+            description = "The name of the output layer in the model.",
+            displayName = "Output layer",
+            commandLineParamName = "layer-output",
+            commandLineParamSynopsis = "-layer-output <String>"
+    )
     public String getOutputLayer() {
         return m_outputLayer;
     }
@@ -205,6 +209,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         this.m_outputLayer = outputLayer;
     }
 
+    @OptionMetadata(
+            description = "Number of feature extraction layer output nodes",
+            displayName = "Num feature extract outputs",
+            commandLineParamName = "layer-feature-outputs",
+            commandLineParamSynopsis = "-layer-feature-outputs <int>"
+    )
     public int getNumFExtractOutputs() {
         return m_numFExtractOutputs;
     }
@@ -214,14 +224,10 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     @OptionMetadata(
-            description =
-                    "Pretrained Weights (LINE_GRADIENT_DESCENT,"
-                            + " CONJUGATE_GRADIENT, HESSIAN_FREE, "
-                            + "LBFGS, STOCHASTIC_GRADIENT_DESCENT)",
+            description = "Pretrained Type (IMAGENET, VGGFACE, IMAGENET LARGE, MNIST)",
             displayName = "Pretrained Type",
             commandLineParamName = "pretrained",
-            commandLineParamSynopsis = "-pretrained <string>",
-            displayOrder = 1
+            commandLineParamSynopsis = "-pretrained <string>"
     )
     public PretrainedType getPretrainedType() {
         return m_pretrainedType;
