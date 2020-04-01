@@ -25,7 +25,10 @@ import org.deeplearning4j.nn.modelimport.keras.KerasSequentialModel;
 import org.deeplearning4j.nn.modelimport.keras.utils.KerasModelBuilder;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import weka.core.OptionMetadata;
+import weka.core.WekaPackageManager;
 import weka.dl4j.PretrainedType;
+
+import java.io.File;
 
 /**
  *
@@ -36,13 +39,12 @@ public class GenericKerasModel extends AbstractZooModel {
 
   private static final long serialVersionUID = 549852142732L;
 
-  // TODO change to file as in AbstractZooModel
-  protected String kerasH5File = "";
+  protected File kerasH5File = new File(WekaPackageManager.getPackageHome().toURI());
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape) {
     try {
-      ComputationGraph computationGraph = KerasModelImport.importKerasModelAndWeights(kerasH5File);
+      ComputationGraph computationGraph = KerasModelImport.importKerasModelAndWeights(kerasH5File.getPath());
 
       return addFinalOutputLayer(computationGraph, seed, numLabels);
     } catch (Exception ex) {
@@ -52,15 +54,18 @@ public class GenericKerasModel extends AbstractZooModel {
   }
 
   @OptionMetadata(
-          displayName = "Keras Model File",
-          description = "Location of the keras model weights"
+          description = "The trained Keras model file.",
+          displayName = "Keras H5 file",
+          commandLineParamName = "model",
+          commandLineParamSynopsis = "-model <File>",
+          displayOrder = 1
   )
-  public String getKerasH5File() {
+  public File getKerasH5File() {
     return kerasH5File;
   }
 
-  public void setKerasH5File(String kerasH5File) {
-    this.kerasH5File = kerasH5File;
+  public void setKerasH5File(File modelPath) {
+    this.kerasH5File = modelPath;
   }
 
   @Override
