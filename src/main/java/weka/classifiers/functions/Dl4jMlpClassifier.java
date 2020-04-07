@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.flatbuffers.FlatBufferBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
@@ -1850,12 +1852,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @param layerName Layer name to get the activations from
    * @return Activations in form of instances
    */
-  public Instances getActivationsAtLayer(String layerName, Instances input, boolean isZooModel)
+  public Instances getActivationsAtLayer(String layerName, Instances input, boolean isZooModel, boolean pool)
       throws Exception {
     DataSetIterator iter = getDataSetIterator(input);
     iter.reset();
     DataSet next;
     INDArray result = null;
+//    layerName = "conv2_block1_0_conv";
     TransferLearningHelper transferLearningHelper = null;
     if (isZooModel) {
       transferLearningHelper = new TransferLearningHelper(getModel(), layerName);

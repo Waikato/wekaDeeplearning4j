@@ -68,6 +68,8 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
    */
   protected boolean useZooModel = true;
 
+  protected boolean poolActivations = false;
+
   protected Dl4jMlpClassifier model;
 
   /**
@@ -184,13 +186,13 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
     loadModel(inputFormat);
-    return model.getActivationsAtLayer(transformationLayerName, inputFormat, useZooModel);
+    return model.getActivationsAtLayer(transformationLayerName, inputFormat, useZooModel, poolActivations);
   }
 
 
   @Override
   protected Instances process(Instances instances) throws Exception {
-    return model.getActivationsAtLayer(transformationLayerName, instances, useZooModel);
+    return model.getActivationsAtLayer(transformationLayerName, instances, useZooModel, poolActivations);
   }
 
 
