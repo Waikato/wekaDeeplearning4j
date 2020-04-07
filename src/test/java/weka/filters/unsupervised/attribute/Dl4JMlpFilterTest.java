@@ -71,9 +71,9 @@ public class Dl4JMlpFilterTest {
     String clfPath = Paths.get(tmpDir, "dl4j-mlp-clf.ser").toString();
     saveClf(clfPath, clf);
 
-    checkLayer(clf, iris, dl1.getLayerName(), clfPath);
-    checkLayer(clf, iris, dl2.getLayerName(), clfPath);
-    checkLayer(clf, iris, dl3.getLayerName(), clfPath);
+    checkLayer(clf, iris, dl1.getLayerName(), clfPath, false);
+    checkLayer(clf, iris, dl2.getLayerName(), clfPath, false);
+    checkLayer(clf, iris, dl3.getLayerName(), clfPath, false);
 
     Files.delete(Paths.get(clfPath));
   }
@@ -107,17 +107,18 @@ public class Dl4JMlpFilterTest {
     saveClf(clfPath, clf);
 
     for (Layer layer : layers) {
-      checkLayer(clf, dataMnist, layer.getLayerName(), clfPath);
+      checkLayer(clf, dataMnist, layer.getLayerName(), clfPath, false);
     }
   }
 
   protected void checkLayer(Dl4jMlpClassifier clf, Instances iris, String transformationLayerName,
-      String clfPath) throws Exception {
+      String clfPath, boolean useZooModel) throws Exception {
     Instances activationsExpected = clf.getActivationsAtLayer(transformationLayerName, iris);
     Dl4jMlpFilter filter = new Dl4jMlpFilter();
     filter.setSerializedModelFile(new File(clfPath));
     filter.setTransformationLayerName(transformationLayerName);
     filter.setInputFormat(iris);
+    filter.setUseZooModel(useZooModel);
 
     Instances activationsActual = Filter.useFilter(iris, filter);
 
