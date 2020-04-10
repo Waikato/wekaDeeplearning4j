@@ -1,8 +1,10 @@
 package weka.dl4j.zoo;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.NotImplementedException;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -11,8 +13,6 @@ import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -25,13 +25,12 @@ import java.util.*;
  *
  * @author Rhys Compton
  */
+@Log4j2
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
 
     private org.deeplearning4j.zoo.ZooModel m_zooModelType;
-
-    protected final Logger log = LoggerFactory.getLogger(AbstractZooModel.class);
 
     protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "weka_predictions";
 
@@ -117,7 +116,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 graphBuilder.removeVertexAndConnections(layer);
             }
 
-            System.out.println(computationGraph.summary());
             System.out.println(graphBuilder.build().summary());
             return graphBuilder.build();
         } catch (Exception ex) {
