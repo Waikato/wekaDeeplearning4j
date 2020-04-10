@@ -1811,8 +1811,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) {
-    ComputationGraph tmpGraph = model.clone();
-    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(tmpGraph, layerName);
+    // TransferLearningHelper alters cmp graph in place so we need to clone it
+    ComputationGraph clonedGraph = model.clone();
+    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
     boolean checkedReshaping = false;
     String initShape = "", reshapedShape = "";
     iter.reset();
