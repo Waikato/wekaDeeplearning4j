@@ -168,7 +168,25 @@ public class Utils {
   }
 
   public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
-    return ndArrayToInstances(ndArray, null);
+    return ndArrayToInstances(ndArray, null, null);
+  }
+
+  public static String getAttributeName(Map<String, Long> attributesPerLayer, int i) {
+    if (attributesPerLayer == null) {
+      return "transformedAttribute" + i;
+    }
+
+    int layerSum = 0;
+    for (Map.Entry<String, Long> entry : attributesPerLayer.entrySet()) {
+      long numAttributesForLayer = entry.getValue();
+      if (layerSum + numAttributesForLayer > i) {
+        return String.format("%s%d", entry.getKey(), i - layerSum);
+      }
+      layerSum += numAttributesForLayer;
+    }
+
+
+    return null;
   }
 
   /**
@@ -201,7 +219,7 @@ public class Utils {
         else
           atts.add(new Attribute(inputFormat.classAttribute().name()));
       } else {
-        atts.add(new Attribute("transformedAttribute" + i));
+        atts.add(new Attribute(getAttributeName(attributesPerLayer, i)));
       }
     }
 
