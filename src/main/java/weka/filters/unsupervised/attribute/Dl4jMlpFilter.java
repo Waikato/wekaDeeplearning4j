@@ -25,6 +25,7 @@ import java.util.Enumeration;
 
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
+import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.ResNet50;
@@ -68,7 +69,15 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
    */
   protected boolean useZooModel = true;
 
-  protected boolean poolActivations = false;
+  public PoolingType getPoolingType() {
+    return poolingType;
+  }
+
+  public void setPoolingType(PoolingType poolingType) {
+    this.poolingType = poolingType;
+  }
+
+  protected PoolingType poolingType = PoolingType.NONE;
 
   protected Dl4jMlpClassifier model;
 
@@ -187,13 +196,14 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
     loadModel(inputFormat);
-    return model.getActivationsAtLayer(transformationLayerName, inputFormat, useZooModel, poolActivations);
+//    poolActivations = true;
+    return model.getActivationsAtLayer(transformationLayerName, inputFormat, poolingType);
   }
 
 
   @Override
   protected Instances process(Instances instances) throws Exception {
-    return model.getActivationsAtLayer(transformationLayerName, instances, useZooModel, poolActivations);
+    return model.getActivationsAtLayer(transformationLayerName, instances, poolingType);
   }
 
 
