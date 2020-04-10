@@ -107,7 +107,9 @@ public class Dl4JMlpFilterTest {
     saveClf(clfPath, clf);
 
     for (Layer layer : layers) {
-      checkLayer(clf, dataMnist, layer.getLayerName(), clfPath, false);
+      // Can't freeze output layer so we don't check this
+      if (!(layer instanceof OutputLayer))
+        checkLayer(clf, dataMnist, layer.getLayerName(), clfPath, false);
     }
   }
 
