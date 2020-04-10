@@ -121,6 +121,6 @@ public class ZooModelTest {
    */
   @Test(expected = UnsupportedOperationException.class)
   public void testCustomNetInit() throws OperationNotSupportedException {
-    new CustomNet().init(0, 0, null);
+    new CustomNet().init(0, 0, null, false);
   }
 }
