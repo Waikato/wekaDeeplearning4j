@@ -26,6 +26,7 @@ import java.util.Arrays;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -39,6 +40,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
+import weka.dl4j.PoolingType;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -301,6 +303,65 @@ public class Utils {
     } finally {
       // Switch back to the old loader
       Thread.currentThread().setContextClassLoader(origLoader);
+    }
+  }
+
+
+  public static boolean needsReshaping(INDArray activationAtLayer) {
+    return activationAtLayer.shape().length != 2;
+  }
+
+  public static float poolNDArray(INDArray array, PoolingType poolingType) {
+    if (poolingType == PoolingType.MAX) {
+      return array.maxNumber().floatValue();
+    } else if (poolingType == PoolingType.AVG) {
+      return array.meanNumber().floatValue();
+    } else if (poolingType == PoolingType.SUM) {
+      return  array.sumNumber().floatValue();
+    } else if (poolingType == PoolingType.MIN) {
+      return array.minNumber().floatValue();
+    } else {
+      throw new IllegalArgumentException(String.format("Pooling type %s not supported", poolingType));
+    }
+  }
+
+  public static INDArray reshapeActivations(INDArray activationAtLayer, PoolingType poolingType) {
+    long[] resultShape = activationAtLayer.shape();
+
+    if (poolingType == PoolingType.NONE) {
+      int extraDimension = (int) (resultShape[1] * resultShape[2] * resultShape[3]);
+      return activationAtLayer.reshape(new int[] {(int) resultShape[0], extraDimension});
+    } else {
+      float[][] pooledBatch = new float[(int) resultShape[0]][(int) resultShape[1]];
+
+      for (int batchItem = 0; batchItem < pooledBatch.length; batchItem++) {
+        // 3D array e.g. shape = [512, 64, 64]
+        INDArray itemActivations = activationAtLayer.get(NDArrayIndex.point(batchItem));
+        for (int activationI = 0; activationI < resultShape[1]; activationI++) {
+          // 2D array e.g. shape = [64, 64]
+          INDArray attributeActivations = itemActivations.get(NDArrayIndex.point(activationI));
+          pooledBatch[batchItem][activationI] = poolNDArray(attributeActivations, poolingType);
+        }
+      }
+
+      return new NDArray(pooledBatch);
+    }
+  }
+
+  public static INDArray appendClasses(INDArray result, Instances input) {
+    NDArray classes = (NDArray) Nd4j.zeros(result.shape()[0], 1);
+    for (int i = 0; i < classes.length(); i++) {
+      Instance inst = input.instance(i);
+      classes.putScalar(i, inst.classValue());
+    }
+    return Nd4j.concat(1, result, classes);
+  }
+
+  public static Instances convertToInstances(INDArray result, Instances input) throws Exception {
+    if (result == null) {
+      return new Instances(input, 0);
+    } else {
+      return Utils.ndArrayToInstances(result, input);
     }
   }
 }

@@ -1814,41 +1814,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public Instances getActivationsAtLayer(String layerName, Instances input) throws Exception {
-    return getActivationsAtLayer(layerName, input, false, false);
-  }
-
-  private boolean needsReshaping(INDArray activationAtLayer) {
-    return activationAtLayer.shape().length != 2;
-  }
-
-  private INDArray reshapeActivations(INDArray activationAtLayer, boolean pool) {
-    long[] resultShape = activationAtLayer.shape();
-
-    if (!pool) {
-      int extraDimension = (int) (resultShape[1] * resultShape[2] * resultShape[3]);
-      return activationAtLayer.reshape(new int[] {(int) resultShape[0], extraDimension});
-    } else {
-      // TODO allow different pooling types
-      // Pool the extra extra dimensions
-      return activationAtLayer;
-    }
-  }
-
-  private INDArray appendClasses(INDArray result, Instances input) { //TODO put into Utils
-    NDArray classes = (NDArray) Nd4j.zeros(result.shape()[0], 1);
-    for (int i = 0; i < classes.length(); i++) {
-      Instance inst = input.instance(i);
-      classes.putScalar(i, inst.classValue());
-    }
-    return Nd4j.concat(1, result, classes);
-  }
-
-  private Instances convertToInstances(INDArray result, Instances input) throws Exception {
-    if (result == null) {
-      return new Instances(input, 0);
-    } else {
-      return Utils.ndArrayToInstances(result, input);
-    }
+    return getActivationsAtLayer(layerName, input, PoolingType.NONE);
   }
 
   /**
@@ -1857,37 +1823,31 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @param layerName Layer name to get the activations from
    * @return Activations in form of instances
    */
-  public Instances getActivationsAtLayer(String layerName, Instances input, boolean isZooModel, boolean pool)
+  public Instances getActivationsAtLayer(String layerName, Instances input, PoolingType poolingType)
       throws Exception {
     DataSetIterator iter = getDataSetIterator(input);
     iter.reset();
-    DataSet next;
-    INDArray result = null;
-//    layerName = "conv2_block1_0_conv";
-    TransferLearningHelper transferLearningHelper = null;
-    if (isZooModel) {
-      transferLearningHelper = new TransferLearningHelper(getModel(), layerName);
-    }
+    INDArray activationAtLayer, result = null;
+    String initShape = "", reshapedShape = "";
+    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(getModel(), layerName);
+    boolean checkedReshaping = false;
 
     while (iter.hasNext()) {
-      next = iter.next();
-      INDArray activationAtLayer;
-      if (!isZooModel) {
-        // TODO remove legacy mode of featurizing dataset
-        // Use the classic way of getting features, if using a serialized model
-        INDArray features = next.getFeatures();
-        int layerIdx = model.getLayer(layerName).getIndex() - 1;
-        Map<String, INDArray> activations =
-            model.feedForward(features, layerIdx, false);
-        activationAtLayer = activations.get(layerName);
-      } else {
-        // Use the DL4J way of featurizing data if using a model zoo model
-        DataSet currentFeaturized = transferLearningHelper.featurize(next);
-        activationAtLayer = currentFeaturized.getFeatures();
-      }
+      // Use the DL4J way of featurizing data
+      DataSet currentFeaturized = transferLearningHelper.featurize(iter.next());
+      activationAtLayer = currentFeaturized.getFeatures();
 
-      if (needsReshaping(activationAtLayer)) {
-        activationAtLayer = reshapeActivations(activationAtLayer, pool);
+      if (Utils.needsReshaping(activationAtLayer)) {
+        if (!checkedReshaping)
+          initShape = Arrays.toString(activationAtLayer.shape());
+
+        activationAtLayer = Utils.reshapeActivations(activationAtLayer, poolingType);
+
+        if (!checkedReshaping) {
+          reshapedShape = Arrays.toString(activationAtLayer.shape());
+          log.info(String.format("Reshaped batch from %s to %s", initShape, reshapedShape));
+          checkedReshaping = true;
+        }
       }
 
       if (result == null) {
@@ -1897,8 +1857,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
     }
 
-    result = appendClasses(result, input);
+    result = Utils.appendClasses(result, input);
 
-    return convertToInstances(result, input);
+    return Utils.convertToInstances(result, input);
   }
 }
