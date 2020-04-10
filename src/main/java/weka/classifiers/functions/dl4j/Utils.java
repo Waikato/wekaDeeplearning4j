@@ -180,20 +180,19 @@ public class Utils {
     int numInstances = (int) ndArray.size(0);
     long[] shape = ndArray.shape();
     int dims = shape.length;
-    if (dims < 2) {
-      throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
+    if (dims != 2) {
+      throw new WekaException("Invalid input, NDArray shape needs to be two dimensional "
           + "but was " + Arrays.toString(shape));
     }
 
-    long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
-    prod = prod / numInstances;
+    long numAttributes = shape[1];
     int classI = -1;
     if (inputFormat != null) {
-      classI = (int) (prod - 1);
+      classI = (int) (numAttributes - 1);
     }
 
     ArrayList<Attribute> atts = new ArrayList<>();
-    for (int i = 0; i < prod; i++) {
+    for (int i = 0; i < numAttributes; i++) {
       if (i == classI && inputFormat != null) {
         if (inputFormat.classAttribute().isNominal())
           atts.add(copyNominalAttribute(inputFormat.classAttribute()));
@@ -208,11 +207,8 @@ public class Utils {
     instances.setClassIndex(classI);
     for (int i = 0; i < numInstances; i++) {
       INDArray row = ndArray.get(NDArrayIndex.point(i));
-      INDArray flattenedRow = Nd4j.toFlattened(row);
-      Instance inst = new DenseInstance(atts.size());
-      for (int j = 0; j < flattenedRow.size(0); j++) {
-        inst.setValue(j, flattenedRow.getDouble(j));
-      }
+      double[] instanceVals = row.toDoubleVector();
+      Instance inst = new DenseInstance(1.0, instanceVals);
       inst.setDataset(instances);
       instances.add(inst);
     }
