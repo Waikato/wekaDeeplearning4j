@@ -175,6 +175,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
     } else {
       // If that fails, try loading from selected zoo model (or keras file)
       model = new Dl4jMlpClassifier();
+      model.setFilterMode(true);
       model.setZooModel(zooModelType);
       model.setInstanceIterator(imageInstanceIterator);
       model.initializeClassifier(data);

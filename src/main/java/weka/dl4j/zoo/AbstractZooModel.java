@@ -46,10 +46,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @param numLabels Number of labels to adjust the output
      * @param seed Seed
+     * @param shape shape
+     * @param filterMode True if creating for feature extraction
      * @return MultiLayerNetwork of the specified ZooModel
      * @throws UnsupportedOperationException Init(...) was not supported (only CustomNet)
      */
-    public abstract ComputationGraph init(int numLabels, long seed, int[] shape)
+    public abstract ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode)
             throws UnsupportedOperationException;
 
     /**
@@ -66,7 +68,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
-                                                 int numLabels) {
+                                                 int numLabels,
+                                                 boolean filterMode) {
 
         this.seed = seed;
         this.numLabels = numLabels;
@@ -86,7 +89,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         if (pretrainedModel == null)
             return defaultNet;
 
-        return addFinalOutputLayer(pretrainedModel);
+        System.out.println(pretrainedModel.summary());
+
+        if (!filterMode)
+            return addFinalOutputLayer(pretrainedModel);
+        else
+            return pretrainedModel;
     }
 
     protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph, long seed, int numLabels) {

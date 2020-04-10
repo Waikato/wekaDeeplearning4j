@@ -86,10 +86,7 @@ import weka.core.Tag;
 import weka.core.WekaException;
 import weka.core.WekaPackageClassLoaderManager;
 import weka.core.WrongIteratorException;
-import weka.dl4j.CacheMode;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
@@ -180,6 +177,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * The model zoo model.
    */
   protected AbstractZooModel zooModel = new CustomNet();
+  /**
+   * True if using the model for feature extraction
+   */
+  protected boolean filterMode = false;
   /**
    * The size of the serialized network model in bytes.
    */
@@ -874,7 +875,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final Layer lastLayer = layers[layers.length - 1];
     org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
         lastLayer.getBackend();
-    if (!(lastLayerBackend instanceof BaseOutputLayer
+    if (!(isFilterMode()) && !(lastLayerBackend instanceof BaseOutputLayer
         || lastLayerBackend instanceof LossLayer || lastLayerBackend instanceof ActivationLayer)) {
       throw new MissingOutputLayerException(
           "Last layer in network must be an output layer but was: "
@@ -1291,7 +1292,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected boolean initZooModel(int numClasses, long seed, int[] newShape)
       throws Exception {
     try {
-      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape);
+      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape, isFilterMode());
       // Make a dummy feed forward pass to check if the model dimensions fit at
       // each layer
       Instances dummyData = new Instances(trainData);
@@ -1303,7 +1304,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       tmpModel.feedForward(iter.next().getFeatures(), false);
 
       // No Exception thrown -> set model to this zoo model and return true
-      model = zooModel.init(numClasses, seed, newShape);
+      model = zooModel.init(numClasses, seed, newShape, isFilterMode());
       return true;
     } catch (UnsupportedOperationException e) {
       throw new UnsupportedOperationException(
@@ -1610,7 +1611,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       Thread.currentThread().setContextClassLoader(
           this.getClass().getClassLoader());
       ComputationGraph tmpCg =
-          zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0]);
+          zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
       tmpCg.init();
       layers =
           Arrays.stream(tmpCg.getLayers())
@@ -1649,6 +1650,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setCacheMode(CacheMode cm) {
     cacheMode = cm;
   }
+
+  public boolean isFilterMode() { return filterMode; }
+
+  public void setFilterMode(boolean filterMode) { this.filterMode = filterMode; }
 
   /**
    * Performs efficient batch prediction
