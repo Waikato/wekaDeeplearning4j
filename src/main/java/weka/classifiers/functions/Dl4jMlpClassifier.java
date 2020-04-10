@@ -26,14 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.flatbuffers.FlatBufferBuilder;
@@ -1813,24 +1806,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return !(zooModel instanceof CustomNet);
   }
 
-  public Instances getActivationsAtLayer(String layerName, Instances input) throws Exception {
-    return getActivationsAtLayer(layerName, input, PoolingType.NONE);
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input) throws Exception {
+    return getActivationsAtLayers(layerNames, input, PoolingType.NONE);
   }
 
-  /**
-   * Returns the activations at a certain
-   *
-   * @param layerName Layer name to get the activations from
-   * @return Activations in form of instances
-   */
-  public Instances getActivationsAtLayer(String layerName, Instances input, PoolingType poolingType)
-      throws Exception {
-    DataSetIterator iter = getDataSetIterator(input);
-    iter.reset();
-    INDArray activationAtLayer, result = null;
-    String initShape = "", reshapedShape = "";
-    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(getModel(), layerName);
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) {
+    ComputationGraph tmpGraph = model.clone();
+    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(tmpGraph, layerName);
     boolean checkedReshaping = false;
+    String initShape = "", reshapedShape = "";
+    iter.reset();
+
+    INDArray activationAtLayer, result = null;
 
     while (iter.hasNext()) {
       // Use the DL4J way of featurizing data
@@ -1838,6 +1825,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       activationAtLayer = currentFeaturized.getFeatures();
 
       if (Utils.needsReshaping(activationAtLayer)) {
+        // Output an info message once if we're reshaping
         if (!checkedReshaping)
           initShape = Arrays.toString(activationAtLayer.shape());
 
@@ -1845,7 +1833,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
         if (!checkedReshaping) {
           reshapedShape = Arrays.toString(activationAtLayer.shape());
-          log.info(String.format("Reshaped batch from %s to %s", initShape, reshapedShape));
+          log.debug(String.format("Reshaped batch from %s to %s", initShape, reshapedShape));
           checkedReshaping = true;
         }
       }
@@ -1856,9 +1844,41 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         result = Nd4j.concat(0, result, activationAtLayer);
       }
     }
+    return result;
+  }
+
+  /**
+   * Returns the activations at a certain
+   *
+   * @param layerNames Layer name to get the activations from
+   * @return Activations in form of instances
+   */
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input, PoolingType poolingType)
+      throws Exception {
+    DataSetIterator iter = getDataSetIterator(input);
+    INDArray result = null;
+    Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
+
+    log.info("Getting features from layers: " + Arrays.toString(layerNames));
+
+    for (String layerName : layerNames) {
+      if (attributesPerLayer.containsKey(layerName)) {
+        log.warn("Concatenating two identical layers not supported");
+        continue;
+      }
+
+      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+
+      attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
+      if (result == null) {
+        result = activationsAtLayer;
+      } else {
+        result = Nd4j.concat(1, result, activationsAtLayer);
+      }
+    }
 
     result = Utils.appendClasses(result, input);
 
-    return Utils.convertToInstances(result, input);
+    return Utils.convertToInstances(result, input, attributesPerLayer);
   }
 }

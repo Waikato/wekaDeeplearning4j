@@ -23,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -196,7 +198,7 @@ public class Utils {
    * @return Instances object
    * @throws WekaException Invalid input
    */
-  public static Instances ndArrayToInstances(INDArray ndArray, Instances inputFormat) throws WekaException {
+  public static Instances ndArrayToInstances(INDArray ndArray, Instances inputFormat, Map<String, Long> attributesPerLayer) throws WekaException {
     int numInstances = (int) ndArray.size(0);
     long[] shape = ndArray.shape();
     int dims = shape.length;
@@ -339,7 +341,8 @@ public class Utils {
     } else if (poolingType == PoolingType.MIN) {
       return array.minNumber().floatValue();
     } else {
-      throw new IllegalArgumentException(String.format("Pooling type %s not supported", poolingType));
+      throw new IllegalArgumentException(String.format("Pooling type %s not supported, only " +
+              "MAX, AVG, SUM, MIN supported", poolingType));
     }
   }
 
@@ -375,11 +378,11 @@ public class Utils {
     return Nd4j.concat(1, result, classes);
   }
 
-  public static Instances convertToInstances(INDArray result, Instances input) throws Exception {
+  public static Instances convertToInstances(INDArray result, Instances input, Map<String, Long> attributesPerLayer) throws Exception {
     if (result == null) {
       return new Instances(input, 0);
     } else {
-      return Utils.ndArrayToInstances(result, input);
+      return Utils.ndArrayToInstances(result, input, attributesPerLayer);
     }
   }
 }
