@@ -31,11 +31,11 @@ public class KerasXception extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         Xception xception = new Xception();
         xception.setVariation(variation);
 
-        return attemptToLoadWeights(xception, null, seed, numLabels);
+        return attemptToLoadWeights(xception, null, seed, numLabels, filterMode);
     }
 
     @Override

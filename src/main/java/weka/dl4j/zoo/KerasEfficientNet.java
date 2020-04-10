@@ -59,12 +59,12 @@ public class KerasEfficientNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         EfficientNet efficientNet = new EfficientNet();
         efficientNet.setVariation(variation);
         ComputationGraph defaultNet = efficientNet.init();
 
-        return attemptToLoadWeights(efficientNet, defaultNet, seed, numLabels);
+        return attemptToLoadWeights(efficientNet, defaultNet, seed, numLabels, filterMode);
     }
 
     @Override

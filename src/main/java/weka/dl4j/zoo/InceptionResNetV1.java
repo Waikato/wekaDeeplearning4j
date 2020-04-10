@@ -35,7 +35,7 @@ public class InceptionResNetV1 extends AbstractZooModel {
   private static final long serialVersionUID = -8732818258861661L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.InceptionResNetV1 net = org.deeplearning4j.zoo.model.InceptionResNetV1
         .builder()
         .cacheMode(CacheMode.NONE)
@@ -46,7 +46,7 @@ public class InceptionResNetV1 extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

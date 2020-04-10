@@ -41,11 +41,11 @@ public class KerasNASNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         NASNet nasNet = new NASNet();
         nasNet.setVariation(variation);
 
-        return attemptToLoadWeights(nasNet, null, seed, numLabels);
+        return attemptToLoadWeights(nasNet, null, seed, numLabels, filterMode);
     }
 
     @Override

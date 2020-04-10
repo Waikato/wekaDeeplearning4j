@@ -34,7 +34,7 @@ public class SimpleCNN extends AbstractZooModel {
   private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -44,7 +44,7 @@ public class SimpleCNN extends AbstractZooModel {
 
     ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

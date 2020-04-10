@@ -43,7 +43,7 @@ public class Xception extends AbstractZooModel {
   }
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.Xception net = org.deeplearning4j.zoo.model.Xception.builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -53,7 +53,7 @@ public class Xception extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

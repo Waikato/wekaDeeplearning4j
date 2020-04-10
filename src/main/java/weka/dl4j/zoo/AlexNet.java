@@ -35,7 +35,7 @@ public class AlexNet extends AbstractZooModel {
   private static final long serialVersionUID = -52066063848861661L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.AlexNet net = org.deeplearning4j.zoo.model.AlexNet.builder()
             .cacheMode(CacheMode.NONE)
             .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -44,7 +44,7 @@ public class AlexNet extends AbstractZooModel {
             .build();
     ComputationGraph defaultNet = net.init().toComputationGraph();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

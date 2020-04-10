@@ -1,5 +1,6 @@
 package weka.dl4j.zoo.keras;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.common.resources.DL4JResources;
 import org.deeplearning4j.common.resources.ResourceType;
@@ -18,9 +19,8 @@ import java.net.URL;
 import java.util.zip.Adler32;
 import java.util.zip.Checksum;
 
+@Log4j2
 public abstract class KerasZooModel extends ZooModel {
-
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     protected int[] inputShape;
 

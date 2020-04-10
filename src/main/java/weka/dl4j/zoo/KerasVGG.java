@@ -31,11 +31,11 @@ public class KerasVGG extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         VGG vgg = new VGG();
         vgg.setVariation(variation);
 
-        return attemptToLoadWeights(vgg, null, seed, numLabels);
+        return attemptToLoadWeights(vgg, null, seed, numLabels, filterMode);
     }
 
     @Override

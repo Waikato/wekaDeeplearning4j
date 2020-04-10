@@ -38,11 +38,11 @@ public class KerasInceptionV3 extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         InceptionV3 inceptionV3 = new InceptionV3();
         inceptionV3.setVariation(variation);
 
-        return attemptToLoadWeights(inceptionV3, null, seed, numLabels);
+        return attemptToLoadWeights(inceptionV3, null, seed, numLabels, filterMode);
     }
 
     @Override

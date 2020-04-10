@@ -38,11 +38,11 @@ public class KerasInceptionResNetV2 extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         InceptionResNetV2 inceptionResNetV2 = new InceptionResNetV2();
         inceptionResNetV2.setVariation(variation);
 
-        return attemptToLoadWeights(inceptionResNetV2, null, seed, numLabels);
+        return attemptToLoadWeights(inceptionResNetV2, null, seed, numLabels, filterMode);
     }
 
     @Override

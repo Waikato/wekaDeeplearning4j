@@ -46,7 +46,7 @@ public class SqueezeNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         org.deeplearning4j.zoo.model.SqueezeNet net = org.deeplearning4j.zoo.model.SqueezeNet.builder()
                 .cacheMode(CacheMode.NONE)
                 .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -56,7 +56,7 @@ public class SqueezeNet extends AbstractZooModel {
 
         ComputationGraph defaultNet = net.init();
 
-        return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+        return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
     }
 
 

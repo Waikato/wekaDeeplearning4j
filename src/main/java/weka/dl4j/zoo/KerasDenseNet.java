@@ -45,12 +45,12 @@ public class KerasDenseNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         DenseNet denseNet = new DenseNet();
         denseNet.setVariation(variation);
         ComputationGraph defaultNet = denseNet.init();
 
-        return attemptToLoadWeights(denseNet, defaultNet, seed, numLabels);
+        return attemptToLoadWeights(denseNet, defaultNet, seed, numLabels, filterMode);
     }
 
     @Override

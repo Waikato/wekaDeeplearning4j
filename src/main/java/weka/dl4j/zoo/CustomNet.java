@@ -32,7 +32,7 @@ public class CustomNet extends AbstractZooModel {
   private static final long serialVersionUID = 7131900848379752732L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape)
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode)
       throws UnsupportedOperationException {
     throw new UnsupportedOperationException(
         "This model cannot be initialized as a MultiLayerNetwork.");

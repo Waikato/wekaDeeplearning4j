@@ -38,11 +38,11 @@ public class KerasMobileNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         MobileNet mobileNet = new MobileNet();
         mobileNet.setVariation(variation);
 
-        return attemptToLoadWeights(mobileNet, null, seed, numLabels);
+        return attemptToLoadWeights(mobileNet, null, seed, numLabels, filterMode);
     }
 
     @Override

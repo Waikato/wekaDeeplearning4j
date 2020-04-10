@@ -31,11 +31,11 @@ public class KerasResNet extends AbstractZooModel {
     }
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         ResNet resNet = new ResNet();
         resNet.setVariation(variation);
 
-        return attemptToLoadWeights(resNet, null, seed, numLabels);
+        return attemptToLoadWeights(resNet, null, seed, numLabels, filterMode);
     }
 
     @Override

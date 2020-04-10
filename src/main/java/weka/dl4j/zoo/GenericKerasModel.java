@@ -42,7 +42,7 @@ public class GenericKerasModel extends AbstractZooModel {
   protected File kerasH5File = new File(WekaPackageManager.getPackageHome().toURI());
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape) {
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     try {
       ComputationGraph computationGraph = KerasModelImport.importKerasModelAndWeights(kerasH5File.getPath());
 

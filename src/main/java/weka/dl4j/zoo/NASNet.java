@@ -33,7 +33,7 @@ public class NASNet extends AbstractZooModel {
     private static final long serialVersionUID = -5206943146661L;
 
     @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape) {
+    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         org.deeplearning4j.zoo.model.NASNet net = org.deeplearning4j.zoo.model.NASNet.builder()
                 .cacheMode(CacheMode.NONE)
                 .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -45,7 +45,7 @@ public class NASNet extends AbstractZooModel {
         // However addInputs() is not available on NASNet.builder()
         ComputationGraph defaultNet = net.init();
 
-        return attemptToLoadWeights(net, defaultNet, seed, numLabels);
+        return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
     }
 
 
