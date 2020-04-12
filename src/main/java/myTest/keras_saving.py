@@ -38,12 +38,19 @@ def download_and_save_model(model_def):
     model_fn = model_def[0]
     model_name = model_def[1]
 
+    # Download the model
     keras_model = model_fn()
 
-    with open(path.join(save_path, model_name + ".txt"), mode='w') as fh:
+    # Save the summary (for debugging)
+    with open(path.join(save_path, model_name + "_summary.txt"), mode='w') as fh:
         keras_model.summary(print_fn=lambda x: fh.write(x + '\n'))
+    
+    # Save the model config
+    with open(path.join(save_path, model_name + ".json"), mode='w') as fh:
+        fh.write(keras_model.to_json())
 
-    keras_model.save(path.join(save_path, model_name + ".h5"))
+    # # Save the model weights
+    # keras_model.save(path.join(save_path, model_name + ".h5"))
 
     return model_name
 
@@ -51,3 +58,5 @@ results = ThreadPool(8).imap_unordered(download_and_save_model, models)
 
 for name in results:
     print("\n\n", name, "saved\n\n")
+
+# download_and_save_model((keras.applications.resnet.ResNet50, 'ResNet50'))
