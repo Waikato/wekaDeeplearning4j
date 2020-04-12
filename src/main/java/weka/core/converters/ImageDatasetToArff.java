@@ -63,6 +63,7 @@ public class ImageDatasetToArff {
             }
         } else {
             System.out.println("Usage: java ImageDatasetToArff <directory name>");
+            System.exit(1);
         }
     }
 }
