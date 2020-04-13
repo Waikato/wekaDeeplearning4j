@@ -28,6 +28,7 @@ import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
@@ -164,6 +165,7 @@ public class Dl4JMlpFilterTest {
     filter.setSerializedModelFile(new File(clfPath));
     filter.setTransformationLayerNames(transformationLayerNames);
     filter.setInputFormat(iris);
+    filter.setPoolingType(PoolingType.NONE);
     filter.setUseZooModel(useZooModel);
 
     Instances activationsActual = Filter.useFilter(iris, filter);
