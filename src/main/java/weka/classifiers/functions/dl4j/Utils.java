@@ -182,7 +182,7 @@ public class Utils {
     for (Map.Entry<String, Long> entry : attributesPerLayer.entrySet()) {
       long numAttributesForLayer = entry.getValue();
       if (layerSum + numAttributesForLayer > i) {
-        return String.format("%s%d", entry.getKey(), i - layerSum);
+        return String.format("%s-%d", entry.getKey(), i - layerSum);
       }
       layerSum += numAttributesForLayer;
     }
