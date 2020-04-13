@@ -68,3 +68,8 @@ Now you can add the maven dependency in your `pom.xml` file
     <version>${wekaDeeplearning4j.version}</version>
 </dependency>
 ```
+
+Note that building WekaDeeplearning4J from source is only supported on Ubuntu. 
+If you wish to include this package in a maven project on Windows then download the latest `.zip`
+file (e.g. `wekaDeeplearning4j-1.15.14.zip`) from the [releases page](https://github.com/Waikato/wekaDeeplearning4j/releases), extract to get the 
+`wekaDeeplearning4j-x.x.x.jar` file, and install this `.jar` file in your local maven repository via [these instructions](https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html).
