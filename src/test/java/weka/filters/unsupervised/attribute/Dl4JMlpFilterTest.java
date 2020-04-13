@@ -34,6 +34,10 @@ import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
+import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.zoo.KerasDenseNet;
+import weka.dl4j.zoo.ResNet50;
+import weka.dl4j.zoo.keras.DenseNet;
 import weka.filters.Filter;
 import weka.util.DatasetLoader;
 import weka.util.TestUtil;
@@ -41,9 +45,21 @@ import weka.util.TestUtil;
 /**
  * JUnit tests for Dl4jMlpFilter.
  *
- * @author Steven Lang
+ * @author Steven Lang, Rhys Compton
  */
 public class Dl4JMlpFilterTest {
+
+  @Test
+  public void testProcessMnistResNet() throws Exception {
+    checkZooModelMNIST(new ResNet50());
+  }
+
+  @Test
+  public void testProcessMnistKerasDenseNet201() throws Exception {
+    KerasDenseNet kerasDenseNet = new KerasDenseNet();
+    kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET201);
+    checkZooModelMNIST(kerasDenseNet);
+  }
 
   @Test
   public void testProcessIris() throws Exception {
@@ -110,6 +126,34 @@ public class Dl4JMlpFilterTest {
       // Can't freeze output layer so we don't check this
       if (!(layer instanceof OutputLayer))
         checkLayer(clf, dataMnist, new String[] { layer.getLayerName() }, clfPath, false);
+    }
+  }
+
+  protected void checkZooModelMNIST(AbstractZooModel zooModel) throws Exception {
+    Instances dataMnist = DatasetLoader.loadMiniMnistMeta();
+    ImageInstanceIterator idiMnist = DatasetLoader.loadMiniMnistImageIterator();
+
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    clf.setInstanceIterator(idiMnist);
+    // Testing pretrained model, no point training for 1 epoch
+    clf.setNumEpochs(0);
+    clf.setZooModel(zooModel);
+    clf.buildClassifier(dataMnist);
+
+    Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, dataMnist);
+
+    Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+    myFilter.setImageInstanceIterator(idiMnist);
+    myFilter.setZooModelType(zooModel);
+    myFilter.setInputFormat(dataMnist);
+    Instances activationsActual = Filter.useFilter(dataMnist, myFilter);
+
+    for (int i = 0; i < activationsActual.size(); i++) {
+      Instance expected = activationsExpected.get(i);
+      Instance actual = activationsActual.get(i);
+      for (int j = 0; j < expected.numAttributes(); j++) {
+        assertEquals(expected.value(j), actual.value(j), 1e-6);
+      }
     }
   }
 
