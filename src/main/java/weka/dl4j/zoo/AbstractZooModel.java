@@ -142,6 +142,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
             Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
+            if (pretrained == null) {
+                throw new Exception("Error while initialising model");
+            }
             if (pretrained instanceof MultiLayerNetwork) {
                 return ((MultiLayerNetwork) pretrained).toComputationGraph();
             } else {
