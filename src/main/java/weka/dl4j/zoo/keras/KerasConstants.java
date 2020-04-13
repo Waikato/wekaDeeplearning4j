@@ -17,9 +17,9 @@ public class KerasConstants {
         // ########
         // DenseNet
         // ########
-        locations.put("DenseNet121", "https://drive.google.com/uc?export=download&id=1skHkrjXhCv10-ASZelLaF98lAxOB9c1-");
-        locations.put("DenseNet169", "https://drive.google.com/uc?export=download&id=1n6E--TOXBmsLoROzYHI7KJYpSe4BJFS5");
-        locations.put("DenseNet201", "https://drive.google.com/uc?export=download&id=10Ki6JCHmB27LJw1nKs4m_H65w3L-_VrA");
+        locations.put("DenseNet121", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/DenseNet121.h5");
+        locations.put("DenseNet169", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/DenseNet169.h5");
+        locations.put("DenseNet201", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/DenseNet201.h5");
         checksums.put("DenseNet121", 3218375330L);
         checksums.put("DenseNet169", 618879071L);
         checksums.put("DenseNet201", 2157344866L);
@@ -53,7 +53,7 @@ public class KerasConstants {
         // ###########
         // InceptionV3
         // ###########
-        locations.put("InceptionV3", "https://drive.google.com/uc?export=download&id=19BxOrIFjUMyu_IQv6AKAufTxdnPIXrQ5");
+        locations.put("InceptionV3", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/InceptionV3.h5");
         checksums.put("InceptionV3", 2734012442L);
 
         // #########
@@ -67,20 +67,20 @@ public class KerasConstants {
         // ######
         // NASNet
         // ######
-        locations.put("NASNetMobile", "https://drive.google.com/uc?export=download&id=1bDkDO-UUvYxZENg5CTwJPAAs1jaGly6z");
-        locations.put("NASNetLarge", "https://drive.google.com/uc?export=download&id=1_lDpE9U9Y7y4_Tqjc-RvACT9Gf372j_z");
+        locations.put("NASNetMobile", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/NASNetMobile.h5");
+        locations.put("NASNetLarge", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/NASNetLarge.h5");
         checksums.put("NASNetMobile", 2888382958L);
         checksums.put("NASNetLarge", 914859199L);
 
         // ######
         // ResNet
         // ######
-        locations.put("ResNet50", "https://drive.google.com/uc?export=download&id=1VkHHHgWtH0rZf00kajhd46KB08L50yng");
-        locations.put("ResNet50V2", "https://drive.google.com/uc?export=download&id=112HAXAg_FXk6mfwsWrnJ4d1lzZ3aFhgk");
-        locations.put("ResNet101", "https://drive.google.com/uc?export=download&id=1tc-EZvCvddYGDB0RyJVhcHscvWy5dabE");
-        locations.put("ResNet101V2", "https://drive.google.com/uc?export=download&id=1amU0nCXEI79tRF1qH1MTKTiOUPJkHzaB");
-        locations.put("ResNet152", "https://drive.google.com/uc?export=download&id=1j48X1YQBMpozT6LQz0PI_VyCjKmA60DJ");
-        locations.put("ResNet152V2", "https://drive.google.com/uc?export=download&id=1hF42bWVH0qGaTannNJXbMO_NON_rOvBN");
+        locations.put("ResNet50", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet50.h5");
+        locations.put("ResNet50V2", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet50V2.h5");
+        locations.put("ResNet101", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet101.h5");
+        locations.put("ResNet101V2", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet101V2.h5");
+        locations.put("ResNet152", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet152.h5");
+        locations.put("ResNet152V2", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/ResNet152V2.h5");
         checksums.put("ResNet50", 3696145880L);
         checksums.put("ResNet50V2", 2441552962L);
         checksums.put("ResNet101", 1250607721L);
@@ -91,15 +91,15 @@ public class KerasConstants {
         // ###
         // VGG
         // ###
-        locations.put("VGG16", "https://drive.google.com/uc?export=download&id=1tJ5OfX4lCGeJYEwll_VYzGfiCwDGmRid");
-        locations.put("VGG19", "https://drive.google.com/uc?export=download&id=1MHSUfWyhMzj3oId49aJTXGj5WRJS8Qb5");
+        locations.put("VGG16", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/VGG16.h5");
+        locations.put("VGG19", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/VGG19.h5");
         checksums.put("VGG16", 1055892086L);
         checksums.put("VGG19", 1129296369L);
 
         // ########
         // Xception
         // ########
-        locations.put("Xception", "https://drive.google.com/uc?export=download&id=1ZBZYXz6UKeUjtCIfrxoBG7YHhlNisBlq");
+        locations.put("Xception", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models/Xception.h5");
         checksums.put("Xception", 775702932L);
 
         Locations = Collections.unmodifiableMap(locations);
