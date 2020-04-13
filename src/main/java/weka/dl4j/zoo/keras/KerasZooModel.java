@@ -88,13 +88,14 @@ public abstract class KerasZooModel extends ZooModel {
                 log.error("Checksums do not match. Cleaning up files and failing...");
                 cachedFile.delete();
                 throw new IllegalStateException(
-                        "Pretrained model file failed checksum. If this error persists, please open an issue at https://github.com/deeplearning4j/deeplearning4j.");
+                        String.format("Pretrained model file for model %s failed checksum.", this.modelPrettyName()));
             }
         }
 
         try {
             return KerasModelImport.importKerasModelAndWeights(cachedFile.getPath());
         } catch (Exception ex) {
+            System.err.println("Failed to load model");
             ex.printStackTrace();
             return null;
         }
