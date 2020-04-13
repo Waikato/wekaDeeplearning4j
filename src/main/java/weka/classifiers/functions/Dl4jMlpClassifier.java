@@ -1264,7 +1264,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int newHeight = iii.getHeight();
     int channels = iii.getNumChannels();
     boolean initSuccessful = false;
+    int maxWidth = 10000;
     while (!initSuccessful) {
+      if (newWidth > maxWidth) {
+        // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks
+        throw new Exception("Error when creating model, could not succeed");
+      }
       // Increase width and height
       int[] newShape = new int[]{channels, newHeight, newWidth};
       setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth,
