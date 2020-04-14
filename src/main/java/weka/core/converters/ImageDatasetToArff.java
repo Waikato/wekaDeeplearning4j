@@ -1,22 +1,66 @@
 package weka.core.converters;
 
+import org.apache.commons.math3.analysis.function.Abs;
 import weka.core.*;
+import weka.filters.Filter;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImageDatasetToArff {
+public class ImageDatasetToArff extends AbstractLoader implements
+        BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
+    protected String inputDirectory = "";
+
+    protected String outputFile = "";
+
+    @OptionMetadata(
+            displayName = "Input directory",
+            description = "Top level directory of the image dataset",
+            commandLineParamName = "i",
+            commandLineParamSynopsis = "-i <directory>"
+    )
+    public String getInputDirectory() { return inputDirectory; }
+
+    public void setInputDirectory(String inputDirectory) { this.inputDirectory = inputDirectory; }
+
+    @OptionMetadata(
+            displayName = "Output File",
+            description = "Output meta .arff file",
+            commandLineParamName = "o",
+            commandLineParamSynopsis = "-o <filepath> (default: inputDir/output.arff)"
+    )
+    public String getOutputFile() {
+        return outputFile;
+    }
+
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
+    }
+
+    public boolean isImage(String imgName) {
+        return imgName.toLowerCase().endsWith(".jpg") && !imgName.toLowerCase().endsWith(".png");
+    }
+
+    /**
+     * Appends the folder that the image is in, to the image path
+     * @param folder
+     * @return Image names (including the folder they're in)
+     */
     public String[] fileListForFolder(File folder) {
         String[] imageNames = folder.list();
         String imgClass = folder.getName();
         for (int i = 0; i < imageNames.length; i++) {
             String imgName = imageNames[i];
-            if (!imgName.toLowerCase().endsWith(".jpg") && !imgName.toLowerCase().endsWith(".png")) {
+            if (!isImage(imgName)) {
                 System.err.println(String.format("Found non image file: %s, ignoring...", imgName));
                 continue;
             }
@@ -25,9 +69,8 @@ public class ImageDatasetToArff {
         return imageNames;
     }
 
-    public Instances createDataset(String directoryPath) throws Exception {
-
-        File dir = new File(directoryPath);
+    public Instances createDataset() throws Exception {
+        File dir = new File(inputDirectory);
         File[] classArr = dir.listFiles();
         assert classArr != null;
         List<File> classes = Arrays.stream(classArr).filter(File::isDirectory).collect(Collectors.toList());
@@ -51,19 +94,105 @@ public class ImageDatasetToArff {
         return data;
     }
 
-    public static void main(String[] args) {
-        if (args.length == 1) {
-            ImageDatasetToArff imageDatasetToArff = new ImageDatasetToArff();
+    private boolean unusedOptions(String[] options) {
+        return Arrays.stream(options).anyMatch(x -> !x.equals(""));
+    }
+
+    @Override
+    public void preExecution() throws Exception {}
+
+    @Override
+    public void run(Object toRun, String[] options) throws Exception {
+        ImageDatasetToArff loader = (ImageDatasetToArff) toRun;
+        if (options.length > 0) {
             try {
-                Instances dataset = imageDatasetToArff.createDataset(args[0]);
-                System.out.println(dataset);
+                loader.setOptions(options);
+                Instances dataset = loader.createDataset();
+
+                // Save the dataset
+                ConverterUtils.DataSink.write(outputFile, dataset);
+
+                System.out.println("------- SUCCESS -------");
+                System.out.println("Output arff file written to: " + outputFile);
             } catch (Exception e) {
-                System.err.println(e.getMessage());
                 e.printStackTrace();
+                printInfo();
             }
         } else {
-            System.out.println("Usage: java ImageDatasetToArff <directory name>");
-            System.exit(1);
+            printInfo();
         }
+    }
+
+    private void printInfo() {
+        System.err.println("\nUsage:\n" + "\tImageDatasetToArff [options]\n"
+                + "\n" + "Options:\n");
+
+        Enumeration<Option> enm =
+                ((OptionHandler) new ImageDatasetToArff()).listOptions();
+        while (enm.hasMoreElements()) {
+            Option option = enm.nextElement();
+            System.err.println(option.synopsis());
+            System.err.println(option.description());
+        }
+    }
+
+    @Override
+    public void postExecution() throws Exception {
+
+    }
+
+    @Override
+    public Instances getStructure() throws IOException {
+        return null;
+    }
+
+    @Override
+    public Instances getDataSet() throws IOException {
+        return null;
+    }
+
+    @Override
+    public Instance getNextInstance(Instances structure) throws IOException {
+        return null;
+    }
+
+    @Override
+    public String getRevision() {
+        return null;
+    }
+
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    public Enumeration<Option> listOptions() {
+        return Option.listOptionsForClassHierarchy(this.getClass(), AbstractFileLoader.class).elements();
+    }
+
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    public String[] getOptions() {
+        return Option.getOptionsForHierarchy(this, AbstractFileLoader.class);
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
+        Option.setOptionsForHierarchy(options, this, AbstractFileLoader.class);
+
+        if (outputFile.equals("")) {
+            outputFile = Paths.get(inputDirectory, "output.arff").toString();
+        }
+
+        if (unusedOptions(options))
+            throw new Exception("Invalid arguments: " + Arrays.toString(options));
     }
 }
