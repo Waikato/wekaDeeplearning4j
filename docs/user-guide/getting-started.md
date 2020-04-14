@@ -166,18 +166,9 @@ java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j/*:$WEKA_HOM
 
 
 # Model Zoo
-WekaDeeplearning4j adapts the model zoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
 
-- AlexNet
-- LeNet
-- GoogLeNet
-- SimpleCNN
-- VGG16
-- VGG19
-
-This set of models will be extended over the time.
-
-To set a predefined model, e.g. LeNet, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier` object.
+WekaDeeplearning4j now contains a wide range of pretrained image classification models. 
+For more information, see the [Model Zoo](./model-zoo.md) guide.
 
 # Early Stopping
 Early stopping allows to stop the training process as soon as the network does not improve its loss on a validation set for `N` epochs. 
