@@ -1839,7 +1839,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
         if (!checkedReshaping) {
           reshapedShape = Arrays.toString(activationAtLayer.shape());
-          log.debug(String.format("Reshaped batch from %s to %s", initShape, reshapedShape));
+          log.info(String.format("Reshaped batch from %s to %s using %s", initShape, reshapedShape, poolingType));
           checkedReshaping = true;
         }
       }
