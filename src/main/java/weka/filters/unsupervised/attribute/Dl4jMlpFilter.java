@@ -207,7 +207,9 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
     loadModel(inputFormat);
-    return model.getActivationsAtLayers(transformationLayerNames, inputFormat, poolingType);
+    // No need to featurize full dataset at this point - only getting the output format
+    Instances subset = new Instances(inputFormat, 0, 1);
+    return model.getActivationsAtLayers(transformationLayerNames, subset, poolingType);
   }
 
 
