@@ -83,7 +83,9 @@ is not supported in WekaDeeplearning4j.
 The models typically have a dense layer as the final layer, with 1024/2048/some large number of inputs, and # 
 of classes outputs (e.g. 1000 for Imagenet). This is then stripped off (with the connections still intact) 
 and an OutputLayer attached with the sane number of inputs, and the number of output classes we want (e.g. only 10).
-This works fine for most models, however, some have a more complex final layer setup.
+This works fine for most models, however, some don't reduce to a 2d Dense layer before the output layer, 
+so we don't strip off anything and just attach the output layer to the final classification layer.
+
 
 ### Current State
 
