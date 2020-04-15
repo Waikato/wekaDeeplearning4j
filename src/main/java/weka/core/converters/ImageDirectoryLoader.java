@@ -1,12 +1,8 @@
 package weka.core.converters;
 
-import org.apache.commons.math3.analysis.function.Abs;
 import weka.core.*;
-import weka.filters.Filter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,7 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImageDatasetToArff extends AbstractLoader implements
+public class ImageDirectoryLoader extends AbstractLoader implements
         BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
     protected String inputDirectory = "";
@@ -103,7 +99,7 @@ public class ImageDatasetToArff extends AbstractLoader implements
 
     @Override
     public void run(Object toRun, String[] options) throws Exception {
-        ImageDatasetToArff loader = (ImageDatasetToArff) toRun;
+        ImageDirectoryLoader loader = (ImageDirectoryLoader) toRun;
         if (options.length > 0) {
             try {
                 loader.setOptions(options);
@@ -124,11 +120,11 @@ public class ImageDatasetToArff extends AbstractLoader implements
     }
 
     private void printInfo() {
-        System.err.println("\nUsage:\n" + "\tImageDatasetToArff [options]\n"
+        System.err.println("\nUsage:\n" + "\tImageDirectoryLoader [options]\n"
                 + "\n" + "Options:\n");
 
         Enumeration<Option> enm =
-                ((OptionHandler) new ImageDatasetToArff()).listOptions();
+                ((OptionHandler) new ImageDirectoryLoader()).listOptions();
         while (enm.hasMoreElements()) {
             Option option = enm.nextElement();
             System.err.println(option.synopsis());
