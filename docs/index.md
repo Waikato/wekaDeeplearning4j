@@ -20,6 +20,25 @@ The following Neural Network Layers are available to build sophisticated archite
 Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)
 
+## New Features
+The new release of WekaDeeplearning4j contains some few exciting features that will make it easier than ever
+to run experiments on your data.
+
+### Pretrained Models
+A wide range of pretrained models are now available, sourced from both the DL4J model zoo *and* the Keras Applications module.
+These can easily be instantiated and used as a base for further finetuning, or simply as a feature extractor, after which 
+you can then apply any standard Weka classifier. The weights are cached locally after being downloaded, so it's quick to instantiate in the future.
+
+### Updated Dl4jMlpFilter
+The Dl4jMlpFilter takes activations from a layer in the given neural network, and uses those as the output for the instance
+(e.g. take the activations of the second-to-last layer), commonly referred to as *feature extraction* or *embedding creation*.
+
+The DL4jMlpFilter can  
+
+### Image Dataset Conversion Script
+Often, image classification datasets come in a folder-organized fashion i.e., instance classes are inferred
+from the subfolder they're in. Now included is a tool to create an `.arff` file from this folder structure. 
+
 
 ## Citation
 
