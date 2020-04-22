@@ -2,6 +2,8 @@ weka.dl4j.layers.Layer=weka.gui.GenericObjectEditor
 
 weka.dl4j.layers.Layer[]=weka.gui.GenericArrayEditor
 
+java.lang.String[]=weka.gui.GenericArrayEditor
+
 weka.dl4j.listener.TrainingListener=weka.gui.GenericObjectEditor
 
 weka.dl4j.distribution.Distribution=weka.gui.GenericObjectEditor
