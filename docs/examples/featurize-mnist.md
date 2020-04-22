@@ -59,7 +59,7 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
         -decimal 20 \
         -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 1" \
         -layerName flatten_1 \
-        -zooModel "weka.dl4j.zoo.ResNet50" 
+        -zooModel "weka.dl4j.zoo.Dl4JResNet50" 
 ```
 We now have a standard `.arff` file that can be fit to like any standard numerical dataset
 ```bash
@@ -182,7 +182,7 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
         -decimal 20 \
         -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 16" \
         -poolingType AVG \
-        -zooModel "weka.dl4j.zoo.ResNet50" 
+        -zooModel "weka.dl4j.zoo.Dl4JResNet50" 
         -layerName res4a_branch2b \
         -layerName flatten_1 \
          
