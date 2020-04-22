@@ -29,7 +29,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.google.flatbuffers.FlatBufferBuilder;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
@@ -49,7 +48,6 @@ import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -1815,10 +1813,15 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return getActivationsAtLayers(layerNames, input, PoolingType.NONE);
   }
 
-  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) {
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
     // TransferLearningHelper alters cmp graph in place so we need to clone it
-    ComputationGraph clonedGraph = model.clone();
-    TransferLearningHelper transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
+    TransferLearningHelper transferLearningHelper;
+    try {
+      ComputationGraph clonedGraph = model.clone();
+      transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
+    } catch (Exception e) {
+      throw new WekaException(String.format("Could not find features for layer %s, please ensure the name is correctly entered", layerName));
+    }
     boolean checkedReshaping = false;
     String initShape = "", reshapedShape = "";
     iter.reset();
