@@ -15,8 +15,7 @@ Values in **bold** are the defaults.
 | DL4J      | ResNet50          | Yes                    | **ImageNet**                  | -                                 |
 | DL4J      | SimpleCNN         | No                     | -                         | -                                 |
 | DL4J      | SqueezeNet        | Yes                    | **ImageNet**                  | -                                 |
-| DL4J      | VGG16             | Yes                    | **ImageNet**, VGGFace         | -                                 |
-| DL4J      | VGG19             | Yes                    | **ImageNet**                  | -                                 |
+| DL4J      | VGG               | Yes                    | **ImageNet**, VGGFace (VGG16 only) | 16, 19                               |
 | DL4J      | XCeption          | Yes                    | **ImageNet**                  | -                                 |
 | Keras     | DenseNet          | Yes                    | **ImageNet**                  | **121**, 169, 201                            |
 | Keras     | InceptionV3       | Yes                    | **ImageNet**                  | -                                 |
@@ -27,7 +26,7 @@ Values in **bold** are the defaults.
 
 The EfficientNet family of models will be added soon.
 
-To set a predefined model, e.g. ResNet50, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.ResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
+To set a predefined model, e.g. ResNet50, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.Dl4JResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
 DL4J's DarkNet19 model has two variations, however, to set this one must set the image `width` and `height` to `448`, otherwise the default `224` size will be used.
 
 Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`.
