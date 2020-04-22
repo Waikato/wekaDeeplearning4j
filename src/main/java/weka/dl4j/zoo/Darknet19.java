@@ -22,6 +22,7 @@ import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
+import weka.dl4j.zoo.keras.DenseNet;
 
 /**
  * A WEKA version of DeepLearning4j's Darknet19 ZooModel.
@@ -33,7 +34,15 @@ public class Darknet19 extends AbstractZooModel {
 
   private static final long serialVersionUID = -52066850554864161L;
 
+  public enum VARIATION {INPUT224, INPUT448};
+
+  protected VARIATION m_variation = VARIATION.INPUT224;
+
   public Darknet19() { setPretrainedType(PretrainedType.IMAGENET); }
+
+  public void setVariation(VARIATION var) {
+    m_variation = var;
+  }
 
   @Override
   public void setPretrainedType(PretrainedType pretrainedType) {
@@ -58,6 +67,14 @@ public class Darknet19 extends AbstractZooModel {
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.Darknet19.builder().build().metaData().getInputShape();
+    int imgSize = -1;
+    if (m_variation == VARIATION.INPUT224) {
+      imgSize = 224;
+    } else if (m_variation == VARIATION.INPUT448) {
+      imgSize = 448;
+    }
+    int[][] shape = new int[1][];
+    shape[0] = new int[] {3, imgSize, imgSize};
+    return shape;
   }
 }
