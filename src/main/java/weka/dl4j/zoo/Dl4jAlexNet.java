@@ -30,7 +30,7 @@ import weka.dl4j.Preferences;
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class AlexNet extends AbstractZooModel {
+public class Dl4jAlexNet extends AbstractZooModel {
 
   private static final long serialVersionUID = -52066063848861661L;
 

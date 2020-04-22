@@ -23,13 +23,12 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Enumeration;
 
-import org.apache.commons.lang.ArrayUtils;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.ResNet50;
+import weka.dl4j.zoo.Dl4JResNet50;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
@@ -51,7 +50,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   /**
    * The zoo model to use, if we're not loading from the serialized model file
    */
-  protected AbstractZooModel zooModelType = new ResNet50();
+  protected AbstractZooModel zooModelType = new Dl4JResNet50();
 
   /**
    * The image instance iterator to use

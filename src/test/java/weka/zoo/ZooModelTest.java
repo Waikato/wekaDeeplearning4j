@@ -19,7 +19,6 @@
 package weka.zoo;
 
 import java.io.IOException;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -27,23 +26,19 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.OperationNotSupportedException;
 
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.zoo.ZooModel;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.nd4j.shade.protobuf.MapEntry;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.zoo.*;
-import weka.dl4j.zoo.Xception;
+import weka.dl4j.zoo.Dl4jXception;
 import weka.dl4j.zoo.keras.*;
 import weka.dl4j.zoo.keras.NASNet;
 import weka.util.DatasetLoader;
@@ -232,7 +227,7 @@ public class ZooModelTest {
     // DL4J Model Tests
     @Test
     public void testAlexNetMnist() throws Exception {
-        buildModel(new AlexNet());
+        buildModel(new Dl4jAlexNet());
     }
 
     @Test
@@ -242,17 +237,17 @@ public class ZooModelTest {
 
     @Test
     public void testFaceNetNN4Small2() throws Exception {
-        buildModel(new FaceNetNN4Small2());
+        buildModel(new Dl4jFaceNetNN4Small2());
     }
 
     @Test
     public void testInceptionResNetV1() throws Exception {
-        buildModel(new InceptionResNetV1());
+        buildModel(new Dl4jInceptionResNetV1());
     }
 
     @Test
     public void testLeNetMnist() throws Exception {
-        buildModel(new LeNet());
+        buildModel(new Dl4jLeNet());
     }
 
 //    @Test
@@ -264,12 +259,12 @@ public class ZooModelTest {
 
     @Test
     public void testResNet50() throws Exception {
-        buildModel(new ResNet50());
+        buildModel(new Dl4JResNet50());
     }
 
     @Test
     public void testSqueezeNet() throws Exception {
-        buildModel(new SqueezeNet());
+        buildModel(new Dl4jSqueezeNet());
     }
 
     @Test
@@ -284,7 +279,7 @@ public class ZooModelTest {
 
     @Test
     public void testXception() throws Exception {
-        buildModel(new Xception());
+        buildModel(new Dl4jXception());
     }
 
     // Keras Zoo Models

@@ -30,7 +30,7 @@ import weka.dl4j.PretrainedType;
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class VGG extends AbstractZooModel {
+public class Dl4jVGG extends AbstractZooModel {
 
     // Pretrained weights notes:
     // VGG16 CIFAR10 -  Download link possibly broken on DL4J end?
@@ -44,7 +44,7 @@ public class VGG extends AbstractZooModel {
 
     protected VARIATION m_variation = VARIATION.VGG16;
 
-    public VGG() {
+    public Dl4jVGG() {
         setPretrainedType(PretrainedType.IMAGENET);
     }
 

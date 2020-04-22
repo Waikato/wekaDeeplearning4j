@@ -36,8 +36,8 @@ import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.zoo.Dl4JResNet50;
 import weka.dl4j.zoo.KerasDenseNet;
-import weka.dl4j.zoo.ResNet50;
 import weka.dl4j.zoo.keras.DenseNet;
 import weka.filters.Filter;
 import weka.util.DatasetLoader;
@@ -52,7 +52,7 @@ public class Dl4JMlpFilterTest {
 
   @Test
   public void testProcessMnistResNet() throws Exception {
-    checkZooModelMNIST(new ResNet50());
+    checkZooModelMNIST(new Dl4JResNet50());
   }
 
   @Test

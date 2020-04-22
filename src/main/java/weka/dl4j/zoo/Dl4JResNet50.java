@@ -18,31 +18,54 @@
 
 package weka.dl4j.zoo;
 
+import org.deeplearning4j.nn.api.Layer;
+import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.CacheMode;
+import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
+import org.deeplearning4j.nn.transferlearning.TransferLearning;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.zoo.ZooModel;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Nesterovs;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 
+import java.io.IOException;
+
 /**
- * A WEKA version of DeepLearning4j's NASNet ZooModel.
+ * A WEKA version of DeepLearning4j's ResNet50 ZooModel.
  *
+ * @author Steven Lang
  * @author Rhys Compton
  */
-public class NASNet extends AbstractZooModel {
+public class Dl4JResNet50 extends AbstractZooModel {
 
-    private static final long serialVersionUID = -5206943146661L;
+    private static final long serialVersionUID = -5206947378361661L;
+
+    public Dl4JResNet50() { setPretrainedType(PretrainedType.IMAGENET); }
+
+    @Override
+    public void setPretrainedType(PretrainedType pretrainedType) {
+        setPretrainedType(pretrainedType, 2048, "flatten_1", "fc1000");
+    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-        org.deeplearning4j.zoo.model.NASNet net = org.deeplearning4j.zoo.model.NASNet.builder()
+        org.deeplearning4j.zoo.model.ResNet50 net = org.deeplearning4j.zoo.model.ResNet50.builder()
                 .cacheMode(CacheMode.NONE)
                 .workspaceMode(Preferences.WORKSPACE_MODE)
                 .inputShape(shape)
                 .numClasses(numLabels)
                 .build();
 
-        // DL4J bug? Throws IllegalArgumentException: Cannot calculate activation types if no inputs have been set (use addInputs(String...))
-        // However addInputs() is not available on NASNet.builder()
         ComputationGraph defaultNet = net.init();
 
         return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);

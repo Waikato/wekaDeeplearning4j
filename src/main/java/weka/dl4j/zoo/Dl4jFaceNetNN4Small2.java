@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * XCeption.java
+ * FaceNetNN4Small2.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -20,31 +20,23 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
 
 /**
- * A WEKA version of DeepLearning4j's XCeption ZooModel.
+ * A WEKA version of DeepLearning4j's FaceNetNN4Small2 ZooModel.
  *
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class Xception extends AbstractZooModel {
+public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -4452023767749633607L;
-
-  public Xception() {
-    setPretrainedType(PretrainedType.IMAGENET);
-  }
-
-  @Override
-  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 1000, "predictions", "");
-  }
+  private static final long serialVersionUID = -5206685097658861661L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-    org.deeplearning4j.zoo.model.Xception net = org.deeplearning4j.zoo.model.Xception.builder()
+    org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2
+        .builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
         .inputShape(shape)
@@ -58,6 +50,7 @@ public class Xception extends AbstractZooModel {
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.Xception.builder().build().metaData().getInputShape();
+    return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
+        .getInputShape();
   }
 }

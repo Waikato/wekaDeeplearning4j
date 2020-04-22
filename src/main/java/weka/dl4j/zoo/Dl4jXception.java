@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * SimpleCNN.java
+ * XCeption.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -20,35 +20,44 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
- * A WEKA version of DeepLearning4j's SimpleCNN ZooModel.
+ * A WEKA version of DeepLearning4j's XCeption ZooModel.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
-public class SimpleCNN extends AbstractZooModel {
+public class Dl4jXception extends AbstractZooModel {
 
-  private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
+  private static final long serialVersionUID = -4452023767749633607L;
+
+  public Dl4jXception() {
+    setPretrainedType(PretrainedType.IMAGENET);
+  }
+
+  @Override
+  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType, 1000, "predictions", "");
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-    org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
+    org.deeplearning4j.zoo.model.Xception net = org.deeplearning4j.zoo.model.Xception.builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
 
-    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
+    ComputationGraph defaultNet = net.init();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.SimpleCNN.builder().build().metaData().getInputShape();
+    return org.deeplearning4j.zoo.model.Xception.builder().build().metaData().getInputShape();
   }
 }

@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * InceptionResNetV1.java
+ * LeNet.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -20,38 +20,50 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import weka.classifiers.functions.MultilayerPerceptron;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
- * A WEKA version of DeepLearning4j's InceptionResNetV1 ZooModel.
+ * A WEKA version of DeepLearning4j's LeNet ZooModel.
  *
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class InceptionResNetV1 extends AbstractZooModel {
+public class Dl4jLeNet extends AbstractZooModel {
 
-  private static final long serialVersionUID = -8732818258861661L;
+  private static final long serialVersionUID = 79837621346455139L;
+
+  public Dl4jLeNet() {
+    setPretrainedType(PretrainedType.MNIST);
+  }
+
+  @Override
+  public void setPretrainedType(PretrainedType pretrainedType) {
+    setPretrainedType(pretrainedType,
+            500,
+            "7",
+            "8",
+            new String[] {"9"});
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-    org.deeplearning4j.zoo.model.InceptionResNetV1 net = org.deeplearning4j.zoo.model.InceptionResNetV1
-        .builder()
+    org.deeplearning4j.zoo.model.LeNet net = org.deeplearning4j.zoo.model.LeNet.builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
 
-    ComputationGraph defaultNet = net.init();
+    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.InceptionResNetV1.builder().build().metaData()
-        .getInputShape();
+    return org.deeplearning4j.zoo.model.LeNet.builder().build().metaData().getInputShape();
   }
 }

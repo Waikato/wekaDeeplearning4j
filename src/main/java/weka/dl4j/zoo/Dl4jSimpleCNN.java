@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * FaceNetNN4Small2.java
+ * SimpleCNN.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -20,37 +20,35 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
 
 /**
- * A WEKA version of DeepLearning4j's FaceNetNN4Small2 ZooModel.
+ * A WEKA version of DeepLearning4j's SimpleCNN ZooModel.
  *
  * @author Steven Lang
- * @author Rhys Compton
  */
-public class FaceNetNN4Small2 extends AbstractZooModel {
+public class Dl4jSimpleCNN extends AbstractZooModel {
 
-  private static final long serialVersionUID = -5206685097658861661L;
+  private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-    org.deeplearning4j.zoo.model.FaceNetNN4Small2 net = org.deeplearning4j.zoo.model.FaceNetNN4Small2
-        .builder()
+    org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
         .cacheMode(CacheMode.NONE)
         .workspaceMode(Preferences.WORKSPACE_MODE)
         .inputShape(shape)
         .numClasses(numLabels)
         .build();
 
-    ComputationGraph defaultNet = net.init();
+    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
 
     return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override
   public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
-        .getInputShape();
+    return org.deeplearning4j.zoo.model.SimpleCNN.builder().build().metaData().getInputShape();
   }
 }
