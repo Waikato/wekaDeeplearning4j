@@ -188,7 +188,8 @@ public class ImageDirectoryLoader extends AbstractLoader implements
             outputFile = Paths.get(inputDirectory, "output.arff").toString();
         }
 
-        if (unusedOptions(options))
-            throw new Exception("Invalid arguments: " + Arrays.toString(options));
+        Utils.checkForRemainingOptions(options);
+//        if (unusedOptions(options))
+//            throw new Exception("Invalid arguments: " + Arrays.toString(options));
     }
 }
