@@ -72,6 +72,10 @@ documentation in the Java files) and pushed to the `gh-pages` branch via:
 $ ./update-javadocs.sh
 ```
 
+## Correctly Setting Classpath
+If you run into a `The filename or extension is too long` error, make sure to set the `Shorten Command line`
+parameter in your run configuration to `@argfiles`.
+
 ## Updating Zoo Models
 
 Currently there are two types of zoo models included in WekaDeeplearning4j: DL4J Zoo and Keras Applications.
