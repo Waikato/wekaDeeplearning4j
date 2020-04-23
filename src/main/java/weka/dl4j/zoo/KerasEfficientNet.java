@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.DenseNet;
 import weka.dl4j.zoo.keras.EfficientNet;
 
 public class KerasEfficientNet extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = -7261085237958094389L;
 
     private EfficientNet.VARIATION variation = EfficientNet.VARIATION.EFFICIENTNET_B0;
 

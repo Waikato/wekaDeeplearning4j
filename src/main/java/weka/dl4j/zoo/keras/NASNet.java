@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class NASNet extends KerasZooModel {
+    private static final long serialVersionUID = -8106239516237343141L;
+
     public enum VARIATION {
         MOBILE,
         LARGE

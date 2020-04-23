@@ -26,17 +26,16 @@ import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's VGG16 ZooModel.
+ * Pretrained weights notes:
+ * VGG16 CIFAR10 -  Download link possibly broken on DL4J end?
+ *                  The downloaded zip for these weights is only 10mb vs 513mb for Imagenet
  *
  * @author Steven Lang
  * @author Rhys Compton
  */
 public class Dl4jVGG extends AbstractZooModel {
 
-    // Pretrained weights notes:
-    // VGG16 CIFAR10 -  Download link possibly broken on DL4J end?
-    //            The downloaded zip for these weights is only 10mb vs 513mb for Imagenet
-
-    private static final long serialVersionUID = -6728816609851L;
+    private static final long serialVersionUID = -4741420712433849216L;
 
     public enum VARIATION {VGG16, VGG19}
 

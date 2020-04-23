@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.ResNet;
 import weka.dl4j.zoo.keras.VGG;
 
 public class KerasVGG extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = 4745962510013669482L;
 
     private VGG.VARIATION variation = VGG.VARIATION.VGG16;
 

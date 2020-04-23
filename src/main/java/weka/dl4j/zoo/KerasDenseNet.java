@@ -7,7 +7,8 @@ import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
 
 public class KerasDenseNet extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = 4978029404997176050L;
 
     private DenseNet.VARIATION variation = DenseNet.VARIATION.DENSENET121;
 

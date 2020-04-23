@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class Xception extends KerasZooModel {
+    private static final long serialVersionUID = -5423178061075685025L;
+
     public enum VARIATION {STANDARD};
 
     public static int[] inputShape = new int[] {3, 229, 229};

@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 public class ImageDirectoryLoader extends AbstractLoader implements
         BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
+    private static final long serialVersionUID = 8956780190928290891L;
+
     protected String inputDirectory = "";
 
     protected String outputFile = "";

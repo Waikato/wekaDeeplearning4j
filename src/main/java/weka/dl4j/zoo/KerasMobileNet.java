@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.DenseNet;
 import weka.dl4j.zoo.keras.MobileNet;
 
 public class KerasMobileNet extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = 8206193669750977225L;
 
     private MobileNet.VARIATION variation = MobileNet.VARIATION.V2;
 

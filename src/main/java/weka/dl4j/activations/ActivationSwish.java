@@ -33,7 +33,8 @@ import java.util.Enumeration;
 public class ActivationSwish extends Activation<org.nd4j.linalg.activations.impl.ActivationSwish>
     implements OptionHandler {
 
-  private static final long serialVersionUID = -705527390430410412L;
+
+  private static final long serialVersionUID = 4991484045836286902L;
 
   @Override
   public void initializeBackend() {

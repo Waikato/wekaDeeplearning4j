@@ -50,7 +50,6 @@ import weka.dl4j.CacheMode;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
 
 /**

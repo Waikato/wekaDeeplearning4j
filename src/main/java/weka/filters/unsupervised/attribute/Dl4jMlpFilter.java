@@ -40,8 +40,7 @@ import weka.filters.SimpleBatchFilter;
  */
 public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
 
-  private static final long serialVersionUID = 21054165308223L;
-
+  private static final long serialVersionUID = 1317698787337080580L;
   /**
    * The classifier model this filter is based on.
    */

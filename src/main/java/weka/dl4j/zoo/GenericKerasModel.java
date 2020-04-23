@@ -37,7 +37,7 @@ import java.io.File;
  */
 public class GenericKerasModel extends AbstractZooModel {
 
-  private static final long serialVersionUID = 549852142732L;
+  private static final long serialVersionUID = 7572785977498659081L;
 
   protected File kerasH5File = new File(WekaPackageManager.getPackageHome().toURI());
 

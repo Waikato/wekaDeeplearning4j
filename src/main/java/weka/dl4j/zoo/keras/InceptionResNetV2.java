@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class InceptionResNetV2 extends KerasZooModel {
+    private static final long serialVersionUID = 7648403112324512260L;
+
     public enum VARIATION {
         STANDARD
     };

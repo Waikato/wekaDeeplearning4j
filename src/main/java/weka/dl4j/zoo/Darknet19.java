@@ -32,7 +32,7 @@ import weka.dl4j.zoo.keras.DenseNet;
  */
 public class Darknet19 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -52066850554864161L;
+  private static final long serialVersionUID = 7854379460490744564L;
 
   public enum VARIATION {INPUT224, INPUT448};
 

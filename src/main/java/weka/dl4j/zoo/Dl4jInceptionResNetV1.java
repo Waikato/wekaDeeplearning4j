@@ -21,7 +21,6 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.PretrainedType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import weka.dl4j.Preferences;
 
 /**
@@ -32,7 +31,7 @@ import weka.dl4j.Preferences;
  */
 public class Dl4jInceptionResNetV1 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -8732818258861661L;
+  private static final long serialVersionUID = -9139462134170258014L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

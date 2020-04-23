@@ -3,6 +3,8 @@ package weka.dl4j.zoo.keras;
 // TODO check all models download properly
 
 public class InceptionV3 extends KerasZooModel {
+    private static final long serialVersionUID = -3697352145124549273L;
+
     public enum VARIATION {
         STANDARD
     };

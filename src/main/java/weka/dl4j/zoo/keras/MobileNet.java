@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class MobileNet extends KerasZooModel {
+    private static final long serialVersionUID = -5326817943250936967L;
+
     public enum VARIATION {
         V1,
         V2

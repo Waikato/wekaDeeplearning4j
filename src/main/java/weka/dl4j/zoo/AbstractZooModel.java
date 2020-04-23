@@ -28,6 +28,8 @@ import java.util.*;
 @Log4j2
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
+    private static final long serialVersionUID = -4598529061609767660L;
+
     protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
 
     private org.deeplearning4j.zoo.ZooModel m_zooModelType;

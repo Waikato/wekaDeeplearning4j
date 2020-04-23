@@ -30,7 +30,7 @@ import weka.dl4j.PretrainedType;
  */
 public class Dl4jNASNet extends AbstractZooModel {
 
-    private static final long serialVersionUID = -5206943146661L;
+    private static final long serialVersionUID = 2139721217546347671L;
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

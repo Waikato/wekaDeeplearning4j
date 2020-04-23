@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EfficientNet extends KerasZooModel {
+    private static final long serialVersionUID = -3638980669539385867L;
+
     public enum VARIATION {
         EFFICIENTNET_B0,
         EFFICIENTNET_B1,

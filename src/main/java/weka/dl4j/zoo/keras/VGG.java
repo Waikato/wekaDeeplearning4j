@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class VGG extends KerasZooModel {
+    private static final long serialVersionUID = 3908733587819287902L;
+
     public enum VARIATION {VGG16, VGG19};
 
     public static int[] inputShape = new int[] {3, 224, 224};

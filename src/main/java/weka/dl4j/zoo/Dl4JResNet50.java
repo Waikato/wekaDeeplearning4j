@@ -48,7 +48,7 @@ import java.io.IOException;
  */
 public class Dl4JResNet50 extends AbstractZooModel {
 
-    private static final long serialVersionUID = -5206947378361661L;
+    private static final long serialVersionUID = 6012647103023109618L;
 
     public Dl4JResNet50() { setPretrainedType(PretrainedType.IMAGENET); }
 

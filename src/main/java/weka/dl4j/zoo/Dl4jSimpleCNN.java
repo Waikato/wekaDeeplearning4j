@@ -31,7 +31,7 @@ import weka.dl4j.Preferences;
  */
 public class Dl4jSimpleCNN extends AbstractZooModel {
 
-  private static final long serialVersionUID = 42184563995669736L; // TODO figure out why no output layers
+  private static final long serialVersionUID = -7543565465157698715L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

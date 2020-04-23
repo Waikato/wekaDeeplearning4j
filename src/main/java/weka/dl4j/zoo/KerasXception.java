@@ -6,8 +6,9 @@ import weka.dl4j.zoo.keras.VGG;
 import weka.dl4j.zoo.keras.Xception;
 
 public class KerasXception extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
 
+    private static final long serialVersionUID = -6899732453136761839L;
+    
     private Xception.VARIATION variation = Xception.VARIATION.STANDARD;
 
     public KerasXception() {

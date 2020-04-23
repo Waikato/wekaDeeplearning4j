@@ -31,7 +31,7 @@ import weka.dl4j.PretrainedType;
  */
 public class Dl4jSqueezeNet extends AbstractZooModel {
 
-    private static final long serialVersionUID = -5206943146661L;
+    private static final long serialVersionUID = -9163009640895595245L;
 
     public Dl4jSqueezeNet() {
         setPretrainedType(PretrainedType.IMAGENET);

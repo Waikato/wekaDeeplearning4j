@@ -15,12 +15,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.zip.Adler32;
 import java.util.zip.Checksum;
 
 @Log4j2
-public abstract class KerasZooModel extends ZooModel {
+public abstract class KerasZooModel extends ZooModel implements Serializable {
+
+    private static final long serialVersionUID = -7117367016579062724L;
 
     protected int[] inputShape;
 

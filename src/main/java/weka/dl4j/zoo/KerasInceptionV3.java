@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.InceptionResNetV2;
 import weka.dl4j.zoo.keras.InceptionV3;
 
 public class KerasInceptionV3 extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = 4695067559456124034L;
 
     private InceptionV3.VARIATION variation = InceptionV3.VARIATION.STANDARD;
 

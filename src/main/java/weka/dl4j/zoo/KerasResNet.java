@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.DenseNet;
 import weka.dl4j.zoo.keras.ResNet;
 
 public class KerasResNet extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = 5525252856492208127L;
 
     private ResNet.VARIATION variation = ResNet.VARIATION.RESNET50; // TODO refactor this variation to just use Keras model variation
 

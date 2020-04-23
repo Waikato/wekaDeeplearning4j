@@ -33,7 +33,7 @@ import weka.dl4j.PretrainedType;
  */
 public class Dl4jLeNet extends AbstractZooModel {
 
-  private static final long serialVersionUID = 79837621346455139L;
+  private static final long serialVersionUID = 1656653625527283532L;
 
   public Dl4jLeNet() {
     setPretrainedType(PretrainedType.MNIST);

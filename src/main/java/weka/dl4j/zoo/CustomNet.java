@@ -20,7 +20,6 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.PretrainedType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A dummy ZooModel which is empty.
@@ -29,7 +28,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class CustomNet extends AbstractZooModel {
 
-  private static final long serialVersionUID = 7131900848379752732L;
+  private static final long serialVersionUID = -1211860593883280761L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode)

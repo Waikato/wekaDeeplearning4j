@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DenseNet extends KerasZooModel {
+    private static final long serialVersionUID = 982160047744739299L;
+
     public enum VARIATION {DENSENET121, DENSENET169, DENSENET201};
 
     public static int[] inputShape = new int[] {3, 224, 224};

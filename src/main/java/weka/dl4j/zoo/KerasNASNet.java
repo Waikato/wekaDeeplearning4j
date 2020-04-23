@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.MobileNet;
 import weka.dl4j.zoo.keras.NASNet;
 
 public class KerasNASNet extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = -6046846303686819108L;
 
     private NASNet.VARIATION variation = NASNet.VARIATION.MOBILE;
 

@@ -6,7 +6,8 @@ import weka.dl4j.zoo.keras.InceptionResNetV2;
 
 // TODO write custom lambda layers for block35, block17, block8: https://github.com/keras-team/keras-applications/blob/master/keras_applications/inception_resnet_v2.py#L168
 public class KerasInceptionResNetV2 extends AbstractZooModel {
-//    private static final long serialVersionUID = -947378361661L;
+
+    private static final long serialVersionUID = -7137786081088311216L;
 
     private InceptionResNetV2.VARIATION variation = InceptionResNetV2.VARIATION.STANDARD;
 

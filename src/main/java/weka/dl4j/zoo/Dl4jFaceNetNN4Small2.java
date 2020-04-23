@@ -31,7 +31,7 @@ import weka.dl4j.Preferences;
  */
 public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
 
-  private static final long serialVersionUID = -5206685097658861661L;
+  private static final long serialVersionUID = -3489424545896301678L;
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

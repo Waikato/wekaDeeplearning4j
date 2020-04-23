@@ -1,6 +1,8 @@
 package weka.dl4j.zoo.keras;
 
 public class ResNet extends KerasZooModel {
+    private static final long serialVersionUID = 5315928260273073018L;
+
     public enum VARIATION {RESNET50, RESNET50V2, RESNET101, RESNET101V2, RESNET152, RESNET152V2};
 
     public static int[] inputShape = new int[] {3, 224, 224};
