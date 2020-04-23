@@ -269,12 +269,16 @@ public class ZooModelTest {
 
     @Test
     public void testVGG16() throws Exception {
-        buildModel(new VGG16());
+        Dl4jVGG vgg16 = new Dl4jVGG();
+        vgg16.setVariation(Dl4jVGG.VARIATION.VGG16);
+        buildModel(vgg16);
     }
 
     @Test
     public void testVGG19() throws Exception {
-        buildModel(new VGG19());
+        Dl4jVGG vgg19 = new Dl4jVGG();
+        vgg19.setVariation(Dl4jVGG.VARIATION.VGG19);
+        buildModel(vgg19);
     }
 
     @Test
