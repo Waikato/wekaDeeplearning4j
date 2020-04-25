@@ -33,7 +33,7 @@ There are 4 pooling methods currently supported:
 These pool the 2nd and 3rd dimension into a single value, i.e., activations of 
 [512, 26, 26] (512 26x26 feature maps) are pooled into shape [512]. You can also specify `PoolingType.NONE`
 which simply flattens the extra dimensions (aforementioned example would become shape [346112]). 
-`PoolingType` does not need to be specified when using the default activations - they are already the correct dimensionality.
+`PoolingType` does not need to be specified when using the default activation layer - the outputs are already the correct dimensionality.
 
 ## Example 1: Default MNIST Minimal
 The following example walks through using a pretrained ResNet50 (from the Deeplearning4j model Zoo)
@@ -41,7 +41,7 @@ as a feature extractor on the MNIST dataset, and fitting Weka's Random Forest al
 This only takes ~45 seconds on a modern CPU - much faster than training a neural network from scratch.
 
 The steps shown below split this into two steps; storing the featurized dataset, and fitting a Weka classifier to the dataset.
-It can obviously be combined into a single command with a filtered classifier, however, this method
+It can obviously be combined into a single command with a filtered classifier, however, the method shown below
 is more efficient as the dataset featurizing (which is the most expensive part of this operation) 
 is only done once (would be done 10 times using 10-fold CV with a FilteredClassifier). It's also
 much faster to swap out different Weka classifiers.
@@ -61,7 +61,7 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
         -layerName flatten_1 \
         -zooModel "weka.dl4j.zoo.Dl4JResNet50" 
 ```
-We now have a standard `.arff` file that can be fit to like any standard numerical dataset
+We now have a standard `.arff` file that can be fit to like any numerical dataset
 ```bash
 $ java -cp $WEKA_HOME/weka.jar weka.Run .RandomForest -t mnist-rn50.arff
 ```
@@ -77,8 +77,8 @@ Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
 // Create our iterator, pointing it to the location of the images
 ImageInstanceIterator imgIter = new ImageInstanceIterator();
 imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-// Featurize 16 instances at a time
-imgIter.setTrainBatchSize(16);
+// Featurize 1 instances at a time (increase if machine memory allows)
+imgIter.setTrainBatchSize(1);
 myFilter.setImageInstanceIterator(imgIter);
 
 // Load our pretrained model
@@ -116,19 +116,15 @@ If you run into memory issues then use a smaller mini-batch size.
 `ResNet50` is already selected as the feature extractor model, and will by default use the final dense layer activations as the image features.
 The other filter options can be left as default; they'll be explained in the next example.
 
-Click `Ok` and `Apply` to begin processing your dataset. This may take a few minutes depending on the size of your dataset.
-
-After completion, you should see your newly processed dataset!
+Click `Ok` and `Apply` to begin processing your dataset. After completion, you should see your newly processed dataset!
 
 ![Processed Dataset](../img/gui/featurize-std-processed.png)
 
 Simply switch to the `Classify` tab to start applying different WEKA classifiers to your newly transformed dataset.  
 ### Results
 Using `RandomForest` gives us 83% accuracy - certainly not SOTA but given the simplicity and speed of the method it's not bad!
-```text
-=== Stratified cross-validation ===
-=== Summary ===
 
+```text
 Correctly Classified Instances         349               83.0952 %
 Incorrectly Classified Instances        71               16.9048 %
 Kappa statistic                          0.812 
@@ -137,21 +133,6 @@ Root mean squared error                  0.2179
 Relative absolute error                 66.6557 %
 Root relative squared error             72.629  %
 Total Number of Instances              420     
-
-=== Detailed Accuracy By Class ===
-
-                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
-                 0.951    0.016    0.867      0.951    0.907      0.898    0.992     0.944     0
-                 0.979    0.003    0.979      0.979    0.979      0.976    0.996     0.986     1
-                 0.829    0.008    0.919      0.829    0.872      0.860    0.982     0.892     2
-                 0.818    0.040    0.706      0.818    0.758      0.730    0.957     0.761     3
-                 0.732    0.016    0.833      0.732    0.779      0.759    0.978     0.833     4
-                 0.737    0.024    0.757      0.737    0.747      0.722    0.968     0.810     5
-                 0.976    0.013    0.889      0.976    0.930      0.924    0.997     0.971     6
-                 0.932    0.032    0.774      0.932    0.845      0.830    0.987     0.891     7
-                 0.683    0.005    0.933      0.683    0.789      0.781    0.958     0.844     8
-                 0.643    0.032    0.692      0.643    0.667      0.632    0.927     0.711     9
-Weighted Avg.    0.831    0.019    0.836      0.831    0.829      0.813    0.974     0.866     
 
 === Confusion Matrix ===
 
@@ -187,9 +168,9 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
         -layerName flatten_1 \
          
 ```
-We now have a standard `.arff` file that can be fit to like any standard numerical dataset
+We now have a standard `.arff` file that can be fit to like any numerical dataset
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run .RandomForest -t mnist-rn50.arff
+$ java -cp $WEKA_HOME/weka.jar weka.Run .RandomForest -t mnist-rn50-concat.arff
 ```
 
 ### Java
@@ -198,6 +179,10 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run .RandomForest -t mnist-rn50.arff
 Instances instances = new Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
 instances.setClassIndex(1);
 Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+
+// Load our pretrained model (must be done *before* specifying extra transformation layers)
+Dl4JResNet50 zooModel = new Dl4JResNet50();
+myFilter.setZooModelType(zooModel);
 
 // Concatenate activations from an intermediate convolution layer
 myFilter.addTransformationLayerName("res4a_branch2b");
@@ -211,10 +196,6 @@ imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
 imgIter.setTrainBatchSize(16);
 myFilter.setImageInstanceIterator(imgIter);
 
-// Load our pretrained model
-ResNet50 zooModel = new ResNet50();
-myFilter.setZooModelType(zooModel);
-
 // Run the filter, using the model as a feature extractor
 myFilter.setInputFormat(instances);
 Instances transformedInstances = Filter.useFilter(instances, myFilter);
@@ -227,32 +208,36 @@ System.out.println(evaluation.toSummaryString());
 ```
 
 ### GUI
+The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preprocess` tab via `Open File`. 
+A randomly sampled MNIST dataset of 420 images is provided in the WekaDeeplearning4j package for testing purposes 
+(`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist.meta.minimal.arff`). 
 
-The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preprocess` tab via `Open File`. A randomly sampled MNIST dataset of 420 images is provided in the WekaDeeplearning4j package for testing purposes (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist.meta.minimal.arff`). In the next step, the `Dl4jMlpClassifier` has to be selected as `Classifier` in the `Classify` tab. A click on the classifier will open the configuration window
+Then, select the the `Dl4jMlpFilter` in the filter panel. Click in the box to open the filter settings.
 
-![Classifier](../img/gui/mlp-classifier.png)
+![Classifier](../img/gui/featurize-std-filter.png)
 
-To correctly load the images it is further necessary to select the `Image-Instance-Iterator` as `instance iterator` and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`). 
+To correctly load the images it is further necessary to select the `Image-Instance-Iterator` as `instance iterator` 
+and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`). 
+
+If you run into memory issues then use a smaller mini-batch size.
 
 ![Image Instance Iterator](../img/gui/image-instance-iterator.png)
 
-Select `LeNet` from the `zooModel` option as network architecture. 
+`ResNet50` is already selected as the feature extractor model. To add `res4a_branch2b` as another feature extraction layer, we edit the `Feature extraction layer` property:
 
-![LeNet](../img/gui/layer-array.png)
+![Feature Extraction Layers](../img/gui/featurize-concat-layers.png)
 
-A holdout evaluation strategy has to be selected in the `Test options` box via `Percentage split`, which can be set to 66% for a 2/3 - 1/3 split. The classifier training is now ready to be started with the `Start` button. The resulting classifier evaluation can be examined in the `Classifier output` box. Here, an evaluation summary is shown for the training and testing split. 
+Also make sure to set the `Pooling Type` property to `AVG`.
 
-The above setup, trained for 50 epochs with a batch size of 256 produces a classification accuracy of 93.71% on the test data after training on the smaller sampled MNIST dataset and a score of 98.57% after training on the full MNIST dataset.
+Click `Ok` and `Apply` to begin processing your dataset. After completion, you should see your newly processed dataset! The attributes are named after the layer they were derived from, so more investigation can be done around attribute selection (e.g., using the `Select Attributes` panel in WEKA)
 
-| MNIST   |  Train Size |  Test Size |  Train Accuracy |  Test Accuracy | Train Time      |
-| -----   | ----------: | ---------: | --------------: | -------------: | --------------: |
-| Sampled |         277 |        143 |          100.0% |         93.71% | 48.99s          |
-| Full    |      60.000 |     10.000 |          98.76% |         98.57% | 406.30s         |
+![Processed Dataset](../img/gui/featurize-concat-processed.png)
 
-Table 1: Results for training time and classification accuracy after 50 epochs for both the sampled and the full MNIST training dataset using the LeNet architecture. Experiments were run on a NVIDIA TITAN X Pascal GPU.
+Simply switch to the `Classify` tab to start applying different WEKA classifiers (this example uses `RandomForest`) to your newly transformed dataset.  
 
 ### Results
-Unfortunately, adding this extra layer lowered the accuracy (perhaps adding too many unneccessary features).
+Unfortunately, adding this extra layer lowered the accuracy (perhaps adding too many unneccessary features). 
+Try playing around with some other layers to try improve the accuracy.
 
 ```text
 Correctly Classified Instances         327               77.8571 %
