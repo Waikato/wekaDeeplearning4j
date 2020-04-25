@@ -50,6 +50,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
                 imgName.toLowerCase().endsWith(".png");
     }
 
+    private String[] removeNullImages(String[] images) {
+        return Arrays.stream(images).filter(x -> !(x == null)).toArray(String[]::new);
+    }
+
     /**
      * Appends the folder that the image is in, to the image path
      * @param folder
@@ -62,11 +66,12 @@ public class ImageDirectoryLoader extends AbstractLoader implements
             String imgName = imageNames[i];
             if (!isImage(imgName)) {
                 System.err.println(String.format("Found non image file: %s, ignoring...", imgName));
+                imageNames[i] = null;
                 continue;
             }
             imageNames[i] = Paths.get(imgClass, imgName).toString();
         }
-        return imageNames;
+        return removeNullImages(imageNames);
     }
 
     public Instances createDataset() throws Exception {
