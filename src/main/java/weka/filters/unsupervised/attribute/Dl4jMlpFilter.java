@@ -68,54 +68,32 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
    */
   protected boolean useZooModel = true;
 
+  /**
+   * The pooling function to use if taking activations from an intermediary convolution layer
+   * (instead of the already-pooled output layer)
+   */
   protected PoolingType poolingType = PoolingType.MAX;
 
-  public PoolingType getPoolingType() {
-    return poolingType;
-  }
-
-  public void setPoolingType(PoolingType poolingType) {
-    this.poolingType = poolingType;
-  }
-
-  protected Dl4jMlpClassifier model;
-
   /**
-   * Layer index of the layer which is used to get the outputs from.
+   * Layer names of the layer which is used to get the outputs from.
    */
   protected String[] transformationLayerNames = new String[] { };
 
-  @OptionMetadata(
-      description = "Layer names of the layer used for the feature transformation",
-      displayName = "Feature extraction layer",
-      commandLineParamName = "layerName",
-      commandLineParamSynopsis = "-layerName <String>",
-      displayOrder = 0
-  )
-  public String[] getTransformationLayerNames() {
-    return transformationLayerNames;
-  }
+  /**
+   * Model used for feature extraction
+   */
+  protected Dl4jMlpClassifier model;
 
-  public void setTransformationLayerNames(String[] transformationLayerNames) {
-    this.transformationLayerNames = transformationLayerNames;
-  }
-
-  public void addTransformationLayerName(String transformationLayerName) {
-    int n = this.transformationLayerNames.length;
-    String[] newArr = new String[n + 1];
-    for (int i = 0; i < n; i++)
-      newArr[i] = this.transformationLayerNames[i];
-
-    newArr[n] = transformationLayerName;
-    this.transformationLayerNames = newArr;
-  }
+  /**
+   * GET/SET METHODS
+   */
 
   @OptionMetadata(
-      description = "The trained Dl4jMlpClassifier object that contains the network, used for transformation.",
-      displayName = "Serialized model file",
-      commandLineParamName = "model",
-      commandLineParamSynopsis = "-model <File>",
-      displayOrder = 1
+          description = "The trained Dl4jMlpClassifier object that contains the network, used for transformation.",
+          displayName = "Serialized model file",
+          commandLineParamName = "model",
+          commandLineParamSynopsis = "-model <File>",
+          displayOrder = 1
   )
   public File getSerializedModelFile() {
     return serializedModelFile;
@@ -134,7 +112,24 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   )
   public AbstractZooModel getZooModelType() { return zooModelType; }
 
-  public void setZooModelType(AbstractZooModel zooModelType) { this.zooModelType = zooModelType; }
+  public void setZooModelType(AbstractZooModel zooModelType) {
+    this.zooModelType = zooModelType;
+    // Clear the old transformation layers and set the new name
+    setTransformationLayerNames(new String[] {this.zooModelType.getFeatureExtractionLayer()});
+  }
+
+  @OptionMetadata(
+          description = "The instance iterator to use.",
+          displayName = "instance iterator", commandLineParamName = "iterator",
+          commandLineParamSynopsis = "-iterator <string>"
+  )
+  public ImageInstanceIterator getImageInstanceIterator() {
+    return imageInstanceIterator;
+  }
+
+  public void setImageInstanceIterator(ImageInstanceIterator imageInstanceIterator) {
+    this.imageInstanceIterator = imageInstanceIterator;
+  }
 
   @OptionMetadata(
           description = "Are the supplied instances 'meta instances' (just point to image file location)",
@@ -159,16 +154,47 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   public void setUseZooModel(boolean useZooModel) { this.useZooModel = useZooModel; }
 
   @OptionMetadata(
-          description = "The instance iterator to use.",
-          displayName = "instance iterator", commandLineParamName = "iterator",
-          commandLineParamSynopsis = "-iterator <string>"
+          description = "Pooling function to apply on intermediary activations",
+          displayName = "Pooling Type",
+          commandLineParamName = "poolingType",
+          commandLineParamSynopsis = "-poolingType <String>"
   )
-  public ImageInstanceIterator getImageInstanceIterator() {
-    return imageInstanceIterator;
+  public PoolingType getPoolingType() {
+    return poolingType;
   }
 
-  public void setImageInstanceIterator(ImageInstanceIterator imageInstanceIterator) {
-    this.imageInstanceIterator = imageInstanceIterator;
+  public void setPoolingType(PoolingType poolingType) {
+    this.poolingType = poolingType;
+  }
+
+  @OptionMetadata(
+          description = "Layer names of the used for the feature transformation (can be left blank, default will be applied)",
+          displayName = "Feature extraction layer",
+          commandLineParamName = "layerName",
+          commandLineParamSynopsis = "-layerName <String>",
+          displayOrder = 0
+  )
+  public String[] getTransformationLayerNames() {
+    return transformationLayerNames;
+  }
+
+  public void setTransformationLayerNames(String[] transformationLayerNames) {
+    this.transformationLayerNames = transformationLayerNames;
+  }
+
+  public void addTransformationLayerName(String transformationLayerName) {
+    int n = this.transformationLayerNames.length;
+    String[] newArr = new String[n + 1];
+    for (int i = 0; i < n; i++)
+      newArr[i] = this.transformationLayerNames[i];
+
+    newArr[n] = transformationLayerName;
+    this.transformationLayerNames = newArr;
+  }
+
+  public Dl4jMlpFilter() {
+    // By default we set the zoo model default feature extraction as our layer to use
+    setZooModelType(zooModelType);
   }
 
   @Override
@@ -186,9 +212,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
+        model.setFilterMode(true);
+        model.setInstanceIterator(imageInstanceIterator);
       } catch (Exception e) {
-        System.err.println("Couldn't load from model file, trying a pretrained zoo model");
-        e.printStackTrace();
+        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
       }
     } else {
       // If that fails, try loading from selected zoo model (or keras file)
@@ -197,8 +224,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
       model.setZooModel(zooModelType);
       model.setInstanceIterator(imageInstanceIterator);
       model.initializeClassifier(data);
-
-      addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
     }
   }
 
@@ -210,12 +235,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
     return model.getActivationsAtLayers(transformationLayerNames, subset, poolingType);
   }
 
-
   @Override
   protected Instances process(Instances instances) throws Exception {
     return model.getActivationsAtLayers(transformationLayerNames, instances, poolingType);
   }
-
 
   /**
    * Returns an enumeration describing the available options.
