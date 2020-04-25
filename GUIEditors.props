@@ -22,8 +22,6 @@ weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator=weka.gui.
 
 weka.dl4j.activations.Activation=weka.gui.GenericObjectEditor
 
-weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor
-
 weka.dl4j.zoo.AbstractZooModel=weka.gui.GenericObjectEditor
 
 weka.dl4j.earlystopping.EarlyStopping=weka.gui.GenericObjectEditor

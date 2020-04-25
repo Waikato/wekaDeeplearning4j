@@ -28,9 +28,6 @@ weka.dl4j.activations.Activation =\
 weka.dl4j.zoo.AbstractZooModel =\
  weka.dl4j.zoo
 
-weka.dl4j.zoo.ZooModel =\
- weka.dl4j.zoo
-
 weka.dl4j.listener.TrainingListener =\
  weka.dl4j.listener
 
