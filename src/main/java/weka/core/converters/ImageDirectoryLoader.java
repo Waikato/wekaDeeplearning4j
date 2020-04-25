@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ImageDirectoryLoader extends AbstractLoader implements
@@ -18,13 +19,14 @@ public class ImageDirectoryLoader extends AbstractLoader implements
 
     protected String inputDirectory = "";
 
-    protected String outputFile = "";
+    protected String outputFileName = "";
 
     @OptionMetadata(
             displayName = "Input directory",
             description = "Top level directory of the image dataset",
             commandLineParamName = "i",
-            commandLineParamSynopsis = "-i <directory>"
+            commandLineParamSynopsis = "-i <directory>",
+            displayOrder = 1
     )
     public String getInputDirectory() { return inputDirectory; }
 
@@ -32,16 +34,17 @@ public class ImageDirectoryLoader extends AbstractLoader implements
 
     @OptionMetadata(
             displayName = "Output File",
-            description = "Output meta .arff file",
-            commandLineParamName = "o",
-            commandLineParamSynopsis = "-o <filepath> (default: inputDir/output.arff)"
+            description = "Output meta .arff filename",
+            commandLineParamName = "name",
+            commandLineParamSynopsis = "-name <filename> (default: output.arff)",
+            displayOrder = 2
     )
-    public String getOutputFile() {
-        return outputFile;
+    public String getOutputFileName() {
+        return outputFileName;
     }
 
-    public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+    public void setOutputFileName(String outputFileName) {
+        this.outputFileName = outputFileName;
     }
 
     public boolean isImage(String imgName) {
@@ -115,10 +118,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
                 Instances dataset = loader.createDataset();
 
                 // Save the dataset
-                ConverterUtils.DataSink.write(outputFile, dataset);
+                ConverterUtils.DataSink.write(outputFileName, dataset);
 
                 System.out.println("------- SUCCESS -------");
-                System.out.println("Output arff file written to: " + outputFile);
+                System.out.println("Output arff file written to: " + outputFileName);
             } catch (Exception e) {
                 e.printStackTrace();
                 printInfo();
@@ -193,8 +196,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     public void setOptions(String[] options) throws Exception {
         Option.setOptionsForHierarchy(options, this, AbstractFileLoader.class);
 
-        if (outputFile.equals("")) {
-            outputFile = Paths.get(inputDirectory, "output.arff").toString();
+        if (outputFileName.equals("")) {
+            outputFileName = Paths.get(inputDirectory, "output.arff").toString();
+        } else{
+            outputFileName = Paths.get(inputDirectory, outputFileName).toString();
         }
 
         Utils.checkForRemainingOptions(options);
