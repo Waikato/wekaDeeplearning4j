@@ -45,7 +45,9 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     }
 
     public boolean isImage(String imgName) {
-        return imgName.toLowerCase().endsWith(".jpg") && !imgName.toLowerCase().endsWith(".png");
+        return  imgName.toLowerCase().endsWith(".jpg") ||
+                imgName.toLowerCase().endsWith(".jpeg") ||
+                imgName.toLowerCase().endsWith(".png");
     }
 
     /**
