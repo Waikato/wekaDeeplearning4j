@@ -6,6 +6,7 @@ import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.PoolingType;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.updater.Adam;
 import weka.dl4j.updater.Updater;
@@ -63,9 +64,8 @@ class WekaTests {
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         imgIter.setTrainBatchSize(16);
         myFilter.setImageInstanceIterator(imgIter);
-//        myFilter.setTransformationLayerNames(new String[] {"res4a_branch2b"});
-        KerasResNet zooModel = new KerasResNet();
-        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
+        Dl4JResNet50 zooModel = new Dl4JResNet50();
+        myFilter.addTransformationLayerName("res4a_branch2b");
         myFilter.setZooModelType(zooModel);
         Filter.runFilter(myFilter, args);
     }
@@ -119,6 +119,6 @@ class WekaTests {
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        new WekaTests().train(args);
+        new WekaTests().filterTest(args);
     }
 }
