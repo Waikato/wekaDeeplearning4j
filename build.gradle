@@ -9,7 +9,7 @@ group 'nz.ac.waikato.cms.weka'
 version new File('version').text.replace("\n", "")
 description 'Deep learning for WEKA'
 def cuda_version = System.properties['cuda']
-def valid_cuda_versions = ['9.2', '10.0', '10.1']
+def valid_cuda_versions = ['9.2', '10.0', '10.1', '10.2']
 def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
 // Set JDK compatibility
