@@ -24,7 +24,7 @@ allprojects {
 ext.versions = [
         'nd4j'         : '1.0.0-beta6',
         'dl4j'         : '1.0.0-beta6',
-        'weka'         : '3.8.1',
+        'weka'         : '3.8.4',
         'junit'        : '4.12',
         'log4j'        : '2.11.2',
         'ark_tweet_nlp': '0.3.2',
