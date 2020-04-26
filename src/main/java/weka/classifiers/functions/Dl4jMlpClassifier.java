@@ -1599,29 +1599,31 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
-    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-    try {
-      // Try to parse the layers so the user can change them afterwards
-      final int dummyNumLabels = 2;
+    if (!zooModel.isPretrained()) {
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            // Try to parse the layers so the user can change them afterwards
+            final int dummyNumLabels = 2;
 
-      Thread.currentThread().setContextClassLoader(
-          this.getClass().getClassLoader());
-      ComputationGraph tmpCg =
-          zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
-      tmpCg.init();
-      layers =
-          Arrays.stream(tmpCg.getLayers())
-              .map(l -> Layer.create(l.conf().getLayer()))
-              .collect(Collectors.toList())
-              .toArray(new Layer[tmpCg.getLayers().length]);
+            Thread.currentThread().setContextClassLoader(
+                  this.getClass().getClassLoader());
+            ComputationGraph tmpCg =
+                  zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+            tmpCg.init();
+            layers =
+                  Arrays.stream(tmpCg.getLayers())
+                          .map(l -> Layer.create(l.conf().getLayer()))
+                          .collect(Collectors.toList())
+                          .toArray(new Layer[tmpCg.getLayers().length]);
 
-    } catch (Exception e) {
-      if (!(zooModel instanceof CustomNet)) {
-        log.error("Could not set layers from zoomodel.", e);
-      }
-    } finally {
-      Thread.currentThread().setContextClassLoader(origLoader);
-    }
+            } catch (Exception e) {
+                if (!(zooModel instanceof CustomNet)) {
+                  log.error("Could not set layers from zoomodel.", e);
+                }
+            } finally {
+                Thread.currentThread().setContextClassLoader(origLoader);
+            }
+        }
   }
 
   public TrainingListener getIterationListener() {
