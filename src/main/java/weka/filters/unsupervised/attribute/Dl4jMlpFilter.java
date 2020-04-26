@@ -174,10 +174,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   }
 
   @OptionMetadata(
-          description = "Layer names of the used for the feature transformation (can be left blank, default will be applied)",
-          displayName = "Feature extraction layer",
-          commandLineParamName = "layerName",
-          commandLineParamSynopsis = "-layerName <String>",
+          description = "Layers used for the feature transformation (can be left blank, default will be applied)",
+          displayName = "Feature extraction layers",
+          commandLineParamName = "layer-extract",
+          commandLineParamSynopsis = "-layer-extract <Dense Layer Spec>",
           displayOrder = 0
   )
   public DenseLayer[] getTransformationLayers() {
