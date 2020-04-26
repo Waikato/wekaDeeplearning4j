@@ -232,7 +232,7 @@ public class ZooModelTest {
 
     @Test
     public void testDarknet19() throws Exception {
-        buildModel(new Darknet19());
+        buildModel(new Dl4jDarknet19());
     }
 
     @Test
