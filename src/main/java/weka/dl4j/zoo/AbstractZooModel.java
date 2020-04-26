@@ -195,8 +195,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     @OptionMetadata(
             description = "The name of the feature extraction layer in the model.",
             displayName = "Feature extraction layer",
-            commandLineParamName = "layer-features",
-            commandLineParamSynopsis = "-layer-features <String>"
+            commandLineParamName = "layer-feature",
+            commandLineParamSynopsis = "-layer-feature <String>"
     )
     public String getFeatureExtractionLayer() {
         return m_featureExtractionLayer;
