@@ -20,6 +20,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
@@ -30,7 +31,7 @@ import weka.dl4j.zoo.keras.DenseNet;
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class Darknet19 extends AbstractZooModel {
+public class Dl4jDarknet19 extends AbstractZooModel {
 
   private static final long serialVersionUID = 7854379460490744564L;
 
@@ -38,7 +39,17 @@ public class Darknet19 extends AbstractZooModel {
 
   protected VARIATION m_variation = VARIATION.INPUT224;
 
-  public Darknet19() { setPretrainedType(PretrainedType.IMAGENET); }
+  public Dl4jDarknet19() { setPretrainedType(PretrainedType.IMAGENET); }
+
+  @OptionMetadata(
+          description = "The model variation to use.",
+          displayName = "Model Variation",
+          commandLineParamName = "variation",
+          commandLineParamSynopsis = "-variation <String>"
+  )
+  public VARIATION getVariation() {
+    return m_variation;
+  }
 
   public void setVariation(VARIATION var) {
     m_variation = var;

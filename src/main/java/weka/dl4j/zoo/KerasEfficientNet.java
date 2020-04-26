@@ -1,6 +1,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
 import weka.dl4j.zoo.keras.EfficientNet;
@@ -16,6 +17,12 @@ public class KerasEfficientNet extends AbstractZooModel {
         setPretrainedType(PretrainedType.IMAGENET);
     }
 
+    @OptionMetadata(
+            description = "The model variation to use.",
+            displayName = "Model Variation",
+            commandLineParamName = "variation",
+            commandLineParamSynopsis = "-variation <String>"
+    )
     public EfficientNet.VARIATION getVariation() {
         return variation;
     }

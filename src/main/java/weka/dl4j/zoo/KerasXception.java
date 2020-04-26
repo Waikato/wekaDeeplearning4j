@@ -1,6 +1,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.VGG;
 import weka.dl4j.zoo.keras.Xception;
@@ -8,7 +9,7 @@ import weka.dl4j.zoo.keras.Xception;
 public class KerasXception extends AbstractZooModel {
 
     private static final long serialVersionUID = -6899732453136761839L;
-    
+
     private Xception.VARIATION variation = Xception.VARIATION.STANDARD;
 
     public KerasXception() {
@@ -16,6 +17,12 @@ public class KerasXception extends AbstractZooModel {
         setPretrainedType(PretrainedType.IMAGENET);
     }
 
+    @OptionMetadata(
+            description = "The model variation to use.",
+            displayName = "Model Variation",
+            commandLineParamName = "variation",
+            commandLineParamSynopsis = "-variation <String>"
+    )
     public Xception.VARIATION getVariation() {
         return variation;
     }

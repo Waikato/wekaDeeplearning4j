@@ -21,6 +21,7 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.ZooModel;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 
@@ -39,12 +40,20 @@ public class Dl4jVGG extends AbstractZooModel {
 
     public enum VARIATION {VGG16, VGG19}
 
-    ;
-
     protected VARIATION m_variation = VARIATION.VGG16;
 
     public Dl4jVGG() {
         setPretrainedType(PretrainedType.IMAGENET);
+    }
+
+    @OptionMetadata(
+            description = "The model variation to use.",
+            displayName = "Model Variation",
+            commandLineParamName = "variation",
+            commandLineParamSynopsis = "-variation <String>"
+    )
+    public VARIATION getVariation() {
+        return m_variation;
     }
 
     public void setVariation(VARIATION var) {

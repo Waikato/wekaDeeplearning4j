@@ -2,6 +2,7 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
@@ -17,6 +18,12 @@ public class KerasDenseNet extends AbstractZooModel {
         setPretrainedType(PretrainedType.IMAGENET);
     }
 
+    @OptionMetadata(
+            description = "The model variation to use.",
+            displayName = "Model Variation",
+            commandLineParamName = "variation",
+            commandLineParamSynopsis = "-variation <String>"
+    )
     public DenseNet.VARIATION getVariation() {
         return variation;
     }

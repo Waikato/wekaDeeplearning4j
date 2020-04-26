@@ -1,6 +1,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.ResNet;
 import weka.dl4j.zoo.keras.VGG;
@@ -16,6 +17,12 @@ public class KerasVGG extends AbstractZooModel {
         setPretrainedType(PretrainedType.IMAGENET);
     }
 
+    @OptionMetadata(
+            description = "The model variation to use.",
+            displayName = "Model Variation",
+            commandLineParamName = "variation",
+            commandLineParamSynopsis = "-variation <String>"
+    )
     public VGG.VARIATION getVariation() {
         return variation;
     }
