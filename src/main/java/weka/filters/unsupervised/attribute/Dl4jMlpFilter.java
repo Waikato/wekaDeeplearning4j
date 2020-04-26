@@ -21,12 +21,15 @@ package weka.filters.unsupervised.attribute;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Random;
 
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.Dl4JResNet50;
 import weka.filters.Filter;
@@ -77,7 +80,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   /**
    * Layer names of the layer which is used to get the outputs from.
    */
-  protected String[] transformationLayerNames = new String[] { };
+  protected DenseLayer[] transformationLayers = new DenseLayer[] { };
 
   /**
    * Model used for feature extraction
@@ -113,9 +116,12 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   public AbstractZooModel getZooModelType() { return zooModelType; }
 
   public void setZooModelType(AbstractZooModel zooModelType) {
+    // Clear the old transformation layers and set the new one if we've changed to a different model type
+    if (zooModelType.getClass() != this.zooModelType.getClass()) {
+      clearTransformationLayers();
+      addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
+    }
     this.zooModelType = zooModelType;
-    // Clear the old transformation layers and set the new name
-    setTransformationLayerNames(new String[] {this.zooModelType.getFeatureExtractionLayer()});
   }
 
   @OptionMetadata(
