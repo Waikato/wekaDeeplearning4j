@@ -174,27 +174,45 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
           commandLineParamSynopsis = "-layerName <String>",
           displayOrder = 0
   )
-  public String[] getTransformationLayerNames() {
-    return transformationLayerNames;
+  public DenseLayer[] getTransformationLayers() {
+    return transformationLayers;
+  }
+
+  public DenseLayer getTransformationLayer(int index) {
+    return transformationLayers[index];
+  }
+
+  public void setTransformationLayers(DenseLayer[] transformationLayers) {
+    this.transformationLayers = transformationLayers;
   }
 
   public void setTransformationLayerNames(String[] transformationLayerNames) {
-    this.transformationLayerNames = transformationLayerNames;
+    this.transformationLayers = Arrays.stream(transformationLayerNames).map(x -> {
+      DenseLayer newLayer = new DenseLayer();
+      newLayer.setLayerName(x);
+      return newLayer;
+    }).toArray(DenseLayer[]::new);
   }
 
   public void addTransformationLayerName(String transformationLayerName) {
-    int n = this.transformationLayerNames.length;
-    String[] newArr = new String[n + 1];
+    int n = this.transformationLayers.length;
+    DenseLayer[] newArr = new DenseLayer[n + 1];
     for (int i = 0; i < n; i++)
-      newArr[i] = this.transformationLayerNames[i];
+      newArr[i] = this.transformationLayers[i];
 
-    newArr[n] = transformationLayerName;
-    this.transformationLayerNames = newArr;
+    DenseLayer newLayer = new DenseLayer();
+    newLayer.setLayerName(transformationLayerName);
+    newArr[n] = newLayer;
+    this.transformationLayers = newArr;
+  }
+
+  public void clearTransformationLayers() {
+    this.transformationLayers = new DenseLayer[] {};
   }
 
   public Dl4jMlpFilter() {
     // By default we set the zoo model default feature extraction as our layer to use
-    setZooModelType(zooModelType);
+    addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
   }
 
   @Override
@@ -227,17 +245,21 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
     }
   }
 
+  public String[] transformationLayersToNames() {
+    return Arrays.stream(transformationLayers).map(x -> x.getLayerName()).toArray(String[]::new);
+  }
+
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
     loadModel(inputFormat);
     // No need to featurize full dataset at this point - only getting the output format
     Instances subset = new Instances(inputFormat, 0, 1);
-    return model.getActivationsAtLayers(transformationLayerNames, subset, poolingType);
+    return model.getActivationsAtLayers(transformationLayersToNames(), subset, poolingType);
   }
 
   @Override
   protected Instances process(Instances instances) throws Exception {
-    return model.getActivationsAtLayers(transformationLayerNames, instances, poolingType);
+    return model.getActivationsAtLayers(transformationLayersToNames(), instances, poolingType);
   }
 
   /**

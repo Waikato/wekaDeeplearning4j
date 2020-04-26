@@ -1,6 +1,9 @@
 weka.dl4j.NeuralNetConfiguration =\
  weka.dl4j
 
+weka.dl4j.layers.DenseLayer =\
+ weka.dl4j.layers
+
 weka.dl4j.layers.Layer =\
  weka.dl4j.layers
 
