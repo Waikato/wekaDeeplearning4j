@@ -11,21 +11,22 @@ This package mostly follows the official [Google Java Style Guide](https://googl
 The package uses Gradle to manage dependencies and build the necessary weka package zip file, as well as the additional cuda library zip files. It is either possible to call the specific gradle tasks:
 ```bash
 $ ./gradlew makeMain
-$ ./gradlew makeCuda -Dcuda=8.0
-$ ./gradlew makeCuda -Dcuda=9.0
 $ ./gradlew makeCuda -Dcuda=9.2
+$ ./gradlew makeCuda -Dcuda=10.0
+$ ./gradlew makeCuda -Dcuda=10.1
+$ ./gradlew makeCuda -Dcuda=10.2
 ```
 
 or to use the provided `build.py` script. The usage is as follows:
 ```bash
 $ ./build.py -h
-usage: build.py [-h] [--cuda-version {8.0,9.0,9.2}] [--build-all] [--verbose]
+usage: build.py [-h] [--cuda-version {9.2,10.0,10.1,10.2}] [--build-all] [--verbose]
 
 Build the wekaDeeplearning4j packages.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --cuda-version {8.0,9.0,9.2}, -c {8.0,9.0,9.2}
+  --cuda-version {9.2,10.0,10.1,10.2}, -c {9.2,10.0,10.1,10.2}
                         The cuda version.
   --build-all, -a       Flag to build all platform/cuda packages.
   --verbose, -v         Enable verbose output.

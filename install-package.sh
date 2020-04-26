@@ -11,7 +11,7 @@ function show_usage {
     echo -e ""
     echo -e "Optional arguments:"
     echo -e "   -c/--cuda-version       Select specific backend "
-    echo -e "                           Available: ( 8.0 9.0 9.1 )"
+    echo -e "                           Available: ( 9.2 10.0 10.1 10.2 )"
     echo -e "   -h/--help               Show this message"
     exit 0
 }
