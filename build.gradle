@@ -121,6 +121,7 @@ task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
         include 'GenericPropertiesCreator.props'
         include 'GUIEditors.props'
         include 'datasets/**'
+        include 'model-zoo/**'
         include 'doc/**'
         include 'src/main/**'
         exclude 'src/main/*.iml'
