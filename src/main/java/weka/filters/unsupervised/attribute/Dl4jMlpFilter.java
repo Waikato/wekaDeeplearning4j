@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Random;
 
+import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.dl4j.PoolingType;
@@ -41,6 +42,7 @@ import weka.filters.SimpleBatchFilter;
  *
  * @author Steven Lang
  */
+@Log4j2
 public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
 
   private static final long serialVersionUID = 1317698787337080580L;
@@ -117,7 +119,9 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
 
   public void setZooModelType(AbstractZooModel zooModelType) {
     // Clear the old transformation layers and set the new one if we've changed to a different model type
-    if (zooModelType.getClass() != this.zooModelType.getClass()) {
+    if (isDifferentModel(zooModelType)) {
+      log.warn("Changed model family or variation, clearing old transformation layers. " +
+              "If you wanted to keep them you will need to set them again.");
       clearTransformationLayers();
       addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
     }
@@ -219,6 +223,11 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   public Dl4jMlpFilter() {
     // By default we set the zoo model default feature extraction as our layer to use
     addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
+  }
+
+  public boolean isDifferentModel(AbstractZooModel zooModelType) {
+    return zooModelType.getClass() != this.zooModelType.getClass() ||
+            (zooModelType.getVariation() != this.zooModelType.getVariation());
   }
 
   @Override
