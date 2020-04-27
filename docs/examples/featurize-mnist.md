@@ -33,18 +33,19 @@ There are 4 pooling methods currently supported:
 These pool the 2nd and 3rd dimension into a single value, i.e., activations of 
 [512, 26, 26] (512 26x26 feature maps) are pooled into shape [512]. You can also specify `PoolingType.NONE`
 which simply flattens the extra dimensions (aforementioned example would become shape [346112]). 
-`PoolingType` does not need to be specified when using the default activation layer - the outputs are already the correct dimensionality.
+`PoolingType` does not need to be specified when using the default activation layer - the outputs are already the
+ correct dimensionality.
 
 ## Example 1: Default MNIST Minimal
 The following example walks through using a pretrained ResNet50 (from the Deeplearning4j model Zoo)
 as a feature extractor on the MNIST dataset, and fitting Weka's Random Forest algorithm to the dataset.
-This only takes ~45 seconds on a modern CPU - much faster than training a neural network from scratch.
+This only takes 1-2 minutes on a modern CPU &mdash; much faster than training a neural network from scratch.
 
 The steps shown below split this into two steps; storing the featurized dataset, and fitting a Weka classifier to the dataset.
-It can obviously be combined into a single command with a filtered classifier, however, the method shown below
+It can be combined into a single command with a filtered classifier, however, the method shown below
 is more efficient as the dataset featurizing (which is the most expensive part of this operation) 
-is only done once (would be done 10 times using 10-fold CV with a FilteredClassifier). It's also
-much faster to swap out different Weka classifiers.
+is only done once (would be done 10 times using 10-fold CV with a FilteredClassifier). It's then
+much faster to try out different Weka classifiers.
 
 Note that the first time this is run, it will need to download the pretrained weights, so actual runtime
 may be longer. 
@@ -55,11 +56,12 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
     .Dl4jMlpFilter \
         -i datasets/nominal/mnist.meta.minimal.arff \
         -o mnist-rn50.arff \
-        -c last
+        -c last \
         -decimal 20 \
-        -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 1" \
-        -layerName flatten_1 \
-        -zooModel "weka.dl4j.zoo.Dl4JResNet50" 
+        -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12" \
+        -layer-extract "weka.dl4j.layers.DenseLayer -name flatten_1" \
+        -isZoo true 
+        -zooModel "weka.dl4j.zoo.Dl4JResNet50"
 ```
 We now have a standard `.arff` file that can be fit to like any numerical dataset
 ```bash
@@ -77,23 +79,27 @@ Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
 // Create our iterator, pointing it to the location of the images
 ImageInstanceIterator imgIter = new ImageInstanceIterator();
 imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-// Featurize 1 instances at a time (increase if machine memory allows)
-imgIter.setTrainBatchSize(1);
+// Set batch size to thread count if using CPU
+imgIter.setTrainBatchSize(12);
 myFilter.setImageInstanceIterator(imgIter);
 
 // Load our pretrained model
-ResNet50 zooModel = new ResNet50();
+Dl4JResNet50 zooModel = new Dl4JResNet50();
 myFilter.setZooModelType(zooModel);
 
 // Run the filter, using the model as a feature extractor
 myFilter.setInputFormat(instances);
 Instances transformedInstances = Filter.useFilter(instances, myFilter);
 
+// You could save the instances at this point to an arff file to be used with other classifiers via:
+// https://waikato.github.io/weka-wiki/formats_and_processing/save_instances_to_arff/
+
 // CV our Random Forest classifier on the extracted features
 Evaluation evaluation = new Evaluation(transformedInstances);
 int numFolds = 10;
 evaluation.crossValidateModel(new RandomForest(), transformedInstances, numFolds, new Random(1));
 System.out.println(evaluation.toSummaryString());
+System.out.println(evaluation.toMatrixString());
 ```
 
 ### GUI
@@ -109,11 +115,13 @@ Then, select the the `Dl4jMlpFilter` in the filter panel. Click in the box to op
 To correctly load the images it is further necessary to select the `Image-Instance-Iterator` as `instance iterator` 
 and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`). 
 
-If you run into memory issues then use a smaller mini-batch size.
+If running on CPU then set mini-batch size to your machine's thread count. 
+If you run into GPU memory issues then use a smaller mini-batch size.
 
 ![Image Instance Iterator](../img/gui/image-instance-iterator.png)
 
-`ResNet50` is already selected as the feature extractor model, and will by default use the final dense layer activations as the image features.
+`Dl4jResNet50` is already selected as the feature extractor model, and will by default use the final dense layer
+ activations as the image features.
 The other filter options can be left as default; they'll be explained in the next example.
 
 Click `Ok` and `Apply` to begin processing your dataset. After completion, you should see your newly processed dataset!
@@ -163,9 +171,9 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
         -decimal 20 \
         -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 16" \
         -poolingType AVG \
-        -zooModel "weka.dl4j.zoo.Dl4JResNet50" 
-        -layerName res4a_branch2b \
-        -layerName flatten_1 \
+        -zooModel "weka.dl4j.zoo.Dl4JResNet50" \ 
+        -layer-extract "weka.dl4j.layers.DenseLayer -name res4a_branch2b" \
+        -layer-extract "weka.dl4j.layers.DenseLayer -name flatten_1" 
          
 ```
 We now have a standard `.arff` file that can be fit to like any numerical dataset
@@ -200,11 +208,15 @@ myFilter.setImageInstanceIterator(imgIter);
 myFilter.setInputFormat(instances);
 Instances transformedInstances = Filter.useFilter(instances, myFilter);
 
+// You could save the instances at this point to an arff file to be used with other classifiers via:
+// https://waikato.github.io/weka-wiki/formats_and_processing/save_instances_to_arff/
+
 // CV our Random Forest classifier on the extracted features
 Evaluation evaluation = new Evaluation(transformedInstances);
 int numFolds = 10;
 evaluation.crossValidateModel(new RandomForest(), transformedInstances, numFolds, new Random(1));
 System.out.println(evaluation.toSummaryString());
+System.out.println(evaluation.toMatrixString());
 ```
 
 ### GUI
@@ -223,21 +235,27 @@ If you run into memory issues then use a smaller mini-batch size.
 
 ![Image Instance Iterator](../img/gui/image-instance-iterator.png)
 
-`ResNet50` is already selected as the feature extractor model. To add `res4a_branch2b` as another feature extraction layer, we edit the `Feature extraction layer` property:
+`Dl4jResNet50` is already selected as the feature extractor model. To add `res4a_branch2b` as another feature extraction layer, we edit the `Feature extraction layers` property.
+Click to open the array editor, and click the `DenseLayer` specification to open the editor for our new layer.
 
 ![Feature Extraction Layers](../img/gui/featurize-concat-layers.png)
 
-Also make sure to set the `Pooling Type` property to `AVG`.
+When adding another feature extraction layer, only the `layer name` property needs to be set. Click `OK` and `Add` to add the newly created layer:
 
-Click `Ok` and `Apply` to begin processing your dataset. After completion, you should see your newly processed dataset! The attributes are named after the layer they were derived from, so more investigation can be done around attribute selection (e.g., using the `Select Attributes` panel in WEKA)
+![Feature Extraction Layers](../img/gui/featurize-concat-layers2.png)
+
+Note that the order of feature extraction layers may have an effect on accuracy obtained by a WEKA classifier.
+Set the `Pooling Type` property to `AVG`, and click `Ok` and `Apply` to begin processing your dataset. 
+After completion, you should see your newly processed dataset! 
+The attributes are named after the layer they were derived from, so more investigation can be done around which layer provides the most informative features (e.g., using the `Select Attributes` panel in WEKA).
 
 ![Processed Dataset](../img/gui/featurize-concat-processed.png)
 
-Simply switch to the `Classify` tab to start applying different WEKA classifiers (this example uses `RandomForest`) to your newly transformed dataset.  
+Simply switch to the `Classify` tab to start applying different WEKA classifiers (this example uses `RandomForest`) to the newly transformed dataset.  
 
 ### Results
 Unfortunately, adding this extra layer lowered the accuracy (perhaps adding too many unneccessary features). 
-Try playing around with some other layers to try improve the accuracy.
+Try playing around with some other layers/classifiers to try improve the accuracy.
 
 ```text
 Correctly Classified Instances         327               77.8571 %
