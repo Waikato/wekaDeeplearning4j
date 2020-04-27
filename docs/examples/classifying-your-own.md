@@ -14,15 +14,19 @@ WekaDeeplearning4j now comes with the `ImageDirectoryLoader`, a simple command l
 
 #### Usage
 ```bash
+java -cp <path to weka.jar> weka.Run .ImageDirectoryLoader -i <input dataset path> -name <output arff filename>
+```
+e.g.:
+```bash
 java -cp <path to weka.jar> weka.Run .ImageDirectoryLoader -i /path/to/plant-seedlings/data/train -name plant-seedlings-train.arff
 ```
 
-The associated meta `.arff` file has been created inside the directory specified. As we're simply checking accuracy within WEKA, we won't load in the `test/` data and submit it to Kaggle - that is outside the scope of this tutorial.
+The associated meta `.arff` file has been created inside the input directory specified. As we're simply checking accuracy within WEKA, we won't load in the `test/` data and submit it to Kaggle - that is outside the scope of this tutorial.
 
 **Important note:** The newly created arff dataset contains two features, the first one being the `filename` and the second one being the `class`. Therefore it is necessary to define an `ImageDataSetIterator` which uses these filenames in the directory given by the option `-imagesLocation`.
 
 ## Training - Commandline
-The following run finetunes a pretrained ResNet152v2 for 20 epochs
+The following run finetunes a pretrained ResNet model for 20 epochs. This shows how to specify a non-default variation from the command line.
 ```bash
 $ java -cp $WEKA_HOME/weka.jar weka.Run \
     .Dl4jMlpClassifier \
@@ -30,8 +34,8 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
     -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation plant-seedlings/data/train -bs 16" \
     -normalization "Standardize training data" \
     -zooModel "weka.dl4j.zoo.KerasResNet -variation RESNET152V2" \
-    -config "weka.dl4j.NeuralNetConfiguration -updater weka.dl4j.updater.Adam" \
-    -numEpochs 10 \
+    -config "weka.dl4j.NeuralNetConfiguration -updater \"weka.dl4j.updater.Adam -lr 0.1\"" \
+    -numEpochs 20 \
     -t plant-seedlings/data/train/plant-seedlings-train.arff \
     -split-percentage 66
 ```

@@ -42,13 +42,13 @@ Check out the [filter tutorial](./examples/featurize-mnist.md) for usage example
 
 ### Image Dataset Conversion Script
 Often, image classification datasets come in a folder-organized fashion i.e., instance classes are inferred
-from the subfolder they're in. Now included is `ImageDirectoryLoader`, a tool to create an `.arff` file from this folder structure so it can be loaded into WEKA. 
+from the subfolder they're in as opposed to having a seperate file explicitly defining this. Now included is `ImageDirectoryLoader`, a tool to create an `.arff` file from this folder structure so it can be loaded into WEKA. 
 
 Check out [Classify Your Own Dataset](examples/classifying-your-own.md) for usage examples
 
 ### CUDA 10.2 Support
-The new release of Deeplearning4j (`1.0.0-beta6`) now supports CUDA 10.2, so WekaDeeplearnin4j has
- some new installation packages for users with this CUDA version. 
+The new release of Deeplearning4j (`1.0.0-beta6`) now supports CUDA 10.2, so WekaDeeplearning4j has
+ new installation packages for users with this CUDA version. 
 
 ## Citation
 
