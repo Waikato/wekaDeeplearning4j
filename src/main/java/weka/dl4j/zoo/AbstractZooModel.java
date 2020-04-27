@@ -63,7 +63,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     public abstract int[][] getShape();
 
     public void setVariation(Enum var) {
+        log.warn("Method not implemented or wrong variation type given, please ensure you set the correct one");
         return;
+    }
+
+    public Enum getVariation() {
+        return null;
     }
 
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
