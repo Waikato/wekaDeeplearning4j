@@ -24,6 +24,7 @@ import org.deeplearning4j.zoo.ZooModel;
 import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
+import weka.dl4j.zoo.keras.VGG;
 
 /**
  * A WEKA version of DeepLearning4j's VGG16 ZooModel.
@@ -38,9 +39,7 @@ public class Dl4jVGG extends AbstractZooModel {
 
     private static final long serialVersionUID = -4741420712433849216L;
 
-    public enum VARIATION {VGG16, VGG19}
-
-    protected VARIATION m_variation = VARIATION.VGG16;
+    protected VGG.VARIATION m_variation = VGG.VARIATION.VGG16;
 
     public Dl4jVGG() {
         setPretrainedType(PretrainedType.IMAGENET);
@@ -52,11 +51,11 @@ public class Dl4jVGG extends AbstractZooModel {
             commandLineParamName = "variation",
             commandLineParamSynopsis = "-variation <String>"
     )
-    public VARIATION getVariation() {
+    public VGG.VARIATION getVariation() {
         return m_variation;
     }
 
-    public void setVariation(VARIATION var) {
+    public void setVariation(VGG.VARIATION var) {
         m_variation = var;
 
         setPretrainedType(m_pretrainedType);
@@ -64,28 +63,28 @@ public class Dl4jVGG extends AbstractZooModel {
 
     @Override
     public void setPretrainedType(PretrainedType pretrainedType) {
-        if (m_variation == VARIATION.VGG16) {
+        if (m_variation == VGG.VARIATION.VGG16) {
             if (pretrainedType == PretrainedType.VGGFACE) {
                 // VGGFace pretrained has slightly different network structure to Imagenet pretrained
                 setPretrainedType(pretrainedType, 4096, "fc7", "fc8");
             } else {
                 setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
             }
-        } else if (m_variation == VARIATION.VGG19) {
+        } else if (m_variation == VGG.VARIATION.VGG19) {
             setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
         }
     }
 
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         ZooModel net = null;
-        if (m_variation == VARIATION.VGG16) {
+        if (m_variation == VGG.VARIATION.VGG16) {
             net = org.deeplearning4j.zoo.model.VGG16.builder()
                     .cacheMode(CacheMode.NONE)
                     .workspaceMode(Preferences.WORKSPACE_MODE)
                     .inputShape(shape)
                     .numClasses(numLabels)
                     .build();
-        } else if (m_variation == VARIATION.VGG19) {
+        } else if (m_variation == VGG.VARIATION.VGG19) {
             net = org.deeplearning4j.zoo.model.VGG19.builder()
                     .cacheMode(CacheMode.NONE)
                     .workspaceMode(Preferences.WORKSPACE_MODE)
@@ -101,7 +100,7 @@ public class Dl4jVGG extends AbstractZooModel {
 
     @Override
     public int[][] getShape() {
-        if (m_variation == VARIATION.VGG16)
+        if (m_variation == VGG.VARIATION.VGG16)
             return org.deeplearning4j.zoo.model.VGG16.builder().build().metaData().getInputShape();
         else
             return org.deeplearning4j.zoo.model.VGG19.builder().build().metaData().getInputShape();
