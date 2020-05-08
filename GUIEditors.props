@@ -6,8 +6,6 @@ weka.dl4j.layers.DenseLayer[]=weka.gui.GenericArrayEditor
 
 weka.dl4j.layers.DenseLayer=weka.gui.GenericObjectEditor
 
-java.lang.String[]=weka.gui.GenericArrayEditor
-
 weka.dl4j.listener.TrainingListener=weka.gui.GenericObjectEditor
 
 weka.dl4j.distribution.Distribution=weka.gui.GenericObjectEditor
