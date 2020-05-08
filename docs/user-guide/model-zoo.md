@@ -26,8 +26,10 @@ Values in **bold** are the defaults.
 
 The EfficientNet family of models will be added soon.
 
-To set a predefined model, e.g. ResNet50, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.Dl4JResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
-DL4J's DarkNet19 model has two variations, however, to set this one must set the image `width` and `height` to `448`, otherwise the default `224` size will be used.
+To set a predefined model, e.g. ResNet50, from the model zoo” -> “To set a predefined model, 
+e.g. ResNet50, from the model zoo in the GUI is straightforward via the corresponding pop-up menu. 
+To set a predefined model from the command-line or via the API”, it is necessary to add the 
+`-zooModel "weka.dl4j.zoo.Dl4JResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
 
 Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`.
 In addition, some Keras models support different variations. These can be set via `.setVariation()` e.g.:
