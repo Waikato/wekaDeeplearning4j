@@ -270,14 +270,14 @@ public class ZooModelTest {
     @Test
     public void testVGG16() throws Exception {
         Dl4jVGG vgg16 = new Dl4jVGG();
-        vgg16.setVariation(Dl4jVGG.VARIATION.VGG16);
+        vgg16.setVariation(VGG.VARIATION.VGG16);
         buildModel(vgg16);
     }
 
     @Test
     public void testVGG19() throws Exception {
         Dl4jVGG vgg19 = new Dl4jVGG();
-        vgg19.setVariation(Dl4jVGG.VARIATION.VGG19);
+        vgg19.setVariation(VGG.VARIATION.VGG19);
         buildModel(vgg19);
     }
 
