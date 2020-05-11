@@ -48,9 +48,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     }
 
     public boolean isImage(String imgName) {
-        return  imgName.toLowerCase().endsWith(".jpg") ||
-                imgName.toLowerCase().endsWith(".jpeg") ||
-                imgName.toLowerCase().endsWith(".png");
+        String lowerName = imgName.toLowerCase();
+        return  lowerName.endsWith(".jpg") ||
+                lowerName.endsWith(".jpeg") ||
+                lowerName.endsWith(".png");
     }
 
     private String[] removeNullImages(String[] images) {
