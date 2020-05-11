@@ -1,6 +1,7 @@
 package weka.core.converters;
 
 import weka.core.*;
+import weka.gui.ProgrammaticProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class ImageDirectoryLoader extends AbstractLoader implements
@@ -17,10 +17,11 @@ public class ImageDirectoryLoader extends AbstractLoader implements
 
     private static final long serialVersionUID = 8956780190928290891L;
 
-    protected String inputDirectory = "";
+    protected File inputDirectory = new File(System.getProperty("user.dir"));
 
     protected String outputFileName = "";
 
+    @ProgrammaticProperty
     @OptionMetadata(
             displayName = "Input directory",
             description = "Top level directory of the image dataset",
@@ -28,10 +29,11 @@ public class ImageDirectoryLoader extends AbstractLoader implements
             commandLineParamSynopsis = "-i <directory>",
             displayOrder = 1
     )
-    public String getInputDirectory() { return inputDirectory; }
+    public File getInputDirectory() { return inputDirectory; }
 
-    public void setInputDirectory(String inputDirectory) { this.inputDirectory = inputDirectory; }
+    public void setInputDirectory(File inputDirectory) { this.inputDirectory = inputDirectory; }
 
+    @ProgrammaticProperty
     @OptionMetadata(
             displayName = "Output File",
             description = "Output meta .arff filename",
@@ -78,9 +80,8 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         return removeNullImages(imageNames);
     }
 
-    public Instances createDataset() throws Exception {
-        File dir = new File(inputDirectory);
-        File[] classArr = dir.listFiles();
+    public Instances createDataset() {
+        File[] classArr = inputDirectory.listFiles();
         assert classArr != null;
         List<File> classes = Arrays.stream(classArr).filter(File::isDirectory).collect(Collectors.toList());
         List<String> classStrings = classes.stream().map(File::getName).collect(Collectors.toList());
@@ -89,7 +90,7 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         atts.add(new Attribute("image_path", (List<String>) null));
         atts.add(new Attribute("class", classStrings));
 
-        Instances data = new Instances("image_dataset__" + dir.getName(), atts, 0);
+        Instances data = new Instances("image_dataset__" + inputDirectory.getName(), atts, 0);
 
         for (File imgClass : classes) {
             String[] imgs = fileListForFolder(imgClass);
@@ -103,20 +104,28 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         return data;
     }
 
-    private boolean unusedOptions(String[] options) {
-        return Arrays.stream(options).anyMatch(x -> !x.equals(""));
-    }
-
     @Override
     public void preExecution() throws Exception {}
 
     @Override
-    public void run(Object toRun, String[] options) throws Exception {
+    public void run(Object toRun, String[] options) throws IllegalArgumentException {
+        if (!(toRun instanceof ImageDirectoryLoader)) {
+            throw new IllegalArgumentException("Object to execute is not a "
+                    + "ImageDirectoryLoader!");
+        }
+        
         ImageDirectoryLoader loader = (ImageDirectoryLoader) toRun;
         if (options.length > 0) {
             try {
                 loader.setOptions(options);
-                Instances dataset = loader.createDataset();
+
+                if (outputFileName.equals("")) {
+                    outputFileName = Paths.get(inputDirectory.getAbsolutePath(), "output.arff").toString();
+                } else{
+                    outputFileName = Paths.get(inputDirectory.getAbsolutePath(), outputFileName).toString();
+                }
+
+                Instances dataset = getDataSet();
 
                 // Save the dataset
                 ConverterUtils.DataSink.write(outputFileName, dataset);
@@ -157,12 +166,24 @@ public class ImageDirectoryLoader extends AbstractLoader implements
 
     @Override
     public Instances getDataSet() throws IOException {
-        return null;
+        return createDataset();
     }
 
     @Override
     public Instance getNextInstance(Instances structure) throws IOException {
         return null;
+    }
+
+    @Override
+    public void setSource(File dir) throws IOException {
+        if (dir == null) {
+            throw new IOException("Source directory object is null!");
+        }
+
+        inputDirectory = dir;
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new IOException("Directory '" + dir + "' not found");
+        }
     }
 
     @Override
@@ -197,14 +218,11 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     public void setOptions(String[] options) throws Exception {
         Option.setOptionsForHierarchy(options, this, AbstractFileLoader.class);
 
-        if (outputFileName.equals("")) {
-            outputFileName = Paths.get(inputDirectory, "output.arff").toString();
-        } else{
-            outputFileName = Paths.get(inputDirectory, outputFileName).toString();
-        }
-
         Utils.checkForRemainingOptions(options);
-//        if (unusedOptions(options))
-//            throw new Exception("Invalid arguments: " + Arrays.toString(options));
+    }
+    
+    public static void main(String[] args) {
+        ImageDirectoryLoader loader = new ImageDirectoryLoader();
+        loader.run(loader, args);
     }
 }
