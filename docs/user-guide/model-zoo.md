@@ -26,17 +26,25 @@ Values in **bold** are the defaults.
 
 The EfficientNet family of models will be added soon.
 
-To set a predefined model, e.g. ResNet50, from the model zoo” -> “To set a predefined model, 
-e.g. ResNet50, from the model zoo in the GUI is straightforward via the corresponding pop-up menu. 
-To set a predefined model from the command-line or via the API”, it is necessary to add the 
+To set a predefined model, e.g. ResNet50, from the model zoo in the GUI is straightforward via the corresponding pop-up menu. 
+To set a predefined model from the command-line or via the API, it is necessary to add the 
 `-zooModel "weka.dl4j.zoo.Dl4JResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
 
-Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`.
-In addition, some Keras models support different variations. These can be set via `.setVariation()` e.g.:
+Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`, and similarly for Deeplearning4j models (e.g., `DL4JDarknet19`).
+In addition, some models support different variations. Again, it is straightforward to do this via the GUI. 
+To do via command line you must add the `-variation` argument e.g.:
+
+```shell script
+...
+-ZooModel ".KerasResNet -variation RESNET152V2" 
+...
+```
+
+If using the Java API, these can be set via `.setVariation()` e.g.:
 
 ```java
 KerasResNet kerasResNet = new KerasResNet();
-kerasResNet.setVariation(ResNet.VARIATION.RESNET101V2);
+kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
 ```
 
 View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/classifying-your-own.md)
