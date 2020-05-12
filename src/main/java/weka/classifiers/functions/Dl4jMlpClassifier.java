@@ -18,12 +18,7 @@
 
 package weka.classifiers.functions;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.*;
@@ -1262,7 +1257,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     while (!initSuccessful) {
       if (newWidth > maxWidth) {
         // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks
-        throw new Exception("Error when creating model, could not succeed");
+        throw new Exception("Error when creating model, your configuration may be incorrect - check logs for more info");
       }
       // Increase width and height
       int[] newShape = new int[]{channels, newHeight, newWidth};
@@ -1305,9 +1300,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
       e.printStackTrace();
       return false;
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       e.printStackTrace();
-      return false;
+      throw new WekaException("Couldn't find the image file, have you set up the instance iterator correctly?");
     }
   }
 
