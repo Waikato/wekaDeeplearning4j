@@ -820,6 +820,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     done();
   }
 
+  public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
+    return (!(filterMode) && !(layer instanceof BaseOutputLayer
+            || layer instanceof LossLayer || layer instanceof ActivationLayer));
+  }
+
   /**
    * The method used to initialize the classifier.
    *
@@ -861,8 +866,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final Layer lastLayer = layers[layers.length - 1];
     org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
         lastLayer.getBackend();
-    if (!(isFilterMode()) && !(lastLayerBackend instanceof BaseOutputLayer
-        || lastLayerBackend instanceof LossLayer || lastLayerBackend instanceof ActivationLayer)) {
+    if (noOutputLayer(isFilterMode(), lastLayerBackend)) {
       throw new MissingOutputLayerException(
           "Last layer in network must be an output layer but was: "
               + lastLayerBackend.getClass().getSimpleName());
