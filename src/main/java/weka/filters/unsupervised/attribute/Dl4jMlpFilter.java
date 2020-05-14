@@ -62,18 +62,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   protected ImageInstanceIterator imageInstanceIterator = new ImageInstanceIterator();
 
   /**
-   * Is the supplied dataset a meta file (simply contains locations of image files)
-   * or does the arff contain all the image data inside
-   */
-  protected boolean isMetaArff = true;
-
-  /**
-   * Should we use the selected Model Zoo model, or should we use the serialized model
-   * as specified by specifiedModelFile
-   */
-  protected boolean useZooModel = true;
-
-  /**
    * The pooling function to use if taking activations from an intermediary convolution layer
    * (instead of the already-pooled output layer)
    */
@@ -140,28 +128,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   public void setImageInstanceIterator(ImageInstanceIterator imageInstanceIterator) {
     this.imageInstanceIterator = imageInstanceIterator;
   }
-
-  @OptionMetadata(
-          description = "Are the supplied instances 'meta instances' (just point to image file location)",
-          displayName = "Using 'meta instances'?",
-          commandLineParamName = "isMeta",
-          commandLineParamSynopsis = "-isMeta <true|false>",
-          displayOrder = 3
-  )
-  public boolean isMetaArff() { return isMetaArff; }
-
-  public void setMetaArff(boolean metaArff) { isMetaArff = metaArff; }
-
-  @OptionMetadata(
-          description = "Use the zoo model specification instead of the serialized model file",
-          displayName = "Use the zoo model",
-          commandLineParamName = "isZoo",
-          commandLineParamSynopsis = "-isZoo <true|false>",
-          displayOrder = 4
-  )
-  public boolean isUseZooModel() { return useZooModel; }
-
-  public void setUseZooModel(boolean useZooModel) { this.useZooModel = useZooModel; }
 
   @OptionMetadata(
           description = "Pooling function to apply on intermediary activations",
@@ -240,8 +206,13 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
     return true;
   }
 
+  private boolean userSuppliedModelFile() {
+    // Has the model file location been set to something other than the default
+    return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
+  }
+
   private void loadModel(Instances data) throws Exception {
-    if (!useZooModel) {
+    if (userSuppliedModelFile()) {
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
