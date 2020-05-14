@@ -39,7 +39,7 @@ public class Dl4jXception extends AbstractZooModel {
 
   @Override
   public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 1000, "predictions", "");
+    setPretrainedType(pretrainedType, 2048, "avg_pool", "predictions");
   }
 
   @Override
@@ -53,7 +53,7 @@ public class Dl4jXception extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode, true);
   }
 
   @Override

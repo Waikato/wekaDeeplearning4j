@@ -42,7 +42,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     private long seed, numLabels;
 
-    private boolean filterMode;
+    private boolean filterMode, requiresPooling;
 
     /**
      * Initialize the ZooModel as MLP
@@ -78,10 +78,20 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                                                  long seed,
                                                  int numLabels,
                                                  boolean filterMode) {
+        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, filterMode, false);
+    }
+
+    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
+                                                 ComputationGraph defaultNet,
+                                                 long seed,
+                                                 int numLabels,
+                                                 boolean filterMode,
+                                                 boolean requiresPooling) {
 
         this.seed = seed;
         this.numLabels = numLabels;
         this.filterMode = filterMode;
+        this.requiresPooling = requiresPooling;
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == PretrainedType.NONE)
@@ -103,6 +113,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     private ComputationGraph finish(ComputationGraph computationGraph) {
+        System.out.println(computationGraph.summary());
         return addFinalOutputLayer(computationGraph);
     }
 
@@ -120,10 +131,19 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             return computationGraph;
         }
         try {
-            TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
+            TransferLearning.GraphBuilder graphBuilder;
+
+            if (requiresPooling)
+                graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
                     .fineTuneConfiguration(getFineTuneConfig())
-                    .addLayer(m_predictionLayerName, createOutputLayer(), m_featureExtractionLayer)
+                    .addLayer("intermediate_pooling", new GlobalPoolingLayer.Builder().build(), m_featureExtractionLayer)
+                    .addLayer(m_predictionLayerName, createOutputLayer(), "intermediate_pooling")
                     .setOutputs(m_predictionLayerName);
+            else
+                graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
+                        .fineTuneConfiguration(getFineTuneConfig())
+                        .addLayer(m_predictionLayerName, createOutputLayer(), m_featureExtractionLayer)
+                        .setOutputs(m_predictionLayerName);
 
             // Remove the old output layer, but keep the connections
             graphBuilder.removeVertexKeepConnections(m_outputLayer);
