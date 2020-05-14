@@ -237,40 +237,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return m_featureExtractionLayer;
     }
 
-    public void setFeatureExtractionLayer(String featureExtractionLayer) {
-        this.m_featureExtractionLayer = featureExtractionLayer;
-    }
-
     @OptionMetadata(
-            description = "The name of the output layer in the model.",
-            displayName = "Output layer",
-            commandLineParamName = "layer-output",
-            commandLineParamSynopsis = "-layer-output <String>"
-    )
-    public String getOutputLayer() {
-        return m_outputLayer;
-    }
-
-    public void setOutputLayer(String outputLayer) {
-        this.m_outputLayer = outputLayer;
-    }
-
-    @OptionMetadata(
-            description = "Number of feature extraction layer output nodes",
-            displayName = "Num feature extract outputs",
-            commandLineParamName = "layer-feature-outputs",
-            commandLineParamSynopsis = "-layer-feature-outputs <int>"
-    )
-    public int getNumFExtractOutputs() {
-        return m_numFExtractOutputs;
-    }
-
-    public void setNumFExtractOutputs(int m_numFExtractOutputs) {
-        this.m_numFExtractOutputs = m_numFExtractOutputs;
-    }
-
-    @OptionMetadata(
-            description = "Pretrained Type (IMAGENET, VGGFACE, IMAGENET LARGE, MNIST)",
+            description = "Pretrained Type (IMAGENET, VGGFACE, MNIST)",
             displayName = "Pretrained Type",
             commandLineParamName = "pretrained",
             commandLineParamSynopsis = "-pretrained <string>"
