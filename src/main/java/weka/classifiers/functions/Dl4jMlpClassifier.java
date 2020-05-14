@@ -18,10 +18,12 @@
 
 package weka.classifiers.functions;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.extern.log4j.Log4j2;
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
+import org.deeplearning4j.nn.api.layers.IOutputLayer;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
@@ -96,6 +99,9 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.gui.ProgrammaticProperty;
+
+import javax.swing.*;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -1573,6 +1579,48 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+
+  private static void checkIfRunByGUI() {
+    // Don't need to check if we've already set this
+    if (System.getProperty("weka.started.via.GUIChooser") != null) {
+      return;
+    }
+
+    StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    System.setProperty("weka.started.via.GUIChooser", "false");
+    for (StackTraceElement s : stack) {
+      if (s.getClassName().equals("weka.gui.GenericObjectEditor")) {
+        System.setProperty("weka.started.via.GUIChooser", "true");
+        log.debug("Weka started by GUIChooser");
+        break;
+      }
+    }
+  }
+
+  private JFrame showModelLoadingFrame() {
+    checkIfRunByGUI();
+
+    javax.swing.JFrame frame = null;
+    String msg = "Downloading model weights and initializing model, please wait...";
+    log.info(msg);
+    if (!GraphicsEnvironment.isHeadless() && System.getProperty("weka.started.via.GUIChooser").equals("true")) {
+      frame = new javax.swing.JFrame("WekaDeeplearning4j Notification: " + msg);
+      frame.setPreferredSize(new java.awt.Dimension(850, 0));
+      frame.pack();
+      frame.setLocationRelativeTo(null);
+      frame.setVisible(true);
+      frame.setAutoRequestFocus(true);
+      frame.setAlwaysOnTop(true);
+    }
+    return frame;
+  }
+
+  private void closeModelLoadingFrame(JFrame frame) {
+    if (frame != null) {
+      frame.dispose();
+    }
+  }
+
   /**
    * Get the modelzoo model
    *
@@ -1594,31 +1642,32 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
-    if (!zooModel.isPretrained()) {
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            // Try to parse the layers so the user can change them afterwards
-            final int dummyNumLabels = 2;
+      JFrame frame = showModelLoadingFrame();
 
-            Thread.currentThread().setContextClassLoader(
-                  this.getClass().getClassLoader());
-            ComputationGraph tmpCg =
-                  zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
-            tmpCg.init();
-            layers =
-                  Arrays.stream(tmpCg.getLayers())
-                          .map(l -> Layer.create(l.conf().getLayer()))
-                          .collect(Collectors.toList())
-                          .toArray(new Layer[tmpCg.getLayers().length]);
+      ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+      try {
+          // Try to parse the layers so the user can change them afterwards
+          final int dummyNumLabels = 2;
 
-            } catch (Exception e) {
-                if (!(zooModel instanceof CustomNet)) {
-                  log.error("Could not set layers from zoomodel.", e);
-                }
-            } finally {
-                Thread.currentThread().setContextClassLoader(origLoader);
-            }
-        }
+          Thread.currentThread().setContextClassLoader(
+                this.getClass().getClassLoader());
+          ComputationGraph tmpCg =
+                zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+          tmpCg.init();
+          layers =
+                Arrays.stream(tmpCg.getLayers())
+                        .map(l -> Layer.create(l.conf().getLayer()))
+                        .collect(Collectors.toList())
+                        .toArray(new Layer[tmpCg.getLayers().length]);
+
+          } catch (Exception e) {
+              if (!(zooModel instanceof CustomNet)) {
+                log.error("Could not set layers from zoomodel.", e);
+              }
+          } finally {
+              Thread.currentThread().setContextClassLoader(origLoader);
+              closeModelLoadingFrame(frame);
+          }
   }
 
   public TrainingListener getIterationListener() {
@@ -1646,6 +1695,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   public boolean isFilterMode() { return filterMode; }
 
+  @ProgrammaticProperty
   public void setFilterMode(boolean filterMode) { this.filterMode = filterMode; }
 
   /**
