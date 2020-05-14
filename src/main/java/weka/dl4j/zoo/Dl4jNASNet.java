@@ -28,29 +28,34 @@ import weka.dl4j.PretrainedType;
  *
  * @author Rhys Compton
  */
-public class Dl4jNASNet extends AbstractZooModel {
+public class Dl4jNASNet {
+    // NASNet has a bug in the current version of DL4j (1.0.0-beta6)
+    // It should be fixed in the next release
+    // https://github.com/eclipse/deeplearning4j/issues/7319
 
-    private static final long serialVersionUID = 2139721217546347671L;
-
-    @Override
-    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-        org.deeplearning4j.zoo.model.NASNet net = org.deeplearning4j.zoo.model.NASNet.builder()
-                .cacheMode(CacheMode.NONE)
-                .workspaceMode(Preferences.WORKSPACE_MODE)
-                .inputShape(shape)
-                .numClasses(numLabels)
-                .build();
-
-        // DL4J bug? Throws IllegalArgumentException: Cannot calculate activation types if no inputs have been set (use addInputs(String...))
-        // However addInputs() is not available on NASNet.builder()
-        ComputationGraph defaultNet = net.init();
-
-        return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
-    }
-
-
-    @Override
-    public int[][] getShape() {
-        return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
-    }
+//public class Dl4jNASNet extends AbstractZooModel {
+//
+//    private static final long serialVersionUID = 2139721217546347671L;
+//
+//    @Override
+//    public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
+//        org.deeplearning4j.zoo.model.NASNet net = org.deeplearning4j.zoo.model.NASNet.builder()
+//                .cacheMode(CacheMode.NONE)
+//                .workspaceMode(Preferences.WORKSPACE_MODE)
+//                .inputShape(shape)
+//                .numClasses(numLabels)
+//                .build();
+//
+//        // DL4J bug? Throws IllegalArgumentException: Cannot calculate activation types if no inputs have been set (use addInputs(String...))
+//        // However addInputs() is not available on NASNet.builder()
+//        ComputationGraph defaultNet = net.init();
+//
+//        return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+//    }
+//
+//
+//    @Override
+//    public int[][] getShape() {
+//        return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
+//    }
 }

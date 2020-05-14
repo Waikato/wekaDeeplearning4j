@@ -29,26 +29,30 @@ import weka.dl4j.Preferences;
  *
  * @author Steven Lang
  */
-public class Dl4jSimpleCNN extends AbstractZooModel {
+public class Dl4jSimpleCNN {
+  // Removed as default network doesn't have output layer
+  // Also unneeded in the model zoo, AlexNet is a simpler model architecture
+  // So if doing debugging and one wants a simple NN, use AlexNet instead
 
-  private static final long serialVersionUID = -7543565465157698715L;
-
-  @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
-    org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
-        .cacheMode(CacheMode.NONE)
-        .workspaceMode(Preferences.WORKSPACE_MODE)
-        .inputShape(shape)
-        .numClasses(numLabels)
-        .build();
-
-    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
-
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
-  }
-
-  @Override
-  public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.SimpleCNN.builder().build().metaData().getInputShape();
-  }
+//public class Dl4jSimpleCNN extends AbstractZooModel {
+//  private static final long serialVersionUID = -7543565465157698715L;
+//
+//  @Override
+//  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
+//    org.deeplearning4j.zoo.model.SimpleCNN net = org.deeplearning4j.zoo.model.SimpleCNN.builder()
+//        .cacheMode(CacheMode.NONE)
+//        .workspaceMode(Preferences.WORKSPACE_MODE)
+//        .inputShape(shape)
+//        .numClasses(numLabels)
+//        .build();
+//
+//    ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
+//
+//    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+//  }
+//
+//  @Override
+//  public int[][] getShape() {
+//    return org.deeplearning4j.zoo.model.SimpleCNN.builder().build().metaData().getInputShape();
+//  }
 }
