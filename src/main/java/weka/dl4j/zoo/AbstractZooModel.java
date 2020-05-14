@@ -2,6 +2,7 @@ package weka.dl4j.zoo;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.NotImplementedException;
+import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
 import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
@@ -13,6 +14,7 @@ import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
@@ -32,8 +34,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
 
-    private org.deeplearning4j.zoo.ZooModel m_zooModelType;
-
     protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "weka_predictions";
 
     protected String[] m_extraLayersToRemove = new String[0];
@@ -41,6 +41,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     protected int m_numFExtractOutputs;
 
     private long seed, numLabels;
+
+    private boolean filterMode;
 
     /**
      * Initialize the ZooModel as MLP
@@ -79,28 +81,29 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
         this.seed = seed;
         this.numLabels = numLabels;
+        this.filterMode = filterMode;
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == PretrainedType.NONE)
-            return defaultNet;
+            return finish(defaultNet);
 
         // If the specified pretrained weights aren't available, return the standard model
         if (!checkPretrained(zooModel)) {
             m_pretrainedType = PretrainedType.NONE;
-            return defaultNet;
+            return finish(defaultNet);
         }
 
         // If downloading the weights fails, return the standard model
         ComputationGraph pretrainedModel = downloadWeights(zooModel);
         if (pretrainedModel == null)
-            return defaultNet;
+            return finish(defaultNet);
 
-        System.out.println(pretrainedModel.summary());
+        // If all has gone well, we have the pretrained weights
+        return finish(pretrainedModel);
+    }
 
-        if (!filterMode)
-            return addFinalOutputLayer(pretrainedModel);
-        else
-            return pretrainedModel;
+    private ComputationGraph finish(ComputationGraph computationGraph) {
+        return addFinalOutputLayer(computationGraph);
     }
 
     protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph, long seed, int numLabels) {
@@ -110,6 +113,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph) {
+        org.deeplearning4j.nn.conf.layers.Layer lastLayer = computationGraph.getLayers()[computationGraph.getNumLayers() - 1].conf().getLayer();
+        if (!Dl4jMlpClassifier.noOutputLayer(filterMode, lastLayer)) {
+            log.debug("No need to add output layer, ignoring");
+            log.debug(computationGraph.summary());
+            return computationGraph;
+        }
         try {
             TransferLearning.GraphBuilder graphBuilder = new TransferLearning.GraphBuilder(computationGraph)
                     .fineTuneConfiguration(getFineTuneConfig())
@@ -123,7 +132,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 graphBuilder.removeVertexAndConnections(layer);
             }
 
-            System.out.println(graphBuilder.build().summary());
+            log.debug("Finished adding output layer");
+            log.debug(graphBuilder.build().summary());
             return graphBuilder.build();
         } catch (Exception ex) {
             ex.printStackTrace();
