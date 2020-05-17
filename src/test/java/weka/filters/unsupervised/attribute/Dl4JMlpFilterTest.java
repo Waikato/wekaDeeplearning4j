@@ -166,7 +166,6 @@ public class Dl4JMlpFilterTest {
     filter.setTransformationLayerNames(transformationLayerNames);
     filter.setInputFormat(iris);
     filter.setPoolingType(PoolingType.NONE);
-    filter.setUseZooModel(useZooModel);
 
     Instances activationsActual = Filter.useFilter(iris, filter);
 
