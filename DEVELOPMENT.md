@@ -116,5 +116,3 @@ so we don't strip off anything and just attach the output layer to the final cla
 | Keras     | VGG               | Yes                    | ImageNet                  | 16, 19                                   |                                                                                                                                                                        |
 | Keras     | Xception          | Yes                    | ImageNet                  | Standard                                 |                                                                                                                                                                        |
 
-- Add a new class in /keras
-- Add links to the model .h5 file and the relevant checksum in ...
