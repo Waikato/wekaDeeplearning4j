@@ -68,6 +68,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
                     "Pretrained " + pretrainedType + " weights are not available for this model.");
 
         String localFilename = modelPrettyName() + ".h5";
+//        String localFilename = "EfficientNetB0Broadcasted.h5";
 
         File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelFamily());
         File cachedFile = new File(rootCacheDir, localFilename);
