@@ -32,12 +32,12 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
+import org.nd4j.common.primitives.Pair;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
-import org.nd4j.linalg.primitives.Pair;
 import weka.core.stopwords.AbstractStopwords;
 
 /**
