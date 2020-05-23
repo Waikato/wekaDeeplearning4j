@@ -1,18 +1,12 @@
 package myTest;
 
-import org.deeplearning4j.zoo.ZooModel;
-import org.nd4j.shade.protobuf.MapEntry;
+import org.deeplearning4j.nn.modelimport.keras.KerasLayer;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils;
-import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.PoolingType;
-import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.updater.Adam;
-import weka.dl4j.updater.Updater;
+import weka.dl4j.layers.lambda.CustomBroadcast;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.Dl4jVGG;
 import weka.dl4j.zoo.keras.*;
@@ -259,13 +253,30 @@ public class WekaTests {
             Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
             ImageInstanceIterator imgIter = new ImageInstanceIterator();
             imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-            imgIter.setTrainBatchSize(16);
-            imgIter.setHeight(224);
-            imgIter.setWidth(224);
-            imgIter.setNumChannels(3);
+//            imgIter.setHeight(224);
+//            imgIter.setWidth(224);
+//            imgIter.setNumChannels(3);
             myFilter.setImageInstanceIterator(imgIter);
+//
+//            KerasLayer.registerLambdaLayer("broadcast_w112_d32_1", new CustomBroadcast(112));
+//            KerasLayer.registerLambdaLayer("broadcast_w56_d96_1", new CustomBroadcast(56));
+//            KerasLayer.registerLambdaLayer("broadcast_w56_d144_1", new CustomBroadcast(56));
+//            KerasLayer.registerLambdaLayer("broadcast_w28_d144_1", new CustomBroadcast(28));
+//            KerasLayer.registerLambdaLayer("broadcast_w28_d240_1", new CustomBroadcast(28));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d240_1", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_1", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_2", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_3", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d672_1", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w14_d672_2", new CustomBroadcast(14));
+//            KerasLayer.registerLambdaLayer("broadcast_w7_d672_1", new CustomBroadcast(7));
+//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_1", new CustomBroadcast(7));
+//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_2", new CustomBroadcast(7));
+//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_3", new CustomBroadcast(7));
+//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_4", new CustomBroadcast(7));
 
-            Dl4JResNet50 thisModel = new Dl4JResNet50();
+            Dl4jVGG thisModel = new Dl4jVGG();
+//            thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
 //            thisModel.setPretrainedType(PretrainedType.NONE);
 //            thisModel.setVariation(NASNet.VARIATION.LARGE);
             myFilter.setZooModelType(thisModel);
