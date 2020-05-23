@@ -22,8 +22,8 @@ allprojects {
  * Dependency versions.
  */
 ext.versions = [
-        'nd4j'         : '1.0.0-beta6',
-        'dl4j'         : '1.0.0-beta6',
+        'nd4j'         : '1.0.0-beta7',
+        'dl4j'         : '1.0.0-beta7',
         'weka'         : '3.8.4',
         'junit'        : '4.12',
         'log4j'        : '2.11.2',
@@ -271,7 +271,6 @@ dependencies {
     implementation "org.deeplearning4j:deeplearning4j-nlp:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-zoo:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-parallel-wrapper:$versions.dl4j"
-    implementation "org.nd4j:nd4j-jackson:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-platform:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-api:$versions.nd4j"
     implementation "org.bytedeco.javacpp-presets:openblas-platform:$versions.openblas"
