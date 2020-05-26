@@ -116,3 +116,23 @@ so we don't strip off anything and just attach the output layer to the final cla
 | Keras     | VGG               | Yes                    | ImageNet                  | 16, 19                                   |                                                                                                                                                                        |
 | Keras     | Xception          | Yes                    | ImageNet                  | Standard                                 |                                                                                                                                                                        |
 
+## Adding new Zoo models
+
+In a recent release of DL4J, importing Keras models via `.h5` files broke for some model types.
+
+[Github Issue](https://github.com/eclipse/deeplearning4j/issues/8976)
+
+To remedy this, Keras model loading is now done via the raw DL4J format.
+
+All of these steps should be run from within the `weka/dl4j/scripts/` folder
+
+- Set up python environment. Recommended to use Anaconda. Create an environment from `environment.yml`.
+- Run the keras downloader: `python keras_download.py`. This downloads and saves Keras models as specified in `models.py`.
+At this point you could load these `.h5` files directly, but as mentioned above, that method doesn't work in later versions of DL4J.
+- Convert the `.h5` files into `.zip`. This is done by running the `KerasModelConverter` script. 
+Provide it with the location of the h5 files e.g., 
+```shell script
+java KerasModelConverter src/main/weka/dl4j/scripts/output_h5
+```
+- In the `dl4j_format` folder, you should now have `.zip` files for all models that were successfully converted.
+Check the logs for information on models that couldn't be converted.
