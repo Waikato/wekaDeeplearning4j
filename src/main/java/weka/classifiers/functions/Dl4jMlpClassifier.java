@@ -828,7 +828,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
     return (!(filterMode) && !(layer instanceof BaseOutputLayer
-            || layer instanceof LossLayer || layer instanceof ActivationLayer));
+            //|| layer instanceof LossLayer || layer instanceof ActivationLayer
+            // The above two layers still throw errors from DL4j if they're the output
+            ));
   }
 
   /**
