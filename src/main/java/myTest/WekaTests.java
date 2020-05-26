@@ -1,6 +1,16 @@
 package myTest;
 
+import org.datavec.api.split.FileSplit;
+import org.datavec.image.recordreader.ImageRecordReader;
+import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasLayer;
+import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
+import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
+import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.trees.RandomForest;
@@ -13,8 +23,7 @@ import weka.dl4j.zoo.keras.*;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 
 public class WekaTests {
@@ -249,42 +258,58 @@ public class WekaTests {
         System.out.println(originalNum);
     }
 
+    public void dl4jTest(String[] args) throws InvalidKerasConfigurationException, IOException, UnsupportedKerasConfigurationException {
+//        KerasLayer.registerLambdaLayer("broadcast_w112_d32_1", new CustomBroadcast(112));
+//        KerasLayer.registerLambdaLayer("broadcast_w56_d96_1", new CustomBroadcast(56));
+//        KerasLayer.registerLambdaLayer("broadcast_w56_d144_1", new CustomBroadcast(56));
+//        KerasLayer.registerLambdaLayer("broadcast_w28_d144_1", new CustomBroadcast(28));
+//        KerasLayer.registerLambdaLayer("broadcast_w28_d240_1", new CustomBroadcast(28));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d240_1", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_1", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_2", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_3", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d672_1", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w14_d672_2", new CustomBroadcast(14));
+//        KerasLayer.registerLambdaLayer("broadcast_w7_d672_1", new CustomBroadcast(7));
+//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_1", new CustomBroadcast(7));
+//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_2", new CustomBroadcast(7));
+//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_3", new CustomBroadcast(7));
+//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_4", new CustomBroadcast(7));
+
+        // Create VGG16 from a Keras .h5 file
+//        ComputationGraph tmpModel = KerasModelImport.importKerasModelAndWeights("ResNet50_old.h5");
+//        tmpModel.save(new File("VGG.zip"));
+//        ComputationGraph tmpModel = ComputationGraph.load(new File("/home/rhys/Documents/git/wekaDeeplearning4j/src/main/java/weka/dl4j/scripts/dl4j_format/KerasVGG16.zip"), true);
+//        ComputationGraph tmpModel = ComputationGraph.load(new File("/home/rhys/Documents/git/wekaDeeplearning4j/EfficientNetB0.zip"), true);
+        ComputationGraph tmpModel = KerasModelImport.importKerasModelAndWeights("/home/rhys/EfficientNetB0tfkeras.h5");
+        tmpModel.init();
+//
+//        ImageRecordReader reader = new ImageRecordReader(224, 224, 3);
+//        reader.initialize(new FileSplit(new File("datasets/nominal/mnist-minimal/img_125_5.jpg"))); // Test with a single image
+//        DataSetIterator it = new RecordReaderDataSetIterator(reader, 1);
+//
+//        // Keras model has wrong channel order, so flip it at the reader level
+////        reader.setNchw_channels_first(false);
+//
+//        INDArray features = it.next().getFeatures();
+////        INDArray features = Nd4j.rand(1, 3, 224, 224); // Runs fine when initializing from random array of same size
+//
+//        System.out.println(Arrays.toString(features.shape())); // prints [1, 224, 224, 3]
+//
+//        tmpModel.feedForward(features, false);
+    }
+
     public void filterTest2(String[] args) throws Exception {
             Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
             ImageInstanceIterator imgIter = new ImageInstanceIterator();
             imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
-//            imgIter.setHeight(224);
-//            imgIter.setWidth(224);
-//            imgIter.setNumChannels(3);
             myFilter.setImageInstanceIterator(imgIter);
-//
-//            KerasLayer.registerLambdaLayer("broadcast_w112_d32_1", new CustomBroadcast(112));
-//            KerasLayer.registerLambdaLayer("broadcast_w56_d96_1", new CustomBroadcast(56));
-//            KerasLayer.registerLambdaLayer("broadcast_w56_d144_1", new CustomBroadcast(56));
-//            KerasLayer.registerLambdaLayer("broadcast_w28_d144_1", new CustomBroadcast(28));
-//            KerasLayer.registerLambdaLayer("broadcast_w28_d240_1", new CustomBroadcast(28));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d240_1", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_1", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_2", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d480_3", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d672_1", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w14_d672_2", new CustomBroadcast(14));
-//            KerasLayer.registerLambdaLayer("broadcast_w7_d672_1", new CustomBroadcast(7));
-//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_1", new CustomBroadcast(7));
-//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_2", new CustomBroadcast(7));
-//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_3", new CustomBroadcast(7));
-//            KerasLayer.registerLambdaLayer("broadcast_w7_d1152_4", new CustomBroadcast(7));
 
-            Dl4jVGG thisModel = new Dl4jVGG();
-//            thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
-//            thisModel.setPretrainedType(PretrainedType.NONE);
+            KerasResNet thisModel = new KerasResNet();
+            thisModel.setVariation(ResNet.VARIATION.RESNET101);
+//            thisModel.setVariation(NASNet.VARIATION.LARGE);
 //            thisModel.setVariation(NASNet.VARIATION.LARGE);
             myFilter.setZooModelType(thisModel);
-
-//            weka.core.Instances instances = new weka.core.Instances(new FileReader(args[1]));
-//            instances.setClassIndex(1);
-//
-//            myFilter.setInputFormat(instances);
 
             Filter.runFilter(myFilter, args);
     }
@@ -307,8 +332,8 @@ public class WekaTests {
         clf.setInstanceIterator(imgIter);
 
         // Set up the pretrained model
-        Dl4jDarknet19 zooModel = new Dl4jDarknet19();
-//        zooModel.setVariation(Dl4jDarknet19.VARIATION.INPUT448);
+        KerasNASNet zooModel = new KerasNASNet();
+//        zooModel.setVariation(NASNet.VARIATION.LARGE);
         clf.setZooModel(zooModel);
 
         // Stratify and split the data
@@ -332,6 +357,6 @@ public class WekaTests {
     }
 
     public static void main(String[] args) throws Exception {
-        new WekaTests().filterTest2(args);
+        new WekaTests().dl4jTest(args);
     }
 }
