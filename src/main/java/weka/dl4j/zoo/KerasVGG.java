@@ -13,7 +13,7 @@ public class KerasVGG extends AbstractZooModel {
     private VGG.VARIATION variation = VGG.VARIATION.VGG16;
 
     public KerasVGG() {
-        setVariation(VGG.VARIATION.VGG19);
+        setVariation(VGG.VARIATION.VGG16);
         setPretrainedType(PretrainedType.IMAGENET);
     }
 
