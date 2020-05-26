@@ -58,8 +58,8 @@ public class Dl4jDarknet19 extends AbstractZooModel {
   @Override
   public void setPretrainedType(PretrainedType pretrainedType) {
     setPretrainedType(pretrainedType, 1000,
-            "globalpooling", "softmax",
-            new String[]{"loss"});
+            "conv2d_19", "globalpooling",
+            new String[]{"softmax", "loss"});
   }
 
   @Override
@@ -73,7 +73,7 @@ public class Dl4jDarknet19 extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode, true);
   }
 
   @Override
