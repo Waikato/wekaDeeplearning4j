@@ -27,9 +27,9 @@ public class VGG extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case VGG16:
-                return "VGG16";
+                return "KerasVGG16";
             case VGG19:
-                return "VGG19";
+                return "KerasVGG19";
             default:
                 return null;
         }

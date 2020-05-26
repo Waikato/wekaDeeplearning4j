@@ -31,11 +31,11 @@ public class DenseNet extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case DENSENET121:
-                return "DenseNet121";
+                return "KerasDenseNet121";
             case DENSENET169:
-                return "DenseNet169";
+                return "KerasDenseNet169";
             case DENSENET201:
-                return "DenseNet201";
+                return "KerasDenseNet201";
             default:
                 return null;
         }

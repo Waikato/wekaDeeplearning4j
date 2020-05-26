@@ -40,21 +40,21 @@ public class EfficientNet extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case EFFICIENTNET_B0:
-                return "EfficientNetB0";
+                return "KerasEfficientNetB0";
             case EFFICIENTNET_B1:
-                return "EfficientNetB1";
+                return "KerasEfficientNetB1";
             case EFFICIENTNET_B2:
-                return "EfficientNetB2";
+                return "KerasEfficientNetB2";
             case EFFICIENTNET_B3:
-                return "EfficientNetB3";
+                return "KerasEfficientNetB3";
             case EFFICIENTNET_B4:
-                return "EfficientNetB4";
+                return "KerasEfficientNetB4";
             case EFFICIENTNET_B5:
-                return "EfficientNetB5";
+                return "KerasEfficientNetB5";
             case EFFICIENTNET_B6:
-                return "EfficientNetB6";
+                return "KerasEfficientNetB6";
             case EFFICIENTNET_B7:
-                return "EfficientNetB7";
+                return "KerasEfficientNetB7";
             default:
                 return null;
         }

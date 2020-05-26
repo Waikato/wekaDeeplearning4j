@@ -29,6 +29,6 @@ public class InceptionV3 extends KerasZooModel {
 
     @Override
     public String modelPrettyName() {
-        return "InceptionV3";
+        return "KerasInceptionV3";
     }
 }

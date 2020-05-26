@@ -38,9 +38,9 @@ public class NASNet extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case MOBILE:
-                return "NASNetMobile";
+                return "KerasNASNetMobile";
             case LARGE:
-                return "NASNetLarge";
+                return "KerasNASNetLarge";
             default:
                 return null;
         }

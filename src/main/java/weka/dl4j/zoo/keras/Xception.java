@@ -27,7 +27,7 @@ public class Xception extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case STANDARD:
-                return "Xception";
+                return "KerasXception";
             default:
                 return null;
         }

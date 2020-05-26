@@ -27,17 +27,17 @@ public class ResNet extends KerasZooModel {
     public String modelPrettyName() {
         switch (m_variation) {
             case RESNET50:
-                return "ResNet50";
+                return "KerasResNet50";
             case RESNET50V2:
-                return "ResNet50V2";
+                return "KerasResNet50V2";
             case RESNET101:
-                return "ResNet101";
+                return "KerasResNet101";
             case RESNET101V2:
-                return "ResNet101V2";
+                return "KerasResNet101V2";
             case RESNET152:
-                return "ResNet152";
+                return "KerasResNet152";
             case RESNET152V2:
-                return "ResNet152V2";
+                return "KerasResNet152V2";
             default:
                 return null;
         }
