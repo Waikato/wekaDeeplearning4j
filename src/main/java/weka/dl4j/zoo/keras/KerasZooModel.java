@@ -6,6 +6,8 @@ import org.deeplearning4j.common.resources.DL4JResources;
 import org.deeplearning4j.common.resources.ResourceType;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.modelimport.keras.KerasLayer;
+import org.deeplearning4j.nn.modelimport.keras.KerasModel;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.deeplearning4j.util.ModelSerializer;
 import org.deeplearning4j.zoo.ModelMetaData;
@@ -69,6 +71,9 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
                     "Pretrained " + pretrainedType + " weights are not available for this model.");
 
         String localFilename = modelPrettyName() + ".zip";
+//        String localFilename = "EfficientNetB0Fixed_clast.h5";    // TODO come back to fixing EfficientNet after Github issue resolved
+                                                                    // https://github.com/eclipse/deeplearning4j/issues/8976
+
 
         File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelFamily());
         File cachedFile = new File(rootCacheDir, localFilename);
