@@ -185,3 +185,5 @@ output_summary
 dl4j_format
 
 .vscode
+
+*.h5
