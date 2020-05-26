@@ -1,6 +1,5 @@
 import efficientnet.keras as efn
 import keras
-import efficientnet
 
 # Commented out models cannot currently be loaded into DL4J 
 # Look at the model zoo table in DEVELOPMENT.md for more information
