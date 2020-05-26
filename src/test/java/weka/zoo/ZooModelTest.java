@@ -18,15 +18,15 @@
 
 package weka.zoo;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.naming.OperationNotSupportedException;
 
+import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.zoo.ZooModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -41,26 +41,22 @@ import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.Dl4jXception;
 import weka.dl4j.zoo.keras.*;
 import weka.dl4j.zoo.keras.NASNet;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 import weka.util.DatasetLoader;
 
 import static org.junit.Assert.fail;
 
 class ModelDownloader implements Runnable {
 
-    ZooModel zooModel;
-    PretrainedType pretrainedType;
+    AbstractZooModel zooModel;
 
-    public ModelDownloader(ZooModel zooModel, PretrainedType pretrainedType) {
+    public ModelDownloader(AbstractZooModel zooModel) {
         this.zooModel = zooModel;
-        this.pretrainedType = pretrainedType;
     }
 
     public void run() {
-        try {
-            this.zooModel.initPretrained(this.pretrainedType.getBackend());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        this.zooModel.init(2, 0, new int[] {3, 224, 224}, true);
     }
 }
 
@@ -73,22 +69,20 @@ class ModelDownloader implements Runnable {
 @Log4j2
 public class ZooModelTest {
 
-    private static Map<ZooModel, PretrainedType> modelsToDownload;
+    public static List<AbstractZooModel> createKerasModels() {
+        List<AbstractZooModel> kerasModels = new ArrayList<>();
 
-    private static List<ZooModel> createKerasModelVariations() {
-        List<ZooModel> kerasModels = new ArrayList<>();
+        KerasDenseNet kerasDenseNet121 = new KerasDenseNet();
+        kerasDenseNet121.setVariation(DenseNet.VARIATION.DENSENET121);
+        kerasModels.add(kerasDenseNet121);
 
-        DenseNet denseNet121 = new DenseNet();
-        denseNet121.setVariation(DenseNet.VARIATION.DENSENET121);
-        kerasModels.add(denseNet121);
+        KerasDenseNet kerasDenseNet169 = new KerasDenseNet();
+        kerasDenseNet169.setVariation(DenseNet.VARIATION.DENSENET169);
+        kerasModels.add(kerasDenseNet169);
 
-        DenseNet denseNet169 = new DenseNet();
-        denseNet169.setVariation(DenseNet.VARIATION.DENSENET169);
-        kerasModels.add(denseNet169);
-
-        DenseNet denseNet201 = new DenseNet();
-        denseNet201.setVariation(DenseNet.VARIATION.DENSENET201);
-        kerasModels.add(denseNet201);
+        KerasDenseNet kerasDenseNet201 = new KerasDenseNet();
+        kerasDenseNet201.setVariation(DenseNet.VARIATION.DENSENET201);
+        kerasModels.add(kerasDenseNet121);
 
 //        EfficientNet efficientNetB0 = new EfficientNet();
 //        efficientNetB0.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
@@ -126,9 +120,8 @@ public class ZooModelTest {
 //        inceptionResNetV2.setVariation(InceptionResNetV2.VARIATION.STANDARD);
 //        kerasModels.add(inceptionResNetV2);
 
-        InceptionV3 inceptionV3 = new InceptionV3();
-        inceptionV3.setVariation(InceptionV3.VARIATION.STANDARD);
-        kerasModels.add(inceptionV3);
+        KerasInceptionV3 kerasInceptionV3 = new KerasInceptionV3();
+        kerasModels.add(kerasInceptionV3);
 
 //        MobileNet mobileNet = new MobileNet();
 //        mobileNet.setVariation(MobileNet.VARIATION.V1);
@@ -138,80 +131,93 @@ public class ZooModelTest {
 //        mobileNet.setVariation(MobileNet.VARIATION.V2);
 //        kerasModels.add(mobileNetV2);
 
-        weka.dl4j.zoo.keras.NASNet nasNetMobile = new weka.dl4j.zoo.keras.NASNet();
-        nasNetMobile.setVariation(weka.dl4j.zoo.keras.NASNet.VARIATION.MOBILE);
-        kerasModels.add(nasNetMobile);
+        KerasNASNet kerasNASNetMobile = new KerasNASNet();
+        kerasNASNetMobile.setVariation(weka.dl4j.zoo.keras.NASNet.VARIATION.MOBILE);
+        kerasModels.add(kerasNASNetMobile);
 
-        weka.dl4j.zoo.keras.NASNet nasNetLarge = new weka.dl4j.zoo.keras.NASNet();
-        nasNetLarge.setVariation(weka.dl4j.zoo.keras.NASNet.VARIATION.LARGE);
-        kerasModels.add(nasNetLarge);
+        KerasNASNet kerasNASNetLarge = new KerasNASNet();
+        kerasNASNetLarge.setVariation(weka.dl4j.zoo.keras.NASNet.VARIATION.LARGE);
+        kerasModels.add(kerasNASNetLarge);
 
-        ResNet resNet50 = new ResNet();
-        resNet50.setVariation(ResNet.VARIATION.RESNET50);
-        kerasModels.add(resNet50);
+        KerasResNet kerasResNet50 = new KerasResNet();
+        kerasResNet50.setVariation(ResNet.VARIATION.RESNET50);
+        kerasModels.add(kerasResNet50);
 
-        ResNet resNet50V2 = new ResNet();
-        resNet50V2.setVariation(ResNet.VARIATION.RESNET50V2);
-        kerasModels.add(resNet50V2);
+        KerasResNet kerasResNet50v2 = new KerasResNet();
+        kerasResNet50v2.setVariation(ResNet.VARIATION.RESNET50V2);
+        kerasModels.add(kerasResNet50v2);
 
-        ResNet resNet101 = new ResNet();
-        resNet101.setVariation(ResNet.VARIATION.RESNET101);
-        kerasModels.add(resNet101);
+        KerasResNet kerasResNet101 = new KerasResNet();
+        kerasResNet101.setVariation(ResNet.VARIATION.RESNET101);
+        kerasModels.add(kerasResNet101);
 
-        ResNet resNet101V2 = new ResNet();
-        resNet101V2.setVariation(ResNet.VARIATION.RESNET101V2);
-        kerasModels.add(resNet101V2);
+        KerasResNet kerasResNet101v2 = new KerasResNet();
+        kerasResNet101v2.setVariation(ResNet.VARIATION.RESNET101V2);
+        kerasModels.add(kerasResNet101v2);
 
-        ResNet resNet152 = new ResNet();
-        resNet152.setVariation(ResNet.VARIATION.RESNET152);
-        kerasModels.add(resNet152);
+        KerasResNet kerasResNet152 = new KerasResNet();
+        kerasResNet152.setVariation(ResNet.VARIATION.RESNET152);
+        kerasModels.add(kerasResNet152);
 
-        ResNet resNet152V2 = new ResNet();
-        resNet152V2.setVariation(ResNet.VARIATION.RESNET152V2);
-        kerasModels.add(resNet152V2);
+        KerasResNet kerasResNet152v2 = new KerasResNet();
+        kerasResNet152v2.setVariation(ResNet.VARIATION.RESNET152V2);
+        kerasModels.add(kerasResNet152v2);
 
-        VGG vgg16 = new VGG();
-        vgg16.setVariation(VGG.VARIATION.VGG16);
-        kerasModels.add(vgg16);
+        KerasVGG kerasVGG16 = new KerasVGG();
+        kerasVGG16.setVariation(VGG.VARIATION.VGG16);
+        kerasModels.add(kerasVGG16);
 
-        VGG vgg19 = new VGG();
-        vgg19.setVariation(VGG.VARIATION.VGG19);
-        kerasModels.add(vgg19);
+        KerasVGG kerasVGG19 = new KerasVGG();
+        kerasVGG19.setVariation(VGG.VARIATION.VGG19);
+        kerasModels.add(kerasVGG19);
 
-        weka.dl4j.zoo.keras.Xception xception = new weka.dl4j.zoo.keras.Xception();
-        xception.setVariation(weka.dl4j.zoo.keras.Xception.VARIATION.STANDARD);
-        kerasModels.add(xception);
+        KerasXception kerasXception = new KerasXception();
+        kerasModels.add(kerasXception);
 
         return kerasModels;
     }
 
-    private static void createModelsToDownload() {
-        Map<ZooModel, PretrainedType> models = new HashMap<>();
-        models.put(org.deeplearning4j.zoo.model.Darknet19.builder().build(), PretrainedType.IMAGENET);
-        models.put(org.deeplearning4j.zoo.model.LeNet.builder().build(), PretrainedType.MNIST);
-        models.put(org.deeplearning4j.zoo.model.ResNet50.builder().build(), PretrainedType.IMAGENET);
-        models.put(org.deeplearning4j.zoo.model.SqueezeNet.builder().build(), PretrainedType.IMAGENET);
-        models.put(org.deeplearning4j.zoo.model.VGG16.builder().build(), PretrainedType.IMAGENET);
-        models.put(org.deeplearning4j.zoo.model.VGG16.builder().build(), PretrainedType.VGGFACE);
-        models.put(org.deeplearning4j.zoo.model.VGG19.builder().build(), PretrainedType.IMAGENET);
-        models.put(org.deeplearning4j.zoo.model.Xception.builder().build(), PretrainedType.IMAGENET);
+    public static List<AbstractZooModel> createDL4JModels() {
+        List<AbstractZooModel> dl4jModels = new ArrayList<>();
 
-        List<ZooModel> kerasModels = createKerasModelVariations();
-        for (ZooModel zooModel : kerasModels) {
-          models.put(zooModel, PretrainedType.IMAGENET);
-        }
+        Dl4jDarknet19 darknet19 = new Dl4jDarknet19();
+        dl4jModels.add(darknet19);
 
-        modelsToDownload = Collections.unmodifiableMap(models);
+        Dl4jLeNet leNet = new Dl4jLeNet();
+        dl4jModels.add(leNet);
+
+        Dl4JResNet50 resNet50 = new Dl4JResNet50();
+        dl4jModels.add(resNet50);
+
+        Dl4jSqueezeNet squeezeNet = new Dl4jSqueezeNet();
+        dl4jModels.add(squeezeNet);
+
+        Dl4jVGG vgg16 = new Dl4jVGG();
+        dl4jModels.add(vgg16);
+
+        Dl4jVGG vgg16VGGFace = new Dl4jVGG();
+        vgg16VGGFace.setPretrainedType(PretrainedType.VGGFACE);
+        dl4jModels.add(vgg16VGGFace);
+
+        Dl4jVGG vgg19 = new Dl4jVGG();
+        vgg19.setVariation(VGG.VARIATION.VGG19);
+        dl4jModels.add(vgg19);
+
+        Dl4jXception xception = new Dl4jXception();
+        dl4jModels.add(xception);
+
+        return dl4jModels;
     }
 
     @BeforeClass
     public static void downloadModels() {
-        createModelsToDownload();
+        List<AbstractZooModel> dl4jModels = createDL4JModels();
+        List<AbstractZooModel> kerasModels = createKerasModels();
         // Attempts to initialise pretrained versions of all models we're testing - via threads to speed up download
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 2);
         log.info("Ensuring zoo model weights are downloaded");
-        for (Map.Entry<ZooModel, PretrainedType> mapEntry : modelsToDownload.entrySet()) {
-            ModelDownloader modelDownloader = new ModelDownloader(mapEntry.getKey(), mapEntry.getValue());
+        for (AbstractZooModel zooModel : dl4jModels) {
+            ModelDownloader modelDownloader = new ModelDownloader(zooModel);
             executor.execute(modelDownloader);
         }
         executor.shutdown();
@@ -227,27 +233,37 @@ public class ZooModelTest {
     // DL4J Model Tests
     @Test
     public void testAlexNetMnist() throws Exception {
-        buildModel(new Dl4jAlexNet());
+        trainModel(new Dl4jAlexNet());
     }
 
     @Test
     public void testDarknet19() throws Exception {
-        buildModel(new Dl4jDarknet19());
+        trainModel(new Dl4jDarknet19());
+    }
+
+    @Test
+    public void testDarknet19Filter() throws Exception {
+        filterModel(new Dl4jDarknet19());
     }
 
     @Test
     public void testFaceNetNN4Small2() throws Exception {
-        buildModel(new Dl4jFaceNetNN4Small2());
+        trainModel(new Dl4jFaceNetNN4Small2());
     }
 
     @Test
     public void testInceptionResNetV1() throws Exception {
-        buildModel(new Dl4jInceptionResNetV1());
+        trainModel(new Dl4jInceptionResNetV1());
     }
 
     @Test
     public void testLeNetMnist() throws Exception {
-        buildModel(new Dl4jLeNet());
+        trainModel(new Dl4jLeNet());
+    }
+
+    @Test
+    public void testLeNetMnistFilter() throws Exception {
+        filterModel(new Dl4jLeNet());
     }
 
 //    @Test
@@ -259,31 +275,60 @@ public class ZooModelTest {
 
     @Test
     public void testResNet50() throws Exception {
-        buildModel(new Dl4JResNet50());
+        trainModel(new Dl4JResNet50());
+    }
+
+    @Test
+    public void testResNet50Filter() throws Exception {
+        filterModel(new Dl4JResNet50());
     }
 
     @Test
     public void testSqueezeNet() throws Exception {
-        buildModel(new Dl4jSqueezeNet());
+        trainModel(new Dl4jSqueezeNet());
+    }
+
+    @Test
+    public void testSqueezeNetFilter() throws Exception {
+        filterModel(new Dl4jSqueezeNet());
     }
 
     @Test
     public void testVGG16() throws Exception {
         Dl4jVGG vgg16 = new Dl4jVGG();
         vgg16.setVariation(VGG.VARIATION.VGG16);
-        buildModel(vgg16);
+        trainModel(vgg16);
+    }
+
+    @Test
+    public void testVGG16Filter() throws Exception {
+        Dl4jVGG vgg16 = new Dl4jVGG();
+        vgg16.setVariation(VGG.VARIATION.VGG16);
+        filterModel(vgg16);
     }
 
     @Test
     public void testVGG19() throws Exception {
         Dl4jVGG vgg19 = new Dl4jVGG();
         vgg19.setVariation(VGG.VARIATION.VGG19);
-        buildModel(vgg19);
+        trainModel(vgg19);
+    }
+
+    @Test
+    public void testVGG19Filter() throws Exception {
+        Dl4jVGG vgg19 = new Dl4jVGG();
+        vgg19.setVariation(VGG.VARIATION.VGG19);
+        trainModel(vgg19);
     }
 
     @Test
     public void testXception() throws Exception {
-        buildModel(new Dl4jXception());
+        trainModel(new Dl4jXception());
+    }
+
+    @Test
+    public void testXceptionFilter() throws Exception {
+        filterModel(new Dl4jXception());
     }
 
     // Keras Zoo Models
@@ -292,21 +337,42 @@ public class ZooModelTest {
     public void testDenseNet121() throws Exception {
         KerasDenseNet kerasDenseNet = new KerasDenseNet();
         kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET121);
-        buildModel(kerasDenseNet);
+        trainModel(kerasDenseNet);
+    }
+
+    @Test
+    public void testDenseNet121Filter() throws Exception {
+        KerasDenseNet kerasDenseNet = new KerasDenseNet();
+        kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET121);
+        filterModel(kerasDenseNet);
     }
 
     @Test
     public void testDenseNet169() throws Exception {
         KerasDenseNet kerasDenseNet = new KerasDenseNet();
         kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET169);
-        buildModel(kerasDenseNet);
+        trainModel(kerasDenseNet);
+    }
+
+    @Test
+    public void testDenseNet169Filter() throws Exception {
+        KerasDenseNet kerasDenseNet = new KerasDenseNet();
+        kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET169);
+        filterModel(kerasDenseNet);
     }
 
     @Test
     public void testDenseNet201() throws Exception {
         KerasDenseNet kerasDenseNet = new KerasDenseNet();
         kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET201);
-        buildModel(kerasDenseNet);
+        trainModel(kerasDenseNet);
+    }
+
+    @Test
+    public void testDenseNet201Filter() throws Exception {
+        KerasDenseNet kerasDenseNet = new KerasDenseNet();
+        kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET201);
+        filterModel(kerasDenseNet);
     }
 
     /**
@@ -381,7 +447,14 @@ public class ZooModelTest {
     public void testInceptionV3() throws Exception {
         KerasInceptionV3 kerasInceptionV3 = new KerasInceptionV3();
         kerasInceptionV3.setVariation(InceptionV3.VARIATION.STANDARD);
-        buildModel(kerasInceptionV3);
+        trainModel(kerasInceptionV3);
+    }
+
+    @Test
+    public void testInceptionV3Filter() throws Exception {
+        KerasInceptionV3 kerasInceptionV3 = new KerasInceptionV3();
+        kerasInceptionV3.setVariation(InceptionV3.VARIATION.STANDARD);
+        filterModel(kerasInceptionV3);
     }
 
 //    @Test
@@ -402,99 +475,190 @@ public class ZooModelTest {
     public void testNASNetMobile() throws Exception {
         KerasNASNet kerasNASNet = new KerasNASNet();
         kerasNASNet.setVariation(NASNet.VARIATION.MOBILE);
-        buildModel(kerasNASNet);
+        trainModel(kerasNASNet);
+    }
+
+    @Test
+    public void testNASNetMobileFilter() throws Exception {
+        KerasNASNet kerasNASNet = new KerasNASNet();
+        kerasNASNet.setVariation(NASNet.VARIATION.MOBILE);
+        filterModel(kerasNASNet);
     }
 
     @Test
     public void testNASNetLarge() throws Exception {
         KerasNASNet kerasNASNet = new KerasNASNet();
         kerasNASNet.setVariation(NASNet.VARIATION.LARGE);
-        buildModel(kerasNASNet);
+        trainModel(kerasNASNet);
+    }
+
+    @Test
+    public void testNASNetLargeFilter() throws Exception {
+        KerasNASNet kerasNASNet = new KerasNASNet();
+        kerasNASNet.setVariation(NASNet.VARIATION.LARGE);
+        filterModel(kerasNASNet);
     }
 
     @Test
     public void testKerasResnet50() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET50);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet50Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET50);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasResnet50V2() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET50V2);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet50V2Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET50V2);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasResnet101() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET101);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet101Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET101);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasResnet101V2() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET101V2);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet101V2Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET101V2);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasResnet152() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET152);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet152Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET152);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasResnet152V2() throws Exception {
         KerasResNet kerasResNet = new KerasResNet();
         kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
-        buildModel(kerasResNet);
+        trainModel(kerasResNet);
+    }
+
+    @Test
+    public void testKerasResnet152V2Filter() throws Exception {
+        KerasResNet kerasResNet = new KerasResNet();
+        kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
+        filterModel(kerasResNet);
     }
 
     @Test
     public void testKerasVGG16() throws Exception {
         KerasVGG kerasVGG = new KerasVGG();
         kerasVGG.setVariation(VGG.VARIATION.VGG16);
-        buildModel(kerasVGG);
+        trainModel(kerasVGG);
+    }
+
+    @Test
+    public void testKerasVGG16Filter() throws Exception {
+        KerasVGG kerasVGG = new KerasVGG();
+        kerasVGG.setVariation(VGG.VARIATION.VGG16);
+        filterModel(kerasVGG);
     }
 
     @Test
     public void testKerasVGG19() throws Exception {
         KerasVGG kerasVGG = new KerasVGG();
         kerasVGG.setVariation(VGG.VARIATION.VGG19);
-        buildModel(kerasVGG);
+        trainModel(kerasVGG);
+    }
+
+    @Test
+    public void testKerasVGG19Filter() throws Exception {
+        KerasVGG kerasVGG = new KerasVGG();
+        kerasVGG.setVariation(VGG.VARIATION.VGG19);
+        filterModel(kerasVGG);
     }
 
     @Test
     public void testKerasXception() throws Exception {
         KerasXception kerasXception = new KerasXception();
         kerasXception.setVariation(weka.dl4j.zoo.keras.Xception.VARIATION.STANDARD);
-        buildModel(kerasXception);
+        trainModel(kerasXception);
     }
 
-    private void buildModel(AbstractZooModel model) throws Exception {
+    @Test
+    public void testKerasXceptionFilter() throws Exception {
+        KerasXception kerasXception = new KerasXception();
+        kerasXception.setVariation(weka.dl4j.zoo.keras.Xception.VARIATION.STANDARD);
+        filterModel(kerasXception);
+    }
+
+    private void filterModel(AbstractZooModel model) throws Exception {
+        Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+        Instances shrunkenInstances = shrinkInstances(DatasetLoader.loadMiniMnistMeta());
+        myFilter.setZooModelType(model);
+        myFilter.setImageInstanceIterator(iterator);
+        myFilter.setInputFormat(shrunkenInstances);
+        Filter.useFilter(shrunkenInstances, myFilter);
+    }
+
+    private Instances shrinkInstances(Instances data) {
+        ArrayList<Attribute> atts = new ArrayList<>();
+        for (int i = 0; i < data.numAttributes(); i++) {
+            atts.add(data.attribute(i));
+        }
+        Instances shrunkenData = new Instances("shrinked", atts, 10);
+        shrunkenData.setClassIndex(1);
+        for (int i = 0; i < 10; i++) {
+            Instance inst = data.get(i);
+            inst.setClassValue(i % 10);
+            inst.setDataset(shrunkenData);
+            shrunkenData.add(inst);
+        }
+        return shrunkenData;
+    }
+
+    private void trainModel(AbstractZooModel model) throws Exception {
         // CLF
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
 
         // Data
         Instances data = DatasetLoader.loadMiniMnistMeta();
-
-        ArrayList<Attribute> atts = new ArrayList<>();
-        for (int i = 0; i < data.numAttributes(); i++) {
-            atts.add(data.attribute(i));
-        }
-        Instances shrinkedData = new Instances("shrinked", atts, 10);
-        shrinkedData.setClassIndex(1);
-        for (int i = 0; i < 10; i++) {
-            Instance inst = data.get(i);
-            inst.setClassValue(i % 10);
-            inst.setDataset(shrinkedData);
-            shrinkedData.add(inst);
-        }
+        Instances shrunkenData = shrinkInstances(data);
 
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
         iterator.setTrainBatchSize(10);
@@ -505,7 +669,7 @@ public class ZooModelTest {
         epochListener.setN(1);
         clf.setIterationListener(epochListener);
         clf.setEarlyStopping(new EarlyStopping(5, 0));
-        clf.buildClassifier(shrinkedData);
+        clf.buildClassifier(shrunkenData);
     }
 
 
