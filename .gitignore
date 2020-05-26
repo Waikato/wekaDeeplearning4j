@@ -177,3 +177,11 @@ gradle-app.setting
 # End of https://www.gitignore.io/api/gradle
 
 release-files
+
+## Keras model downloading scripts
+__pycache__
+output_h5
+output_summary
+dl4j_format
+
+.vscode
