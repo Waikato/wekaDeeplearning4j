@@ -136,3 +136,16 @@ java KerasModelConverter src/main/weka/dl4j/scripts/output_h5
 ```
 - In the `dl4j_format` folder, you should now have `.zip` files for all models that were successfully converted.
 Check the logs for information on models that couldn't be converted.
+
+## EfficientNet
+
+Getting the EfficientNet family of models takes a bit of extra work due to a few 'gotchas' in the model
+- Swish activation function
+- FixedDropout layer (instead of standard dropout)
+- Squeeze and excite block
+
+#### Swish Activation Function
+
+EfficientNet makes use of the 'Swish' activation function, which as of DL4J 1.0.0-beta6 is **not** supported.
+
+
