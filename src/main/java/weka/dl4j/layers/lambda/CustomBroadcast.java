@@ -37,7 +37,14 @@ public class CustomBroadcast extends SameDiffLambdaLayer {
 
     @Override
     public InputType getOutputType(int layerIndex, InputType inputType) {
-        long channels = Math.max(inputType.getShape()[0], inputType.getShape()[2]);
-        return InputType.convolutional(channels, width, width, CNN2DFormat.NCHW);
+        long[] shape = inputType.getShape(false);
+        long channels = shape[2];
+        if (channels == 1) {
+            System.err.println("Got input type in wrong order: " + inputType.toString());
+            channels = shape[0];
+        }
+        assert channels != 1;
+        return InputType.convolutional(width, width, channels, CNN2DFormat.NHWC);
+//        return InputType.convolutional(width, width, channels);
     }
 }
