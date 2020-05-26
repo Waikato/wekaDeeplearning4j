@@ -7,6 +7,7 @@ import org.deeplearning4j.common.resources.ResourceType;
 import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
+import org.deeplearning4j.util.ModelSerializer;
 import org.deeplearning4j.zoo.ModelMetaData;
 import org.deeplearning4j.zoo.PretrainedType;
 import org.deeplearning4j.zoo.ZooModel;
@@ -67,8 +68,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
             throw new UnsupportedOperationException(
                     "Pretrained " + pretrainedType + " weights are not available for this model.");
 
-        String localFilename = modelPrettyName() + ".h5";
-//        String localFilename = "EfficientNetB0Broadcasted.h5";
+        String localFilename = modelPrettyName() + ".zip";
 
         File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelFamily());
         File cachedFile = new File(rootCacheDir, localFilename);
@@ -97,7 +97,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
         }
 
         try {
-            return KerasModelImport.importKerasModelAndWeights(cachedFile.getPath());
+            return ModelSerializer.restoreComputationGraph(cachedFile);
         } catch (Exception ex) {
             System.err.println("Failed to load model");
             ex.printStackTrace();
