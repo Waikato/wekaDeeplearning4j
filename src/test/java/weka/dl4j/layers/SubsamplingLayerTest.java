@@ -50,6 +50,9 @@ public class SubsamplingLayerTest extends AbstractLayerTest<SubsamplingLayer> {
   @Test
   public void testPoolingType() {
     for (PoolingType type : PoolingType.values()) {
+      if (type == PoolingType.NONE)
+        continue;
+
       wrapper.setPoolingType(type);
 
       assertEquals(type, wrapper.getPoolingType());
