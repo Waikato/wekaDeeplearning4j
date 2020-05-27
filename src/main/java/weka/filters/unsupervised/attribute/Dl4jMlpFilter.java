@@ -23,12 +23,12 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Random;
 
 import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.dl4j.PoolingType;
+import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.zoo.AbstractZooModel;
@@ -92,7 +92,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   /**
    * The image instance iterator to use
    */
-  protected ImageInstanceIterator imageInstanceIterator = new ImageInstanceIterator();
+  protected AbstractInstanceIterator instanceIterator = new ImageInstanceIterator();
 
   /**
    * The pooling function to use if taking activations from an intermediary convolution layer
@@ -154,12 +154,12 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
           displayName = "instance iterator", commandLineParamName = "iterator",
           commandLineParamSynopsis = "-iterator <string>"
   )
-  public ImageInstanceIterator getImageInstanceIterator() {
-    return imageInstanceIterator;
+  public AbstractInstanceIterator getInstanceIterator() {
+    return instanceIterator;
   }
 
-  public void setImageInstanceIterator(ImageInstanceIterator imageInstanceIterator) {
-    this.imageInstanceIterator = imageInstanceIterator;
+  public void setInstanceIterator(AbstractInstanceIterator instanceIterator) {
+    this.instanceIterator = instanceIterator;
   }
 
   @OptionMetadata(
@@ -244,19 +244,17 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
-        model.setFilterMode(true);
-        model.setInstanceIterator(imageInstanceIterator);
       } catch (Exception e) {
         throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
       }
     } else {
       // If that fails, try loading from selected zoo model (or keras file)
       model = new Dl4jMlpClassifier();
-      model.setFilterMode(true);
       model.setZooModel(zooModelType);
-      model.setInstanceIterator(imageInstanceIterator);
-      model.initializeClassifier(data);
     }
+    model.setFilterMode(true);
+    model.setInstanceIterator(instanceIterator);
+    model.initializeClassifier(data);
   }
 
   public String[] transformationLayersToNames() {
@@ -295,6 +293,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
 
     // attributes
     result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+    result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
 
     // class
     result.enable(Capabilities.Capability.NOMINAL_CLASS);

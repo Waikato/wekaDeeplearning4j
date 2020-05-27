@@ -77,10 +77,7 @@ import weka.core.WekaPackageClassLoaderManager;
 import weka.core.WrongIteratorException;
 import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.DefaultInstanceIterator;
-import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
+import weka.dl4j.iterators.instance.*;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
@@ -1238,32 +1235,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return data;
   }
 
-  /**
-   * Build the Zoomodel instance
-   *
-   * @return ComputationGraph instance
-   * @throws WekaException Either the .init operation on the current zooModel was not supported or
-   * the data shape does not fit the chosen zooModel
-   */
-  protected void createZooModel() throws Exception {
-    final AbstractInstanceIterator it = getInstanceIterator();
-    final boolean isImageIterator = it instanceof ImageInstanceIterator;
-
-    // Make sure data is convolutional
-    if (!isImageIterator) {
-      throw new WrongIteratorException(
-          "ZooModels currently only support images. "
-              + "Please setup an ImageInstanceIterator.");
-    }
-
-    // Get the new width/heigth/channels from the iterator
-    ImageInstanceIterator iii = (ImageInstanceIterator) it;
-
-    AbstractZooModel tmpZooModel = getZooModel();
+  private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
     // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
+    AbstractZooModel tmpZooModel = getZooModel();
     if (tmpZooModel.isPretrained()) {
-     if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
-       log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
+      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
         iii.setNumChannels(1);
         iii.setHeight(28);
         iii.setWidth(28);
@@ -1276,21 +1253,90 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
               iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
     }
+    return iii;
+  }
 
-    int newWidth = iii.getWidth();
-    int newHeight = iii.getHeight();
-    int channels = iii.getNumChannels();
+  /**
+   * The only one-channel zoo model currently implemented is Dl4JLeNet.
+   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
+   * @param instanceIterator
+   */
+  private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
+    if (instanceIterator.getNumChannels() != 1) {
+      return;
+    }
+    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
+    Set<Class> oneChannelModels = new HashSet<>();
+    oneChannelModels.add(Dl4jLeNet.class);
+
+    AbstractZooModel tmpZooModel = getZooModel();
+    Class currModelClass = tmpZooModel.getClass();
+
+    // If we have a one channel model, continue;
+    if (oneChannelModels.contains(currModelClass)) {
+      return;
+    }
+
+    throw new WrongIteratorException(
+            "You've used an instance iterator for instances of only one channel, however, " +
+                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
+                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
+    );
+  }
+
+  /**
+   * Build the Zoomodel instance
+   *
+   * @return ComputationGraph instance
+   * @throws WekaException Either the .init operation on the current zooModel was not supported or
+   * the data shape does not fit the chosen zooModel
+   */
+  protected void createZooModel() throws Exception {
+    final AbstractInstanceIterator it = getInstanceIterator();
+    final boolean isCorrectIterator = it instanceof ImageInstanceIterator || it instanceof ConvolutionInstanceIterator;
+
+    // Make sure data is convolutional
+    if (!isCorrectIterator) {
+      throw new WrongIteratorException(
+          "ZooModels currently only support images. "
+              + "Please setup an ImageInstanceIterator or ConvolutionalInstanceIterator.");
+    }
+
+    boolean isImageIterator = it instanceof ImageInstanceIterator;
+    ImageInstanceIterator iii = null;
+    ConvolutionInstanceIterator cii = null;
+    int newWidth, newHeight, channels;
+
+    if (isImageIterator) {
+      iii = enforceZooModelSize((ImageInstanceIterator) it);
+      newWidth = iii.getWidth();
+      newHeight = iii.getHeight();
+      channels = iii.getNumChannels();
+    } else {
+      cii = (ConvolutionInstanceIterator) it;
+      enforceConvolutionIteratorZooModel(cii);
+      newWidth = cii.getWidth();
+      newHeight = cii.getHeight();
+      channels = cii.getNumChannels();
+
+    }
+
+
     boolean initSuccessful = false;
     int maxWidth = 10000;
     while (!initSuccessful) {
       if (newWidth > maxWidth) {
-        // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks
+        // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks otherwise
         throw new Exception("Error when creating model, your configuration may be incorrect - check logs for more info");
       }
       // Increase width and height
       int[] newShape = new int[]{channels, newHeight, newWidth};
-      setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth,
-          newHeight));
+      if (isImageIterator) {
+        setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+      } else {
+        setInstanceIterator(cii);
+      }
+
       initSuccessful =
           initZooModel(trainData.numClasses(), getSeed(), newShape);
 
