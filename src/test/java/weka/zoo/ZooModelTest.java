@@ -630,7 +630,7 @@ public class ZooModelTest {
         ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
         Instances shrunkenInstances = shrinkInstances(DatasetLoader.loadMiniMnistMeta());
         myFilter.setZooModelType(model);
-        myFilter.setImageInstanceIterator(iterator);
+        myFilter.setInstanceIterator(iterator);
         myFilter.setInputFormat(shrunkenInstances);
         Filter.useFilter(shrunkenInstances, myFilter);
     }

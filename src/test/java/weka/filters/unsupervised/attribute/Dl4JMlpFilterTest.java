@@ -144,7 +144,7 @@ public class Dl4JMlpFilterTest {
     Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, dataMnist);
 
     Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
-    myFilter.setImageInstanceIterator(idiMnist);
+    myFilter.setInstanceIterator(idiMnist);
     myFilter.setZooModelType(zooModel);
     myFilter.setInputFormat(dataMnist);
     Instances activationsActual = Filter.useFilter(dataMnist, myFilter);
