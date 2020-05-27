@@ -8,7 +8,7 @@ This tutorial will walk through the steps required to finetune a pretrained mode
 The dataset used in this tutorial is from the [Plant Seedlings Classification](https://www.kaggle.com/c/plant-seedlings-classification) competition on Kaggle. Visit the link to download the dataset.
 
 ### Creating the Meta ARFF File (`ImageDirectoryLoader`)
-This dataset is uses a common 'folder organised' format - images are sorted into subfolders, with the class name being the subfolder name. This format is intuitive and easy to work with, however, cannot be loaded directly into WEKA without further processing.
+This dataset is uses a common 'folder organised' format - images are sorted into subfolders, with the class name being the subfolder name. This format is intuitive and easy to work with but cannot be loaded directly into WEKA without further processing.
 
 WekaDeeplearning4j now comes with the `ImageDirectoryLoader`, a simple command line tool which creates a `.arff` file from a 'folder organised' dataset.
 
@@ -23,7 +23,7 @@ java -cp <path to weka.jar> weka.Run .ImageDirectoryLoader -i /path/to/plant-see
 
 The associated meta `.arff` file has been created inside the input directory specified. As we're simply checking accuracy within WEKA, we won't load in the `test/` data and submit it to Kaggle - that is outside the scope of this tutorial.
 
-**Important note:** The newly created arff dataset contains two features, the first one being the `filename` and the second one being the `class`. Therefore it is necessary to define an `ImageDataSetIterator` which uses these filenames in the directory given by the option `-imagesLocation`.
+**Important note:** The newly created arff dataset contains two features, the first one being the `filename` and the second one being the `class`. Therefore it is necessary to define an `ImageInstanceIterator` (in `Dl4jMlpFilter` or `Dl4jMlpClassifier`) which uses these filenames in the directory given by the option `-imagesLocation`.
 
 ## Training - Commandline
 The following run finetunes a pretrained ResNet model for 20 epochs. This shows how to specify a non-default variation from the command line.
