@@ -43,7 +43,9 @@ import weka.filters.SimpleBatchFilter;
  * @author Steven Lang
  */
 @Log4j2
-public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
+public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, CapabilitiesHandler {
+
+
 
   private static final long serialVersionUID = 1317698787337080580L;
   /**
@@ -197,11 +199,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   }
 
   @Override
-  public String globalInfo() {
-    return null;
-  }
-
-  @Override
   public boolean allowAccessToFullInputFormat() {
     return true;
   }
@@ -246,6 +243,35 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler {
   @Override
   protected Instances process(Instances instances) throws Exception {
     return model.getActivationsAtLayers(transformationLayersToNames(), instances, poolingType);
+  }
+
+  @Override
+  public String globalInfo() {
+    return "Enables the use of a neural network for feature extraction using DL4J.\n" +
+            "One can use either a model that's been trained within WEKA, or simply choose a pretrained model from the model zoo\n"
+            + "(See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )";
+  }
+
+  /**
+   * Returns default capabilities of the classifier.
+   *
+   * @return the capabilities of this classifier
+   */
+  @Override
+  public Capabilities getCapabilities() {
+    Capabilities result = super.getCapabilities();
+    result.disableAll();
+
+    // attributes
+    result.enable(Capabilities.Capability.STRING_ATTRIBUTES);
+
+    // class
+    result.enable(Capabilities.Capability.NOMINAL_CLASS);
+    result.enable(Capabilities.Capability.NUMERIC_CLASS);
+    result.enable(Capabilities.Capability.DATE_CLASS);
+    result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
+
+    return result;
   }
 
   /**
