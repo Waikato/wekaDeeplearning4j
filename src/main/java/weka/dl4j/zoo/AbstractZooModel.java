@@ -32,7 +32,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     private static final long serialVersionUID = -4598529061609767660L;
 
-    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
+    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.IMAGENET;
 
     protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "weka_predictions";
 
