@@ -264,6 +264,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected boolean doNotClearFilesystemCache;
   /**
+   * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching) when starting
+   * or resuming learning
+   */
+  protected boolean loadLayerSpecification = false;
+  /**
    * Number of physical GPUs available. If greater than 1, then data-parallel training + parameter
    * averaging is used to leverage multiple GPUs. Ignored entirely if there is no GPU backend
    * available.
@@ -736,6 +741,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setResume(boolean resume) {
     this.resume = resume;
   }
+
+  public boolean getLoadLayerSpecification() {return loadLayerSpecification;}
+
+  @OptionMetadata(
+          description = "Set whether you want the GUI to load the layer specification when selecting" +
+                  "a zoo model. This does not affect the model's function. " +
+                  "Note that this can slow the GUI down considerably.",
+          displayName = "Load layer specification in GUI",
+          displayOrder = 3
+  )
+  public void setLoadLayerSpecification(boolean loadLayerSpecification) {this.loadLayerSpecification = loadLayerSpecification;}
 
   public boolean getDoNotClearFilesystemCache() {
     return doNotClearFilesystemCache;
@@ -1644,32 +1660,36 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel; //TODO check if the zoo model type is different before loading this
 
+    if (getLoadLayerSpecification()) {
       JFrame frame = showModelLoadingFrame();
 
       ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
       try {
-          // Try to parse the layers so the user can change them afterwards
-          final int dummyNumLabels = 2;
+        // Try to parse the layers so the user can change them afterwards
+        final int dummyNumLabels = 2;
 
-          Thread.currentThread().setContextClassLoader(
+        Thread.currentThread().setContextClassLoader(
                 this.getClass().getClassLoader());
-          ComputationGraph tmpCg =
+        ComputationGraph tmpCg =
                 zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
-          tmpCg.init();
-          layers =
+        tmpCg.init();
+        layers =
                 Arrays.stream(tmpCg.getLayers())
                         .map(l -> Layer.create(l.conf().getLayer()))
                         .collect(Collectors.toList())
                         .toArray(new Layer[tmpCg.getLayers().length]);
 
-          } catch (Exception e) {
-              if (!(zooModel instanceof CustomNet)) {
-                log.error("Could not set layers from zoomodel.", e);
-              }
-          } finally {
-              Thread.currentThread().setContextClassLoader(origLoader);
-              closeModelLoadingFrame(frame);
-          }
+      } catch (Exception e) {
+        if (!(zooModel instanceof CustomNet)) {
+          log.error("Could not set layers from zoomodel.", e);
+        }
+      } finally {
+        Thread.currentThread().setContextClassLoader(origLoader);
+        closeModelLoadingFrame(frame);
+      }
+    }
+
+
   }
 
   public TrainingListener getIterationListener() {
