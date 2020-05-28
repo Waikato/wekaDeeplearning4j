@@ -36,6 +36,36 @@ import weka.dl4j.zoo.Dl4JResNet50;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
+/*
+<!-- options-start -->
+* Valid options are: <p>
+*
+* <pre> -layer-extract &lt;Dense Layer Spec&gt;
+*  Layers used for the feature transformation (can be left blank, default will be applied)</pre>
+*
+* <pre> -model &lt;File&gt;
+*  The trained Dl4jMlpClassifier object that contains the network, used for transformation.</pre>
+*
+* <pre> -zooModel &lt;Model Zoo specification&gt;
+*  The pretrained model from the DL4J Model Zoo (or a keras model)</pre>
+*
+* <pre> -iterator &lt;string&gt;
+*  The instance iterator to use.</pre>
+*
+* <pre> -poolingType &lt;String&gt;
+*  Pooling function to apply on intermediary activations</pre>
+*
+<!-- options-end -->
+
+<!-- globalinfo-start -->
+* Enables the use of a neural network for feature extraction using DL4J.<br>
+* One can use either a model that's been trained within WEKA, or simply choose a pretrained model from the model zoo<br>
+* (See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )
+* <br><br>
+<!-- globalinfo-end -->
+
+ **/
+
 /**
  * Weka filter that uses a neural network trained via {@link Dl4jMlpClassifier} as feature
  * transformation.
