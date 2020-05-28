@@ -41,6 +41,7 @@ import weka.filters.SimpleBatchFilter;
  * transformation.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 @Log4j2
 public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, CapabilitiesHandler {
