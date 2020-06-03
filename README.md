@@ -49,7 +49,7 @@ All three ways are explained in the [getting-started](https://deeplearning.cms.w
 
 Example commandline scripts are provided in the `weka-run-test-scripts` directory, e.g. a simple network with one dense layer of 32 neurons and one output layer, classifying the iris dataset, would look like the following:
 ```bash
-$ java -cp ${WEKA_HOME}/weka.jar weka.Run \
+$ java weka.Run \
        .Dl4jMlpClassifier \
        -layer "weka.dl4j.layers.DenseLayer -nOut 32 -activation \"weka.dl4j.activations.ActivationReLU \" " \
        -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" " \

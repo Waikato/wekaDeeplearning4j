@@ -39,9 +39,9 @@ As explained further in the [data section](../user-guide/data.md), depending on 
 ![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
 
 ## Commandline Interface
-A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
+Assuming `weka.jar` is on the CLASSPATH, a first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run .Dl4jMlpClassifier -h
+$ java weka.Run .Dl4jMlpClassifier -h
 ```
 Below the general options, the specific ones are listed:
 ```
@@ -79,7 +79,7 @@ Options specific to weka.classifiers.functions.Dl4jMlpClassifier:
 The most interesting option may be the `-layer` specification. This option can be used multiple times and defines the architecture of the network layer-wise. 
 
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run \
+$ java weka.Run \
        .Dl4jMlpClassifier \
        -layer "weka.dl4j.layers.DenseLayer \
               -activation weka.dl4j.activations.ActivationReLU \

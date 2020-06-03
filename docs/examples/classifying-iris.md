@@ -4,26 +4,22 @@ A very common dataset to test algorithms with is the _Iris Dataset_ . The follow
 
 The iris dataset can be found in the `datasets/nominal` directory of the WekaDeeplearning4j package.
 
-
-<details> 
-  <summary>Iris Visualization </summary>
-  ![Iris Visualization](../img/iris.png)
-</details>
+Iris Visualization ![Iris Visualization](../img/iris.png)
 
 ## Commandline
 Starting simple, the most straight forward way to create a neural network with this package is by using the commandline. A Single-Layer-Perceptron (the most basic neural network possible) is shown in the following
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run \
-		.Dl4jMlpClassifier \
-		-S 1 \
-		-layer "weka.dl4j.layers.OutputLayer \
-		        -activation weka.dl4j.activations.ActivationSoftmax \
-		        -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
-		-config "weka.dl4j.NeuralNetConfiguration \
-		        -updater weka.dl4j.updater.Adam" \
-		-numEpochs 10 \
-		-t datasets/nominal/iris.arff \
-		-split-percentage 66
+$ java weka.Run \
+    .Dl4jMlpClassifier \
+    -S 1 \
+    -layer "weka.dl4j.layers.OutputLayer \
+            -activation weka.dl4j.activations.ActivationSoftmax \
+            -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
+    -config "weka.dl4j.NeuralNetConfiguration \
+            -updater weka.dl4j.updater.Adam" \
+    -numEpochs 10 \
+    -t datasets/nominal/iris.arff \
+    -split-percentage 66
 ```
 
 

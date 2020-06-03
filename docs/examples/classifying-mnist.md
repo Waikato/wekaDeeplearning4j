@@ -22,7 +22,7 @@ The minimal MNIST arff file can be found in the `datasets/nominal` directory of 
 ## Commandline
 The following run creates a Conv(3x3x8) > Pool(2x2,MAX) > Conv(3x3x8) > Pool(2x2,MAX) > Out architecture
 ```bash
-$ java -Xmx5g -cp $WEKA_HOME/weka.jar weka.Run \
+$ java -Xmx5g weka.Run \
      .Dl4jMlpClassifier \
      -S 1 \
      -iterator "weka.dl4j.iterators.instance.ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -numChannels 1 -height 28 -width 28 -bs 16" \
