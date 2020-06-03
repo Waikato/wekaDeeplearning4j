@@ -150,10 +150,14 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     if (!imagesLoc.isDirectory()) {
       throw new InvalidInputDataException("Directory not valid: " + resolved);
     }
-    if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
+    if (!isMetaArff(data)) {
       throw new InvalidInputDataException(
           "An ARFF is required with a string attribute and a class attribute");
     }
+  }
+
+  public static boolean isMetaArff(Instances data) {
+    return (data.attribute(0).isString() && data.classIndex() == 1);
   }
 
 
