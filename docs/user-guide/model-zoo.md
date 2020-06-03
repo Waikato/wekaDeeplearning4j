@@ -13,7 +13,6 @@ Values in **bold** are the defaults.
 | DL4J      | InceptionResNetV1 | No                     | -                                  | -                                    |
 | DL4J      | LeNet             | Yes                    | **MNIST**                          | -                                    |
 | DL4J      | ResNet50          | Yes                    | **ImageNet**                       | -                                    |
-| DL4J      | SimpleCNN         | No                     | -                                  | -                                    |
 | DL4J      | SqueezeNet        | Yes                    | **ImageNet**                       | -                                    |
 | DL4J      | VGG               | Yes                    | **ImageNet**, VGGFace (VGG16 only) | **16**, 19                           |
 | DL4J      | XCeption          | Yes                    | **ImageNet**                       | -                                    |
