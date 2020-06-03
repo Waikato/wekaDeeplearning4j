@@ -27,11 +27,12 @@ to run experiments on your data.
 
 ### Pretrained Models
 A wide range of pretrained models are now available, sourced from both the DL4J model zoo *and* the Keras Applications module.
-These can easily be instantiated and used as a base for further finetuning, or simply as a feature extractor, after which 
-you can then apply any standard Weka classifier. The weights are cached locally after being downloaded, so it's quick to instantiate in the future. Check out the [Model Zoo](user-guide/model-zoo.md) for more information.
+These can easily be instantiated and used as a base for further finetuning or simply as a feature extractor, after which 
+you can then apply any standard Weka classifier. The weights are cached locally after being initially downloaded, so it's quick to instantiate in the future. 
+Check out the [Model Zoo](user-guide/model-zoo.md) for more information.
 
 ### Updated Dl4jMlpFilter
-The Dl4jMlpFilter takes activations from a layer in the given neural network, and uses those as the output for the instance, commonly referred to as *feature extraction* or *embedding creation*.
+The Dl4jMlpFilter takes activations from a layer in the given neural network and uses those as the output for the instance, commonly referred to as *feature extraction* or *embedding creation*.
 
 The DL4jMlpFilter can now accept multiple layer names to use activations from, concatenating the activations together.
 
@@ -47,7 +48,7 @@ from the subfolder they're in as opposed to having a seperate file explicitly de
 Check out [Classify Your Own Dataset](examples/classifying-your-own.md) for usage examples
 
 ### CUDA 10.2 Support
-The new release of Deeplearning4j (`1.0.0-beta6`) now supports CUDA 10.2, so WekaDeeplearning4j has
+The new release of Deeplearning4j (`1.0.0-beta7`) now supports CUDA 10.2, so WekaDeeplearning4j has
  new installation packages for users with this CUDA version. 
 
 ## Citation
