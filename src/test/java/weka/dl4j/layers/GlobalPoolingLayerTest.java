@@ -42,7 +42,7 @@ public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer
   @Test
   public void testPoolingType() {
     for (PoolingType type : PoolingType.values()) {
-      if (type == PoolingType.NONE)
+      if (type.isCustom())
         continue;
 
       wrapper.setPoolingType(type);
