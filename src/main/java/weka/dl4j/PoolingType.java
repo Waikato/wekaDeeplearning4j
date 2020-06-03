@@ -28,6 +28,10 @@ package weka.dl4j;
 public enum PoolingType implements ApiWrapper<org.deeplearning4j.nn.conf.layers.PoolingType> {
   MAX, AVG, SUM, PNORM, NONE, MIN;
 
+  public boolean isCustom() {
+    return this == NONE || this == MIN;
+  }
+
   /**
    * Parse backend pooling type and return weka enum implementation.
    *
