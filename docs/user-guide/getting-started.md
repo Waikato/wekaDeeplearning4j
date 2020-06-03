@@ -81,7 +81,7 @@ The most interesting option may be the `-layer` specification. This option can b
 ```bash
 $ java weka.Run \
        .Dl4jMlpClassifier \
-       -layer "weka.dl4j.layers.DenseLayer \
+       -layer ".DenseLayer \
               -activation weka.dl4j.activations.ActivationReLU \
               -nOut 10" \
        -layer "weka.dl4j.layers.OutputLayer \
