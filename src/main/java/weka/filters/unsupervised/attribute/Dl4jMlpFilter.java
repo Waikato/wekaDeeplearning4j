@@ -18,6 +18,7 @@
 
 package weka.filters.unsupervised.attribute;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -253,8 +254,13 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
       model.setZooModel(zooModelType);
     }
     model.setFilterMode(true);
-    model.setInstanceIterator(instanceIterator);
-    model.initializeClassifier(data);
+    if (ImageInstanceIterator.isMetaArff(data))
+      model.setInstanceIterator(instanceIterator);
+
+    // If we're loading from a previously trained model, we don't need to intialize the classifier again,
+    // We do need to, however, if we're loading from a fresh zoo model
+    if (!userSuppliedModelFile())
+      model.initializeClassifier(data);
   }
 
   public String[] transformationLayersToNames() {
