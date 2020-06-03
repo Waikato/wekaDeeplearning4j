@@ -162,6 +162,8 @@ public class Dl4JMlpFilterTest {
       String clfPath, boolean useZooModel) throws Exception {
     Instances activationsExpected = clf.getActivationsAtLayers(transformationLayerNames, instances);
     Dl4jMlpFilter filter = new Dl4jMlpFilter();
+    if (ImageInstanceIterator.isMetaArff(instances))
+      filter.setInstanceIterator(DatasetLoader.loadMiniMnistImageIterator());
     filter.setSerializedModelFile(new File(clfPath));
     filter.setTransformationLayerNames(transformationLayerNames);
     filter.setInputFormat(instances);
