@@ -14,8 +14,8 @@ pages:
         - 'Natural Language Processing': 'user-guide/nlp.md'
     - Examples:
         - 'Image Feature Extraction': 'examples/featurize-mnist.md'
-        - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
-        - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
-        - 'Classifying the IMDB Dataset': 'examples/classifying-imdb.md'
         - 'Classifying a Custom Dataset': 'examples/classifying-your-own.md'
+        - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
+        - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
+        - 'Classifying the IMDB Dataset': 'examples/classifying-imdb.md'
     - Troubleshooting: troubleshooting.md
