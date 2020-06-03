@@ -158,16 +158,16 @@ public class Dl4JMlpFilterTest {
     }
   }
 
-  protected void checkLayer(Dl4jMlpClassifier clf, Instances iris, String[] transformationLayerNames,
+  protected void checkLayer(Dl4jMlpClassifier clf, Instances instances, String[] transformationLayerNames,
       String clfPath, boolean useZooModel) throws Exception {
-    Instances activationsExpected = clf.getActivationsAtLayers(transformationLayerNames, iris);
+    Instances activationsExpected = clf.getActivationsAtLayers(transformationLayerNames, instances);
     Dl4jMlpFilter filter = new Dl4jMlpFilter();
     filter.setSerializedModelFile(new File(clfPath));
     filter.setTransformationLayerNames(transformationLayerNames);
-    filter.setInputFormat(iris);
+    filter.setInputFormat(instances);
     filter.setPoolingType(PoolingType.NONE);
 
-    Instances activationsActual = Filter.useFilter(iris, filter);
+    Instances activationsActual = Filter.useFilter(instances, filter);
 
     for (int i = 0; i < activationsActual.size(); i++) {
       Instance expected = activationsExpected.get(i);
