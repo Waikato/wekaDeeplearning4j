@@ -105,7 +105,7 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     }
 
     @Override
-    public void preExecution() throws Exception {}
+    public void preExecution() {}
 
     @Override
     public void run(Object toRun, String[] options) throws IllegalArgumentException {
@@ -155,22 +155,22 @@ public class ImageDirectoryLoader extends AbstractLoader implements
     }
 
     @Override
-    public void postExecution() throws Exception {
+    public void postExecution() {
 
     }
 
     @Override
-    public Instances getStructure() throws IOException {
+    public Instances getStructure() {
         return null;
     }
 
     @Override
-    public Instances getDataSet() throws IOException {
+    public Instances getDataSet() {
         return createDataset();
     }
 
     @Override
-    public Instance getNextInstance(Instances structure) throws IOException {
+    public Instance getNextInstance(Instances structure) {
         return null;
     }
 
