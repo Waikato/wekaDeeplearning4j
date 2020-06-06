@@ -31,6 +31,7 @@ import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.api.layers.IOutputLayer;
@@ -1793,6 +1794,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return distributionsForInstances(data)[0];
   }
 
+  public boolean arithmeticUnderflow(INDArray array) {
+    return array.isNaN().any();
+  }
+
   /**
    * The method to use when making predictions for test instances.
    *
@@ -1822,6 +1827,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     // Get predictions batch-wise
     while (next) {
       INDArray predBatch = model.outputSingle(it.next().getFeatures());
+
+      if (arithmeticUnderflow(predBatch))
+        throw new DL4JException("NaNs in model output, likely caused by arithmetic underflow");
+
       int currentBatchSize = (int) predBatch.shape()[0];
 
       // Build weka distribution output
