@@ -626,13 +626,18 @@ public class ZooModelTest {
     }
 
     private void filterModel(AbstractZooModel model) throws Exception {
-        Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        Instances shrunkenInstances = shrinkInstances(DatasetLoader.loadMiniMnistMeta());
-        myFilter.setZooModelType(model);
-        myFilter.setInstanceIterator(iterator);
-        myFilter.setInputFormat(shrunkenInstances);
-        Filter.useFilter(shrunkenInstances, myFilter);
+        try {
+            Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+            ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+            Instances shrunkenInstances = shrinkInstances(DatasetLoader.loadMiniMnistMeta());
+            myFilter.setZooModelType(model);
+            myFilter.setInstanceIterator(iterator);
+            myFilter.setInputFormat(shrunkenInstances);
+            Filter.useFilter(shrunkenInstances, myFilter);
+        } catch (OutOfMemoryError error) {
+            throw new OutOfMemoryError("Dl4jMlpFilter test ran out of memory, possibly due to running multiple tests.\n" +
+                    " Please run this test individually to ensure this is the case and no other exceptions have occured.");
+        }
     }
 
     private Instances shrinkInstances(Instances data) {
@@ -652,24 +657,29 @@ public class ZooModelTest {
     }
 
     private void trainModel(AbstractZooModel model) throws Exception {
-        // CLF
-        Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-        clf.setSeed(1);
+        try {
+            // CLF
+            Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+            clf.setSeed(1);
 
-        // Data
-        Instances data = DatasetLoader.loadMiniMnistMeta();
-        Instances shrunkenData = shrinkInstances(data);
+            // Data
+            Instances data = DatasetLoader.loadMiniMnistMeta();
+            Instances shrunkenData = shrinkInstances(data);
 
-        ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
-        iterator.setTrainBatchSize(10);
-        clf.setInstanceIterator(iterator);
-        clf.setZooModel(model);
-        clf.setNumEpochs(1);
-        final EpochListener epochListener = new EpochListener();
-        epochListener.setN(1);
-        clf.setIterationListener(epochListener);
-        clf.setEarlyStopping(new EarlyStopping(5, 0));
-        clf.buildClassifier(shrunkenData);
+            ImageInstanceIterator iterator = DatasetLoader.loadMiniMnistImageIterator();
+            iterator.setTrainBatchSize(10);
+            clf.setInstanceIterator(iterator);
+            clf.setZooModel(model);
+            clf.setNumEpochs(1);
+            final EpochListener epochListener = new EpochListener();
+            epochListener.setN(1);
+            clf.setIterationListener(epochListener);
+            clf.setEarlyStopping(new EarlyStopping(5, 0));
+            clf.buildClassifier(shrunkenData);
+        } catch (OutOfMemoryError error) {
+            throw new OutOfMemoryError("Dl4jMlpClassifier test ran out of memory, possibly due to running multiple tests.\n" +
+                    " Please run this test individually to ensure this is the case and no other exceptions have occured.");
+        }
     }
 
 
