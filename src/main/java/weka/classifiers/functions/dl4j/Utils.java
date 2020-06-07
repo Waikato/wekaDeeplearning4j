@@ -33,7 +33,6 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -384,5 +383,13 @@ public class Utils {
     } else {
       return Utils.ndArrayToInstances(result, input, attributesPerLayer);
     }
+  }
+
+  public static DataSet getNext(DataSetIterator iter) {
+    return iter.next().copy();
+  }
+
+  public static DataSet getNext(DataSetIterator iter, int num) {
+    return iter.next(num).copy();
   }
 }
