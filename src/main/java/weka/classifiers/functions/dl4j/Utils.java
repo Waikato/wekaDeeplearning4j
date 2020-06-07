@@ -141,11 +141,11 @@ public class Utils {
       DataSet next;
       if (iter instanceof AsyncDataSetIterator
           || iter instanceof CachingDataSetIterator) {
-        next = iter.next();
+        next = getNext(iter);
       } else {
         // TODO: figure out which batch size is feasible for inference
         final int batch = iter.batch() * 8;
-        next = iter.next(batch);
+        next = Utils.getNext(iter, batch);
       }
       scoreSum += model.score(next);
       numBatches++;
