@@ -34,14 +34,11 @@ import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
-import org.deeplearning4j.nn.api.layers.IOutputLayer;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
-import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.parallelism.ParallelWrapper;
@@ -1363,7 +1360,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
       tmpModel.init();
       DataSetIterator iter = getDataSetIterator(dummyData);
-      tmpModel.feedForward(iter.next().getFeatures(), false);
+      tmpModel.feedForward(Utils.getNext(iter).getFeatures(), false);
 
       // No Exception thrown -> set model to this zoo model and return true
       model = zooModel.init(numClasses, seed, newShape, isFilterMode());
@@ -1544,7 +1541,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     if (!it.hasNext()) {
       throw new RuntimeException("Iterator was unexpectedly empty.");
     }
-    final INDArray features = it.next().getFeatures();
+    final INDArray features = Utils.getNext(it).getFeatures();
     it.reset();
     return features;
   }
@@ -1826,7 +1823,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Get predictions batch-wise
     while (next) {
-      INDArray predBatch = model.outputSingle(it.next().getFeatures());
+      INDArray predBatch = model.outputSingle(Utils.getNext(it).getFeatures());
 
       if (arithmeticUnderflow(predBatch))
         throw new DL4JException("NaNs in model output, likely caused by arithmetic underflow");
@@ -1954,7 +1951,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     while (iter.hasNext()) {
       // Use the DL4J way of featurizing data
-      DataSet currentFeaturized = transferLearningHelper.featurize(iter.next());
+      DataSet currentFeaturized = transferLearningHelper.featurize(Utils.getNext(iter));
       activationAtLayer = currentFeaturized.getFeatures();
 
       if (Utils.needsReshaping(activationAtLayer)) {
