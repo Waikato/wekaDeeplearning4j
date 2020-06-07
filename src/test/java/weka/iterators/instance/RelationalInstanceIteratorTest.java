@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
@@ -92,7 +93,7 @@ public class RelationalInstanceIteratorTest {
         final DataSetIterator it = rii.getDataSetIterator(data, TestUtil.SEED, bs);
         assertEquals(bs, it.batch());
         assertEquals(Arrays.asList("0.0", "1.0"), it.getLabels());
-        final DataSet next = it.next();
+        final DataSet next = Utils.getNext(it);
 
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
         final long[] shapeFeats = next.getFeatures().shape();
@@ -142,7 +143,7 @@ public class RelationalInstanceIteratorTest {
     int count = 0;
     while (it.hasNext()) {
       count++;
-      it.next();
+      Utils.getNext(it);
     }
     return count;
   }

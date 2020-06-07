@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.sequence.text.rnn.RnnTextEmbeddingInstanceIterator;
 import weka.util.DatasetLoader;
@@ -86,7 +87,7 @@ public class RnnTextEmbeddingInstanceIteratorTest {
         final DataSetIterator it = tii.getDataSetIterator(data, TestUtil.SEED, bs);
         assertEquals(bs, it.batch());
         assertEquals(Arrays.asList("0", "1"), it.getLabels());
-        final DataSet next = it.next();
+        final DataSet next = Utils.getNext(it);
 
         // Check feature shape, expect: (batchsize x wordvecsize x sequencelength)
         final long[] shapeFeats = next.getFeatures().shape();
@@ -113,7 +114,7 @@ public class RnnTextEmbeddingInstanceIteratorTest {
     data.forEach(
         inst -> {
           final double expected = inst.classValue();
-          final INDArray lbls = itSingle.next().getLabels();
+          final INDArray lbls = Utils.getNext(itSingle).getLabels();
           final double actual = lbls.getDouble(0, 1, lbls.shape()[2] - 1);
           assertEquals(expected, actual, 10e-5);
         });
