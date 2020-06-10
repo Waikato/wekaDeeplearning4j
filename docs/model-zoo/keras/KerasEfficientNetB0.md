@@ -1,5 +1,7 @@
 # KerasEfficientNetB0
 
+[Back to Model Zoo](../../user-guide/model-zoo.md)
+
 ```text
 Model: "model_2"
 __________________________________________________________________________________________________

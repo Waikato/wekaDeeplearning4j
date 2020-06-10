@@ -1,5 +1,7 @@
 # DL4JSqueezeNet
 
+[Back to Model Zoo](../../user-guide/model-zoo.md)
+
 ```text
 ======================================================================================================================================================
 VertexName (VertexType)                           nIn,nOut   TotalParams   ParamsShape                    Vertex Inputs

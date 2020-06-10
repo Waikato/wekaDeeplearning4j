@@ -1,5 +1,7 @@
 # KerasResNet152v2
 
+[Back to Model Zoo](../../user-guide/model-zoo.md)
+
 ```text
 Model: "resnet152v2"
 __________________________________________________________________________________________________
