@@ -1,49 +1,18 @@
 package myTest;
-//        KerasLayer.registerLambdaLayer("broadcast_w112_d32_1", new CustomBroadcast(112));
-//        KerasLayer.registerLambdaLayer("broadcast_w56_d96_1", new CustomBroadcast(56));
-//        KerasLayer.registerLambdaLayer("broadcast_w56_d144_1", new CustomBroadcast(56));
-//        KerasLayer.registerLambdaLayer("broadcast_w28_d144_1", new CustomBroadcast(28));
-//        KerasLayer.registerLambdaLayer("broadcast_w28_d240_1", new CustomBroadcast(28));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d240_1", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_1", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_2", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d480_3", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d672_1", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w14_d672_2", new CustomBroadcast(14));
-//        KerasLayer.registerLambdaLayer("broadcast_w7_d672_1", new CustomBroadcast(7));
-//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_1", new CustomBroadcast(7));
-//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_2", new CustomBroadcast(7));
-//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_3", new CustomBroadcast(7));
-//        KerasLayer.registerLambdaLayer("broadcast_w7_d1152_4", new CustomBroadcast(7));
 
-import com.sun.jna.platform.win32.OaIdl;
-import org.datavec.api.split.FileSplit;
-import org.datavec.image.recordreader.ImageRecordReader;
-import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
-import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.conf.CNN2DFormat;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.modelimport.keras.KerasLayer;
-import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
-import org.deeplearning4j.nn.modelimport.keras.exceptions.InvalidKerasConfigurationException;
-import org.deeplearning4j.nn.modelimport.keras.exceptions.UnsupportedKerasConfigurationException;
-import org.deeplearning4j.zoo.model.Darknet19;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.trees.RandomForest;
-import weka.core.AllJavadoc;
 import weka.core.Instances;
-import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.lambda.CustomBroadcast;
-import weka.dl4j.updater.Adam;
 import weka.dl4j.zoo.*;
-import weka.dl4j.zoo.Dl4jVGG;
-import weka.dl4j.zoo.keras.*;
+import weka.dl4j.zoo.keras.EfficientNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -143,29 +112,25 @@ public class WekaTests {
     }
 
     public void filterTest(String[] args) throws Exception {
-            Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+        Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
 
-            ConvolutionInstanceIterator imgIter = new ConvolutionInstanceIterator();
-            imgIter.setHeight(28);
-            imgIter.setWidth(28);
-            imgIter.setNumChannels(1);
-            imgIter.setTrainBatchSize(8);
+        ImageInstanceIterator imgIter = new ImageInstanceIterator();
+        imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
+        imgIter.setTrainBatchSize(2);
 
-            myFilter.setInstanceIterator(imgIter);
+        myFilter.setInstanceIterator(imgIter);
 
-            Dl4jLeNet thisModel = new Dl4jLeNet();
-//            thisModel.setVariation(ResNet.VARIATION.RESNET101);
-//            thisModel.setVariation(NASNet.VARIATION.LARGE);
-//            thisModel.setVariation(NASNet.VARIATION.LARGE);
-            myFilter.setZooModelType(thisModel);
+        Dl4jXception thisModel = new Dl4jXception();
+        thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
+        myFilter.setZooModelType(thisModel);
 
-            Filter.runFilter(myFilter, args);
+        Filter.runFilter(myFilter, args);
     }
 
     public void train(String[] args) throws Exception {
         Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
         clf.setSeed(1);
-        clf.setNumEpochs(30);
+        clf.setNumEpochs(5);
 
         // Load the arff file
         Instances data = new Instances(new FileReader("datasets/nominal/mnist.meta.tiny.arff"));
@@ -175,13 +140,10 @@ public class WekaTests {
         ImageInstanceIterator imgIter = new ImageInstanceIterator();
         imgIter.setImagesLocation(new File("datasets/nominal/mnist-minimal"));
         imgIter.setTrainBatchSize(16);
-//        imgIter.setWidth(28);
-//        imgIter.setHeight(28);
-//        imgIter.setNumChannels(1);
         clf.setInstanceIterator(imgIter);
 
         // Set up the pretrained model
-        Dl4jSqueezeNet zooModel = new Dl4jSqueezeNet();
+        Dl4jXception zooModel = new Dl4jXception();
         zooModel.setVariation(Dl4jDarknet19.VARIATION.INPUT224);
 //        zooModel.setVariation(NASNet.VARIATION.LARGE);
         clf.setZooModel(zooModel);
