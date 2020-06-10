@@ -76,6 +76,7 @@ public class ResizeImageInstanceIterator extends ImageInstanceIterator {
     this.setTrainBatchSize(iii.getTrainBatchSize());
     this.setImagesLocation(iii.getImagesLocation());
     this.setNumChannels(iii.getNumChannels());
+    this.setChannelsLast(iii.getChannelsLast());
   }
 
   @OptionMetadata(
