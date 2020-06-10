@@ -127,7 +127,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         org.deeplearning4j.nn.conf.layers.Layer lastLayer = computationGraph.getLayers()[computationGraph.getNumLayers() - 1].conf().getLayer();
         if (!Dl4jMlpClassifier.noOutputLayer(filterMode, lastLayer)) {
             log.debug("No need to add output layer, ignoring");
-            log.debug(computationGraph.summary());
             return computationGraph;
         }
         try {
@@ -153,7 +152,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             }
 
             log.debug("Finished adding output layer");
-            log.debug(graphBuilder.build().summary());
             return graphBuilder.build();
         } catch (Exception ex) {
             ex.printStackTrace();
