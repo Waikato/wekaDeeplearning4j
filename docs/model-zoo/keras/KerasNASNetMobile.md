@@ -1,26 +1,29 @@
+# KerasNASNetMobile
+
+```text
 Model: "NASNet"
 __________________________________________________________________________________________________
 Layer (type)                    Output Shape         Param #     Connected to                     
 ==================================================================================================
-input_15 (InputLayer)           [(None, 224, 224, 3) 0                                            
+input_9 (InputLayer)            (None, 224, 224, 3)  0                                            
 __________________________________________________________________________________________________
-stem_conv1 (Conv2D)             (None, 111, 111, 32) 864         input_15[0][0]                   
+stem_conv1 (Conv2D)             (None, 111, 111, 32) 864         input_9[0][0]                    
 __________________________________________________________________________________________________
 stem_bn1 (BatchNormalization)   (None, 111, 111, 32) 128         stem_conv1[0][0]                 
 __________________________________________________________________________________________________
-activation_354 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
+activation_95 (Activation)      (None, 111, 111, 32) 0           stem_bn1[0][0]                   
 __________________________________________________________________________________________________
-reduction_conv_1_stem_1 (Conv2D (None, 111, 111, 11) 352         activation_354[0][0]             
+reduction_conv_1_stem_1 (Conv2D (None, 111, 111, 11) 352         activation_95[0][0]              
 __________________________________________________________________________________________________
 reduction_bn_1_stem_1 (BatchNor (None, 111, 111, 11) 44          reduction_conv_1_stem_1[0][0]    
 __________________________________________________________________________________________________
-activation_355 (Activation)     (None, 111, 111, 11) 0           reduction_bn_1_stem_1[0][0]      
+activation_96 (Activation)      (None, 111, 111, 11) 0           reduction_bn_1_stem_1[0][0]      
 __________________________________________________________________________________________________
-activation_357 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
+activation_98 (Activation)      (None, 111, 111, 32) 0           stem_bn1[0][0]                   
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 115, 115, 11) 0           activation_355[0][0]             
+separable_conv_1_pad_reduction_ (None, 115, 115, 11) 0           activation_96[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 117, 117, 32) 0           activation_357[0][0]             
+separable_conv_1_pad_reduction_ (None, 117, 117, 32) 0           activation_98[0][0]              
 __________________________________________________________________________________________________
 separable_conv_1_reduction_left (None, 56, 56, 11)   396         separable_conv_1_pad_reduction_le
 __________________________________________________________________________________________________
@@ -30,40 +33,40 @@ separable_conv_1_bn_reduction_l (None, 56, 56, 11)   44          separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 56, 56, 11)   44          separable_conv_1_reduction_right1
 __________________________________________________________________________________________________
-activation_356 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_lef
+activation_97 (Activation)      (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
-activation_358 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
+activation_99 (Activation)      (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 56, 56, 11)   396         activation_356[0][0]             
+separable_conv_2_reduction_left (None, 56, 56, 11)   396         activation_97[0][0]              
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 56, 56, 11)   660         activation_358[0][0]             
+separable_conv_2_reduction_righ (None, 56, 56, 11)   660         activation_99[0][0]              
 __________________________________________________________________________________________________
-activation_359 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
+activation_100 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_l (None, 56, 56, 11)   44          separable_conv_2_reduction_left1_
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 56, 56, 11)   44          separable_conv_2_reduction_right1
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 117, 117, 32) 0           activation_359[0][0]             
+separable_conv_1_pad_reduction_ (None, 117, 117, 32) 0           activation_100[0][0]             
 __________________________________________________________________________________________________
-activation_361 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
+activation_102 (Activation)     (None, 111, 111, 32) 0           stem_bn1[0][0]                   
 __________________________________________________________________________________________________
 reduction_add_1_stem_1 (Add)    (None, 56, 56, 11)   0           separable_conv_2_bn_reduction_lef
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 56, 56, 11)   1920        separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 115, 115, 32) 0           activation_361[0][0]             
+separable_conv_1_pad_reduction_ (None, 115, 115, 32) 0           activation_102[0][0]             
 __________________________________________________________________________________________________
-activation_363 (Activation)     (None, 56, 56, 11)   0           reduction_add_1_stem_1[0][0]     
+activation_104 (Activation)     (None, 56, 56, 11)   0           reduction_add_1_stem_1[0][0]     
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 56, 56, 11)   44          separable_conv_1_reduction_right2
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 56, 56, 11)   1152        separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_reduction_left (None, 56, 56, 11)   220         activation_363[0][0]             
+separable_conv_1_reduction_left (None, 56, 56, 11)   220         activation_104[0][0]             
 __________________________________________________________________________________________________
-activation_360 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
+activation_101 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 56, 56, 11)   44          separable_conv_1_reduction_right3
 __________________________________________________________________________________________________
@@ -71,19 +74,19 @@ separable_conv_1_bn_reduction_l (None, 56, 56, 11)   44          separable_conv_
 __________________________________________________________________________________________________
 reduction_pad_1_stem_1 (ZeroPad (None, 113, 113, 11) 0           reduction_bn_1_stem_1[0][0]      
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 56, 56, 11)   660         activation_360[0][0]             
+separable_conv_2_reduction_righ (None, 56, 56, 11)   660         activation_101[0][0]             
 __________________________________________________________________________________________________
-activation_362 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
+activation_103 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-activation_364 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_lef
+activation_105 (Activation)     (None, 56, 56, 11)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
 reduction_left2_stem_1 (MaxPool (None, 56, 56, 11)   0           reduction_pad_1_stem_1[0][0]     
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 56, 56, 11)   44          separable_conv_2_reduction_right2
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 56, 56, 11)   396         activation_362[0][0]             
+separable_conv_2_reduction_righ (None, 56, 56, 11)   396         activation_103[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 56, 56, 11)   220         activation_364[0][0]             
+separable_conv_2_reduction_left (None, 56, 56, 11)   220         activation_105[0][0]             
 __________________________________________________________________________________________________
 adjust_relu_1_stem_2 (Activatio (None, 111, 111, 32) 0           stem_bn1[0][0]                   
 __________________________________________________________________________________________________
@@ -100,50 +103,50 @@ separable_conv_2_bn_reduction_l (None, 56, 56, 11)   44          separable_conv_
 __________________________________________________________________________________________________
 reduction_right5_stem_1 (MaxPoo (None, 56, 56, 11)   0           reduction_pad_1_stem_1[0][0]     
 __________________________________________________________________________________________________
-zero_padding2d_10 (ZeroPadding2 (None, 112, 112, 32) 0           adjust_relu_1_stem_2[0][0]       
+zero_padding2d_5 (ZeroPadding2D (None, 112, 112, 32) 0           adjust_relu_1_stem_2[0][0]       
 __________________________________________________________________________________________________
 reduction_add3_stem_1 (Add)     (None, 56, 56, 11)   0           reduction_left3_stem_1[0][0]     
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
-add_16 (Add)                    (None, 56, 56, 11)   0           reduction_add_2_stem_1[0][0]     
+add_1 (Add)                     (None, 56, 56, 11)   0           reduction_add_2_stem_1[0][0]     
                                                                  reduction_left4_stem_1[0][0]     
 __________________________________________________________________________________________________
 reduction_add4_stem_1 (Add)     (None, 56, 56, 11)   0           separable_conv_2_bn_reduction_lef
                                                                  reduction_right5_stem_1[0][0]    
 __________________________________________________________________________________________________
-cropping2d_4 (Cropping2D)       (None, 111, 111, 32) 0           zero_padding2d_10[0][0]          
+cropping2d_1 (Cropping2D)       (None, 111, 111, 32) 0           zero_padding2d_5[0][0]           
 __________________________________________________________________________________________________
 reduction_concat_stem_1 (Concat (None, 56, 56, 44)   0           reduction_add_2_stem_1[0][0]     
                                                                  reduction_add3_stem_1[0][0]      
-                                                                 add_16[0][0]                     
+                                                                 add_1[0][0]                      
                                                                  reduction_add4_stem_1[0][0]      
 __________________________________________________________________________________________________
 adjust_avg_pool_1_stem_2 (Avera (None, 56, 56, 32)   0           adjust_relu_1_stem_2[0][0]       
 __________________________________________________________________________________________________
-adjust_avg_pool_2_stem_2 (Avera (None, 56, 56, 32)   0           cropping2d_4[0][0]               
+adjust_avg_pool_2_stem_2 (Avera (None, 56, 56, 32)   0           cropping2d_1[0][0]               
 __________________________________________________________________________________________________
-activation_365 (Activation)     (None, 56, 56, 44)   0           reduction_concat_stem_1[0][0]    
+activation_106 (Activation)     (None, 56, 56, 44)   0           reduction_concat_stem_1[0][0]    
 __________________________________________________________________________________________________
 adjust_conv_1_stem_2 (Conv2D)   (None, 56, 56, 11)   352         adjust_avg_pool_1_stem_2[0][0]   
 __________________________________________________________________________________________________
 adjust_conv_2_stem_2 (Conv2D)   (None, 56, 56, 11)   352         adjust_avg_pool_2_stem_2[0][0]   
 __________________________________________________________________________________________________
-reduction_conv_1_stem_2 (Conv2D (None, 56, 56, 22)   968         activation_365[0][0]             
+reduction_conv_1_stem_2 (Conv2D (None, 56, 56, 22)   968         activation_106[0][0]             
 __________________________________________________________________________________________________
-concatenate_6 (Concatenate)     (None, 56, 56, 22)   0           adjust_conv_1_stem_2[0][0]       
+concatenate_3 (Concatenate)     (None, 56, 56, 22)   0           adjust_conv_1_stem_2[0][0]       
                                                                  adjust_conv_2_stem_2[0][0]       
 __________________________________________________________________________________________________
 reduction_bn_1_stem_2 (BatchNor (None, 56, 56, 22)   88          reduction_conv_1_stem_2[0][0]    
 __________________________________________________________________________________________________
-adjust_bn_stem_2 (BatchNormaliz (None, 56, 56, 22)   88          concatenate_6[0][0]              
+adjust_bn_stem_2 (BatchNormaliz (None, 56, 56, 22)   88          concatenate_3[0][0]              
 __________________________________________________________________________________________________
-activation_366 (Activation)     (None, 56, 56, 22)   0           reduction_bn_1_stem_2[0][0]      
+activation_107 (Activation)     (None, 56, 56, 22)   0           reduction_bn_1_stem_2[0][0]      
 __________________________________________________________________________________________________
-activation_368 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
+activation_109 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 59, 59, 22)   0           activation_366[0][0]             
+separable_conv_1_pad_reduction_ (None, 59, 59, 22)   0           activation_107[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 61, 61, 22)   0           activation_368[0][0]             
+separable_conv_1_pad_reduction_ (None, 61, 61, 22)   0           activation_109[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_reduction_left (None, 28, 28, 22)   1034        separable_conv_1_pad_reduction_le
 __________________________________________________________________________________________________
@@ -153,40 +156,40 @@ separable_conv_1_bn_reduction_l (None, 28, 28, 22)   88          separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 28, 28, 22)   88          separable_conv_1_reduction_right1
 __________________________________________________________________________________________________
-activation_367 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_lef
+activation_108 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
-activation_369 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
+activation_110 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 28, 28, 22)   1034        activation_367[0][0]             
+separable_conv_2_reduction_left (None, 28, 28, 22)   1034        activation_108[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 28, 28, 22)   1562        activation_369[0][0]             
+separable_conv_2_reduction_righ (None, 28, 28, 22)   1562        activation_110[0][0]             
 __________________________________________________________________________________________________
-activation_370 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
+activation_111 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_l (None, 28, 28, 22)   88          separable_conv_2_reduction_left1_
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 28, 28, 22)   88          separable_conv_2_reduction_right1
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 61, 61, 22)   0           activation_370[0][0]             
+separable_conv_1_pad_reduction_ (None, 61, 61, 22)   0           activation_111[0][0]             
 __________________________________________________________________________________________________
-activation_372 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
+activation_113 (Activation)     (None, 56, 56, 22)   0           adjust_bn_stem_2[0][0]           
 __________________________________________________________________________________________________
 reduction_add_1_stem_2 (Add)    (None, 28, 28, 22)   0           separable_conv_2_bn_reduction_lef
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 28, 28, 22)   1562        separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 59, 59, 22)   0           activation_372[0][0]             
+separable_conv_1_pad_reduction_ (None, 59, 59, 22)   0           activation_113[0][0]             
 __________________________________________________________________________________________________
-activation_374 (Activation)     (None, 28, 28, 22)   0           reduction_add_1_stem_2[0][0]     
+activation_115 (Activation)     (None, 28, 28, 22)   0           reduction_add_1_stem_2[0][0]     
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 28, 28, 22)   88          separable_conv_1_reduction_right2
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 28, 28, 22)   1034        separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_reduction_left (None, 28, 28, 22)   682         activation_374[0][0]             
+separable_conv_1_reduction_left (None, 28, 28, 22)   682         activation_115[0][0]             
 __________________________________________________________________________________________________
-activation_371 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
+activation_112 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 28, 28, 22)   88          separable_conv_1_reduction_right3
 __________________________________________________________________________________________________
@@ -194,19 +197,19 @@ separable_conv_1_bn_reduction_l (None, 28, 28, 22)   88          separable_conv_
 __________________________________________________________________________________________________
 reduction_pad_1_stem_2 (ZeroPad (None, 57, 57, 22)   0           reduction_bn_1_stem_2[0][0]      
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 28, 28, 22)   1562        activation_371[0][0]             
+separable_conv_2_reduction_righ (None, 28, 28, 22)   1562        activation_112[0][0]             
 __________________________________________________________________________________________________
-activation_373 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
+activation_114 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-activation_375 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_lef
+activation_116 (Activation)     (None, 28, 28, 22)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
 reduction_left2_stem_2 (MaxPool (None, 28, 28, 22)   0           reduction_pad_1_stem_2[0][0]     
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 28, 28, 22)   88          separable_conv_2_reduction_right2
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 28, 28, 22)   1034        activation_373[0][0]             
+separable_conv_2_reduction_righ (None, 28, 28, 22)   1034        activation_114[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 28, 28, 22)   682         activation_375[0][0]             
+separable_conv_2_reduction_left (None, 28, 28, 22)   682         activation_116[0][0]             
 __________________________________________________________________________________________________
 adjust_relu_1_0 (Activation)    (None, 56, 56, 44)   0           reduction_concat_stem_1[0][0]    
 __________________________________________________________________________________________________
@@ -223,62 +226,62 @@ separable_conv_2_bn_reduction_l (None, 28, 28, 22)   88          separable_conv_
 __________________________________________________________________________________________________
 reduction_right5_stem_2 (MaxPoo (None, 28, 28, 22)   0           reduction_pad_1_stem_2[0][0]     
 __________________________________________________________________________________________________
-zero_padding2d_11 (ZeroPadding2 (None, 57, 57, 44)   0           adjust_relu_1_0[0][0]            
+zero_padding2d_6 (ZeroPadding2D (None, 57, 57, 44)   0           adjust_relu_1_0[0][0]            
 __________________________________________________________________________________________________
 reduction_add3_stem_2 (Add)     (None, 28, 28, 22)   0           reduction_left3_stem_2[0][0]     
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
-add_17 (Add)                    (None, 28, 28, 22)   0           reduction_add_2_stem_2[0][0]     
+add_2 (Add)                     (None, 28, 28, 22)   0           reduction_add_2_stem_2[0][0]     
                                                                  reduction_left4_stem_2[0][0]     
 __________________________________________________________________________________________________
 reduction_add4_stem_2 (Add)     (None, 28, 28, 22)   0           separable_conv_2_bn_reduction_lef
                                                                  reduction_right5_stem_2[0][0]    
 __________________________________________________________________________________________________
-cropping2d_5 (Cropping2D)       (None, 56, 56, 44)   0           zero_padding2d_11[0][0]          
+cropping2d_2 (Cropping2D)       (None, 56, 56, 44)   0           zero_padding2d_6[0][0]           
 __________________________________________________________________________________________________
 reduction_concat_stem_2 (Concat (None, 28, 28, 88)   0           reduction_add_2_stem_2[0][0]     
                                                                  reduction_add3_stem_2[0][0]      
-                                                                 add_17[0][0]                     
+                                                                 add_2[0][0]                      
                                                                  reduction_add4_stem_2[0][0]      
 __________________________________________________________________________________________________
 adjust_avg_pool_1_0 (AveragePoo (None, 28, 28, 44)   0           adjust_relu_1_0[0][0]            
 __________________________________________________________________________________________________
-adjust_avg_pool_2_0 (AveragePoo (None, 28, 28, 44)   0           cropping2d_5[0][0]               
+adjust_avg_pool_2_0 (AveragePoo (None, 28, 28, 44)   0           cropping2d_2[0][0]               
 __________________________________________________________________________________________________
 adjust_conv_1_0 (Conv2D)        (None, 28, 28, 22)   968         adjust_avg_pool_1_0[0][0]        
 __________________________________________________________________________________________________
 adjust_conv_2_0 (Conv2D)        (None, 28, 28, 22)   968         adjust_avg_pool_2_0[0][0]        
 __________________________________________________________________________________________________
-activation_376 (Activation)     (None, 28, 28, 88)   0           reduction_concat_stem_2[0][0]    
+activation_117 (Activation)     (None, 28, 28, 88)   0           reduction_concat_stem_2[0][0]    
 __________________________________________________________________________________________________
-concatenate_7 (Concatenate)     (None, 28, 28, 44)   0           adjust_conv_1_0[0][0]            
+concatenate_4 (Concatenate)     (None, 28, 28, 44)   0           adjust_conv_1_0[0][0]            
                                                                  adjust_conv_2_0[0][0]            
 __________________________________________________________________________________________________
-normal_conv_1_0 (Conv2D)        (None, 28, 28, 44)   3872        activation_376[0][0]             
+normal_conv_1_0 (Conv2D)        (None, 28, 28, 44)   3872        activation_117[0][0]             
 __________________________________________________________________________________________________
-adjust_bn_0 (BatchNormalization (None, 28, 28, 44)   176         concatenate_7[0][0]              
+adjust_bn_0 (BatchNormalization (None, 28, 28, 44)   176         concatenate_4[0][0]              
 __________________________________________________________________________________________________
 normal_bn_1_0 (BatchNormalizati (None, 28, 28, 44)   176         normal_conv_1_0[0][0]            
 __________________________________________________________________________________________________
-activation_377 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_0[0][0]              
+activation_118 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_0[0][0]              
 __________________________________________________________________________________________________
-activation_379 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
+activation_120 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
 __________________________________________________________________________________________________
-activation_381 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
+activation_122 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
 __________________________________________________________________________________________________
-activation_383 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
+activation_124 (Activation)     (None, 28, 28, 44)   0           adjust_bn_0[0][0]                
 __________________________________________________________________________________________________
-activation_385 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_0[0][0]              
+activation_126 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_0[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_0 (None, 28, 28, 44)   3036        activation_377[0][0]             
+separable_conv_1_normal_left1_0 (None, 28, 28, 44)   3036        activation_118[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_379[0][0]             
+separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_120[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_0 (None, 28, 28, 44)   3036        activation_381[0][0]             
+separable_conv_1_normal_left2_0 (None, 28, 28, 44)   3036        activation_122[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_383[0][0]             
+separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_124[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_0 (None, 28, 28, 44)   2332        activation_385[0][0]             
+separable_conv_1_normal_left5_0 (None, 28, 28, 44)   2332        activation_126[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left1_0[0
 __________________________________________________________________________________________________
@@ -290,25 +293,25 @@ separable_conv_1_bn_normal_righ (None, 28, 28, 44)   176         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left5_0[0
 __________________________________________________________________________________________________
-activation_378 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
+activation_119 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_380 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
+activation_121 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_382 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
+activation_123 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_384 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
+activation_125 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_386 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
+activation_127 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_0 (None, 28, 28, 44)   3036        activation_378[0][0]             
+separable_conv_2_normal_left1_0 (None, 28, 28, 44)   3036        activation_119[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_380[0][0]             
+separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_121[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_0 (None, 28, 28, 44)   3036        activation_382[0][0]             
+separable_conv_2_normal_left2_0 (None, 28, 28, 44)   3036        activation_123[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_384[0][0]             
+separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_125[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_0 (None, 28, 28, 44)   2332        activation_386[0][0]             
+separable_conv_2_normal_left5_0 (None, 28, 28, 44)   2332        activation_127[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 28, 28, 44)   176         separable_conv_2_normal_left1_0[0
 __________________________________________________________________________________________________
@@ -348,37 +351,37 @@ normal_concat_0 (Concatenate)   (None, 28, 28, 264)  0           adjust_bn_0[0][
                                                                  normal_add_4_0[0][0]             
                                                                  normal_add_5_0[0][0]             
 __________________________________________________________________________________________________
-activation_387 (Activation)     (None, 28, 28, 88)   0           reduction_concat_stem_2[0][0]    
+activation_128 (Activation)     (None, 28, 28, 88)   0           reduction_concat_stem_2[0][0]    
 __________________________________________________________________________________________________
-activation_388 (Activation)     (None, 28, 28, 264)  0           normal_concat_0[0][0]            
+activation_129 (Activation)     (None, 28, 28, 264)  0           normal_concat_0[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_1 (Conv2 (None, 28, 28, 44)   3872        activation_387[0][0]             
+adjust_conv_projection_1 (Conv2 (None, 28, 28, 44)   3872        activation_128[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_1 (Conv2D)        (None, 28, 28, 44)   11616       activation_388[0][0]             
+normal_conv_1_1 (Conv2D)        (None, 28, 28, 44)   11616       activation_129[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_1 (BatchNormalization (None, 28, 28, 44)   176         adjust_conv_projection_1[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_1 (BatchNormalizati (None, 28, 28, 44)   176         normal_conv_1_1[0][0]            
 __________________________________________________________________________________________________
-activation_389 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_1[0][0]              
+activation_130 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_1[0][0]              
 __________________________________________________________________________________________________
-activation_391 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
+activation_132 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
 __________________________________________________________________________________________________
-activation_393 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
+activation_134 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
 __________________________________________________________________________________________________
-activation_395 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
+activation_136 (Activation)     (None, 28, 28, 44)   0           adjust_bn_1[0][0]                
 __________________________________________________________________________________________________
-activation_397 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_1[0][0]              
+activation_138 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_1[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_1 (None, 28, 28, 44)   3036        activation_389[0][0]             
+separable_conv_1_normal_left1_1 (None, 28, 28, 44)   3036        activation_130[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_391[0][0]             
+separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_132[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_1 (None, 28, 28, 44)   3036        activation_393[0][0]             
+separable_conv_1_normal_left2_1 (None, 28, 28, 44)   3036        activation_134[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_395[0][0]             
+separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_136[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_1 (None, 28, 28, 44)   2332        activation_397[0][0]             
+separable_conv_1_normal_left5_1 (None, 28, 28, 44)   2332        activation_138[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left1_1[0
 __________________________________________________________________________________________________
@@ -390,25 +393,25 @@ separable_conv_1_bn_normal_righ (None, 28, 28, 44)   176         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left5_1[0
 __________________________________________________________________________________________________
-activation_390 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
+activation_131 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_392 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
+activation_133 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_394 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
+activation_135 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_396 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
+activation_137 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_398 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
+activation_139 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_1 (None, 28, 28, 44)   3036        activation_390[0][0]             
+separable_conv_2_normal_left1_1 (None, 28, 28, 44)   3036        activation_131[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_392[0][0]             
+separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_133[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_1 (None, 28, 28, 44)   3036        activation_394[0][0]             
+separable_conv_2_normal_left2_1 (None, 28, 28, 44)   3036        activation_135[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_396[0][0]             
+separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_137[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_1 (None, 28, 28, 44)   2332        activation_398[0][0]             
+separable_conv_2_normal_left5_1 (None, 28, 28, 44)   2332        activation_139[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 28, 28, 44)   176         separable_conv_2_normal_left1_1[0
 __________________________________________________________________________________________________
@@ -448,37 +451,37 @@ normal_concat_1 (Concatenate)   (None, 28, 28, 264)  0           adjust_bn_1[0][
                                                                  normal_add_4_1[0][0]             
                                                                  normal_add_5_1[0][0]             
 __________________________________________________________________________________________________
-activation_399 (Activation)     (None, 28, 28, 264)  0           normal_concat_0[0][0]            
+activation_140 (Activation)     (None, 28, 28, 264)  0           normal_concat_0[0][0]            
 __________________________________________________________________________________________________
-activation_400 (Activation)     (None, 28, 28, 264)  0           normal_concat_1[0][0]            
+activation_141 (Activation)     (None, 28, 28, 264)  0           normal_concat_1[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_2 (Conv2 (None, 28, 28, 44)   11616       activation_399[0][0]             
+adjust_conv_projection_2 (Conv2 (None, 28, 28, 44)   11616       activation_140[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_2 (Conv2D)        (None, 28, 28, 44)   11616       activation_400[0][0]             
+normal_conv_1_2 (Conv2D)        (None, 28, 28, 44)   11616       activation_141[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_2 (BatchNormalization (None, 28, 28, 44)   176         adjust_conv_projection_2[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_2 (BatchNormalizati (None, 28, 28, 44)   176         normal_conv_1_2[0][0]            
 __________________________________________________________________________________________________
-activation_401 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_2[0][0]              
+activation_142 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_2[0][0]              
 __________________________________________________________________________________________________
-activation_403 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
+activation_144 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
 __________________________________________________________________________________________________
-activation_405 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
+activation_146 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
 __________________________________________________________________________________________________
-activation_407 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
+activation_148 (Activation)     (None, 28, 28, 44)   0           adjust_bn_2[0][0]                
 __________________________________________________________________________________________________
-activation_409 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_2[0][0]              
+activation_150 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_2[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_2 (None, 28, 28, 44)   3036        activation_401[0][0]             
+separable_conv_1_normal_left1_2 (None, 28, 28, 44)   3036        activation_142[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_403[0][0]             
+separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_144[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_2 (None, 28, 28, 44)   3036        activation_405[0][0]             
+separable_conv_1_normal_left2_2 (None, 28, 28, 44)   3036        activation_146[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_407[0][0]             
+separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_148[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_2 (None, 28, 28, 44)   2332        activation_409[0][0]             
+separable_conv_1_normal_left5_2 (None, 28, 28, 44)   2332        activation_150[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left1_2[0
 __________________________________________________________________________________________________
@@ -490,25 +493,25 @@ separable_conv_1_bn_normal_righ (None, 28, 28, 44)   176         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left5_2[0
 __________________________________________________________________________________________________
-activation_402 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
+activation_143 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_404 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
+activation_145 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_406 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
+activation_147 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_408 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
+activation_149 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_410 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
+activation_151 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_2 (None, 28, 28, 44)   3036        activation_402[0][0]             
+separable_conv_2_normal_left1_2 (None, 28, 28, 44)   3036        activation_143[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_404[0][0]             
+separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_145[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_2 (None, 28, 28, 44)   3036        activation_406[0][0]             
+separable_conv_2_normal_left2_2 (None, 28, 28, 44)   3036        activation_147[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_408[0][0]             
+separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_149[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_2 (None, 28, 28, 44)   2332        activation_410[0][0]             
+separable_conv_2_normal_left5_2 (None, 28, 28, 44)   2332        activation_151[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 28, 28, 44)   176         separable_conv_2_normal_left1_2[0
 __________________________________________________________________________________________________
@@ -548,37 +551,37 @@ normal_concat_2 (Concatenate)   (None, 28, 28, 264)  0           adjust_bn_2[0][
                                                                  normal_add_4_2[0][0]             
                                                                  normal_add_5_2[0][0]             
 __________________________________________________________________________________________________
-activation_411 (Activation)     (None, 28, 28, 264)  0           normal_concat_1[0][0]            
+activation_152 (Activation)     (None, 28, 28, 264)  0           normal_concat_1[0][0]            
 __________________________________________________________________________________________________
-activation_412 (Activation)     (None, 28, 28, 264)  0           normal_concat_2[0][0]            
+activation_153 (Activation)     (None, 28, 28, 264)  0           normal_concat_2[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_3 (Conv2 (None, 28, 28, 44)   11616       activation_411[0][0]             
+adjust_conv_projection_3 (Conv2 (None, 28, 28, 44)   11616       activation_152[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_3 (Conv2D)        (None, 28, 28, 44)   11616       activation_412[0][0]             
+normal_conv_1_3 (Conv2D)        (None, 28, 28, 44)   11616       activation_153[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_3 (BatchNormalization (None, 28, 28, 44)   176         adjust_conv_projection_3[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_3 (BatchNormalizati (None, 28, 28, 44)   176         normal_conv_1_3[0][0]            
 __________________________________________________________________________________________________
-activation_413 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_3[0][0]              
+activation_154 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_3[0][0]              
 __________________________________________________________________________________________________
-activation_415 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
+activation_156 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
 __________________________________________________________________________________________________
-activation_417 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
+activation_158 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
 __________________________________________________________________________________________________
-activation_419 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
+activation_160 (Activation)     (None, 28, 28, 44)   0           adjust_bn_3[0][0]                
 __________________________________________________________________________________________________
-activation_421 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_3[0][0]              
+activation_162 (Activation)     (None, 28, 28, 44)   0           normal_bn_1_3[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_3 (None, 28, 28, 44)   3036        activation_413[0][0]             
+separable_conv_1_normal_left1_3 (None, 28, 28, 44)   3036        activation_154[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_415[0][0]             
+separable_conv_1_normal_right1_ (None, 28, 28, 44)   2332        activation_156[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_3 (None, 28, 28, 44)   3036        activation_417[0][0]             
+separable_conv_1_normal_left2_3 (None, 28, 28, 44)   3036        activation_158[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_419[0][0]             
+separable_conv_1_normal_right2_ (None, 28, 28, 44)   2332        activation_160[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_3 (None, 28, 28, 44)   2332        activation_421[0][0]             
+separable_conv_1_normal_left5_3 (None, 28, 28, 44)   2332        activation_162[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left1_3[0
 __________________________________________________________________________________________________
@@ -590,25 +593,25 @@ separable_conv_1_bn_normal_righ (None, 28, 28, 44)   176         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 28, 28, 44)   176         separable_conv_1_normal_left5_3[0
 __________________________________________________________________________________________________
-activation_414 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
+activation_155 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_416 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
+activation_157 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_418 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
+activation_159 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_420 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
+activation_161 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_422 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
+activation_163 (Activation)     (None, 28, 28, 44)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_3 (None, 28, 28, 44)   3036        activation_414[0][0]             
+separable_conv_2_normal_left1_3 (None, 28, 28, 44)   3036        activation_155[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_416[0][0]             
+separable_conv_2_normal_right1_ (None, 28, 28, 44)   2332        activation_157[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_3 (None, 28, 28, 44)   3036        activation_418[0][0]             
+separable_conv_2_normal_left2_3 (None, 28, 28, 44)   3036        activation_159[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_420[0][0]             
+separable_conv_2_normal_right2_ (None, 28, 28, 44)   2332        activation_161[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_3 (None, 28, 28, 44)   2332        activation_422[0][0]             
+separable_conv_2_normal_left5_3 (None, 28, 28, 44)   2332        activation_163[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 28, 28, 44)   176         separable_conv_2_normal_left1_3[0
 __________________________________________________________________________________________________
@@ -648,25 +651,25 @@ normal_concat_3 (Concatenate)   (None, 28, 28, 264)  0           adjust_bn_3[0][
                                                                  normal_add_4_3[0][0]             
                                                                  normal_add_5_3[0][0]             
 __________________________________________________________________________________________________
-activation_424 (Activation)     (None, 28, 28, 264)  0           normal_concat_3[0][0]            
+activation_165 (Activation)     (None, 28, 28, 264)  0           normal_concat_3[0][0]            
 __________________________________________________________________________________________________
-activation_423 (Activation)     (None, 28, 28, 264)  0           normal_concat_2[0][0]            
+activation_164 (Activation)     (None, 28, 28, 264)  0           normal_concat_2[0][0]            
 __________________________________________________________________________________________________
-reduction_conv_1_reduce_4 (Conv (None, 28, 28, 88)   23232       activation_424[0][0]             
+reduction_conv_1_reduce_4 (Conv (None, 28, 28, 88)   23232       activation_165[0][0]             
 __________________________________________________________________________________________________
-adjust_conv_projection_reduce_4 (None, 28, 28, 88)   23232       activation_423[0][0]             
+adjust_conv_projection_reduce_4 (None, 28, 28, 88)   23232       activation_164[0][0]             
 __________________________________________________________________________________________________
 reduction_bn_1_reduce_4 (BatchN (None, 28, 28, 88)   352         reduction_conv_1_reduce_4[0][0]  
 __________________________________________________________________________________________________
 adjust_bn_reduce_4 (BatchNormal (None, 28, 28, 88)   352         adjust_conv_projection_reduce_4[0
 __________________________________________________________________________________________________
-activation_425 (Activation)     (None, 28, 28, 88)   0           reduction_bn_1_reduce_4[0][0]    
+activation_166 (Activation)     (None, 28, 28, 88)   0           reduction_bn_1_reduce_4[0][0]    
 __________________________________________________________________________________________________
-activation_427 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
+activation_168 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 31, 31, 88)   0           activation_425[0][0]             
+separable_conv_1_pad_reduction_ (None, 31, 31, 88)   0           activation_166[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 33, 33, 88)   0           activation_427[0][0]             
+separable_conv_1_pad_reduction_ (None, 33, 33, 88)   0           activation_168[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_reduction_left (None, 14, 14, 88)   9944        separable_conv_1_pad_reduction_le
 __________________________________________________________________________________________________
@@ -676,40 +679,40 @@ separable_conv_1_bn_reduction_l (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 14, 14, 88)   352         separable_conv_1_reduction_right1
 __________________________________________________________________________________________________
-activation_426 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_lef
+activation_167 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
-activation_428 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
+activation_169 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 14, 14, 88)   9944        activation_426[0][0]             
+separable_conv_2_reduction_left (None, 14, 14, 88)   9944        activation_167[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 14, 14, 88)   12056       activation_428[0][0]             
+separable_conv_2_reduction_righ (None, 14, 14, 88)   12056       activation_169[0][0]             
 __________________________________________________________________________________________________
-activation_429 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
+activation_170 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_l (None, 14, 14, 88)   352         separable_conv_2_reduction_left1_
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 14, 14, 88)   352         separable_conv_2_reduction_right1
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 33, 33, 88)   0           activation_429[0][0]             
+separable_conv_1_pad_reduction_ (None, 33, 33, 88)   0           activation_170[0][0]             
 __________________________________________________________________________________________________
-activation_431 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
+activation_172 (Activation)     (None, 28, 28, 88)   0           adjust_bn_reduce_4[0][0]         
 __________________________________________________________________________________________________
 reduction_add_1_reduce_4 (Add)  (None, 14, 14, 88)   0           separable_conv_2_bn_reduction_lef
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 14, 14, 88)   12056       separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 31, 31, 88)   0           activation_431[0][0]             
+separable_conv_1_pad_reduction_ (None, 31, 31, 88)   0           activation_172[0][0]             
 __________________________________________________________________________________________________
-activation_433 (Activation)     (None, 14, 14, 88)   0           reduction_add_1_reduce_4[0][0]   
+activation_174 (Activation)     (None, 14, 14, 88)   0           reduction_add_1_reduce_4[0][0]   
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 14, 14, 88)   352         separable_conv_1_reduction_right2
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 14, 14, 88)   9944        separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_reduction_left (None, 14, 14, 88)   8536        activation_433[0][0]             
+separable_conv_1_reduction_left (None, 14, 14, 88)   8536        activation_174[0][0]             
 __________________________________________________________________________________________________
-activation_430 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
+activation_171 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 14, 14, 88)   352         separable_conv_1_reduction_right3
 __________________________________________________________________________________________________
@@ -717,19 +720,19 @@ separable_conv_1_bn_reduction_l (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 reduction_pad_1_reduce_4 (ZeroP (None, 29, 29, 88)   0           reduction_bn_1_reduce_4[0][0]    
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 14, 14, 88)   12056       activation_430[0][0]             
+separable_conv_2_reduction_righ (None, 14, 14, 88)   12056       activation_171[0][0]             
 __________________________________________________________________________________________________
-activation_432 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
+activation_173 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-activation_434 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_lef
+activation_175 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
 reduction_left2_reduce_4 (MaxPo (None, 14, 14, 88)   0           reduction_pad_1_reduce_4[0][0]   
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 14, 14, 88)   352         separable_conv_2_reduction_right2
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 14, 14, 88)   9944        activation_432[0][0]             
+separable_conv_2_reduction_righ (None, 14, 14, 88)   9944        activation_173[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 14, 14, 88)   8536        activation_434[0][0]             
+separable_conv_2_reduction_left (None, 14, 14, 88)   8536        activation_175[0][0]             
 __________________________________________________________________________________________________
 adjust_relu_1_5 (Activation)    (None, 28, 28, 264)  0           normal_concat_3[0][0]            
 __________________________________________________________________________________________________
@@ -746,62 +749,62 @@ separable_conv_2_bn_reduction_l (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 reduction_right5_reduce_4 (MaxP (None, 14, 14, 88)   0           reduction_pad_1_reduce_4[0][0]   
 __________________________________________________________________________________________________
-zero_padding2d_12 (ZeroPadding2 (None, 29, 29, 264)  0           adjust_relu_1_5[0][0]            
+zero_padding2d_7 (ZeroPadding2D (None, 29, 29, 264)  0           adjust_relu_1_5[0][0]            
 __________________________________________________________________________________________________
 reduction_add3_reduce_4 (Add)   (None, 14, 14, 88)   0           reduction_left3_reduce_4[0][0]   
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
-add_18 (Add)                    (None, 14, 14, 88)   0           reduction_add_2_reduce_4[0][0]   
+add_3 (Add)                     (None, 14, 14, 88)   0           reduction_add_2_reduce_4[0][0]   
                                                                  reduction_left4_reduce_4[0][0]   
 __________________________________________________________________________________________________
 reduction_add4_reduce_4 (Add)   (None, 14, 14, 88)   0           separable_conv_2_bn_reduction_lef
                                                                  reduction_right5_reduce_4[0][0]  
 __________________________________________________________________________________________________
-cropping2d_6 (Cropping2D)       (None, 28, 28, 264)  0           zero_padding2d_12[0][0]          
+cropping2d_3 (Cropping2D)       (None, 28, 28, 264)  0           zero_padding2d_7[0][0]           
 __________________________________________________________________________________________________
 reduction_concat_reduce_4 (Conc (None, 14, 14, 352)  0           reduction_add_2_reduce_4[0][0]   
                                                                  reduction_add3_reduce_4[0][0]    
-                                                                 add_18[0][0]                     
+                                                                 add_3[0][0]                      
                                                                  reduction_add4_reduce_4[0][0]    
 __________________________________________________________________________________________________
 adjust_avg_pool_1_5 (AveragePoo (None, 14, 14, 264)  0           adjust_relu_1_5[0][0]            
 __________________________________________________________________________________________________
-adjust_avg_pool_2_5 (AveragePoo (None, 14, 14, 264)  0           cropping2d_6[0][0]               
+adjust_avg_pool_2_5 (AveragePoo (None, 14, 14, 264)  0           cropping2d_3[0][0]               
 __________________________________________________________________________________________________
 adjust_conv_1_5 (Conv2D)        (None, 14, 14, 44)   11616       adjust_avg_pool_1_5[0][0]        
 __________________________________________________________________________________________________
 adjust_conv_2_5 (Conv2D)        (None, 14, 14, 44)   11616       adjust_avg_pool_2_5[0][0]        
 __________________________________________________________________________________________________
-activation_435 (Activation)     (None, 14, 14, 352)  0           reduction_concat_reduce_4[0][0]  
+activation_176 (Activation)     (None, 14, 14, 352)  0           reduction_concat_reduce_4[0][0]  
 __________________________________________________________________________________________________
-concatenate_8 (Concatenate)     (None, 14, 14, 88)   0           adjust_conv_1_5[0][0]            
+concatenate_5 (Concatenate)     (None, 14, 14, 88)   0           adjust_conv_1_5[0][0]            
                                                                  adjust_conv_2_5[0][0]            
 __________________________________________________________________________________________________
-normal_conv_1_5 (Conv2D)        (None, 14, 14, 88)   30976       activation_435[0][0]             
+normal_conv_1_5 (Conv2D)        (None, 14, 14, 88)   30976       activation_176[0][0]             
 __________________________________________________________________________________________________
-adjust_bn_5 (BatchNormalization (None, 14, 14, 88)   352         concatenate_8[0][0]              
+adjust_bn_5 (BatchNormalization (None, 14, 14, 88)   352         concatenate_5[0][0]              
 __________________________________________________________________________________________________
 normal_bn_1_5 (BatchNormalizati (None, 14, 14, 88)   352         normal_conv_1_5[0][0]            
 __________________________________________________________________________________________________
-activation_436 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_5[0][0]              
+activation_177 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_5[0][0]              
 __________________________________________________________________________________________________
-activation_438 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
+activation_179 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
 __________________________________________________________________________________________________
-activation_440 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
+activation_181 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
 __________________________________________________________________________________________________
-activation_442 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
+activation_183 (Activation)     (None, 14, 14, 88)   0           adjust_bn_5[0][0]                
 __________________________________________________________________________________________________
-activation_444 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_5[0][0]              
+activation_185 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_5[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_5 (None, 14, 14, 88)   9944        activation_436[0][0]             
+separable_conv_1_normal_left1_5 (None, 14, 14, 88)   9944        activation_177[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_438[0][0]             
+separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_179[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_5 (None, 14, 14, 88)   9944        activation_440[0][0]             
+separable_conv_1_normal_left2_5 (None, 14, 14, 88)   9944        activation_181[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_442[0][0]             
+separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_183[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_5 (None, 14, 14, 88)   8536        activation_444[0][0]             
+separable_conv_1_normal_left5_5 (None, 14, 14, 88)   8536        activation_185[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left1_5[0
 __________________________________________________________________________________________________
@@ -813,25 +816,25 @@ separable_conv_1_bn_normal_righ (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left5_5[0
 __________________________________________________________________________________________________
-activation_437 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
+activation_178 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_439 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
+activation_180 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_441 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
+activation_182 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_443 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
+activation_184 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_445 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
+activation_186 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_5 (None, 14, 14, 88)   9944        activation_437[0][0]             
+separable_conv_2_normal_left1_5 (None, 14, 14, 88)   9944        activation_178[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_439[0][0]             
+separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_180[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_5 (None, 14, 14, 88)   9944        activation_441[0][0]             
+separable_conv_2_normal_left2_5 (None, 14, 14, 88)   9944        activation_182[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_443[0][0]             
+separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_184[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_5 (None, 14, 14, 88)   8536        activation_445[0][0]             
+separable_conv_2_normal_left5_5 (None, 14, 14, 88)   8536        activation_186[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 14, 14, 88)   352         separable_conv_2_normal_left1_5[0
 __________________________________________________________________________________________________
@@ -871,37 +874,37 @@ normal_concat_5 (Concatenate)   (None, 14, 14, 528)  0           adjust_bn_5[0][
                                                                  normal_add_4_5[0][0]             
                                                                  normal_add_5_5[0][0]             
 __________________________________________________________________________________________________
-activation_446 (Activation)     (None, 14, 14, 352)  0           reduction_concat_reduce_4[0][0]  
+activation_187 (Activation)     (None, 14, 14, 352)  0           reduction_concat_reduce_4[0][0]  
 __________________________________________________________________________________________________
-activation_447 (Activation)     (None, 14, 14, 528)  0           normal_concat_5[0][0]            
+activation_188 (Activation)     (None, 14, 14, 528)  0           normal_concat_5[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_6 (Conv2 (None, 14, 14, 88)   30976       activation_446[0][0]             
+adjust_conv_projection_6 (Conv2 (None, 14, 14, 88)   30976       activation_187[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_6 (Conv2D)        (None, 14, 14, 88)   46464       activation_447[0][0]             
+normal_conv_1_6 (Conv2D)        (None, 14, 14, 88)   46464       activation_188[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_6 (BatchNormalization (None, 14, 14, 88)   352         adjust_conv_projection_6[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_6 (BatchNormalizati (None, 14, 14, 88)   352         normal_conv_1_6[0][0]            
 __________________________________________________________________________________________________
-activation_448 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_6[0][0]              
+activation_189 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_6[0][0]              
 __________________________________________________________________________________________________
-activation_450 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
+activation_191 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
 __________________________________________________________________________________________________
-activation_452 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
+activation_193 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
 __________________________________________________________________________________________________
-activation_454 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
+activation_195 (Activation)     (None, 14, 14, 88)   0           adjust_bn_6[0][0]                
 __________________________________________________________________________________________________
-activation_456 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_6[0][0]              
+activation_197 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_6[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_6 (None, 14, 14, 88)   9944        activation_448[0][0]             
+separable_conv_1_normal_left1_6 (None, 14, 14, 88)   9944        activation_189[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_450[0][0]             
+separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_191[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_6 (None, 14, 14, 88)   9944        activation_452[0][0]             
+separable_conv_1_normal_left2_6 (None, 14, 14, 88)   9944        activation_193[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_454[0][0]             
+separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_195[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_6 (None, 14, 14, 88)   8536        activation_456[0][0]             
+separable_conv_1_normal_left5_6 (None, 14, 14, 88)   8536        activation_197[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left1_6[0
 __________________________________________________________________________________________________
@@ -913,25 +916,25 @@ separable_conv_1_bn_normal_righ (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left5_6[0
 __________________________________________________________________________________________________
-activation_449 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
+activation_190 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_451 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
+activation_192 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_453 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
+activation_194 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_455 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
+activation_196 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_457 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
+activation_198 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_6 (None, 14, 14, 88)   9944        activation_449[0][0]             
+separable_conv_2_normal_left1_6 (None, 14, 14, 88)   9944        activation_190[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_451[0][0]             
+separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_192[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_6 (None, 14, 14, 88)   9944        activation_453[0][0]             
+separable_conv_2_normal_left2_6 (None, 14, 14, 88)   9944        activation_194[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_455[0][0]             
+separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_196[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_6 (None, 14, 14, 88)   8536        activation_457[0][0]             
+separable_conv_2_normal_left5_6 (None, 14, 14, 88)   8536        activation_198[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 14, 14, 88)   352         separable_conv_2_normal_left1_6[0
 __________________________________________________________________________________________________
@@ -971,37 +974,37 @@ normal_concat_6 (Concatenate)   (None, 14, 14, 528)  0           adjust_bn_6[0][
                                                                  normal_add_4_6[0][0]             
                                                                  normal_add_5_6[0][0]             
 __________________________________________________________________________________________________
-activation_458 (Activation)     (None, 14, 14, 528)  0           normal_concat_5[0][0]            
+activation_199 (Activation)     (None, 14, 14, 528)  0           normal_concat_5[0][0]            
 __________________________________________________________________________________________________
-activation_459 (Activation)     (None, 14, 14, 528)  0           normal_concat_6[0][0]            
+activation_200 (Activation)     (None, 14, 14, 528)  0           normal_concat_6[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_7 (Conv2 (None, 14, 14, 88)   46464       activation_458[0][0]             
+adjust_conv_projection_7 (Conv2 (None, 14, 14, 88)   46464       activation_199[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_7 (Conv2D)        (None, 14, 14, 88)   46464       activation_459[0][0]             
+normal_conv_1_7 (Conv2D)        (None, 14, 14, 88)   46464       activation_200[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_7 (BatchNormalization (None, 14, 14, 88)   352         adjust_conv_projection_7[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_7 (BatchNormalizati (None, 14, 14, 88)   352         normal_conv_1_7[0][0]            
 __________________________________________________________________________________________________
-activation_460 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_7[0][0]              
+activation_201 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_7[0][0]              
 __________________________________________________________________________________________________
-activation_462 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
+activation_203 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
 __________________________________________________________________________________________________
-activation_464 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
+activation_205 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
 __________________________________________________________________________________________________
-activation_466 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
+activation_207 (Activation)     (None, 14, 14, 88)   0           adjust_bn_7[0][0]                
 __________________________________________________________________________________________________
-activation_468 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_7[0][0]              
+activation_209 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_7[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_7 (None, 14, 14, 88)   9944        activation_460[0][0]             
+separable_conv_1_normal_left1_7 (None, 14, 14, 88)   9944        activation_201[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_462[0][0]             
+separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_203[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_7 (None, 14, 14, 88)   9944        activation_464[0][0]             
+separable_conv_1_normal_left2_7 (None, 14, 14, 88)   9944        activation_205[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_466[0][0]             
+separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_207[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_7 (None, 14, 14, 88)   8536        activation_468[0][0]             
+separable_conv_1_normal_left5_7 (None, 14, 14, 88)   8536        activation_209[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left1_7[0
 __________________________________________________________________________________________________
@@ -1013,25 +1016,25 @@ separable_conv_1_bn_normal_righ (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left5_7[0
 __________________________________________________________________________________________________
-activation_461 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
+activation_202 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_463 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
+activation_204 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_465 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
+activation_206 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_467 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
+activation_208 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_469 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
+activation_210 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_7 (None, 14, 14, 88)   9944        activation_461[0][0]             
+separable_conv_2_normal_left1_7 (None, 14, 14, 88)   9944        activation_202[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_463[0][0]             
+separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_204[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_7 (None, 14, 14, 88)   9944        activation_465[0][0]             
+separable_conv_2_normal_left2_7 (None, 14, 14, 88)   9944        activation_206[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_467[0][0]             
+separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_208[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_7 (None, 14, 14, 88)   8536        activation_469[0][0]             
+separable_conv_2_normal_left5_7 (None, 14, 14, 88)   8536        activation_210[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 14, 14, 88)   352         separable_conv_2_normal_left1_7[0
 __________________________________________________________________________________________________
@@ -1071,37 +1074,37 @@ normal_concat_7 (Concatenate)   (None, 14, 14, 528)  0           adjust_bn_7[0][
                                                                  normal_add_4_7[0][0]             
                                                                  normal_add_5_7[0][0]             
 __________________________________________________________________________________________________
-activation_470 (Activation)     (None, 14, 14, 528)  0           normal_concat_6[0][0]            
+activation_211 (Activation)     (None, 14, 14, 528)  0           normal_concat_6[0][0]            
 __________________________________________________________________________________________________
-activation_471 (Activation)     (None, 14, 14, 528)  0           normal_concat_7[0][0]            
+activation_212 (Activation)     (None, 14, 14, 528)  0           normal_concat_7[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_8 (Conv2 (None, 14, 14, 88)   46464       activation_470[0][0]             
+adjust_conv_projection_8 (Conv2 (None, 14, 14, 88)   46464       activation_211[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_8 (Conv2D)        (None, 14, 14, 88)   46464       activation_471[0][0]             
+normal_conv_1_8 (Conv2D)        (None, 14, 14, 88)   46464       activation_212[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_8 (BatchNormalization (None, 14, 14, 88)   352         adjust_conv_projection_8[0][0]   
 __________________________________________________________________________________________________
 normal_bn_1_8 (BatchNormalizati (None, 14, 14, 88)   352         normal_conv_1_8[0][0]            
 __________________________________________________________________________________________________
-activation_472 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_8[0][0]              
+activation_213 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_8[0][0]              
 __________________________________________________________________________________________________
-activation_474 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
+activation_215 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
 __________________________________________________________________________________________________
-activation_476 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
+activation_217 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
 __________________________________________________________________________________________________
-activation_478 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
+activation_219 (Activation)     (None, 14, 14, 88)   0           adjust_bn_8[0][0]                
 __________________________________________________________________________________________________
-activation_480 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_8[0][0]              
+activation_221 (Activation)     (None, 14, 14, 88)   0           normal_bn_1_8[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_8 (None, 14, 14, 88)   9944        activation_472[0][0]             
+separable_conv_1_normal_left1_8 (None, 14, 14, 88)   9944        activation_213[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_474[0][0]             
+separable_conv_1_normal_right1_ (None, 14, 14, 88)   8536        activation_215[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_8 (None, 14, 14, 88)   9944        activation_476[0][0]             
+separable_conv_1_normal_left2_8 (None, 14, 14, 88)   9944        activation_217[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_478[0][0]             
+separable_conv_1_normal_right2_ (None, 14, 14, 88)   8536        activation_219[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_8 (None, 14, 14, 88)   8536        activation_480[0][0]             
+separable_conv_1_normal_left5_8 (None, 14, 14, 88)   8536        activation_221[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left1_8[0
 __________________________________________________________________________________________________
@@ -1113,25 +1116,25 @@ separable_conv_1_bn_normal_righ (None, 14, 14, 88)   352         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 14, 14, 88)   352         separable_conv_1_normal_left5_8[0
 __________________________________________________________________________________________________
-activation_473 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
+activation_214 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_475 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
+activation_216 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_477 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
+activation_218 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_479 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
+activation_220 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_481 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
+activation_222 (Activation)     (None, 14, 14, 88)   0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_8 (None, 14, 14, 88)   9944        activation_473[0][0]             
+separable_conv_2_normal_left1_8 (None, 14, 14, 88)   9944        activation_214[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_475[0][0]             
+separable_conv_2_normal_right1_ (None, 14, 14, 88)   8536        activation_216[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_8 (None, 14, 14, 88)   9944        activation_477[0][0]             
+separable_conv_2_normal_left2_8 (None, 14, 14, 88)   9944        activation_218[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_479[0][0]             
+separable_conv_2_normal_right2_ (None, 14, 14, 88)   8536        activation_220[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_8 (None, 14, 14, 88)   8536        activation_481[0][0]             
+separable_conv_2_normal_left5_8 (None, 14, 14, 88)   8536        activation_222[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 14, 14, 88)   352         separable_conv_2_normal_left1_8[0
 __________________________________________________________________________________________________
@@ -1171,25 +1174,25 @@ normal_concat_8 (Concatenate)   (None, 14, 14, 528)  0           adjust_bn_8[0][
                                                                  normal_add_4_8[0][0]             
                                                                  normal_add_5_8[0][0]             
 __________________________________________________________________________________________________
-activation_483 (Activation)     (None, 14, 14, 528)  0           normal_concat_8[0][0]            
+activation_224 (Activation)     (None, 14, 14, 528)  0           normal_concat_8[0][0]            
 __________________________________________________________________________________________________
-activation_482 (Activation)     (None, 14, 14, 528)  0           normal_concat_7[0][0]            
+activation_223 (Activation)     (None, 14, 14, 528)  0           normal_concat_7[0][0]            
 __________________________________________________________________________________________________
-reduction_conv_1_reduce_8 (Conv (None, 14, 14, 176)  92928       activation_483[0][0]             
+reduction_conv_1_reduce_8 (Conv (None, 14, 14, 176)  92928       activation_224[0][0]             
 __________________________________________________________________________________________________
-adjust_conv_projection_reduce_8 (None, 14, 14, 176)  92928       activation_482[0][0]             
+adjust_conv_projection_reduce_8 (None, 14, 14, 176)  92928       activation_223[0][0]             
 __________________________________________________________________________________________________
 reduction_bn_1_reduce_8 (BatchN (None, 14, 14, 176)  704         reduction_conv_1_reduce_8[0][0]  
 __________________________________________________________________________________________________
 adjust_bn_reduce_8 (BatchNormal (None, 14, 14, 176)  704         adjust_conv_projection_reduce_8[0
 __________________________________________________________________________________________________
-activation_484 (Activation)     (None, 14, 14, 176)  0           reduction_bn_1_reduce_8[0][0]    
+activation_225 (Activation)     (None, 14, 14, 176)  0           reduction_bn_1_reduce_8[0][0]    
 __________________________________________________________________________________________________
-activation_486 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
+activation_227 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 17, 17, 176)  0           activation_484[0][0]             
+separable_conv_1_pad_reduction_ (None, 17, 17, 176)  0           activation_225[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 19, 19, 176)  0           activation_486[0][0]             
+separable_conv_1_pad_reduction_ (None, 19, 19, 176)  0           activation_227[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_reduction_left (None, 7, 7, 176)    35376       separable_conv_1_pad_reduction_le
 __________________________________________________________________________________________________
@@ -1199,40 +1202,40 @@ separable_conv_1_bn_reduction_l (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 7, 7, 176)    704         separable_conv_1_reduction_right1
 __________________________________________________________________________________________________
-activation_485 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_lef
+activation_226 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
-activation_487 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
+activation_228 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 7, 7, 176)    35376       activation_485[0][0]             
+separable_conv_2_reduction_left (None, 7, 7, 176)    35376       activation_226[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 7, 7, 176)    39600       activation_487[0][0]             
+separable_conv_2_reduction_righ (None, 7, 7, 176)    39600       activation_228[0][0]             
 __________________________________________________________________________________________________
-activation_488 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
+activation_229 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_l (None, 7, 7, 176)    704         separable_conv_2_reduction_left1_
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 7, 7, 176)    704         separable_conv_2_reduction_right1
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 19, 19, 176)  0           activation_488[0][0]             
+separable_conv_1_pad_reduction_ (None, 19, 19, 176)  0           activation_229[0][0]             
 __________________________________________________________________________________________________
-activation_490 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
+activation_231 (Activation)     (None, 14, 14, 176)  0           adjust_bn_reduce_8[0][0]         
 __________________________________________________________________________________________________
 reduction_add_1_reduce_8 (Add)  (None, 7, 7, 176)    0           separable_conv_2_bn_reduction_lef
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 7, 7, 176)    39600       separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_pad_reduction_ (None, 17, 17, 176)  0           activation_490[0][0]             
+separable_conv_1_pad_reduction_ (None, 17, 17, 176)  0           activation_231[0][0]             
 __________________________________________________________________________________________________
-activation_492 (Activation)     (None, 7, 7, 176)    0           reduction_add_1_reduce_8[0][0]   
+activation_233 (Activation)     (None, 7, 7, 176)    0           reduction_add_1_reduce_8[0][0]   
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 7, 7, 176)    704         separable_conv_1_reduction_right2
 __________________________________________________________________________________________________
 separable_conv_1_reduction_righ (None, 7, 7, 176)    35376       separable_conv_1_pad_reduction_ri
 __________________________________________________________________________________________________
-separable_conv_1_reduction_left (None, 7, 7, 176)    32560       activation_492[0][0]             
+separable_conv_1_reduction_left (None, 7, 7, 176)    32560       activation_233[0][0]             
 __________________________________________________________________________________________________
-activation_489 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
+activation_230 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
 separable_conv_1_bn_reduction_r (None, 7, 7, 176)    704         separable_conv_1_reduction_right3
 __________________________________________________________________________________________________
@@ -1240,19 +1243,19 @@ separable_conv_1_bn_reduction_l (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 reduction_pad_1_reduce_8 (ZeroP (None, 15, 15, 176)  0           reduction_bn_1_reduce_8[0][0]    
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 7, 7, 176)    39600       activation_489[0][0]             
+separable_conv_2_reduction_righ (None, 7, 7, 176)    39600       activation_230[0][0]             
 __________________________________________________________________________________________________
-activation_491 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
+activation_232 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_rig
 __________________________________________________________________________________________________
-activation_493 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_lef
+activation_234 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_reduction_lef
 __________________________________________________________________________________________________
 reduction_left2_reduce_8 (MaxPo (None, 7, 7, 176)    0           reduction_pad_1_reduce_8[0][0]   
 __________________________________________________________________________________________________
 separable_conv_2_bn_reduction_r (None, 7, 7, 176)    704         separable_conv_2_reduction_right2
 __________________________________________________________________________________________________
-separable_conv_2_reduction_righ (None, 7, 7, 176)    35376       activation_491[0][0]             
+separable_conv_2_reduction_righ (None, 7, 7, 176)    35376       activation_232[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_reduction_left (None, 7, 7, 176)    32560       activation_493[0][0]             
+separable_conv_2_reduction_left (None, 7, 7, 176)    32560       activation_234[0][0]             
 __________________________________________________________________________________________________
 adjust_relu_1_9 (Activation)    (None, 14, 14, 528)  0           normal_concat_8[0][0]            
 __________________________________________________________________________________________________
@@ -1269,62 +1272,62 @@ separable_conv_2_bn_reduction_l (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 reduction_right5_reduce_8 (MaxP (None, 7, 7, 176)    0           reduction_pad_1_reduce_8[0][0]   
 __________________________________________________________________________________________________
-zero_padding2d_13 (ZeroPadding2 (None, 15, 15, 528)  0           adjust_relu_1_9[0][0]            
+zero_padding2d_8 (ZeroPadding2D (None, 15, 15, 528)  0           adjust_relu_1_9[0][0]            
 __________________________________________________________________________________________________
 reduction_add3_reduce_8 (Add)   (None, 7, 7, 176)    0           reduction_left3_reduce_8[0][0]   
                                                                  separable_conv_2_bn_reduction_rig
 __________________________________________________________________________________________________
-add_19 (Add)                    (None, 7, 7, 176)    0           reduction_add_2_reduce_8[0][0]   
+add_4 (Add)                     (None, 7, 7, 176)    0           reduction_add_2_reduce_8[0][0]   
                                                                  reduction_left4_reduce_8[0][0]   
 __________________________________________________________________________________________________
 reduction_add4_reduce_8 (Add)   (None, 7, 7, 176)    0           separable_conv_2_bn_reduction_lef
                                                                  reduction_right5_reduce_8[0][0]  
 __________________________________________________________________________________________________
-cropping2d_7 (Cropping2D)       (None, 14, 14, 528)  0           zero_padding2d_13[0][0]          
+cropping2d_4 (Cropping2D)       (None, 14, 14, 528)  0           zero_padding2d_8[0][0]           
 __________________________________________________________________________________________________
 reduction_concat_reduce_8 (Conc (None, 7, 7, 704)    0           reduction_add_2_reduce_8[0][0]   
                                                                  reduction_add3_reduce_8[0][0]    
-                                                                 add_19[0][0]                     
+                                                                 add_4[0][0]                      
                                                                  reduction_add4_reduce_8[0][0]    
 __________________________________________________________________________________________________
 adjust_avg_pool_1_9 (AveragePoo (None, 7, 7, 528)    0           adjust_relu_1_9[0][0]            
 __________________________________________________________________________________________________
-adjust_avg_pool_2_9 (AveragePoo (None, 7, 7, 528)    0           cropping2d_7[0][0]               
+adjust_avg_pool_2_9 (AveragePoo (None, 7, 7, 528)    0           cropping2d_4[0][0]               
 __________________________________________________________________________________________________
 adjust_conv_1_9 (Conv2D)        (None, 7, 7, 88)     46464       adjust_avg_pool_1_9[0][0]        
 __________________________________________________________________________________________________
 adjust_conv_2_9 (Conv2D)        (None, 7, 7, 88)     46464       adjust_avg_pool_2_9[0][0]        
 __________________________________________________________________________________________________
-activation_494 (Activation)     (None, 7, 7, 704)    0           reduction_concat_reduce_8[0][0]  
+activation_235 (Activation)     (None, 7, 7, 704)    0           reduction_concat_reduce_8[0][0]  
 __________________________________________________________________________________________________
-concatenate_9 (Concatenate)     (None, 7, 7, 176)    0           adjust_conv_1_9[0][0]            
+concatenate_6 (Concatenate)     (None, 7, 7, 176)    0           adjust_conv_1_9[0][0]            
                                                                  adjust_conv_2_9[0][0]            
 __________________________________________________________________________________________________
-normal_conv_1_9 (Conv2D)        (None, 7, 7, 176)    123904      activation_494[0][0]             
+normal_conv_1_9 (Conv2D)        (None, 7, 7, 176)    123904      activation_235[0][0]             
 __________________________________________________________________________________________________
-adjust_bn_9 (BatchNormalization (None, 7, 7, 176)    704         concatenate_9[0][0]              
+adjust_bn_9 (BatchNormalization (None, 7, 7, 176)    704         concatenate_6[0][0]              
 __________________________________________________________________________________________________
 normal_bn_1_9 (BatchNormalizati (None, 7, 7, 176)    704         normal_conv_1_9[0][0]            
 __________________________________________________________________________________________________
-activation_495 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_9[0][0]              
+activation_236 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_9[0][0]              
 __________________________________________________________________________________________________
-activation_497 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
+activation_238 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
 __________________________________________________________________________________________________
-activation_499 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
+activation_240 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
 __________________________________________________________________________________________________
-activation_501 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
+activation_242 (Activation)     (None, 7, 7, 176)    0           adjust_bn_9[0][0]                
 __________________________________________________________________________________________________
-activation_503 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_9[0][0]              
+activation_244 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_9[0][0]              
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_9 (None, 7, 7, 176)    35376       activation_495[0][0]             
+separable_conv_1_normal_left1_9 (None, 7, 7, 176)    35376       activation_236[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_497[0][0]             
+separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_238[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_9 (None, 7, 7, 176)    35376       activation_499[0][0]             
+separable_conv_1_normal_left2_9 (None, 7, 7, 176)    35376       activation_240[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_501[0][0]             
+separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_242[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_9 (None, 7, 7, 176)    32560       activation_503[0][0]             
+separable_conv_1_normal_left5_9 (None, 7, 7, 176)    32560       activation_244[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left1_9[0
 __________________________________________________________________________________________________
@@ -1336,25 +1339,25 @@ separable_conv_1_bn_normal_righ (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left5_9[0
 __________________________________________________________________________________________________
-activation_496 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
+activation_237 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_498 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
+activation_239 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_500 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
+activation_241 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_502 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
+activation_243 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_504 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
+activation_245 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_9 (None, 7, 7, 176)    35376       activation_496[0][0]             
+separable_conv_2_normal_left1_9 (None, 7, 7, 176)    35376       activation_237[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_498[0][0]             
+separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_239[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_9 (None, 7, 7, 176)    35376       activation_500[0][0]             
+separable_conv_2_normal_left2_9 (None, 7, 7, 176)    35376       activation_241[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_502[0][0]             
+separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_243[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_9 (None, 7, 7, 176)    32560       activation_504[0][0]             
+separable_conv_2_normal_left5_9 (None, 7, 7, 176)    32560       activation_245[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 7, 7, 176)    704         separable_conv_2_normal_left1_9[0
 __________________________________________________________________________________________________
@@ -1394,37 +1397,37 @@ normal_concat_9 (Concatenate)   (None, 7, 7, 1056)   0           adjust_bn_9[0][
                                                                  normal_add_4_9[0][0]             
                                                                  normal_add_5_9[0][0]             
 __________________________________________________________________________________________________
-activation_505 (Activation)     (None, 7, 7, 704)    0           reduction_concat_reduce_8[0][0]  
+activation_246 (Activation)     (None, 7, 7, 704)    0           reduction_concat_reduce_8[0][0]  
 __________________________________________________________________________________________________
-activation_506 (Activation)     (None, 7, 7, 1056)   0           normal_concat_9[0][0]            
+activation_247 (Activation)     (None, 7, 7, 1056)   0           normal_concat_9[0][0]            
 __________________________________________________________________________________________________
-adjust_conv_projection_10 (Conv (None, 7, 7, 176)    123904      activation_505[0][0]             
+adjust_conv_projection_10 (Conv (None, 7, 7, 176)    123904      activation_246[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_10 (Conv2D)       (None, 7, 7, 176)    185856      activation_506[0][0]             
+normal_conv_1_10 (Conv2D)       (None, 7, 7, 176)    185856      activation_247[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_10 (BatchNormalizatio (None, 7, 7, 176)    704         adjust_conv_projection_10[0][0]  
 __________________________________________________________________________________________________
 normal_bn_1_10 (BatchNormalizat (None, 7, 7, 176)    704         normal_conv_1_10[0][0]           
 __________________________________________________________________________________________________
-activation_507 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_10[0][0]             
+activation_248 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_10[0][0]             
 __________________________________________________________________________________________________
-activation_509 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
+activation_250 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
 __________________________________________________________________________________________________
-activation_511 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
+activation_252 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
 __________________________________________________________________________________________________
-activation_513 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
+activation_254 (Activation)     (None, 7, 7, 176)    0           adjust_bn_10[0][0]               
 __________________________________________________________________________________________________
-activation_515 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_10[0][0]             
+activation_256 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_10[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_507[0][0]             
+separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_248[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_509[0][0]             
+separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_250[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_511[0][0]             
+separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_252[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_513[0][0]             
+separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_254[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_515[0][0]             
+separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_256[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left1_10[
 __________________________________________________________________________________________________
@@ -1436,25 +1439,25 @@ separable_conv_1_bn_normal_righ (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left5_10[
 __________________________________________________________________________________________________
-activation_508 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
+activation_249 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_510 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
+activation_251 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_512 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
+activation_253 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_514 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
+activation_255 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_516 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
+activation_257 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_508[0][0]             
+separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_249[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_510[0][0]             
+separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_251[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_512[0][0]             
+separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_253[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_514[0][0]             
+separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_255[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_516[0][0]             
+separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_257[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 7, 7, 176)    704         separable_conv_2_normal_left1_10[
 __________________________________________________________________________________________________
@@ -1494,37 +1497,37 @@ normal_concat_10 (Concatenate)  (None, 7, 7, 1056)   0           adjust_bn_10[0]
                                                                  normal_add_4_10[0][0]            
                                                                  normal_add_5_10[0][0]            
 __________________________________________________________________________________________________
-activation_517 (Activation)     (None, 7, 7, 1056)   0           normal_concat_9[0][0]            
+activation_258 (Activation)     (None, 7, 7, 1056)   0           normal_concat_9[0][0]            
 __________________________________________________________________________________________________
-activation_518 (Activation)     (None, 7, 7, 1056)   0           normal_concat_10[0][0]           
+activation_259 (Activation)     (None, 7, 7, 1056)   0           normal_concat_10[0][0]           
 __________________________________________________________________________________________________
-adjust_conv_projection_11 (Conv (None, 7, 7, 176)    185856      activation_517[0][0]             
+adjust_conv_projection_11 (Conv (None, 7, 7, 176)    185856      activation_258[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_11 (Conv2D)       (None, 7, 7, 176)    185856      activation_518[0][0]             
+normal_conv_1_11 (Conv2D)       (None, 7, 7, 176)    185856      activation_259[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_11 (BatchNormalizatio (None, 7, 7, 176)    704         adjust_conv_projection_11[0][0]  
 __________________________________________________________________________________________________
 normal_bn_1_11 (BatchNormalizat (None, 7, 7, 176)    704         normal_conv_1_11[0][0]           
 __________________________________________________________________________________________________
-activation_519 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_11[0][0]             
+activation_260 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_11[0][0]             
 __________________________________________________________________________________________________
-activation_521 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
+activation_262 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
 __________________________________________________________________________________________________
-activation_523 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
+activation_264 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
 __________________________________________________________________________________________________
-activation_525 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
+activation_266 (Activation)     (None, 7, 7, 176)    0           adjust_bn_11[0][0]               
 __________________________________________________________________________________________________
-activation_527 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_11[0][0]             
+activation_268 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_11[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_519[0][0]             
+separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_260[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_521[0][0]             
+separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_262[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_523[0][0]             
+separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_264[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_525[0][0]             
+separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_266[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_527[0][0]             
+separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_268[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left1_11[
 __________________________________________________________________________________________________
@@ -1536,25 +1539,25 @@ separable_conv_1_bn_normal_righ (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left5_11[
 __________________________________________________________________________________________________
-activation_520 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
+activation_261 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_522 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
+activation_263 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_524 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
+activation_265 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_526 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
+activation_267 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_528 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
+activation_269 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_520[0][0]             
+separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_261[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_522[0][0]             
+separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_263[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_524[0][0]             
+separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_265[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_526[0][0]             
+separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_267[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_528[0][0]             
+separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_269[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 7, 7, 176)    704         separable_conv_2_normal_left1_11[
 __________________________________________________________________________________________________
@@ -1594,37 +1597,37 @@ normal_concat_11 (Concatenate)  (None, 7, 7, 1056)   0           adjust_bn_11[0]
                                                                  normal_add_4_11[0][0]            
                                                                  normal_add_5_11[0][0]            
 __________________________________________________________________________________________________
-activation_529 (Activation)     (None, 7, 7, 1056)   0           normal_concat_10[0][0]           
+activation_270 (Activation)     (None, 7, 7, 1056)   0           normal_concat_10[0][0]           
 __________________________________________________________________________________________________
-activation_530 (Activation)     (None, 7, 7, 1056)   0           normal_concat_11[0][0]           
+activation_271 (Activation)     (None, 7, 7, 1056)   0           normal_concat_11[0][0]           
 __________________________________________________________________________________________________
-adjust_conv_projection_12 (Conv (None, 7, 7, 176)    185856      activation_529[0][0]             
+adjust_conv_projection_12 (Conv (None, 7, 7, 176)    185856      activation_270[0][0]             
 __________________________________________________________________________________________________
-normal_conv_1_12 (Conv2D)       (None, 7, 7, 176)    185856      activation_530[0][0]             
+normal_conv_1_12 (Conv2D)       (None, 7, 7, 176)    185856      activation_271[0][0]             
 __________________________________________________________________________________________________
 adjust_bn_12 (BatchNormalizatio (None, 7, 7, 176)    704         adjust_conv_projection_12[0][0]  
 __________________________________________________________________________________________________
 normal_bn_1_12 (BatchNormalizat (None, 7, 7, 176)    704         normal_conv_1_12[0][0]           
 __________________________________________________________________________________________________
-activation_531 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_12[0][0]             
+activation_272 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_12[0][0]             
 __________________________________________________________________________________________________
-activation_533 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
+activation_274 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
 __________________________________________________________________________________________________
-activation_535 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
+activation_276 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
 __________________________________________________________________________________________________
-activation_537 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
+activation_278 (Activation)     (None, 7, 7, 176)    0           adjust_bn_12[0][0]               
 __________________________________________________________________________________________________
-activation_539 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_12[0][0]             
+activation_280 (Activation)     (None, 7, 7, 176)    0           normal_bn_1_12[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_531[0][0]             
+separable_conv_1_normal_left1_1 (None, 7, 7, 176)    35376       activation_272[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_533[0][0]             
+separable_conv_1_normal_right1_ (None, 7, 7, 176)    32560       activation_274[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_535[0][0]             
+separable_conv_1_normal_left2_1 (None, 7, 7, 176)    35376       activation_276[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_537[0][0]             
+separable_conv_1_normal_right2_ (None, 7, 7, 176)    32560       activation_278[0][0]             
 __________________________________________________________________________________________________
-separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_539[0][0]             
+separable_conv_1_normal_left5_1 (None, 7, 7, 176)    32560       activation_280[0][0]             
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left1_12[
 __________________________________________________________________________________________________
@@ -1636,25 +1639,25 @@ separable_conv_1_bn_normal_righ (None, 7, 7, 176)    704         separable_conv_
 __________________________________________________________________________________________________
 separable_conv_1_bn_normal_left (None, 7, 7, 176)    704         separable_conv_1_normal_left5_12[
 __________________________________________________________________________________________________
-activation_532 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
+activation_273 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left1_
 __________________________________________________________________________________________________
-activation_534 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
+activation_275 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right1
 __________________________________________________________________________________________________
-activation_536 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
+activation_277 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left2_
 __________________________________________________________________________________________________
-activation_538 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
+activation_279 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_right2
 __________________________________________________________________________________________________
-activation_540 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
+activation_281 (Activation)     (None, 7, 7, 176)    0           separable_conv_1_bn_normal_left5_
 __________________________________________________________________________________________________
-separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_532[0][0]             
+separable_conv_2_normal_left1_1 (None, 7, 7, 176)    35376       activation_273[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_534[0][0]             
+separable_conv_2_normal_right1_ (None, 7, 7, 176)    32560       activation_275[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_536[0][0]             
+separable_conv_2_normal_left2_1 (None, 7, 7, 176)    35376       activation_277[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_538[0][0]             
+separable_conv_2_normal_right2_ (None, 7, 7, 176)    32560       activation_279[0][0]             
 __________________________________________________________________________________________________
-separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_540[0][0]             
+separable_conv_2_normal_left5_1 (None, 7, 7, 176)    32560       activation_281[0][0]             
 __________________________________________________________________________________________________
 separable_conv_2_bn_normal_left (None, 7, 7, 176)    704         separable_conv_2_normal_left1_12[
 __________________________________________________________________________________________________
@@ -1694,9 +1697,9 @@ normal_concat_12 (Concatenate)  (None, 7, 7, 1056)   0           adjust_bn_12[0]
                                                                  normal_add_4_12[0][0]            
                                                                  normal_add_5_12[0][0]            
 __________________________________________________________________________________________________
-activation_541 (Activation)     (None, 7, 7, 1056)   0           normal_concat_12[0][0]           
+activation_282 (Activation)     (None, 7, 7, 1056)   0           normal_concat_12[0][0]           
 __________________________________________________________________________________________________
-global_average_pooling2d_1 (Glo (None, 1056)         0           activation_541[0][0]             
+global_average_pooling2d_1 (Glo (None, 1056)         0           activation_282[0][0]             
 __________________________________________________________________________________________________
 predictions (Dense)             (None, 1000)         1057000     global_average_pooling2d_1[0][0] 
 ==================================================================================================
@@ -1704,3 +1707,4 @@ Total params: 5,326,716
 Trainable params: 5,289,978
 Non-trainable params: 36,738
 __________________________________________________________________________________________________
+```
