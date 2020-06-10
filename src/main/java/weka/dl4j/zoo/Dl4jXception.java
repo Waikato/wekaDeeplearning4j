@@ -53,7 +53,9 @@ public class Dl4jXception extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode, true, false);
+    setRequiresPooling(true);
+
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

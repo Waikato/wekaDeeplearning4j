@@ -73,7 +73,7 @@ public class Dl4jDarknet19 extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode, true, false);
+    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override
