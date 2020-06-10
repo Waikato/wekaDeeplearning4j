@@ -17,6 +17,7 @@ Values in **bold** are the defaults.
 | DL4J      | VGG               | Yes                    | **ImageNet**, VGGFace (VGG16 only) | **16**, 19                           |
 | DL4J      | XCeption          | Yes                    | **ImageNet**                       | -                                    |
 | Keras     | DenseNet          | Yes                    | **ImageNet**                       | **121**, 169, 201                    |
+| Keras     | EfficientNet      | Yes                    | **ImageNet**                       | **B0**-B7                            |
 | Keras     | InceptionV3       | Yes                    | **ImageNet**                       | -                                    |
 | Keras     | NASNet            | Yes                    | **ImageNet**                       | **Mobile**, Large                    |
 | Keras     | ResNet            | Yes                    | **ImageNet**                       | **50**, 50V2, 101, 101V2, 152, 152V2 |
