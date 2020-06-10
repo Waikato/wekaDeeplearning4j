@@ -7,6 +7,7 @@ import re
 import efficientnet.keras as efn
 from models import ONLY_EFFICIENTNET
 from os import path, remove
+from utils import save_model
 
 def insert_layer_nonseq(model, layer_regex, insert_layer_factory,
                         insert_layer_name=None, position='after', set_name=True):
@@ -59,7 +60,6 @@ def insert_layer_nonseq(model, layer_regex, insert_layer_factory,
             new_width = str(next_layer_shape[1])
             new_depth = str(next_layer_shape[3]) ## Assuming channels last
 
-
             new_name = "broadcast_w" + new_width + "_d" + new_depth
 
             if new_name in used_names:
@@ -69,36 +69,41 @@ def insert_layer_nonseq(model, layer_regex, insert_layer_factory,
                 used_names[new_name] = 1
                 val = 1
             
-            new_layer = insert_layer_factory(new_name + "_" + str(val))
+            new_layer = insert_layer_factory(new_name + "_" + str(val), 
+                                (int(new_width), int(new_width), int(new_depth)))
 
             if set_name:
                 new_layer.name = '{}_{}'.format(layer.name, new_layer.name)
 
             x = new_layer(x)
-            print('New layer: {} Old layer: {} Type: {}'.format(new_layer.name,
-                                                            layer.name, position))
+            # print('New layer: {} Old layer: {} Type: {}'.format(new_layer.name,
+            #                                                 layer.name, position))
             if position == 'before':
                 x = layer(x)
         else:
             x = layer(layer_input)
 
-        # Set new output tensor (the original one, or the one of the inserted
-        # layer)
+        # Set new output tensor (the original one, or the one of the inserted layer)
         network_dict['new_output_tensor_of'].update({layer.name: x})
 
     return Model(inputs=model.inputs, outputs=x)
 
+from keras import backend
 
-def dropout_layer_factory(no):
+def dropout_layer_factory(*args):
     return Dropout(rate=0.2, name='dropout')
 
-def broadcast_layer_factory(new_name):
-    return Lambda(lambda x: x, name=new_name)
+def broadcast_layer_factory(new_name, shape=None):
+    if shape is not None:
+        return Lambda(lambda x: x, name=new_name, output_shape=shape)
+    else:
+        return Lambda(lambda x: x, name=new_name)
 
 def remove_fixed_dropout(model, re_pattern=r'.*block\w\w_drop.*'):
     new_model = insert_layer_nonseq(model, re_pattern, dropout_layer_factory, position='replace')
     new_model.save('temp.h5')
     return load_model('temp.h5')
+
 
 def fix_broadcast(model, re_pattern=r'.*block\w\w_se_expand.*'):
     new_model = insert_layer_nonseq(model, re_pattern, broadcast_layer_factory, set_name=False)
@@ -115,9 +120,9 @@ for model_def in ONLY_EFFICIENTNET:
     no_fixed_dropout = remove_fixed_dropout(raw_model)
     broadcasted = fix_broadcast(no_fixed_dropout)
 
-    # # Save the model weights and config in a single file
-    broadcasted.save(model_name + "Fixed.h5")
-    break
+    save_model(broadcasted, model_name + 'Fixed')
+
+    print("Finshed fixing " + model_name)
 
 if path.exists("temp.h5"):
     remove("temp.h5")
