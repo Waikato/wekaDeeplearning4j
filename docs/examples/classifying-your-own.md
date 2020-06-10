@@ -122,7 +122,7 @@ $ java weka.Run \
 The same architecture can be built programmatically with the following Java code
 
 ```java
-// Load all packages so that Dl4jMlpFilter class can be found using forName("weka.filters.unsupervised.attribute.Dl4jMlpFilter")
+// Load all packages so that Dl4jMlpClassifier class can be found using forName("weka.filters.unsupervised.attribute.Dl4jMlpClassifier")
 weka.core.WekaPackageManager.loadPackages(true);
 
 // Load the dataset
