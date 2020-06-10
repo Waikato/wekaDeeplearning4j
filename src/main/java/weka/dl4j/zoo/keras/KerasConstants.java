@@ -27,22 +27,22 @@ public class KerasConstants {
         // ############
         // EfficientNet
         // ############
-        locations.put("KerasEfficientNetB0", "https://drive.google.com/uc?export=download&id=1osvsogvbEKyT0VIZ9JtZhfgLQKCiPU8U");
-        locations.put("KerasEfficientNetB1", "https://drive.google.com/uc?export=download&id=1VpMDTrSYkUs-6-Ug6FCrBX_G2WVbXoNp");
-        locations.put("KerasEfficientNetB2", "https://drive.google.com/uc?export=download&id=1omrSGk5x2_lTfPSGjfIzpYlr8cU4WPbi");
-        locations.put("KerasEfficientNetB3", "https://drive.google.com/uc?export=download&id=1e0gaLQ6vsCqe4mMHYDaNkd5jafXfS7HZ");
-        locations.put("KerasEfficientNetB4", "https://drive.google.com/uc?export=download&id=1NDqrSBZ-p6Ct70ZwbBsZOL3YAAN-0ypz");
-        locations.put("KerasEfficientNetB5", "https://drive.google.com/uc?export=download&id=1p6Hd5GNZn0R-xf4LXumFIYYAL2Jbu69y");
-        locations.put("KerasEfficientNetB6", "https://drive.google.com/uc?export=download&id=1AoZunscMwqq7UhpirxfMyRMeN10NYaG6");
-        locations.put("KerasEfficientNetB7", "https://drive.google.com/uc?export=download&id=1IvejTyjhXbPWDuPW5HyogwD2dv0e2Nvg");
-        checksums.put("KerasEfficientNetB0", 3990389537L);
-        checksums.put("KerasEfficientNetB1", 2300415769L);
-        checksums.put("KerasEfficientNetB2", 2993104358L);
-        checksums.put("KerasEfficientNetB3", 1778527599L);
-        checksums.put("KerasEfficientNetB4", 3090591408L);
-        checksums.put("KerasEfficientNetB5", 620292868L);
-        checksums.put("KerasEfficientNetB6", 3557280118L);
-        checksums.put("KerasEfficientNetB7", 1866748858L);
+        locations.put("KerasEfficientNetB0", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB0.zip");
+        locations.put("KerasEfficientNetB1", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB1.zip");
+        locations.put("KerasEfficientNetB2", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB2.zip");
+        locations.put("KerasEfficientNetB3", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB3.zip");
+        locations.put("KerasEfficientNetB4", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB4.zip");
+        locations.put("KerasEfficientNetB5", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB5.zip");
+        locations.put("KerasEfficientNetB6", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB6.zip");
+        locations.put("KerasEfficientNetB7", "https://github.com/basedrhys/wekaDeeplearning4j/releases/download/zoo-models-0.3/KerasEfficientNetB7.zip");
+        checksums.put("KerasEfficientNetB0", 3915144300L);
+        checksums.put("KerasEfficientNetB1", 2399258563L);
+        checksums.put("KerasEfficientNetB2", 3826625376L);
+        checksums.put("KerasEfficientNetB3", 4091966028L);
+        checksums.put("KerasEfficientNetB4", 4208479803L);
+        checksums.put("KerasEfficientNetB5", 2859282668L);
+        checksums.put("KerasEfficientNetB6", 1628985300L);
+        checksums.put("KerasEfficientNetB7", 1160697645L);
 
         // ###########
         // InceptionV3
