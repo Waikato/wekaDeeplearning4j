@@ -1233,6 +1233,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return data;
   }
 
+  /**
+   * Enforces the input image size if using a zoo model
+   * @param iii ImageInstanceIterator we're using
+   * @return iterator with image size fixed
+   */
   private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
     // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
     AbstractZooModel tmpZooModel = getZooModel();
@@ -1257,7 +1262,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * The only one-channel zoo model currently implemented is Dl4JLeNet.
    * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
-   * @param instanceIterator
+   * @param instanceIterator iterator we're wanting to use with the zoo model
    */
   private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
     if (instanceIterator.getNumChannels() != 1) {
@@ -1732,8 +1737,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         closeModelLoadingFrame(frame);
       }
     }
-
-
   }
 
   public TrainingListener getIterationListener() {
