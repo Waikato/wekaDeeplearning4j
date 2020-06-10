@@ -44,7 +44,17 @@ The install script automatically downloads the libraries and copies them into yo
 ./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.6-linux-x86_64.zip
 ```
 
-# Using wekaDeeplearning4j in a Maven Project
+# Using WekaDeeplearning4j via Reflection
+One way to use this package through the Java API is to use reflection. In this case, the WekaPackageManager
+loads this library at runtime. This has the benefit of not needing to include the WekaDeeplearning4j `.jar` file
+in your CLASSPATH, however, means that the IDE cannot type-check the arguments. 
+
+##### Java examples with reflection
+* [Classifying a Custom Dataset](examples/classifying-your-own.md)
+* [Image Feature Extraction](examples/featurize-mnist.md)
+
+
+# Using WekaDeeplearning4j in a Maven Project
 It is also possible to include this package as maven project. As of now it is not provided in any maven repository, therefore you need to install this package to your local `.m2` repository:
 
 ```bash
