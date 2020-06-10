@@ -1080,6 +1080,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm,
       String cacheDirSuffix) throws Exception {
+    // Also set the instance iterator to use this zoo model's channel order
+    if (this.instanceIterator instanceof ImageInstanceIterator) {
+      ((ImageInstanceIterator) this.instanceIterator).setChannelsLast(this.zooModel.getChannelsLast());
+    }
+
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
 
     // Use caching if set
