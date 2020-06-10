@@ -31,6 +31,16 @@ public class KerasModelConverter {
         try {
             INDArray testShape = Nd4j.zeros(1, 3, 224, 224);
             String modelName = modelFile.getName();
+            Method method = null;
+            try {
+                method = InputType.class.getMethod("setDefaultCNN2DFormat", CNN2DFormat.class);
+                method.invoke(null, CNN2DFormat.NCHW);
+            } catch (NoSuchMethodException ex) {
+                System.err.println("setDefaultCNN2DFormat() not found on InputType class... " +
+                        "Are you using the custom built deeplearning4j-nn.jar?");
+                System.exit(1);
+            }
+
             if (modelName.contains("EfficientNet")) {
                 // Fixes for EfficientNet family of models
                 testShape = Nd4j.zeros(1, 224, 224, 3);
