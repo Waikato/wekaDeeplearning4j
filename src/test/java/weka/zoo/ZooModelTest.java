@@ -84,37 +84,37 @@ public class ZooModelTest {
         kerasDenseNet201.setVariation(DenseNet.VARIATION.DENSENET201);
         kerasModels.add(kerasDenseNet121);
 
-//        EfficientNet efficientNetB0 = new EfficientNet();
-//        efficientNetB0.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
-//        kerasModels.add(efficientNetB0);
-//
-//        EfficientNet efficientNetB1 = new EfficientNet();
-//        efficientNetB1.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
-//        kerasModels.add(efficientNetB1);
-//
-//        EfficientNet efficientNetB2 = new EfficientNet();
-//        efficientNetB2.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
-//        kerasModels.add(efficientNetB2);
-//
-//        EfficientNet efficientNetB3 = new EfficientNet();
-//        efficientNetB3.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
-//        kerasModels.add(efficientNetB3);
-//
-//        EfficientNet efficientNetB4 = new EfficientNet();
-//        efficientNetB4.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B4);
-//        kerasModels.add(efficientNetB4);
-//
-//        EfficientNet efficientNetB5 = new EfficientNet();
-//        efficientNetB5.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B5);
-//        kerasModels.add(efficientNetB5);
-//
-//        EfficientNet efficientNetB6 = new EfficientNet();
-//        efficientNetB6.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B6);
-//        kerasModels.add(efficientNetB6);
-//
-//        EfficientNet efficientNetB7 = new EfficientNet();
-//        efficientNetB7.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B7);
-//        kerasModels.add(efficientNetB7);
+        KerasEfficientNet efficientNetB0 = new KerasEfficientNet();
+        efficientNetB0.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
+        kerasModels.add(efficientNetB0);
+
+        KerasEfficientNet efficientNetB1 = new KerasEfficientNet();
+        efficientNetB1.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        kerasModels.add(efficientNetB1);
+
+        KerasEfficientNet efficientNetB2 = new KerasEfficientNet();
+        efficientNetB2.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
+        kerasModels.add(efficientNetB2);
+
+        KerasEfficientNet efficientNetB3 = new KerasEfficientNet();
+        efficientNetB3.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
+        kerasModels.add(efficientNetB3);
+
+        KerasEfficientNet efficientNetB4 = new KerasEfficientNet();
+        efficientNetB4.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B4);
+        kerasModels.add(efficientNetB4);
+
+        KerasEfficientNet efficientNetB5 = new KerasEfficientNet();
+        efficientNetB5.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B5);
+        kerasModels.add(efficientNetB5);
+
+        KerasEfficientNet efficientNetB6 = new KerasEfficientNet();
+        efficientNetB6.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B6);
+        kerasModels.add(efficientNetB6);
+
+        KerasEfficientNet efficientNetB7 = new KerasEfficientNet();
+        efficientNetB7.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B7);
+        kerasModels.add(efficientNetB7);
 
 //        InceptionResNetV2 inceptionResNetV2 = new InceptionResNetV2();
 //        inceptionResNetV2.setVariation(InceptionResNetV2.VARIATION.STANDARD);
@@ -379,61 +379,117 @@ public class ZooModelTest {
      * UNCOMMENT EFFICIENTNET TESTS WHEN ABLE TO RUN - waiting on new DL4J release
      */
 
-//    @Test
-//    public void testEfficientNetB0() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB1() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB2() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB3() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB4() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B4);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB5() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B5);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB6() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B6);
-//        buildModel(kerasEfficientNet);
-//    }
-//
-//    @Test
-//    public void testEfficientNetB7() throws Exception {
-//        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B7);
-//        buildModel(kerasEfficientNet);
-//    }
+    @Test
+    public void testEfficientNetB0() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB0Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB1() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB1Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB2() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB2Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB3() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB3Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB4() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B4);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB4Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B4);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB5() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B5);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB5Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B5);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB6() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B6);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB6Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B6);
+        filterModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB7() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B7);
+        trainModel(kerasEfficientNet);
+    }
+
+    @Test
+    public void testEfficientNetB7Filter() throws Exception {
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B7);
+        filterModel(kerasEfficientNet);
+    }
 
     // InceptionResNetV2 does not work
 //    @Test
