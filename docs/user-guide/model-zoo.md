@@ -49,6 +49,17 @@ kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
 View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/classifying-your-own.md)
 for usage examples with the model zoo.
 
+### Model Summaries
+
+#### DL4J
+* [DL4JDarkNet19](../model-zoo/dl4j/DL4JDarkNet19.md)
+* [DL4JLeNet](../model-zoo/dl4j/DL4JLeNet.md)
+* [DL4JResNet50](../model-zoo/dl4j/DL4JResNet50.md)
+* [DL4JSqueezeNet](../model-zoo/dl4j/DL4JSqueezeNet.md)
+* [DL4JVGG16](../model-zoo/dl4j/DL4JVGG16.md)
+* [DL4JVGG19](../model-zoo/dl4j/DL4JVGG19.md)
+* [DL4JXception](../model-zoo/dl4j/DL4JXception.md)
+
 ### Future Work
 
 In the next release of Deeplearning4j, the `swish` activation function will be supported, which will enable the **EfficientNet** family 
