@@ -21,30 +21,21 @@ public class CustomBroadcast extends SameDiffLambdaLayer {
 
     private long width;
 
+    public CustomBroadcast() {}
+
     public CustomBroadcast(long width) {
         this.width = width;
     }
 
     @Override
     public SDVariable defineLayer(SameDiff sd, SDVariable x) {
-        long[] thisShape = x.shape().getShape();
-        long minibatchSize = thisShape[0];
-        long channels = thisShape[1];
-        INDArray broadcasted = x.getArr().broadcast(minibatchSize, channels, this.width, this.width);
-        System.err.println("CALLED");
-        return x.setArray(broadcasted);
+        return x;
     }
 
     @Override
     public InputType getOutputType(int layerIndex, InputType inputType) {
-        long[] shape = inputType.getShape(false);
-        long channels = shape[2];
-        if (channels == 1) {
-            System.err.println("Got input type in wrong order: " + inputType.toString());
-            channels = shape[0];
-        }
-        assert channels != 1;
+        InputType.InputTypeConvolutional convolutional = (InputType.InputTypeConvolutional) inputType;
+        long channels = convolutional.getChannels();
         return InputType.convolutional(width, width, channels, CNN2DFormat.NHWC);
-//        return InputType.convolutional(width, width, channels);
     }
 }
