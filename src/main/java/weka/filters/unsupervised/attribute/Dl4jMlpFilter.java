@@ -148,6 +148,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
       addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
     }
     this.zooModelType = zooModelType;
+    // Also set the instance iterator to use this zoo model's channel order
+    if (this.instanceIterator instanceof ImageInstanceIterator) {
+      ((ImageInstanceIterator) this.instanceIterator).setChannelsLast(this.zooModelType.getChannelsLast());
+    }
   }
 
   @OptionMetadata(
