@@ -19,6 +19,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
+import weka.gui.ProgrammaticProperty;
 
 import java.io.File;
 import java.io.Serializable;
@@ -88,27 +89,24 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         this.channelsLast = channelsLast;
     }
 
-    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
-                                                 ComputationGraph defaultNet,
-                                                 long seed,
-                                                 int numLabels,
-                                                 boolean filterMode) {
-        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, filterMode, requiresPooling, channelsLast);
+    @ProgrammaticProperty
+    public boolean isRequiresPooling() {
+        return requiresPooling;
+    }
+
+    public void setRequiresPooling(boolean requiresPooling) {
+        this.requiresPooling = requiresPooling;
     }
 
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
                                                  int numLabels,
-                                                 boolean filterMode,
-                                                 boolean requiresPooling,
-                                                 boolean channelsLast) {
+                                                 boolean filterMode) {
 
         this.seed = seed;
         this.numLabels = numLabels;
         this.filterMode = filterMode;
-        this.requiresPooling = requiresPooling;
-        this.channelsLast = channelsLast;
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == PretrainedType.NONE)
@@ -130,7 +128,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     private ComputationGraph finish(ComputationGraph computationGraph) {
-        System.out.println(computationGraph.summary());
         return addFinalOutputLayer(computationGraph);
     }
 
