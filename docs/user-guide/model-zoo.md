@@ -51,6 +51,10 @@ for usage examples with the model zoo.
 
 ### Model Summaries
 
+The following summaries are generated from the pretrained zoo models included in WekaDeeplearning4j. 
+These may be useful as a reference for trying different feature extraction layers, or simply to
+investigate famous model architectures.
+
 #### DL4J
 * [DL4JDarkNet19](../model-zoo/dl4j/DL4JDarkNet19.md)
 * [DL4JLeNet](../model-zoo/dl4j/DL4JLeNet.md)
@@ -59,6 +63,38 @@ for usage examples with the model zoo.
 * [DL4JVGG16](../model-zoo/dl4j/DL4JVGG16.md)
 * [DL4JVGG19](../model-zoo/dl4j/DL4JVGG19.md)
 * [DL4JXception](../model-zoo/dl4j/DL4JXception.md)
+
+#### Keras
+* DenseNet
+    * [KerasDenseNet121](../model-zoo/keras/KerasDenseNet121.md)
+    * [KerasDenseNet169](../model-zoo/keras/KerasDenseNet169.md)
+    * [KerasDenseNet201](../model-zoo/keras/KerasDenseNet201.md)
+* EfficientNet
+    * [KerasEfficientNetB0](../model-zoo/keras/KerasEfficientNetB0.md)
+    * [KerasEfficientNetB1](../model-zoo/keras/KerasEfficientNetB1.md)
+    * [KerasEfficientNetB2](../model-zoo/keras/KerasEfficientNetB2.md)
+    * [KerasEfficientNetB3](../model-zoo/keras/KerasEfficientNetB3.md)
+    * [KerasEfficientNetB4](../model-zoo/keras/KerasEfficientNetB4.md)
+    * [KerasEfficientNetB5](../model-zoo/keras/KerasEfficientNetB5.md)
+    * [KerasEfficientNetB6](../model-zoo/keras/KerasEfficientNetB6.md)
+    * [KerasEfficientNetB7](../model-zoo/keras/KerasEfficientNetB7.md)
+* InceptionV3
+    * [KerasInceptionV3](../model-zoo/keras/KerasInceptionV3.md)
+* NASNet
+    * [KerasNASNetMobile](../model-zoo/keras/KerasNASNetMobile.md)
+    * [KerasNASNetLarge](../model-zoo/keras/KerasNASNetLarge.md)
+* ResNet
+    * [KerasResNet50](../model-zoo/keras/KerasResNet50.md)
+    * [KerasResNet50v2](../model-zoo/keras/KerasResNet50V2.md)
+    * [KerasResNet101](../model-zoo/keras/KerasResNet101.md)
+    * [KerasResNet101V2](../model-zoo/keras/KerasResNet101V2.md)
+    * [KerasResNet152](../model-zoo/keras/KerasResNet152.md)
+    * [KerasResNet152V2](../model-zoo/keras/KerasResNet152V2.md)
+* VGG
+    * [KerasVGG16](../model-zoo/keras/KerasVGG16.md)
+    * [KerasVGG19](../model-zoo/keras/KerasVGG19.md)
+* Xception
+    * [KerasXception](../model-zoo/keras/KerasXception.md)
 
 ### Future Work
 
