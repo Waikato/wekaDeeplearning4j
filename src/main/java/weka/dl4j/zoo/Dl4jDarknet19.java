@@ -58,8 +58,8 @@ public class Dl4jDarknet19 extends AbstractZooModel {
   @Override
   public void setPretrainedType(PretrainedType pretrainedType) {
     setPretrainedType(pretrainedType, 1000,
-            "conv2d_19", "globalpooling",
-            new String[]{"softmax", "loss"});
+            "globalpooling", "softmax",
+            new String[]{"loss"});
   }
 
   @Override
