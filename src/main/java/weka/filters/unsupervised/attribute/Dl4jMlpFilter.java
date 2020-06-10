@@ -32,6 +32,7 @@ import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.DenseLayer;
+import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.Dl4JResNet50;
 import weka.filters.Filter;
@@ -208,11 +209,14 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
     }).toArray(DenseLayer[]::new);
   }
 
+  /**
+   * Adds a new transformation layer for the filter to use
+   * @param transformationLayerName name of the layer in the model to take activations from
+   */
   public void addTransformationLayerName(String transformationLayerName) {
     int n = this.transformationLayers.length;
     DenseLayer[] newArr = new DenseLayer[n + 1];
-    for (int i = 0; i < n; i++)
-      newArr[i] = this.transformationLayers[i];
+    System.arraycopy(this.transformationLayers, 0, newArr, 0, n);
 
     DenseLayer newLayer = new DenseLayer();
     newLayer.setLayerName(transformationLayerName);
@@ -220,15 +224,27 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
     this.transformationLayers = newArr;
   }
 
+  /**
+   * Clear the transformation layers to be used by the filter
+   */
   public void clearTransformationLayers() {
     this.transformationLayers = new DenseLayer[] {};
   }
+
+  /**
+   * FILTER CODE
+   */
 
   public Dl4jMlpFilter() {
     // By default we set the zoo model default feature extraction as our layer to use
     addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
   }
 
+  /**
+   * Checks whether the newly applied zoo model is different to the one we've already selected
+   * @param zooModelType Zoo model we're trying to set to
+   * @return true if the same model family, false otherwise
+   */
   public boolean isDifferentModel(AbstractZooModel zooModelType) {
     return zooModelType.getClass() != this.zooModelType.getClass() ||
             (zooModelType.getVariation() != this.zooModelType.getVariation());
@@ -239,11 +255,18 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
     return true;
   }
 
+  /**
+   * @return true if the user has selected a file to load the model from
+   */
   private boolean userSuppliedModelFile() {
     // Has the model file location been set to something other than the default
     return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
   }
 
+  /**
+   * @param data Sets up the filter by loading the model (either from file or from model zoo)
+   * @throws Exception From errors occuring during loading the model file, or from intializing from the data
+   */
   private void loadModel(Instances data) throws Exception {
     if (userSuppliedModelFile()) {
       // First try load from the WEKA binary model file
@@ -267,8 +290,11 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
       model.initializeClassifier(data);
   }
 
+  /**
+   * @return String[] containing the names of transformation layers this filter is using
+   */
   public String[] transformationLayersToNames() {
-    return Arrays.stream(transformationLayers).map(x -> x.getLayerName()).toArray(String[]::new);
+    return Arrays.stream(transformationLayers).map(Layer::getLayerName).toArray(String[]::new);
   }
 
   @Override
