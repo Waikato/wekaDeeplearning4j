@@ -67,6 +67,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   protected int numChannels = 1;
 
   /**
+   * If true, swap the reader to supply image channels last
+   */
+  protected boolean channelsLast = false;
+
+  /**
    * The location of the folder containing the images
    */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
@@ -130,6 +135,20 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
 
   public void setNumChannels(int numChannels) {
     this.numChannels = numChannels;
+  }
+
+  @OptionMetadata(
+          displayName = "Image channels last",
+          description = "Set to true to supply image channels last",
+          commandLineParamName = "channelsLast",
+          commandLineParamSynopsis = "-channelsLast <boolean>"
+  )
+  public boolean getChannelsLast() {
+    return channelsLast;
+  }
+
+  public void setChannelsLast(boolean channelsLast) {
+    this.channelsLast = channelsLast;
   }
 
   /**
@@ -201,6 +220,9 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     batchSize = Math.min(data.numInstances(), batchSize);
     validate(data);
     ImageRecordReader reader = getImageRecordReader(data);
+
+    if (getChannelsLast())
+      reader.setNchw_channels_first(false);
 
     final int labelIndex = 1; // Use explicit label index position
     final int numPossibleLabels = data.numClasses();
