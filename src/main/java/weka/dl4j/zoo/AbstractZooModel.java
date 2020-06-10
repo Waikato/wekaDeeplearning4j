@@ -20,6 +20,7 @@ import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
@@ -42,7 +43,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     private long seed, numLabels;
 
-    private boolean filterMode, requiresPooling;
+    private boolean filterMode, requiresPooling = false, channelsLast = false;
 
     /**
      * Initialize the ZooModel as MLP
@@ -73,12 +74,26 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return null;
     }
 
+    @OptionMetadata(
+            displayName = "Image channels last",
+            description = "Set to true to supply image channels last",
+            commandLineParamName = "channelsLast",
+            commandLineParamSynopsis = "-channelsLast <boolean>"
+    )
+    public boolean getChannelsLast() {
+        return channelsLast;
+    }
+
+    public void setChannelsLast(boolean channelsLast) {
+        this.channelsLast = channelsLast;
+    }
+
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
                                                  int numLabels,
                                                  boolean filterMode) {
-        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, filterMode, false);
+        return attemptToLoadWeights(zooModel, defaultNet, seed, numLabels, filterMode, requiresPooling, channelsLast);
     }
 
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
@@ -86,12 +101,14 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                                                  long seed,
                                                  int numLabels,
                                                  boolean filterMode,
-                                                 boolean requiresPooling) {
+                                                 boolean requiresPooling,
+                                                 boolean channelsLast) {
 
         this.seed = seed;
         this.numLabels = numLabels;
         this.filterMode = filterMode;
         this.requiresPooling = requiresPooling;
+        this.channelsLast = channelsLast;
 
         // If no pretrained weights specified, simply return the standard model
         if (m_pretrainedType == PretrainedType.NONE)
