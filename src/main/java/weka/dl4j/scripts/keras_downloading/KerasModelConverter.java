@@ -11,6 +11,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import weka.dl4j.layers.lambda.CustomBroadcast;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -25,7 +26,9 @@ import java.util.regex.Pattern;
 public class KerasModelConverter {
 
     // Default location where Keras models are saved
-    private static String modelFolderPath = "./output_h5/";
+    private static String modelFolderPath = "", modelSummariesPath = "";
+
+    private static final String broadcastLayerRegex = "^broadcast_w(\\d+).*";
 
     private static void saveH5File(File modelFile, File outputFolder) {
         try {
@@ -44,7 +47,7 @@ public class KerasModelConverter {
             if (modelName.contains("EfficientNet")) {
                 // Fixes for EfficientNet family of models
                 testShape = Nd4j.zeros(1, 224, 224, 3);
-                InputType.setDefaultCNN2DFormat(CNN2DFormat.NHWC);
+                method.invoke(null, CNN2DFormat.NHWC);
                 // We don't want the resulting .zip files to have 'Fixed' in the name, so we'll strip it off here
                 modelName = modelName.replace("Fixed", "");
             }
@@ -62,12 +65,13 @@ public class KerasModelConverter {
     }
 
     public static void main(String[] args) throws Exception {
-        System.err.println("WARNING: This conversion script should be run with DL4J 1.0.0-beta6, " +
-                "any other version may result in non-working model files");
-
-        if (args.length == 1) {
-            modelFolderPath = args[0];
+        if (args.length != 2) {
+            System.err.println("Usage: KerasModelConverter <h5 folder path> <model summary folder path>");
+            System.exit(1);
         }
+
+        modelFolderPath = args[0];
+        modelSummariesPath = args[1];
 
         File modelFolder = new File(modelFolderPath);
         File outputFolder = new File(Paths.get(modelFolder.getParent(), "dl4j_format").toString());
@@ -90,14 +94,14 @@ public class KerasModelConverter {
     }
 
     private static boolean isBroadcastLayer(String line) {
-        Pattern p = Pattern.compile("^broadcast_w(\\d+).*");   // the pattern to search for
+        Pattern p = Pattern.compile(broadcastLayerRegex);
         Matcher m = p.matcher(line);
 
         return m.matches();
     }
 
     private static int getWidth(String layerName) throws Exception {
-        Pattern p = Pattern.compile("broadcast_w(\\d+)");   // the pattern to search for
+        Pattern p = Pattern.compile(broadcastLayerRegex);
         Matcher m = p.matcher(layerName);
 
         if (m.find()) {
@@ -108,7 +112,7 @@ public class KerasModelConverter {
     }
 
     private static void loadLambdaLayers() throws Exception {
-        File[] modelSummaries = new File("/home/rhys/Documents/git/wekaDeeplearning4j/src/main/java/weka/dl4j/scripts/keras_downloading/output_summary").listFiles();
+        File[] modelSummaries = new File(modelSummariesPath).listFiles();
         Arrays.sort(modelSummaries);
 
         for (File f : modelSummaries) {
