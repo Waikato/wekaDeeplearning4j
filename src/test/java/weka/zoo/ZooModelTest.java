@@ -220,6 +220,10 @@ public class ZooModelTest {
             ModelDownloader modelDownloader = new ModelDownloader(zooModel);
             executor.execute(modelDownloader);
         }
+        for (AbstractZooModel zooModel : kerasModels) {
+            ModelDownloader modelDownloader = new ModelDownloader(zooModel);
+            executor.execute(modelDownloader);
+        }
         executor.shutdown();
 
         try {
