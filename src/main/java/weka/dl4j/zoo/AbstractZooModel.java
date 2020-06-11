@@ -19,6 +19,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.PretrainedType;
+import weka.dl4j.zoo.keras.EfficientNet;
 import weka.gui.ProgrammaticProperty;
 
 import java.io.File;
@@ -26,7 +27,9 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
+ * This class contains the logic necessary to load the pretrained weights for a given zoo model
  *
+ * It also handles the addition/removal of output layers to enable training the model in DL4J
  * @author Rhys Compton
  */
 @Log4j2
@@ -66,11 +69,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     public abstract int[][] getShape();
 
-    public void setVariation(Enum var) {
-        log.warn("Method not implemented or wrong variation type given, please ensure you set the correct one");
-        return;
-    }
-
     public Enum getVariation() {
         return null;
     }
@@ -98,6 +96,16 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         this.requiresPooling = requiresPooling;
     }
 
+
+    /**
+     *
+     * @param zooModel Zoo model family to use
+     * @param defaultNet Default ComputationGraph to use if loading weights fails
+     * @param seed Random seed to initialize with
+     * @param numLabels Number of output labels
+     * @param filterMode True if using this zoo model for a filter - output layers don't need to be setup
+     * @return ComputationGraph - if all succeeds then will be initialized with pretrained weights
+     */
     public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
                                                  ComputationGraph defaultNet,
                                                  long seed,
@@ -127,16 +135,21 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return finish(pretrainedModel);
     }
 
+    /**
+     * Final endpoint for ComputationGraph before returning
+     * @param computationGraph Input ComputationGraph
+     * @return Finalized ComputationGraph
+     */
     private ComputationGraph finish(ComputationGraph computationGraph) {
+        log.debug(computationGraph.summary());
         return addFinalOutputLayer(computationGraph);
     }
 
-    protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph, long seed, int numLabels) {
-        this.seed = seed;
-        this.numLabels = numLabels;
-        return addFinalOutputLayer(computationGraph);
-    }
-
+    /**
+     * Checks if we need to add a final output layer - also applies pooling beforehand if necessary
+     * @param computationGraph Input ComputationGraph
+     * @return Finalized ComputationGraph
+     */
     protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph) {
         org.deeplearning4j.nn.conf.layers.Layer lastLayer = computationGraph.getLayers()[computationGraph.getNumLayers() - 1].conf().getLayer();
         if (!Dl4jMlpClassifier.noOutputLayer(filterMode, lastLayer)) {
@@ -160,7 +173,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
             // Remove the old output layer, but keep the connections
             graphBuilder.removeVertexKeepConnections(m_outputLayer);
-            // Remove any layers we don't want
+            // Remove any other layers we don't want
             for (String layer : m_extraLayersToRemove) {
                 graphBuilder.removeVertexAndConnections(layer);
             }
@@ -175,10 +188,18 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     }
 
+    /**
+     *
+     * @return True if current model is pretrained
+     */
     public boolean isPretrained() {
         return m_pretrainedType != PretrainedType.NONE;
     }
 
+    /**
+     * Creates default fine tuning configuration
+     * @return Default fine tuning config
+     */
     protected FineTuneConfiguration getFineTuneConfig() {
         return new FineTuneConfiguration.Builder()
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -187,6 +208,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .build();
     }
 
+    /**
+     * Attempts to download weights for the given zoo model
+     * @param zooModel Model to try download weights for
+     * @return new ComputationGraph initialized with the given PretrainedType
+     */
     protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         try {
             log.info(String.format("Downloading %s weights", m_pretrainedType));
@@ -205,6 +231,10 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         }
     }
 
+    /**
+     * Creates a default output layer
+     * @return Default output layer
+     */
     protected OutputLayer createOutputLayer() {
         return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                 .nIn(m_numFExtractOutputs).nOut(numLabels)
@@ -212,6 +242,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .activation(Activation.SOFTMAX).build();
     }
 
+    /**
+     * Checks if the zoo model has the specific pretrained type available
+     * @param dl4jModelType ZooModel to check
+     * @return True if model supports `m_pretrainedType` weights
+     */
     protected boolean checkPretrained(org.deeplearning4j.zoo.ZooModel dl4jModelType) {
         Set<PretrainedType> availableTypes = getAvailablePretrainedWeights(dl4jModelType);
         if (availableTypes.isEmpty()) {
@@ -226,6 +261,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
         return true;
     }
 
+    /**
+     * Get all Pretrained types this ZooModel supports
+     * @param zooModel ZooModel to check
+     * @return Set of pretrained types the model supports
+     */
     private Set<PretrainedType> getAvailablePretrainedWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         Set<PretrainedType> availableTypes = new HashSet<>();
         for (PretrainedType pretrainedType : PretrainedType.values()) {
@@ -240,16 +280,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     @OptionMetadata(
-            description = "The name of the feature extraction layer in the model.",
-            displayName = "Feature extraction layer",
-            commandLineParamName = "layer-feature",
-            commandLineParamSynopsis = "-layer-feature <String>"
-    )
-    public String getFeatureExtractionLayer() {
-        return m_featureExtractionLayer;
-    }
-
-    @OptionMetadata(
             description = "Pretrained Type (IMAGENET, VGGFACE, MNIST)",
             displayName = "Pretrained Type",
             commandLineParamName = "pretrained",
@@ -260,31 +290,43 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType, m_numFExtractOutputs, m_featureExtractionLayer, m_outputLayer, m_extraLayersToRemove);
+        this.m_pretrainedType = pretrainedType;
     }
 
-    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
-                                                 int numFExtractOutputs,
-                                                 String featureExtractionLayer,
-                                                 String outputLayer) {
-        return setPretrainedType(pretrainedType,
-                numFExtractOutputs,
-                featureExtractionLayer,
-                outputLayer,
-                new String[]{});
+    @ProgrammaticProperty
+    public String getOutputlayer() {
+        return m_outputLayer;
     }
 
-    protected AbstractZooModel setPretrainedType(PretrainedType pretrainedType,
-                                                 int numFExtractOutputs,
-                                                 String featureExtractionLayer,
-                                                 String outputLayer,
-                                                 String[] extraLayersToRemove) {
-        m_pretrainedType = pretrainedType;
-        m_numFExtractOutputs = numFExtractOutputs;
-        m_outputLayer = outputLayer;
-        m_featureExtractionLayer = featureExtractionLayer;
-        m_extraLayersToRemove = extraLayersToRemove;
-        return this;
+    public void setOutputLayer(String m_outputLayer) {
+        this.m_outputLayer = m_outputLayer;
+    }
+
+    @ProgrammaticProperty
+    public String getFeatureExtractionLayer() {
+        return m_featureExtractionLayer;
+    }
+
+    public void setFeatureExtractionLayer(String m_featureExtractionLayer) {
+        this.m_featureExtractionLayer = m_featureExtractionLayer;
+    }
+
+    @ProgrammaticProperty
+    public String[] getExtraLayersToRemove() {
+        return m_extraLayersToRemove;
+    }
+
+    public void setExtraLayersToRemove(String[] m_extraLayersToRemove) {
+        this.m_extraLayersToRemove = m_extraLayersToRemove;
+    }
+
+    @ProgrammaticProperty
+    public int getNumFExtractOutputs() {
+        return m_numFExtractOutputs;
+    }
+
+    public void setNumFExtractOutputs(int m_numFExtractOutputs) {
+        this.m_numFExtractOutputs = m_numFExtractOutputs;
     }
 
     /**
