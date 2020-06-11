@@ -6,7 +6,6 @@ import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasLayer;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import weka.dl4j.layers.lambda.CustomBroadcast;
 
@@ -25,8 +24,7 @@ import java.util.regex.Pattern;
  */
 public class KerasModelConverter {
 
-    // Default location where Keras models are saved
-    private static String modelFolderPath = "", modelSummariesPath = "";
+    private static String modelSummariesPath = "";
 
     private static final String broadcastLayerRegex = "^broadcast_w(\\d+).*";
 
@@ -70,7 +68,8 @@ public class KerasModelConverter {
             System.exit(1);
         }
 
-        modelFolderPath = args[0];
+        // Default location where Keras models are saved
+        String modelFolderPath = args[0];
         modelSummariesPath = args[1];
 
         File modelFolder = new File(modelFolderPath);
@@ -113,6 +112,7 @@ public class KerasModelConverter {
 
     private static void loadLambdaLayers() throws Exception {
         File[] modelSummaries = new File(modelSummariesPath).listFiles();
+        assert modelSummaries != null;
         Arrays.sort(modelSummaries);
 
         for (File f : modelSummaries) {
