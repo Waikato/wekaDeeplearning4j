@@ -88,7 +88,7 @@ The models typically have a dense layer as the final layer, with 1024/2048/some 
 of classes outputs (e.g. 1000 for Imagenet). This is then stripped off (with the connections still intact) 
 and an OutputLayer attached with the sane number of inputs, and the number of output classes we want (e.g. only 10).
 This works fine for most models, however, some don't reduce to a 2d Dense layer before the output layer, 
-so we don't strip off anything and just attach the output layer to the final classification layer.
+so we have to attach an intermediary pooling layer (`requiresPooling` flag) before attaching the output layer.
 
 
 ### Current State
@@ -116,7 +116,7 @@ so we don't strip off anything and just attach the output layer to the final cla
 | Keras     | VGG               | Yes                    | ImageNet                  | 16, 19                                   |                                                                                                                                                                        |
 | Keras     | Xception          | Yes                    | ImageNet                  | Standard                                 |                                                                                                                                                                        |
 
-## Adding new Zoo models
+### Adding new Zoo models
 
 In a recent release of DL4J, importing Keras models via `.h5` files broke for some model types.
 
@@ -124,28 +124,27 @@ In a recent release of DL4J, importing Keras models via `.h5` files broke for so
 
 To remedy this, Keras model loading is now done via the raw DL4J format.
 
-All of these steps should be run from within the `weka/dl4j/scripts/` folder
+All of these steps should be run from within the `weka/dl4j/scripts/keras_downloading` folder
 
-- Set up python environment. Recommended to use Anaconda. Create an environment from `environment.yml`.
+- Set up python environment. Recommended to use Anaconda.
 - Run the keras downloader: `python keras_download.py`. This downloads and saves Keras models as specified in `models.py`.
 At this point you could load these `.h5` files directly, but as mentioned above, that method doesn't work in later versions of DL4J.
 - Convert the `.h5` files into `.zip`. This is done by running the `KerasModelConverter` script. 
 Provide it with the location of the h5 files e.g., 
 ```shell script
-java KerasModelConverter src/main/weka/dl4j/scripts/output_h5
+java KerasModelConverter src/main/weka/dl4j/scripts/output_h5 src/main/weka/dl4j/scripts/output_summary
 ```
 - In the `dl4j_format` folder, you should now have `.zip` files for all models that were successfully converted.
 Check the logs for information on models that couldn't be converted.
 
-## EfficientNet
+Check out the [Conversion README](src/main/java/weka/dl4j/scripts/keras_downloading/README.md) for more info.
+Note that you only need to do these steps if attempting to release new versions of the models - this is unlikely to be needed
+for the currently implemented models, as the pretrained weights don't change.
 
-Getting the EfficientNet family of models takes a bit of extra work due to a few 'gotchas' in the model
-- Swish activation function
-- FixedDropout layer (instead of standard dropout)
-- Squeeze and excite block
+### Reverse Channels
 
-#### Swish Activation Function
-
-EfficientNet makes use of the 'Swish' activation function, which as of DL4J 1.0.0-beta6 is **not** supported.
+Some models require the input image channels to be reversed (currently only `EfficientNet`) due to the way the weights
+were saved and parsed. To set this for a model, simply add `setChannelsLast(true);` to the constructor. This change
+will be propogated to any ImageInstanceIterators used with the model.
 
 
