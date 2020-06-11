@@ -21,6 +21,19 @@ import java.net.URL;
 import java.util.zip.Adler32;
 import java.util.zip.Checksum;
 
+/**
+ * This class essentially copies DL4J's ZooModel class, allowing the custom Keras models to provide the same interface
+ * as those models provided by DL4J.
+ *
+ * It was originally created as KerasZooModels were loaded from the .h5 file, so they couldn't use DL4J's ZooModel
+ * implementation (as it loads model from the native .zip format). Loading from .h5 format is a little unreliable at times
+ * so this class uses the native DL4J .zip format.
+ *
+ * This implementation is different in that the pretrained URL and checksum are taken from the KerasConstants file
+ * - a global constant which defines these values. This is easier to manage than having URLs and checksums in each
+ * individual model class (as is done in DL4J).
+ * @author Rhys Compton
+ */
 @Log4j2
 public abstract class KerasZooModel extends ZooModel implements Serializable {
 
@@ -68,11 +81,13 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
             throw new UnsupportedOperationException(
                     "Pretrained " + pretrainedType + " weights are not available for this model.");
 
+        // Set up file locations
         String localFilename = modelPrettyName() + ".zip";
 
         File rootCacheDir = DL4JResources.getDirectory(ResourceType.ZOO_MODEL, modelFamily());
         File cachedFile = new File(rootCacheDir, localFilename);
 
+        // Download the file if necessary
         if (!cachedFile.exists()) {
             log.info("Downloading model to " + cachedFile.toString());
             FileUtils.copyURLToFile(new URL(remoteUrl), cachedFile);
@@ -80,6 +95,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
             log.info("Using cached model at " + cachedFile.toString());
         }
 
+        // Validate the checksum - ensure this is the correct file
         long expectedChecksum = pretrainedChecksum(pretrainedType);
         if (expectedChecksum != 0L) {
             log.info("Verifying download...");
@@ -96,6 +112,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
             }
         }
 
+        // Load the .zip file to a ComputationGraph
         try {
             return ModelSerializer.restoreComputationGraph(cachedFile);
         } catch (Exception ex) {

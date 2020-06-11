@@ -39,7 +39,13 @@ public class Dl4jDarknet19 extends AbstractZooModel {
 
   protected VARIATION m_variation = VARIATION.INPUT224;
 
-  public Dl4jDarknet19() { setPretrainedType(PretrainedType.IMAGENET); }
+  public Dl4jDarknet19() {
+    setPretrainedType(PretrainedType.IMAGENET);
+    setNumFExtractOutputs(1000);
+    setFeatureExtractionLayer("globalpooling");
+    setOutputLayer("softmax");
+    setExtraLayersToRemove(new String[]{"loss"});
+  }
 
   @OptionMetadata(
           description = "The model variation to use.",
@@ -55,12 +61,12 @@ public class Dl4jDarknet19 extends AbstractZooModel {
     m_variation = var;
   }
 
-  @Override
-  public void setPretrainedType(PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 1000,
-            "globalpooling", "softmax",
-            new String[]{"loss"});
-  }
+//  @Override
+//  public void setPretrainedType(PretrainedType pretrainedType) {
+//    setPretrainedType(pretrainedType, 1000,
+//            "globalpooling", "softmax",
+//            new String[]{"loss"});
+//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

@@ -14,6 +14,8 @@ public class KerasEfficientNet extends AbstractZooModel {
     public KerasEfficientNet() {
         setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
         setPretrainedType(PretrainedType.IMAGENET);
+        setFeatureExtractionLayer("top_dropout");
+        setOutputLayer("probs");
         setChannelsLast(true);
     }
 
@@ -29,12 +31,6 @@ public class KerasEfficientNet extends AbstractZooModel {
 
     public void setVariation(EfficientNet.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
         int numFExtractOutputs = -1;
         switch (variation) {
             case EFFICIENTNET_B0:
@@ -62,8 +58,7 @@ public class KerasEfficientNet extends AbstractZooModel {
                 numFExtractOutputs = 2560;
                 break;
         }
-
-        setPretrainedType(pretrainedType, numFExtractOutputs, "top_dropout", "probs");
+        setNumFExtractOutputs(numFExtractOutputs);
     }
 
     @Override

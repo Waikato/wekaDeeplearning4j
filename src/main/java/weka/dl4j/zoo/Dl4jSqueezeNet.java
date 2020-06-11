@@ -35,15 +35,18 @@ public class Dl4jSqueezeNet extends AbstractZooModel {
 
     public Dl4jSqueezeNet() {
         setPretrainedType(PretrainedType.IMAGENET);
+        setNumFExtractOutputs(1000);
+        setFeatureExtractionLayer("global_average_pooling2d_5");
+        setOutputLayer("loss");
     }
 
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType,
-                1000,
-                "global_average_pooling2d_5",
-                "loss");
-    }
+//    @Override
+//    public void setPretrainedType(PretrainedType pretrainedType) {
+//        setPretrainedType(pretrainedType,
+//                1000,
+//                "global_average_pooling2d_5",
+//                "loss");
+//    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

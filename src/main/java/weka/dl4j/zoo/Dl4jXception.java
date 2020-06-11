@@ -35,12 +35,15 @@ public class Dl4jXception extends AbstractZooModel {
 
   public Dl4jXception() {
     setPretrainedType(PretrainedType.IMAGENET);
+    setNumFExtractOutputs(2048);
+    setFeatureExtractionLayer("avg_pool");
+    setOutputLayer("predictions");
   }
 
-  @Override
-  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType, 2048, "avg_pool", "predictions");
-  }
+//  @Override
+//  public void setPretrainedType(weka.dl4j.PretrainedType pretrainedType) {
+//    setPretrainedType(pretrainedType, 2048, "avg_pool", "predictions");
+//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

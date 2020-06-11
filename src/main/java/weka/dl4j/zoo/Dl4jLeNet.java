@@ -37,16 +37,20 @@ public class Dl4jLeNet extends AbstractZooModel {
 
   public Dl4jLeNet() {
     setPretrainedType(PretrainedType.MNIST);
+    setNumFExtractOutputs(500);
+    setFeatureExtractionLayer("7");
+    setOutputLayer("8");
+    setExtraLayersToRemove(new String[] {"9"});
   }
-
-  @Override
-  public void setPretrainedType(PretrainedType pretrainedType) {
-    setPretrainedType(pretrainedType,
-            500,
-            "7",
-            "8",
-            new String[] {"9"});
-  }
+//
+//  @Override
+//  public void setPretrainedType(PretrainedType pretrainedType) {
+//    setPretrainedType(pretrainedType,
+//            500,
+//            "7",
+//            "8",
+//            new String[] {"9"});
+//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

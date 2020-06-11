@@ -15,6 +15,8 @@ public class KerasNASNet extends AbstractZooModel {
     public KerasNASNet() {
         setVariation(NASNet.VARIATION.MOBILE);
         setPretrainedType(PretrainedType.IMAGENET);
+        setFeatureExtractionLayer("global_average_pooling2d_1");
+        setOutputLayer("predictions");
     }
 
     @OptionMetadata(
@@ -29,12 +31,6 @@ public class KerasNASNet extends AbstractZooModel {
 
     public void setVariation(NASNet.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
         int numFExtractOutputs = -1;
         switch (variation) {
             case MOBILE:
@@ -44,8 +40,7 @@ public class KerasNASNet extends AbstractZooModel {
                 numFExtractOutputs = 4032;
                 break;
         }
-
-        setPretrainedType(pretrainedType, numFExtractOutputs, "global_average_pooling2d_1", "predictions");
+        setNumFExtractOutputs(numFExtractOutputs);
     }
 
     @Override

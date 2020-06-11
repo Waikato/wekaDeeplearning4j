@@ -50,12 +50,17 @@ public class Dl4JResNet50 extends AbstractZooModel {
 
     private static final long serialVersionUID = 6012647103023109618L;
 
-    public Dl4JResNet50() { setPretrainedType(PretrainedType.IMAGENET); }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType, 2048, "flatten_1", "fc1000");
+    public Dl4JResNet50() {
+        setPretrainedType(PretrainedType.IMAGENET);
+        setNumFExtractOutputs(2048);
+        setFeatureExtractionLayer("flatten_1");
+        setOutputLayer("fc1000");
     }
+
+//    @Override
+//    public void setPretrainedType(PretrainedType pretrainedType) {
+//        setPretrainedType(pretrainedType, 2048, "flatten_1", "fc1000");
+//    }
 
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
@@ -70,7 +75,6 @@ public class Dl4JResNet50 extends AbstractZooModel {
 
         return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
     }
-
 
     @Override
     public int[][] getShape() {

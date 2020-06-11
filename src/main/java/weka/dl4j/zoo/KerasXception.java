@@ -15,6 +15,9 @@ public class KerasXception extends AbstractZooModel {
     public KerasXception() {
         setVariation(Xception.VARIATION.STANDARD);
         setPretrainedType(PretrainedType.IMAGENET);
+        setNumFExtractOutputs(2048);
+        setFeatureExtractionLayer("avg_pool");
+        setOutputLayer("predictions");
     }
 
     @OptionMetadata(
@@ -29,13 +32,6 @@ public class KerasXception extends AbstractZooModel {
 
     public void setVariation(Xception.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType, 2048, "avg_pool", "predictions");
     }
 
     @Override

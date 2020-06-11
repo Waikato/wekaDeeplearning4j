@@ -15,6 +15,9 @@ public class KerasResNet extends AbstractZooModel {
     public KerasResNet() {
         setVariation(ResNet.VARIATION.RESNET50);
         setPretrainedType(PretrainedType.IMAGENET);
+        setNumFExtractOutputs(2048);
+        setFeatureExtractionLayer("avg_pool");
+        setOutputLayer("probs");
     }
 
     @OptionMetadata(
@@ -29,13 +32,6 @@ public class KerasResNet extends AbstractZooModel {
 
     public void setVariation(ResNet.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType, 2048, "avg_pool", "probs");
     }
 
     @Override

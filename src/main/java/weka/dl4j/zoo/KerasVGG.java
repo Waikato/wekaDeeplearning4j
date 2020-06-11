@@ -15,6 +15,9 @@ public class KerasVGG extends AbstractZooModel {
     public KerasVGG() {
         setVariation(VGG.VARIATION.VGG16);
         setPretrainedType(PretrainedType.IMAGENET);
+        setNumFExtractOutputs(4096);
+        setFeatureExtractionLayer("fc2");
+        setOutputLayer("predictions");
     }
 
     @OptionMetadata(
@@ -29,13 +32,6 @@ public class KerasVGG extends AbstractZooModel {
 
     public void setVariation(VGG.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
-
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
-        setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
     }
 
     @Override

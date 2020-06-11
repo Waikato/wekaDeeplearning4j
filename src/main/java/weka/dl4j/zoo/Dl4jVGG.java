@@ -42,7 +42,7 @@ public class Dl4jVGG extends AbstractZooModel {
     protected VGG.VARIATION m_variation = VGG.VARIATION.VGG16;
 
     public Dl4jVGG() {
-        setPretrainedType(PretrainedType.IMAGENET);
+        this.setPretrainedType(PretrainedType.IMAGENET);
     }
 
     @OptionMetadata(
@@ -63,15 +63,15 @@ public class Dl4jVGG extends AbstractZooModel {
 
     @Override
     public void setPretrainedType(PretrainedType pretrainedType) {
-        if (m_variation == VGG.VARIATION.VGG16) {
-            if (pretrainedType == PretrainedType.VGGFACE) {
-                // VGGFace pretrained has slightly different network structure to Imagenet pretrained
-                setPretrainedType(pretrainedType, 4096, "fc7", "fc8");
-            } else {
-                setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
-            }
-        } else if (m_variation == VGG.VARIATION.VGG19) {
-            setPretrainedType(pretrainedType, 4096, "fc2", "predictions");
+        super.setPretrainedType(pretrainedType);
+        setNumFExtractOutputs(4096);
+        if (m_variation == VGG.VARIATION.VGG16 && pretrainedType == PretrainedType.VGGFACE) {
+            // VGGFace pretrained has slightly different network structure to Imagenet pretrained
+            setFeatureExtractionLayer("fc7");
+            setOutputLayer("fc8");
+        } else {
+            setFeatureExtractionLayer("fc2");
+            setOutputLayer("predictions");
         }
     }
 

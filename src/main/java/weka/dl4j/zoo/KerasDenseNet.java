@@ -16,6 +16,8 @@ public class KerasDenseNet extends AbstractZooModel {
     public KerasDenseNet() {
         setVariation(DenseNet.VARIATION.DENSENET121);
         setPretrainedType(PretrainedType.IMAGENET);
+        setFeatureExtractionLayer("avg_pool");
+        setOutputLayer("fc1000");
     }
 
     @OptionMetadata(
@@ -30,12 +32,7 @@ public class KerasDenseNet extends AbstractZooModel {
 
     public void setVariation(DenseNet.VARIATION var) {
         variation = var;
-        // We may need to update the pretrained values based on the new variation
-        setPretrainedType(m_pretrainedType);
-    }
 
-    @Override
-    public void setPretrainedType(PretrainedType pretrainedType) {
         int numFExtractOutputs = -1;
         switch (variation) {
             case DENSENET121:
@@ -48,8 +45,7 @@ public class KerasDenseNet extends AbstractZooModel {
                 numFExtractOutputs = 1920;
                 break;
         }
-
-        setPretrainedType(pretrainedType, numFExtractOutputs, "avg_pool", "fc1000");
+        setNumFExtractOutputs(numFExtractOutputs);
     }
 
     @Override
