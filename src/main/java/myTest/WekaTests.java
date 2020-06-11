@@ -8,11 +8,13 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.lambda.CustomBroadcast;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
+import weka.dl4j.zoo.keras.VGG;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -120,8 +122,11 @@ public class WekaTests {
 
         myFilter.setInstanceIterator(imgIter);
 
-        Dl4jXception thisModel = new Dl4jXception();
-        thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
+//        Dl4jVGG thisModel = new Dl4jVGG();
+//        thisModel.setVariation(VGG.VARIATION.VGG16);
+        KerasEfficientNet thisModel = new KerasEfficientNet();
+        thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B3);
+//        thisModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B2);
         myFilter.setZooModelType(thisModel);
 
         Filter.runFilter(myFilter, args);
@@ -144,7 +149,7 @@ public class WekaTests {
 
         // Set up the pretrained model
         Dl4jXception zooModel = new Dl4jXception();
-        zooModel.setVariation(Dl4jDarknet19.VARIATION.INPUT224);
+//        zooModel.setVariation(Dl4jDarknet19.VARIATION.INPUT224);
 //        zooModel.setVariation(NASNet.VARIATION.LARGE);
         clf.setZooModel(zooModel);
 
@@ -169,6 +174,6 @@ public class WekaTests {
     }
 
     public static void main(String[] args) throws Exception {
-        new WekaTests().train(args);
+        new WekaTests().filterTest(args);
     }
 }
