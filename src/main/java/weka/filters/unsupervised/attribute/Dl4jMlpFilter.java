@@ -29,11 +29,12 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
+import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.DenseLayer;
 import weka.dl4j.layers.Layer;
 import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.Dl4JResNet50;
+import weka.dl4j.zoo.Dl4jResNet50;
 import weka.filters.Filter;
 import weka.filters.SimpleBatchFilter;
 
@@ -88,12 +89,12 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   /**
    * The zoo model to use, if we're not loading from the serialized model file
    */
-  protected AbstractZooModel zooModelType = new Dl4JResNet50();
+  protected AbstractZooModel zooModelType = new Dl4jResNet50();
 
   /**
    * The image instance iterator to use
    */
-  protected AbstractInstanceIterator instanceIterator = new ImageInstanceIterator();
+  protected AbstractInstanceIterator instanceIterator = new DefaultInstanceIterator();
 
   /**
    * The pooling function to use if taking activations from an intermediary convolution layer
@@ -110,6 +111,11 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
    * Model used for feature extraction
    */
   protected Dl4jMlpClassifier model;
+
+  /**
+   * Flag for the GUI to set whether or not default feature extraction layer should be loaded
+   */
+  protected boolean useDefaultFeatureLayer = true;
 
   /**
    * GET/SET METHODS
@@ -139,13 +145,27 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   )
   public AbstractZooModel getZooModelType() { return zooModelType; }
 
+  /**
+   * Clear the old transformation layers and set the new one if we've changed to a different model type.
+   * This function is necessary from a usability perspective - if a user is switching between lots of different models,
+   * the final model's feature extraction layer should be applied. This requires clearing the old layers and applying the new
+   * one. The issue is if a user has selected a zoo model and wants to use some custom layers - when this method is called
+   * by the GUI, it will clear the 'old' layers (which include the custom applied layer) so the user can't actually
+   * use their custom setting.
+   *
+   * To fix this, a GUI flag is shown which the user can set to false if they wish to use non-default feature layers.
+   *
+   * @param zooModelType Type we're changing to
+   */
   public void setZooModelType(AbstractZooModel zooModelType) {
-    // Clear the old transformation layers and set the new one if we've changed to a different model type
-    if (isDifferentModel(zooModelType)) {
-      log.warn("Changed model family or variation, clearing old transformation layers. " +
-              "If you wanted to keep them you will need to set them again.");
+    if (getUseDefaultFeatureLayer()) {
+      log.warn("Using default feature layer, so clearing user-specified transformation layers. " +
+              "If you wanted to keep them you will need to set this flag to false and set them again.");
       clearTransformationLayers();
       addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
+    } else {
+      log.warn("'-default-feature-layer' flag is not set. Please ensure you have explicitly defined the feature " +
+              "extraction layers. If you wish to use the default feature extraction layer, append the -default-feature-layer param.");
     }
     this.zooModelType = zooModelType;
     // Also set the instance iterator to use this zoo model's channel order
@@ -230,6 +250,23 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
     this.transformationLayers = new DenseLayer[] {};
   }
 
+
+  public boolean getUseDefaultFeatureLayer() {
+    return useDefaultFeatureLayer;
+  }
+
+  @OptionMetadata(
+          displayName = "Use default feature layer",
+          description = "Set to true to load the default feature extraction layer in the GUI - false to set your own custom layers.",
+          displayOrder = 0,
+          commandLineParamName = "default-feature-layer",
+          commandLineParamSynopsis = "-default-feature-layer",
+          commandLineParamIsFlag = true
+  )
+  public void setUseDefaultFeatureLayer(boolean useDefaultFeatureLayer) {
+    this.useDefaultFeatureLayer = useDefaultFeatureLayer;
+  }
+
   /**
    * FILTER CODE
    */
@@ -237,16 +274,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   public Dl4jMlpFilter() {
     // By default we set the zoo model default feature extraction as our layer to use
     addTransformationLayerName(zooModelType.getFeatureExtractionLayer());
-  }
-
-  /**
-   * Checks whether the newly applied zoo model is different to the one we've already selected
-   * @param zooModelType Zoo model we're trying to set to
-   * @return true if the same model family, false otherwise
-   */
-  public boolean isDifferentModel(AbstractZooModel zooModelType) {
-    return zooModelType.getClass() != this.zooModelType.getClass() ||
-            (zooModelType.getVariation() != this.zooModelType.getVariation());
   }
 
   @Override
@@ -280,8 +307,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
       model.setZooModel(zooModelType);
     }
     model.setFilterMode(true);
-    if (ImageInstanceIterator.isMetaArff(data))
-      model.setInstanceIterator(instanceIterator);
+    model.setInstanceIterator(instanceIterator);
 
     // If we're loading from a previously trained model, we don't need to intialize the classifier again,
     // We do need to, however, if we're loading from a fresh zoo model
