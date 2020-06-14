@@ -45,11 +45,11 @@ This only takes 1-2 minutes on a modern CPU &mdash; much faster than training a 
 The steps shown below split this into two steps; storing the featurized dataset, and fitting a Weka classifier to the dataset.
 It can be combined into a single command with a filtered classifier, however, the method shown below
 is more efficient as the dataset featurizing (which is the most expensive part of this operation) 
-is only done once (would be done 10 times using 10-fold CV with a FilteredClassifier). Saving the featurized
+is only done once (would be done 10 times using 10-fold CV with a `FilteredClassifier`). Saving the featurized
 dataset separately then makes it much faster to try out different Weka classifiers.
 
-Note that the first time this is run it will need to download the pretrained weights, so actual runtime
-may be longer. 
+Note that the first time this is run it may need to download the pretrained weights, in which case actual runtime
+will be longer. These weights are cached locally so subsequent runs are much faster.
 
 ### GUI
 
@@ -57,7 +57,8 @@ The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preproc
 A randomly sampled MNIST dataset of 420 images is provided in the WekaDeeplearning4j package for testing purposes 
 (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist.meta.minimal.arff`). 
 
-Then, select the the `Dl4jMlpFilter` in the filter panel. Click in the box to open the filter settings.
+Then, select the the `Dl4jMlpFilter` in the filter panel (within `filters/unsupervised/attribute`). 
+Click in the properties box to open the filter settings.
 
 ![Classifier](../img/gui/featurize-std-filter.png)
 
@@ -90,17 +91,22 @@ $ java -Xmx8g weka.Run \
         -c last \
         -decimal 20 \
         -iterator ".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12" \
-        -layer-extract ".DenseLayer -name flatten_1" \
         -zooModel ".Dl4JResNet50"
+        -default-feature-layer
 ```
-We now have a standard `.arff` file that can be fit to like any numerical dataset
+It should be noted that because we're using the default extraction layer (for this model) of `flatten_1`, we can simply specify the `-default-feature-layer`
+flag. This is especially useful if trying a range of different zoo models and one wants to avoid specifying layer names for each one.
+ 
+ We now have a standard `.arff` file that can be fit to like any numerical dataset
 ```bash
 $ java weka.Run .SMO -t mnist-rn50.arff
 ```
 
 
 ### Java
-This uses reflection to load the filter so all the DL4J dependencies don't need to be on the CLASSPATH.
+This uses reflection to load the filter so all the DL4J dependencies don't need to be on the CLASSPATH - 
+as long as WekaDeeplearning4j is installed from the Package Manager, weka.core.WekaPackageManager.loadPackages` will load
+the necessary libraries at runtime.
 ```java
 // Load all packages so that Dl4jMlpFilter class can be found using forName("weka.filters.unsupervised.attribute.Dl4jMlpFilter")
 weka.core.WekaPackageManager.loadPackages(true);
@@ -164,6 +170,8 @@ This example shows concatenating the activations from an intermediary convolutio
 to the default activations (from layer `flatten_1`) and using `PoolingType.AVG`
 to average pool the extra dimensions from `res4a_branch2b`.
 
+Check out the [model summary](../model-zoo/dl4j/DL4JResNet50.md) to look at other layers you could use.
+
 ### GUI
 The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preprocess` tab via `Open File`. 
 A randomly sampled MNIST dataset of 420 images is provided in the WekaDeeplearning4j package for testing purposes 
@@ -180,8 +188,10 @@ If you run into memory issues then use a smaller mini-batch size.
 
 ![Image Instance Iterator](../img/gui/image-instance-iterator.png)
 
-`Dl4jResNet50` is already selected as the feature extractor model. To add `res4a_branch2b` as another feature extraction layer, we edit the `Feature extraction layers` property.
-Click to open the array editor, and click the `DenseLayer` specification to open the editor for our new layer.
+`Dl4jResNet50` is already selected as the feature extractor model. To add `res4a_branch2b` as another feature extraction layer, 
+we first set the `Use default feature layer` flag to **false** - if this is not done, only the default
+extraction layer will be used. To edit the `Feature extraction layers` property,
+click the property to open the array editor, and click the `DenseLayer` specification to open the editor for our new layer.
 
 ![Feature Extraction Layers](../img/gui/featurize-concat-layers.png)
 
