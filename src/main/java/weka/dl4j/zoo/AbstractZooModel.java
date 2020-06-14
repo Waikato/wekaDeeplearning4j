@@ -77,7 +77,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     @OptionMetadata(
             displayName = "Image channels last",
             description = "Set to true to supply image channels last. " +
-                    "The default value will usually be correct, so as an end user you shouldn't need to change this setting." +
+                    "The default value will usually be correct, so as an end user you shouldn't need to change this setting. " +
                     "If you do be aware that it may break the model.",
             commandLineParamName = "channelsLast",
             commandLineParamSynopsis = "-channelsLast <boolean>"
