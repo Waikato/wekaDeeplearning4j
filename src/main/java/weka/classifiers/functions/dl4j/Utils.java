@@ -345,22 +345,45 @@ public class Utils {
     }
   }
 
+  /**
+   * Shape will either be something like [1, 56, 56, 128] or [1, 128, 56, 56]
+   * If it's the former then return true
+   * @param shape
+   * @return
+   */
+  public static boolean isChannelsLast(INDArray activations) {
+    long[] shape = activations.shape();
+    long width = shape[2];
+    return shape[3] != width;
+  }
+
+  /**
+   *
+   * @param activationAtLayer 4d activations e.g., [batch_size, 512, 64, 64]
+   * @param poolingType Pooling type to use to lower the dimensionality
+   * @return 2D activations
+   */
   public static INDArray reshapeActivations(INDArray activationAtLayer, PoolingType poolingType) {
     long[] resultShape = activationAtLayer.shape();
 
-    if (poolingType == PoolingType.NONE) {
-      int extraDimension = (int) (resultShape[1] * resultShape[2] * resultShape[3]);
-      return activationAtLayer.reshape(new int[] {(int) resultShape[0], extraDimension});
-    } else {
-      float[][] pooledBatch = new float[(int) resultShape[0]][(int) resultShape[1]];
+    int batchSize = (int) resultShape[0];
+    int numFeatureMaps = (int) resultShape[1];
+    int featureMapWidth = (int) resultShape[2];
+    int featureMapHeight = (int) resultShape[3];
 
-      for (int batchItem = 0; batchItem < pooledBatch.length; batchItem++) {
-        // 3D array e.g. shape = [512, 64, 64]
-        INDArray itemActivations = activationAtLayer.get(NDArrayIndex.point(batchItem));
-        for (int activationI = 0; activationI < resultShape[1]; activationI++) {
-          // 2D array e.g. shape = [64, 64]
-          INDArray attributeActivations = itemActivations.get(NDArrayIndex.point(activationI));
-          pooledBatch[batchItem][activationI] = poolNDArray(attributeActivations, poolingType);
+    // Simply multiply all the extra dimensions together if we're using no pooling
+    if (poolingType == PoolingType.NONE) {
+      int extraDimensions = numFeatureMaps * featureMapWidth * featureMapHeight;
+      return activationAtLayer.reshape(new int[] {batchSize, extraDimensions});
+    } else {
+      // Otherwise, create a pooled batch
+      float[][] pooledBatch = new float[batchSize][numFeatureMaps];
+
+      for (int batchItem = 0; batchItem < batchSize; batchItem++) {
+        INDArray batchItemActivations = activationAtLayer.get(NDArrayIndex.point(batchItem)); // 3D array e.g. shape = [512, 64, 64]
+        for (int featureMapIndex = 0; featureMapIndex < numFeatureMaps; featureMapIndex++) {
+          INDArray featureMap = batchItemActivations.get(NDArrayIndex.point(featureMapIndex));  // 2D array e.g. shape = [64, 64]
+          pooledBatch[batchItem][featureMapIndex] = poolNDArray(featureMap, poolingType);
         }
       }
 
@@ -369,7 +392,7 @@ public class Utils {
   }
 
   public static INDArray appendClasses(INDArray result, Instances input) {
-    NDArray classes = (NDArray) Nd4j.zeros(result.shape()[0], 1);
+    INDArray classes = Nd4j.zeros(result.shape()[0], 1);
     for (int i = 0; i < classes.length(); i++) {
       Instance inst = input.instance(i);
       classes.putScalar(i, inst.classValue());
