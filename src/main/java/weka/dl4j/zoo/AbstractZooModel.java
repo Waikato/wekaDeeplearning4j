@@ -38,17 +38,51 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     private static final long serialVersionUID = -4598529061609767660L;
 
-    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.IMAGENET;
-
-    protected String m_outputLayer, m_featureExtractionLayer, m_predictionLayerName = "weka_predictions";
-
+    /**
+     * Dataset that the pretrained weights are trained on
+     */
+    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
+    /**
+     * Output layer of the model to be taken off (and replace by our custom output layer)
+     */
+    protected String m_outputLayer;
+    /**
+     * Feature extraction layer of the model (which we'll attach our output layer to) and use for feature extraction
+     */
+    protected String m_featureExtractionLayer;
+    /**
+     * Name of the output layer we attach to the end of the model
+     */
+    protected String m_predictionLayerName = "weka_predictions";
+    /**
+     * Names of extraneous layers to completely remove (doesn't keep the weights of them)
+     */
     protected String[] m_extraLayersToRemove = new String[0];
-
+    /**
+     * Number of dimensions of the feature extraction layer
+     */
     protected int m_numFExtractOutputs;
-
-    private long seed, numLabels; // TODO split up and add docstrings to all fields
-
-    protected boolean filterMode, requiresPooling = false, channelsLast = false;
+    /**
+     * Random seed
+     */
+    private long seed;
+    /**
+     * Number of output labels we want to classify on
+     */
+    private long numLabels;
+    /**
+     * Are we loading this model for use as feature extractor (no need to add output layer)
+     */
+    protected boolean filterMode;
+    /**
+     * Do the activations from featureLayer require pooling (too high dimensionality)
+     */
+    protected boolean requiresPooling = false;
+    /**
+     * Is the model in channels-last order? (i.e. data must come in [minibatch, height, width, channels]
+     * instead of the default [minibatch, channels, height, width]
+     */
+    protected boolean channelsLast = false;
 
     /**
      * Initialize the ZooModel as MLP
@@ -199,7 +233,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Creates default fine tuning configuration
+     * We need to create and set the fine tuning config
      * @return Default fine tuning config
      */
     protected FineTuneConfiguration getFineTuneConfig() {
@@ -234,7 +268,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Creates a default output layer
+     * We need a layer with the correct number of outputs
      * @return Default output layer
      */
     protected OutputLayer createOutputLayer() {

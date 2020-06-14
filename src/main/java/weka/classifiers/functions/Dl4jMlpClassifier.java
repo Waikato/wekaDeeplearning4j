@@ -1718,7 +1718,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
           + "(default = no model).", commandLineParamName = "zooModel",
       commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
   public void setZooModel(AbstractZooModel zooModel) {
-    this.zooModel = zooModel; //TODO check if the zoo model type is different before loading this
+    this.zooModel = zooModel;
 
     if (getLoadLayerSpecification()) {
       JFrame frame = showModelLoadingFrame();
