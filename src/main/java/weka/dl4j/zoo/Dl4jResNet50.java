@@ -46,11 +46,11 @@ import java.io.IOException;
  * @author Steven Lang
  * @author Rhys Compton
  */
-public class Dl4JResNet50 extends AbstractZooModel {
+public class Dl4jResNet50 extends AbstractZooModel {
 
     private static final long serialVersionUID = 6012647103023109618L;
 
-    public Dl4JResNet50() {
+    public Dl4jResNet50() {
         setPretrainedType(PretrainedType.IMAGENET);
         setNumFExtractOutputs(2048);
         setFeatureExtractionLayer("flatten_1");
