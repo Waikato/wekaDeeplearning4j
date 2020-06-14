@@ -18,14 +18,12 @@
 
 package weka.zoo;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.naming.OperationNotSupportedException;
 
-import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -186,7 +184,7 @@ public class ZooModelTest {
         Dl4jLeNet leNet = new Dl4jLeNet();
         dl4jModels.add(leNet);
 
-        Dl4JResNet50 resNet50 = new Dl4JResNet50();
+        Dl4jResNet50 resNet50 = new Dl4jResNet50();
         dl4jModels.add(resNet50);
 
         Dl4jSqueezeNet squeezeNet = new Dl4jSqueezeNet();
@@ -209,7 +207,8 @@ public class ZooModelTest {
         return dl4jModels;
     }
 
-    @BeforeClass
+//    @BeforeClass // You may like to uncomment this annotation to download all the models via threads, otherwise running
+    // full test suite will take a long time (downloading each model individually)
     public static void downloadModels() {
         List<AbstractZooModel> dl4jModels = createDL4JModels();
         List<AbstractZooModel> kerasModels = createKerasModels();
@@ -279,12 +278,12 @@ public class ZooModelTest {
 
     @Test
     public void testResNet50() throws Exception {
-        trainModel(new Dl4JResNet50());
+        trainModel(new Dl4jResNet50());
     }
 
     @Test
     public void testResNet50Filter() throws Exception {
-        filterModel(new Dl4JResNet50());
+        filterModel(new Dl4jResNet50());
     }
 
     @Test
