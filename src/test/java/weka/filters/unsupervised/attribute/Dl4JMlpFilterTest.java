@@ -60,6 +60,10 @@ public class Dl4JMlpFilterTest {
     KerasDenseNet kerasDenseNet = new KerasDenseNet();
     kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET201);
     checkZooModelMNIST(kerasDenseNet);
+  @Test
+  public void testProcessMnistConvolutional() throws Exception {
+    Dl4jLeNet leNet = new Dl4jLeNet();
+    checkZooModelMNIST(leNet, false);
   }
 
   @Test
