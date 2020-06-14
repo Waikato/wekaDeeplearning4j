@@ -35,7 +35,7 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 
 ```bash
-./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.9-linux-x86_64.zip
+./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-10.2-1.60-linux-x86_64.zip
 ```
 
 ## Usage
