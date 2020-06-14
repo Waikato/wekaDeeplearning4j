@@ -1971,7 +1971,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       activationAtLayer = currentFeaturized.getFeatures();
 
       if (Utils.needsReshaping(activationAtLayer)) {
-        // Output an info message once if we're reshaping
+        // permute from [1, 64, 64, 512] to [1, 512, 64, 64] (only necessary if model is in channels-last mode
+        if (Utils.isChannelsLast(activationAtLayer)) { // TODO refactor to check channels last only on first loop
+          activationAtLayer = activationAtLayer.permute(0, 3, 1, 2);
+
+          // Output info message once
+          if (!checkedReshaping) {
+            log.info("Received channels-last activations - permuting to standard channels first (NHWC -> NCHW)");
+          }
+        }
+
+        // Output an info message only once if we're reshaping
         if (!checkedReshaping)
           initShape = Arrays.toString(activationAtLayer.shape());
 
