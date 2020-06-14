@@ -29,6 +29,8 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.PoolingType;
+import weka.dl4j.iterators.instance.AbstractInstanceIterator;
+import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
@@ -36,7 +38,8 @@ import weka.dl4j.layers.Layer;
 import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.Dl4JResNet50;
+import weka.dl4j.zoo.Dl4jResNet50;
+import weka.dl4j.zoo.Dl4jLeNet;
 import weka.dl4j.zoo.KerasDenseNet;
 import weka.dl4j.zoo.keras.DenseNet;
 import weka.filters.Filter;
@@ -52,14 +55,16 @@ public class Dl4JMlpFilterTest {
 
   @Test
   public void testProcessMnistResNet() throws Exception {
-    checkZooModelMNIST(new Dl4JResNet50());
+    checkZooModelMNIST(new Dl4jResNet50(), true);
   }
 
   @Test
   public void testProcessMnistKerasDenseNet201() throws Exception {
     KerasDenseNet kerasDenseNet = new KerasDenseNet();
     kerasDenseNet.setVariation(DenseNet.VARIATION.DENSENET201);
-    checkZooModelMNIST(kerasDenseNet);
+    checkZooModelMNIST(kerasDenseNet, true);
+  }
+
   @Test
   public void testProcessMnistConvolutional() throws Exception {
     Dl4jLeNet leNet = new Dl4jLeNet();
@@ -134,24 +139,37 @@ public class Dl4JMlpFilterTest {
     }
   }
 
-  protected void checkZooModelMNIST(AbstractZooModel zooModel) throws Exception {
-    Instances dataMnist = DatasetLoader.loadMiniMnistMeta();
-    ImageInstanceIterator idiMnist = DatasetLoader.loadMiniMnistImageIterator();
-
+  protected void checkZooModelMNIST(AbstractZooModel zooModel, boolean isMeta) throws Exception {
+    Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-    clf.setInstanceIterator(idiMnist);
+    Instances instances = null;
+    AbstractInstanceIterator iterator = null;
+    // Load the MNIST meta arff with ImageInstanceIterator
+    if (isMeta) {
+      instances = DatasetLoader.loadMiniMnistMeta();
+      iterator = DatasetLoader.loadMiniMnistImageIterator();
+    } else {
+      // Load the Convolutional version of MNIST
+      instances = DatasetLoader.loadMiniMnistArff();
+      iterator = new ConvolutionInstanceIterator();
+      ((ConvolutionInstanceIterator) iterator).setNumChannels(1);
+      ((ConvolutionInstanceIterator) iterator).setHeight(28);
+      ((ConvolutionInstanceIterator) iterator).setWidth(28);
+    }
+
+    clf.setInstanceIterator(iterator);
+    myFilter.setInstanceIterator(iterator);
+
     // Testing pretrained model, no point training for 1 epoch
     clf.setNumEpochs(0);
     clf.setZooModel(zooModel);
-    clf.buildClassifier(dataMnist);
+    clf.buildClassifier(instances);
 
-    Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, dataMnist);
+    Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, instances);
 
-    Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
-    myFilter.setInstanceIterator(idiMnist);
     myFilter.setZooModelType(zooModel);
-    myFilter.setInputFormat(dataMnist);
-    Instances activationsActual = Filter.useFilter(dataMnist, myFilter);
+    myFilter.setInputFormat(instances);
+    Instances activationsActual = Filter.useFilter(instances, myFilter);
 
     for (int i = 0; i < activationsActual.size(); i++) {
       Instance expected = activationsExpected.get(i);
@@ -166,6 +184,7 @@ public class Dl4JMlpFilterTest {
       String clfPath, boolean useZooModel) throws Exception {
     Instances activationsExpected = clf.getActivationsAtLayers(transformationLayerNames, instances);
     Dl4jMlpFilter filter = new Dl4jMlpFilter();
+    // Load the MNIST III if we're being called on the MNIST dataset (dataset is in meta format (String, class))
     if (ImageInstanceIterator.isMetaArff(instances))
       filter.setInstanceIterator(DatasetLoader.loadMiniMnistImageIterator());
     filter.setSerializedModelFile(new File(clfPath));
