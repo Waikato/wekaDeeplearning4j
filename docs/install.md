@@ -9,7 +9,7 @@ You need to unzip the Weka zip file to a directory of your choice.
 For the package no further requisites are necessary.
 
 #### GPU
-The GPU additions needs the CUDA 9.2, 10.0, 10.1, or 10.2 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
+The GPU additions needs the CUDA Toolkit 10.0, 10.1, or 10.2 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
 
 - [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
 - [Mac OS X](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html)
@@ -41,7 +41,7 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 ```bash
-./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.6-linux-x86_64.zip
+./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-10.2-1.6.0-linux-x86_64.zip
 ```
 
 # Using WekaDeeplearning4j via Reflection
@@ -67,7 +67,7 @@ $ ./gradlew build -x test publishToMavenLocal
 or, if you want the cuda version:
 
 ```bash
-$ ./gradlew build -x test publishToMavenLocal -Dcuda=<CUDA-VERSION> # Replace <CUDA-VERSION> with either "9.2", "10.0", "10.1", or "10.2"
+$ ./gradlew build -x test publishToMavenLocal -Dcuda=<CUDA-VERSION> # Replace <CUDA-VERSION> with either "10.0", "10.1", or "10.2"
 ```
 
 Now you can add the maven dependency in your `pom.xml` file 

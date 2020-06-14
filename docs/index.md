@@ -50,6 +50,8 @@ Check out [Classify Your Own Dataset](examples/classifying-your-own.md) for usag
 ### CUDA 10.2 Support
 The new release of Deeplearning4j (`1.0.0-beta7`) now supports CUDA 10.2, so WekaDeeplearning4j has
  new installation packages for users with this CUDA version. 
+ 
+The new release of DL4J has dropped support for CUDA 9.2, so this is also no longer supported in WekaDeeplearning4j.
 
 ## Citation
 
