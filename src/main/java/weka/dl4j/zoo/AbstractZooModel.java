@@ -18,6 +18,7 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.core.WekaException;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.gui.ProgrammaticProperty;
@@ -45,9 +46,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     protected int m_numFExtractOutputs;
 
-    private long seed, numLabels;
+    private long seed, numLabels; // TODO split up and add docstrings to all fields
 
-    private boolean filterMode, requiresPooling = false, channelsLast = false;
+    protected boolean filterMode, requiresPooling = false, channelsLast = false;
 
     /**
      * Initialize the ZooModel as MLP
@@ -75,7 +76,9 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     @OptionMetadata(
             displayName = "Image channels last",
-            description = "Set to true to supply image channels last",
+            description = "Set to true to supply image channels last. " +
+                    "The default value will usually be correct, so as an end user you shouldn't need to change this setting." +
+                    "If you do be aware that it may break the model.",
             commandLineParamName = "channelsLast",
             commandLineParamSynopsis = "-channelsLast <boolean>"
     )
@@ -122,8 +125,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
         // If the specified pretrained weights aren't available, return the standard model
         if (!checkPretrained(zooModel)) {
-            m_pretrainedType = PretrainedType.NONE;
-            return finish(defaultNet);
+            return null;
         }
 
         // If downloading the weights fails, return the standard model
@@ -250,7 +252,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     protected boolean checkPretrained(org.deeplearning4j.zoo.ZooModel dl4jModelType) {
         Set<PretrainedType> availableTypes = getAvailablePretrainedWeights(dl4jModelType);
         if (availableTypes.isEmpty()) {
-            log.error("Sorry, no pretrained weights are available for this model");
+            log.error("Sorry, no pretrained weights are available for this model, " +
+                    "please explicitly set pretrained type to NONE");
             return false;
         }
         if (!availableTypes.contains(m_pretrainedType) && m_pretrainedType != PretrainedType.NONE){
