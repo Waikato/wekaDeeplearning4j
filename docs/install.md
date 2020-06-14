@@ -11,9 +11,14 @@ For the package no further requisites are necessary.
 #### GPU
 The GPU additions needs the CUDA Toolkit 10.0, 10.1, or 10.2 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
 
+##### CUDA Toolkit
 - [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
 - [Mac OS X](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html)
 - [Windows](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html)
+
+##### CUDNN
+- [Linux](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux)
+- [Windows](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-windows)
 
 # Installing the Weka Package
 Weka packages can be easily installed either via the user interface as described [here](https://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2), or simply via the commandline:
