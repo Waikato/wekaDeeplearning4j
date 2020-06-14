@@ -51,6 +51,8 @@ public class DepthwiseConvolution2DLayer
     super();
     setLayerName("Depthwise Convolution 2D layer");
     setActivationFunction(new ActivationIdentity());
+    setConvolutionMode(ConvolutionMode.Truncate);
+    setCudnnAlgoMode(AlgoMode.PREFER_FASTEST);
   }
 
   @Override
@@ -67,6 +69,35 @@ public class DepthwiseConvolution2DLayer
     return "A Depthwise Convolution 2D convolution layer from DeepLearning4J.";
   }
 
+  @OptionMetadata(
+          displayName = "convolution mode",
+          description = "The convolution mode (default = Truncate).",
+          commandLineParamName = "mode",
+          commandLineParamSynopsis = "-mode <string>",
+          displayOrder = 2
+  )
+  public ConvolutionMode getConvolutionMode() {
+    return ConvolutionMode.fromBackend(backend.getConvolutionMode());
+  }
+
+  public void setConvolutionMode(ConvolutionMode convolutionMode) {
+    backend.setConvolutionMode(convolutionMode.getBackend());
+  }
+
+  @OptionMetadata(
+          displayName = "CudnnAlgoMode",
+          description = "The Cudnn algo mode (default = PREFER_FASTEST).",
+          commandLineParamName = "cudnnAlgoMode",
+          commandLineParamSynopsis = "-cudnnAlgoMode <string>",
+          displayOrder = 3
+  )
+  public AlgoMode getCudnnAlgoMode() {
+    return AlgoMode.fromBackend(backend.getCudnnAlgoMode());
+  }
+
+  public void setCudnnAlgoMode(AlgoMode cudnnAlgoMode) {
+    backend.setCudnnAlgoMode(cudnnAlgoMode.getBackend());
+  }
 
   /**
    * Returns an enumeration describing the available options.
