@@ -20,8 +20,8 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's LeNet ZooModel.
@@ -32,6 +32,10 @@ import weka.dl4j.Preferences;
 public class Dl4jAlexNet extends AbstractZooModel {
 
   private static final long serialVersionUID = 1650928023723447528L;
+
+  public Dl4jAlexNet() {
+    setPretrainedType(PretrainedType.NONE);
+  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

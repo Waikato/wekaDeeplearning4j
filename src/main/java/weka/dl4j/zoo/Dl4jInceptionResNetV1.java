@@ -20,8 +20,8 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
 import weka.dl4j.Preferences;
+import weka.dl4j.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's InceptionResNetV1 ZooModel.
@@ -33,6 +33,9 @@ public class Dl4jInceptionResNetV1 extends AbstractZooModel {
 
   private static final long serialVersionUID = -9139462134170258014L;
 
+  public Dl4jInceptionResNetV1() {
+    setPretrainedType(PretrainedType.NONE);
+  }
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.InceptionResNetV1 net = org.deeplearning4j.zoo.model.InceptionResNetV1
