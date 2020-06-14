@@ -737,16 +737,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     this.resume = resume;
   }
 
-  public boolean getLoadLayerSpecification() {return loadLayerSpecification;}
+  public boolean getLoadLayerSpecification() {
+    return loadLayerSpecification;
+  }
 
   @OptionMetadata(
           description = "Set whether you want the GUI to load the layer specification when selecting " +
                   "a model. This does not affect the model's function, but simply allows you to view the model's " +
                   "layers. You may need to click 'OK' and open this window again for this setting to come into effect.",
           displayName = "Load layer specification in GUI",
+          commandLineParamName = "load-layer-spec",
+          commandLineParamSynopsis = "-load-layer-spec",
+          commandLineParamIsFlag = true,
           displayOrder = 3
   )
-  public void setLoadLayerSpecification(boolean loadLayerSpecification) {this.loadLayerSpecification = loadLayerSpecification;}
+  public void setLoadLayerSpecification(boolean loadLayerSpecification) {
+    this.loadLayerSpecification = loadLayerSpecification;}
 
   public boolean getDoNotClearFilesystemCache() {
     return doNotClearFilesystemCache;
@@ -1949,7 +1955,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       ComputationGraph clonedGraph = model.clone();
       transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
     } catch (Exception e) {
-      throw new WekaException(String.format("Could not find features for layer %s, please ensure the name is correctly entered", layerName));
+      throw new WekaException(String.format("Could not find features for layer %s, " +
+              "please ensure the name is correctly entered or append the -default-feature-layer flag to use " +
+              "the default extraction layer", layerName));
     }
     boolean checkedReshaping = false;
     String initShape = "", reshapedShape = "";
