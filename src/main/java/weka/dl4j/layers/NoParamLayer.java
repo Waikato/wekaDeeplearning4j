@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * FeedForwardLayer.java
+ * NoParamLayer.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
@@ -25,10 +25,10 @@ import weka.dl4j.activations.Activation;
 import java.util.Enumeration;
 
 /**
- * Abstract feed forward layer.
+ * Wrapper for DL4J NoParamLayer.
  *
  * @param <T> Feed forward layer implementation
- * @author Steven Lang
+ * @author Rhys Compton
  */
 public abstract class NoParamLayer<T extends org.deeplearning4j.nn.conf.layers.NoParamLayer>
     extends Layer<T> {
@@ -37,38 +37,7 @@ public abstract class NoParamLayer<T extends org.deeplearning4j.nn.conf.layers.N
 
   public NoParamLayer() {
     super();
-//    setActivationFunction(new weka.dl4j.activations.ActivationIdentity());
   }
-
-//  @OptionMetadata(
-//      displayName = "activation function",
-//      description = "The activation function to use (default = Identity).",
-//      commandLineParamName = "activation",
-//      commandLineParamSynopsis = "-activation <specification>",
-//      displayOrder = 1
-//  )
-//  public Activation getActivationFunction() {
-//    return Activation.create(backend.getActivationFn());
-//  }
-//
-//  public void setActivationFunction(Activation activationFn) {
-//    backend.setActivationFn(activationFn.getBackend());
-//  }
-//
-//  @OptionMetadata(
-//      displayName = "number of outputs",
-//      description = "The number of outputs.",
-//      commandLineParamName = "nOut",
-//      commandLineParamSynopsis = "-nOut <int>",
-//      displayOrder = 2
-//  )
-//  public long getNOut() {
-//    return backend.getNOut();
-//  }
-//
-//  public void setNOut(long nOut) {
-//    backend.setNOut(nOut);
-//  }
 
   /**
    * Returns an enumeration describing the available options.
