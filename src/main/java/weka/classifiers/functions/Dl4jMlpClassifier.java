@@ -259,8 +259,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected boolean doNotClearFilesystemCache;
   /**
-   * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching) when starting
-   * or resuming learning
+   * Only useful in the GUI - if set to true, the GUI will load the layer specification of the currently
+   * selected zoo model. This is off by default as it slows the GUI down considerably.
    */
   protected boolean loadLayerSpecification = false;
   /**
@@ -658,9 +658,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
-//    if (!config.equals(netConfig)) { Removed: 23/3 - Rhys Compton
-//      setCustomNet();
-//    }
     netConfig = config;
   }
 
@@ -843,6 +840,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     done();
   }
 
+  /**
+   * Checks if the layer is a valid output layer
+   * @param filterMode true if the model is being used for a filter
+   * @param layer output layer of the model
+   * @return true if the model doesn't have a valid output layer (we need to add one on)
+   */
   public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
     return (!(filterMode) && !(layer instanceof BaseOutputLayer
             //|| layer instanceof LossLayer || layer instanceof ActivationLayer
@@ -1364,6 +1367,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+  /**
+   * Attempts to initialize the zoo model
+   * @param numClasses
+   * @param seed
+   * @param newShape
+   * @return
+   * @throws Exception
+   */
   protected boolean initZooModel(int numClasses, long seed, int[] newShape)
       throws Exception {
     try {
@@ -1675,6 +1686,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+  /**
+   * Creates a JFrame with the loading message. To be used while loading the zoo model layer spec
+   * @return reference to JFrame, so it can be destroyed later
+   */
   private JFrame showModelLoadingFrame() {
     checkIfRunByGUI();
 
@@ -1693,6 +1708,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return frame;
   }
 
+  /**
+   * Destroy the loading JFrame
+   * @param frame JFrame to be destroyed
+   */
   private void closeModelLoadingFrame(JFrame frame) {
     if (frame != null) {
       frame.dispose();
@@ -1944,10 +1963,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return !(zooModel instanceof CustomNet);
   }
 
+  /**
+   * Overridden method - if no pooling type is given then set it to NONE
+   *
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @return Instances transformed to the image features
+   * @throws Exception
+   */
   public Instances getActivationsAtLayers(String[] layerNames, Instances input) throws Exception {
     return getActivationsAtLayers(layerNames, input, PoolingType.NONE);
   }
 
+  /**
+   * Uses the DL4J TransferLearningHelper to featurize the instances using activations from the given layer
+   * @param layerName layer activations to use for instances
+   * @param iter iterator for the instances
+   * @param poolingType pooling type to be used (only necessary if using intermediary layers with 3D activations)
+   * @return INDArray containing the newly transformed instances
+   * @throws Exception
+   */
   public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
     // TransferLearningHelper alters cmp graph in place so we need to clone it
     TransferLearningHelper transferLearningHelper;
@@ -2004,10 +2040,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Returns the activations at a certain
-   *
-   * @param layerNames Layer name to get the activations from
-   * @return Activations in form of instances
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @param poolingType pooling type to use
+   * @return Instances transformed to the image features
    */
   public Instances getActivationsAtLayers(String[] layerNames, Instances input, PoolingType poolingType)
       throws Exception {
@@ -2029,6 +2066,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       if (result == null) {
         result = activationsAtLayer;
       } else {
+        // Concatenate the activations of this layer with the other feature extraction layers
         result = Nd4j.concat(1, result, activationsAtLayer);
       }
     }

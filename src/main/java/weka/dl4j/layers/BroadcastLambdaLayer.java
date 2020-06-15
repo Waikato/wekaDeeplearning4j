@@ -40,7 +40,7 @@ public class BroadcastLambdaLayer extends SameDiffLayer<CustomBroadcast>
   /**
    * The ID used to serialize this class.
    */
-  private static final long serialVersionUID = 6905344091980568487L;
+  private static final long serialVersionUID = 690534416520568487L;
 
   /**
    * Constructor for setting some defaults.
@@ -71,7 +71,7 @@ public class BroadcastLambdaLayer extends SameDiffLayer<CustomBroadcast>
    * @return string describing this class.
    */
   public String globalInfo() {
-    return "A convolution layer from DeepLearning4J.";
+    return "Custom EfficientNet Broadcast layer";
   }
 
   /**

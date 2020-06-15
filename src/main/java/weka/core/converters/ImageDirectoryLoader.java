@@ -12,6 +12,28 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * Loader for image datasets that are in a folder-organized fashion
+ * i.e., image class for an instance is inferred from the folder name it resides in.
+ *
+ * This format cannot be natively imported into WEKA, so this loader creates the appropriate
+ * Instances object which points to the images
+ *
+ * <!-- options-start -->
+ * * Valid options are: <p>
+ * *
+ * * <pre> -i &lt;directory&gt;
+ * *  Top level directory of the image dataset</pre>
+ * *
+ * * <pre> -name &lt;filename&gt; (default: output.arff)
+ * *  Output meta .arff filename</pre>
+ * *
+ * <!-- options-end -->
+ *
+ * <!-- globalinfo-start -->
+ * <!-- globalinfo-end -->
+ */
 public class ImageDirectoryLoader extends AbstractLoader implements
         BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
@@ -113,7 +135,7 @@ public class ImageDirectoryLoader extends AbstractLoader implements
             throw new IllegalArgumentException("Object to execute is not a "
                     + "ImageDirectoryLoader!");
         }
-        
+
         ImageDirectoryLoader loader = (ImageDirectoryLoader) toRun;
         if (options.length > 0) {
             try {
@@ -220,7 +242,7 @@ public class ImageDirectoryLoader extends AbstractLoader implements
 
         Utils.checkForRemainingOptions(options);
     }
-    
+
     public static void main(String[] args) {
         ImageDirectoryLoader loader = new ImageDirectoryLoader();
         loader.run(loader, args);

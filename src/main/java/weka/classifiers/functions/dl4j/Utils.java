@@ -160,6 +160,11 @@ public class Utils {
     return score;
   }
 
+  /**
+   * Copies the attribute name and values of a given nominal attribute
+   * @param oldAttribute attribute to copy
+   * @return duplicated nominal attribute
+   */
   public static Attribute copyNominalAttribute(Attribute oldAttribute) {
     String[] classValues = new String[oldAttribute.numValues()];
     for (int classValI = 0; classValI < oldAttribute.numValues(); classValI++) {
@@ -168,10 +173,17 @@ public class Utils {
     return new Attribute(oldAttribute.name(), Arrays.asList(classValues));
   }
 
-  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
-    return ndArrayToInstances(ndArray, null, null);
-  }
-
+  /**
+   * Helper function for getting the new layer name when using the Dl4jMlpFilter
+   *
+   * The attributes are named after the layer they originated from, so this function
+   * counts throught the attributes per layer, comparing it with the given index
+   * to determine a) which layer the activation came from and b) which number activation
+   * this is
+   * @param attributesPerLayer
+   * @param i
+   * @return
+   */
   public static String getAttributeName(Map<String, Long> attributesPerLayer, int i) {
     if (attributesPerLayer == null) {
       return "transformedAttribute" + i;
@@ -194,6 +206,8 @@ public class Utils {
    * Convert an arbitrary NDArray to Weka instances
    *
    * @param ndArray Input array
+   * @param inputFormat Format to use for the instances
+   * @param attributesPerLayer Hashmap of layer names and how many attributes there are per layer
    * @return Instances object
    * @throws WekaException Invalid input
    */
@@ -212,6 +226,7 @@ public class Utils {
       classI = (int) (numAttributes - 1);
     }
 
+    // Create the new attribute names
     ArrayList<Attribute> atts = new ArrayList<>();
     for (int i = 0; i < numAttributes; i++) {
       if (i == classI && inputFormat != null) {
@@ -224,6 +239,7 @@ public class Utils {
       }
     }
 
+    // Actually create the instances from the values in the given NDArray
     Instances instances = new Instances("Transformed", atts, numInstances);
     instances.setClassIndex(classI);
     for (int i = 0; i < numInstances; i++) {
@@ -325,11 +341,21 @@ public class Utils {
     }
   }
 
-
+  /**
+   * Determines if the activations need reshaping
+   * @param activationAtLayer Activations in question
+   * @return true if the activations need reshaping (too high dimensionality)
+   */
   public static boolean needsReshaping(INDArray activationAtLayer) {
     return activationAtLayer.shape().length != 2;
   }
 
+  /**
+   * Applies the pooling function to the given feature map
+   * @param array feature map to pool
+   * @param poolingType pooling function to apply
+   * @return pooled value
+   */
   public static float poolNDArray(INDArray array, PoolingType poolingType) {
     if (poolingType == PoolingType.MAX) {
       return array.maxNumber().floatValue();
@@ -348,8 +374,8 @@ public class Utils {
   /**
    * Shape will either be something like [1, 56, 56, 128] or [1, 128, 56, 56]
    * If it's the former then return true
-   * @param shape
-   * @return
+   * @param activations
+   * @return true if the activations are in channels-last format
    */
   public static boolean isChannelsLast(INDArray activations) {
     long[] shape = activations.shape();
@@ -358,7 +384,7 @@ public class Utils {
   }
 
   /**
-   *
+   * Reshape the activations, either by pooling or simply multiplying the extra dimensions together
    * @param activationAtLayer 4d activations e.g., [batch_size, 512, 64, 64]
    * @param poolingType Pooling type to use to lower the dimensionality
    * @return 2D activations
@@ -391,6 +417,12 @@ public class Utils {
     }
   }
 
+  /**
+   * Appends the input Instances classes to the INDArray
+   * @param result activations
+   * @param input original Instances
+   * @return activations with class value appended
+   */
   public static INDArray appendClasses(INDArray result, Instances input) {
     INDArray classes = Nd4j.zeros(result.shape()[0], 1);
     for (int i = 0; i < classes.length(); i++) {
@@ -400,6 +432,14 @@ public class Utils {
     return Nd4j.concat(1, result, classes);
   }
 
+  /**
+   * Converts the newly transformed instances to an Instances object
+   * @param result activations generated from feature layers
+   * @param input original input Instances
+   * @param attributesPerLayer Hashmap stating the feature layers and how many attributes each has
+   * @return
+   * @throws Exception
+   */
   public static Instances convertToInstances(INDArray result, Instances input, Map<String, Long> attributesPerLayer) throws Exception {
     if (result == null) {
       return new Instances(input, 0);
@@ -408,10 +448,27 @@ public class Utils {
     }
   }
 
+  /**
+   * Fix for issue with JVM crashing
+   * https://github.com/eclipse/deeplearning4j/issues/8976#issuecomment-639946904
+   *
+   * It is recommended to use this helper function in WekaDeeplearning4j rather than using iter.next() directly.
+   * @param iter DatasetIterator to get images from
+   * @return Next DataSet
+   */
   public static DataSet getNext(DataSetIterator iter) {
     return iter.next().copy();
   }
 
+  /**
+   * Fix for issue with JVM crashing
+   * https://github.com/eclipse/deeplearning4j/issues/8976#issuecomment-639946904
+   *
+   * It is recommended to use this helper function in WekaDeeplearning4j rather than using iter.next() directly.
+   * @param iter DatasetIterator to get images from
+   * @param num Batch size to get
+   * @return Next DataSet
+   */
   public static DataSet getNext(DataSetIterator iter, int num) {
     return iter.next(num).copy();
   }

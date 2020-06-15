@@ -177,6 +177,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     }
   }
 
+  /**
+   * Are the input instances from a 'meta' arff (just points to the image location)
+   * @param data Instances to verify
+   * @return true if Instances are meta
+   */
   public static boolean isMetaArff(Instances data) {
     return (data.attribute(0).isString() && data.classIndex() == 1);
   }
@@ -223,6 +228,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     validate(data);
     ImageRecordReader reader = getImageRecordReader(data);
 
+    // Required for supporting channels-last models (currently only EfficientNet)
     if (getChannelsLast())
       reader.setNchw_channels_first(false);
 

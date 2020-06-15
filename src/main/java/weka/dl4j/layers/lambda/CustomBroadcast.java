@@ -17,6 +17,10 @@ import org.nd4j.linalg.factory.Broadcast;
 
 import java.util.Collection;
 
+/**
+ * Required for loading the EfficientNet family of models
+ * Simply broadcasts the activations up to the correct size for the ElementWiseVertex to multiply the activations
+ */
 public class CustomBroadcast extends SameDiffLambdaLayer {
 
     private long width;
