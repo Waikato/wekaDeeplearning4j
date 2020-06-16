@@ -104,7 +104,7 @@ public class Dl4JMlpFilterTest {
     Files.delete(Paths.get(clfPath));
   }
 
-  @Test
+//  @Test
   public void testProcessMnist() throws Exception {
     // Init data
     Instances dataMnist = DatasetLoader.loadMiniMnistMeta();
