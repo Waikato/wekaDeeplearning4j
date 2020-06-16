@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -88,7 +89,7 @@ public class ResizeImageInstanceIteratorTest {
     Set<Integer> labels = new HashSet<>();
     for (Instance inst : metaData) {
       int label = Integer.parseInt(inst.stringValue(1));
-      final DataSet next = it.next();
+      final DataSet next = Utils.getNext(it);
       int itLabel = next.getLabels().argMax().getInt(0);
       Assert.assertEquals(label, itLabel);
       labels.add(label);

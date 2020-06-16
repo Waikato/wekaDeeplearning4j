@@ -4,26 +4,22 @@ A very common dataset to test algorithms with is the _Iris Dataset_ . The follow
 
 The iris dataset can be found in the `datasets/nominal` directory of the WekaDeeplearning4j package.
 
-
-<details> 
-  <summary>Iris Visualization </summary>
-  ![Iris Visualization](../img/iris.png)
-</details>
+Iris Visualization ![Iris Visualization](../img/iris.png)
 
 ## Commandline
 Starting simple, the most straight forward way to create a neural network with this package is by using the commandline. A Single-Layer-Perceptron (the most basic neural network possible) is shown in the following
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run \
-		.Dl4jMlpClassifier \
-		-S 1 \
-		-layer "weka.dl4j.layers.OutputLayer \
-		        -activation weka.dl4j.activations.ActivationSoftmax \
-		        -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
-		-config "weka.dl4j.NeuralNetConfiguration \
-		        -updater weka.dl4j.updater.Adam" \
-		-numEpochs 10 \
-		-t datasets/nominal/iris.arff \
-		-split-percentage 66
+$ java weka.Run \
+    .Dl4jMlpClassifier \
+    -S 1 \
+    -layer "weka.dl4j.layers.OutputLayer \
+            -activation weka.dl4j.activations.ActivationSoftmax \
+            -lossFn weka.dl4j.lossfunctions.LossMCXENT" \
+    -config "weka.dl4j.NeuralNetConfiguration \
+            -updater weka.dl4j.updater.Adam" \
+    -numEpochs 10 \
+    -t datasets/nominal/iris.arff \
+    -split-percentage 66
 ```
 
 
@@ -31,32 +27,32 @@ $ java -cp $WEKA_HOME/weka.jar weka.Run \
 The same architecture can be built programmatically with the following Java code
 
 ```java
-// Create a new Multi-Layer-Perceptron classifier
-Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-// Set a seed for reproducable results
-clf.setSeed(1);
+// Load all packages so that Dl4jMlpFilter class can be found using forName("weka.filters.unsupervised.attribute.Dl4jMlpFilter")
+weka.core.WekaPackageManager.loadPackages(true);
 
-// Load the iris dataset and set its class index
-Instances data = new Instances(new FileReader("datasets/nominal/iris.arff"));
+// Load the dataset
+weka.core.Instances data = new weka.core.Instances(new FileReader("datasets/nominal/iris.arff"));
 data.setClassIndex(data.numAttributes() - 1);
+String[] classifierOptions = weka.core.Utils.splitOptions("-S 1 -numEpochs 10 -layer \"weka.dl4j.layers.OutputLayer -activation weka.dl4j.activations.ActivationSoftmax -lossFn weka.dl4j.lossfunctions.LossMCXENT\"");
+weka.classifiers.AbstractClassifier myClassifier = (AbstractClassifier) weka.core.Utils.forName(weka.classifiers.AbstractClassifier.class, "weka.classifiers.functions.Dl4jMlpClassifier", classifierOptions);
 
-// Define the output layer
-OutputLayer outputLayer = new OutputLayer();
-outputLayer.setActivationFunction(new ActivationSoftmax());
-outputLayer.setLossFn(new LossMCXENT());
+// Stratify and split the data
+Random rand = new Random(0);
+Instances randData = new Instances(data);
+randData.randomize(rand);
+randData.stratify(3);
+Instances train = randData.trainCV(3, 0);
+Instances test = randData.testCV(3, 0);
 
-NeuralNetConfiguration nnc = new NeuralNetConfiguration();
-nnc.setUpdater(new Adam());
+// Build the classifier on the training data
+myClassifier.buildClassifier(train);
 
-// Add the layers to the classifier
-clf.setLayers(new Layer[]{outputLayer});
-clf.setNeuralNetConfiguration(nnc);
+// Evaluate the model on test data
+Evaluation eval = new Evaluation(test);
+eval.evaluateModel(myClassifier, test);
 
-// Evaluate the network
-Evaluation eval = new Evaluation(data);
-int numFolds = 10;
-eval.crossValidateModel(clf, data, numFolds, new Random(1));
-
+// Output some summary statistics
 System.out.println(eval.toSummaryString());
+System.out.println(eval.toMatrixString());
 ```
 

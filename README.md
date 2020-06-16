@@ -35,7 +35,7 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 
 ```bash
-./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.9-linux-x86_64.zip
+./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-10.2-1.60-linux-x86_64.zip
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ All three ways are explained in the [getting-started](https://deeplearning.cms.w
 
 Example commandline scripts are provided in the `weka-run-test-scripts` directory, e.g. a simple network with one dense layer of 32 neurons and one output layer, classifying the iris dataset, would look like the following:
 ```bash
-$ java -cp ${WEKA_HOME}/weka.jar weka.Run \
+$ java weka.Run \
        .Dl4jMlpClassifier \
        -layer "weka.dl4j.layers.DenseLayer -nOut 32 -activation \"weka.dl4j.activations.ActivationReLU \" " \
        -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" " \
@@ -111,11 +111,11 @@ The java documentation can be found [here](https://waikato.github.io/wekaDeeplea
 
 ## Contributing
 
-If you want to contribute to the project, check out the [contributing guide](https://github.com/Waikato/wekaDeeplearning4j/blob/master/CONTRIBUTING.md).
+If you want to contribute to the project, check out the [contributing guide](./CONTRIBUTING.md).
 
 ## Development 
 
-Check out [DEVELOPMENT.md](https://github.com/Waikato/wekaDeeplearning4j/blob/master/DEVELOPMENT.md) for further information.
+Check out [DEVELOPMENT.md](./DEVELOPMENT.md) for further information.
 
 
 ## Citation

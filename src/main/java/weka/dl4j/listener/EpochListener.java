@@ -101,11 +101,11 @@ public class EpochListener extends TrainingListener {
           // AsyncDataSetIterator and CachingDataSetIterator do not support next(num)
           if (iterator instanceof AsyncDataSetIterator
               || iterator instanceof CachingDataSetIterator) {
-            next = iterator.next();
+            next = Utils.getNext(iterator);
           } else {
             // TODO: figure out which batch size is feasible for inference
             final int batch = iterator.batch() * 8;
-            next = iterator.next(batch);
+            next = Utils.getNext(iterator, batch);
           }
           INDArray output =
               net.outputSingle(next.getFeatures()); // get the networks prediction

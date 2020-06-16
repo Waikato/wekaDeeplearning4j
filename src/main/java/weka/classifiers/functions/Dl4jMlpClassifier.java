@@ -18,38 +18,29 @@
 
 package weka.classifiers.functions;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.awt.*;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
-import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -82,14 +73,9 @@ import weka.core.Tag;
 import weka.core.WekaException;
 import weka.core.WekaPackageClassLoaderManager;
 import weka.core.WrongIteratorException;
-import weka.dl4j.CacheMode;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.DefaultInstanceIterator;
-import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
+import weka.dl4j.iterators.instance.*;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
@@ -100,8 +86,7 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.TrainingListener;
-import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.ZooModel;
+import weka.dl4j.zoo.*;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -109,6 +94,9 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.gui.ProgrammaticProperty;
+
+import javax.swing.*;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -175,7 +163,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * The model zoo model.
    */
-  protected ZooModel zooModel = new CustomNet();
+  protected AbstractZooModel zooModel = new CustomNet();
+  /**
+   * True if using the model for feature extraction
+   */
+  protected boolean filterMode = false;
   /**
    * The size of the serialized network model in bytes.
    */
@@ -266,6 +258,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * or resuming learning
    */
   protected boolean doNotClearFilesystemCache;
+  /**
+   * Only useful in the GUI - if set to true, the GUI will load the layer specification of the currently
+   * selected zoo model. This is off by default as it slows the GUI down considerably.
+   */
+  protected boolean loadLayerSpecification = false;
   /**
    * Number of physical GPUs available. If greater than 1, then data-parallel training + parameter
    * averaging is used to leverage multiple GPUs. Ignored entirely if there is no GPU backend
@@ -661,9 +658,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
-    if (!config.equals(netConfig)) {
-      setCustomNet();
-    }
     netConfig = config;
   }
 
@@ -739,6 +733,23 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setResume(boolean resume) {
     this.resume = resume;
   }
+
+  public boolean getLoadLayerSpecification() {
+    return loadLayerSpecification;
+  }
+
+  @OptionMetadata(
+          description = "Set whether you want the GUI to load the layer specification when selecting " +
+                  "a model. This does not affect the model's function, but simply allows you to view the model's " +
+                  "layers. You may need to click 'OK' and open this window again for this setting to come into effect.",
+          displayName = "Load layer specification in GUI",
+          commandLineParamName = "load-layer-spec",
+          commandLineParamSynopsis = "-load-layer-spec",
+          commandLineParamIsFlag = true,
+          displayOrder = 3
+  )
+  public void setLoadLayerSpecification(boolean loadLayerSpecification) {
+    this.loadLayerSpecification = loadLayerSpecification;}
 
   public boolean getDoNotClearFilesystemCache() {
     return doNotClearFilesystemCache;
@@ -830,6 +841,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
+   * Checks if the layer is a valid output layer
+   * @param filterMode true if the model is being used for a filter
+   * @param layer output layer of the model
+   * @return true if the model doesn't have a valid output layer (we need to add one on)
+   */
+  public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
+    return (!(filterMode) && !(layer instanceof BaseOutputLayer
+            //|| layer instanceof LossLayer || layer instanceof ActivationLayer
+            // The above two layers still throw errors from DL4j if they're the output
+            ));
+  }
+
+  /**
    * The method used to initialize the classifier.
    *
    * @param data set of instances serving as training data
@@ -870,8 +894,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final Layer lastLayer = layers[layers.length - 1];
     org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
         lastLayer.getBackend();
-    if (!(lastLayerBackend instanceof BaseOutputLayer
-        || lastLayerBackend instanceof LossLayer || lastLayerBackend instanceof ActivationLayer)) {
+    if (noOutputLayer(isFilterMode(), lastLayerBackend)) {
       throw new MissingOutputLayerException(
           "Last layer in network must be an output layer but was: "
               + lastLayerBackend.getClass().getSimpleName());
@@ -1066,6 +1089,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm,
       String cacheDirSuffix) throws Exception {
+    // Also set the instance iterator to use this zoo model's channel order
+    if (this.instanceIterator instanceof ImageInstanceIterator) {
+      ((ImageInstanceIterator) this.instanceIterator).setChannelsLast(this.zooModel.getChannelsLast());
+    }
+
     DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
 
     // Use caching if set
@@ -1220,6 +1248,60 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
+   * Enforces the input image size if using a zoo model
+   * @param iii ImageInstanceIterator we're using
+   * @return iterator with image size fixed
+   */
+  private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
+    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
+    AbstractZooModel tmpZooModel = getZooModel();
+    if (tmpZooModel.isPretrained()) {
+      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
+        iii.setNumChannels(1);
+        iii.setHeight(28);
+        iii.setWidth(28);
+      } else {
+        int[] pretrainedShape = tmpZooModel.getShape()[0];
+        iii.setNumChannels(pretrainedShape[0]);
+        iii.setHeight(pretrainedShape[1]);
+        iii.setWidth(pretrainedShape[2]);
+      }
+      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
+              iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
+    }
+    return iii;
+  }
+
+  /**
+   * The only one-channel zoo model currently implemented is Dl4JLeNet.
+   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
+   * @param instanceIterator iterator we're wanting to use with the zoo model
+   */
+  private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
+    if (instanceIterator.getNumChannels() != 1) {
+      return;
+    }
+    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
+    Set<Class> oneChannelModels = new HashSet<>();
+    oneChannelModels.add(Dl4jLeNet.class);
+
+    AbstractZooModel tmpZooModel = getZooModel();
+    Class currModelClass = tmpZooModel.getClass();
+
+    // If we have a one channel model, continue;
+    if (oneChannelModels.contains(currModelClass)) {
+      return;
+    }
+
+    throw new WrongIteratorException(
+            "You've used an instance iterator for instances of only one channel, however, " +
+                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
+                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
+    );
+  }
+
+  /**
    * Build the Zoomodel instance
    *
    * @return ComputationGraph instance
@@ -1228,26 +1310,50 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected void createZooModel() throws Exception {
     final AbstractInstanceIterator it = getInstanceIterator();
-    final boolean isImageIterator = it instanceof ImageInstanceIterator;
+    final boolean isCorrectIterator = it instanceof ImageInstanceIterator || it instanceof ConvolutionInstanceIterator;
 
     // Make sure data is convolutional
-    if (!isImageIterator) {
+    if (!isCorrectIterator) {
       throw new WrongIteratorException(
           "ZooModels currently only support images. "
-              + "Please setup an ImageInstanceIterator.");
+              + "Please setup an ImageInstanceIterator or ConvolutionalInstanceIterator.");
     }
 
-    // Get the new width/heigth/channels from the iterator
-    ImageInstanceIterator iii = (ImageInstanceIterator) it;
-    int newWidth = iii.getWidth();
-    int newHeight = iii.getHeight();
-    int channels = iii.getNumChannels();
+    boolean isImageIterator = it instanceof ImageInstanceIterator;
+    ImageInstanceIterator iii = null;
+    ConvolutionInstanceIterator cii = null;
+    int newWidth, newHeight, channels;
+
+    if (isImageIterator) {
+      iii = enforceZooModelSize((ImageInstanceIterator) it);
+      newWidth = iii.getWidth();
+      newHeight = iii.getHeight();
+      channels = iii.getNumChannels();
+    } else {
+      cii = (ConvolutionInstanceIterator) it;
+      enforceConvolutionIteratorZooModel(cii);
+      newWidth = cii.getWidth();
+      newHeight = cii.getHeight();
+      channels = cii.getNumChannels();
+
+    }
+
+
     boolean initSuccessful = false;
+    int maxWidth = 10000;
     while (!initSuccessful) {
+      if (newWidth > maxWidth) {
+        // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks otherwise
+        throw new Exception("Error when creating model, your configuration may be incorrect - check logs for more info");
+      }
       // Increase width and height
       int[] newShape = new int[]{channels, newHeight, newWidth};
-      setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth,
-          newHeight));
+      if (isImageIterator) {
+        setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+      } else {
+        setInstanceIterator(cii);
+      }
+
       initSuccessful =
           initZooModel(trainData.numClasses(), getSeed(), newShape);
 
@@ -1261,10 +1367,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+  /**
+   * Attempts to initialize the zoo model
+   * @param numClasses
+   * @param seed
+   * @param newShape
+   * @return
+   * @throws Exception
+   */
   protected boolean initZooModel(int numClasses, long seed, int[] newShape)
       throws Exception {
     try {
-      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape);
+      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape, isFilterMode());
       // Make a dummy feed forward pass to check if the model dimensions fit at
       // each layer
       Instances dummyData = new Instances(trainData);
@@ -1273,17 +1387,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
       tmpModel.init();
       DataSetIterator iter = getDataSetIterator(dummyData);
-      tmpModel.feedForward(iter.next().getFeatures(), false);
+      tmpModel.feedForward(Utils.getNext(iter).getFeatures(), false);
 
       // No Exception thrown -> set model to this zoo model and return true
-      model = zooModel.init(numClasses, seed, newShape);
+      model = zooModel.init(numClasses, seed, newShape, isFilterMode());
       return true;
     } catch (UnsupportedOperationException e) {
       throw new UnsupportedOperationException(
           "ZooModel was not set (CustomNet), but createZooModel could be called. Invalid situation",
           e);
     } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
+      e.printStackTrace();
       return false;
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      throw new WekaException("Couldn't find the image file, have you set up the instance iterator correctly?");
     }
   }
 
@@ -1450,7 +1568,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     if (!it.hasNext()) {
       throw new RuntimeException("Iterator was unexpectedly empty.");
     }
-    final INDArray features = it.next().getFeatures();
+    final INDArray features = Utils.getNext(it).getFeatures();
     it.reset();
     return features;
   }
@@ -1550,12 +1668,62 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+
+  private static void checkIfRunByGUI() {
+    // Don't need to check if we've already set this
+    if (System.getProperty("weka.started.via.GUIChooser") != null) {
+      return;
+    }
+
+    StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    System.setProperty("weka.started.via.GUIChooser", "false");
+    for (StackTraceElement s : stack) {
+      if (s.getClassName().equals("weka.gui.GenericObjectEditor")) {
+        System.setProperty("weka.started.via.GUIChooser", "true");
+        log.debug("Weka started by GUIChooser");
+        break;
+      }
+    }
+  }
+
+  /**
+   * Creates a JFrame with the loading message. To be used while loading the zoo model layer spec
+   * @return reference to JFrame, so it can be destroyed later
+   */
+  private JFrame showModelLoadingFrame() {
+    checkIfRunByGUI();
+
+    javax.swing.JFrame frame = null;
+    String msg = "Downloading model weights and initializing model, please wait...";
+    log.info(msg);
+    if (!GraphicsEnvironment.isHeadless() && System.getProperty("weka.started.via.GUIChooser").equals("true")) {
+      frame = new javax.swing.JFrame("WekaDeeplearning4j Notification: " + msg);
+      frame.setPreferredSize(new java.awt.Dimension(850, 0));
+      frame.pack();
+      frame.setLocationRelativeTo(null);
+      frame.setVisible(true);
+      frame.setAutoRequestFocus(true);
+      frame.setAlwaysOnTop(true);
+    }
+    return frame;
+  }
+
+  /**
+   * Destroy the loading JFrame
+   * @param frame JFrame to be destroyed
+   */
+  private void closeModelLoadingFrame(JFrame frame) {
+    if (frame != null) {
+      frame.dispose();
+    }
+  }
+
   /**
    * Get the modelzoo model
    *
    * @return The modelzoo model object
    */
-  public ZooModel getZooModel() {
+  public AbstractZooModel getZooModel() {
     return zooModel;
   }
 
@@ -1568,31 +1736,36 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       description = "The model-architecture to choose from the modelzoo "
           + "(default = no model).", commandLineParamName = "zooModel",
       commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
-  public void setZooModel(ZooModel zooModel) {
+  public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
-    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-    try {
-      // Try to parse the layers so the user can change them afterwards
-      final int dummyNumLabels = 2;
+    if (getLoadLayerSpecification()) {
+      JFrame frame = showModelLoadingFrame();
 
-      Thread.currentThread().setContextClassLoader(
-          this.getClass().getClassLoader());
-      ComputationGraph tmpCg =
-          zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0]);
-      tmpCg.init();
-      layers =
-          Arrays.stream(tmpCg.getLayers())
-              .map(l -> Layer.create(l.conf().getLayer()))
-              .collect(Collectors.toList())
-              .toArray(new Layer[tmpCg.getLayers().length]);
+      ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+      try {
+        // Try to parse the layers so the user can change them afterwards
+        final int dummyNumLabels = 2;
 
-    } catch (Exception e) {
-      if (!(zooModel instanceof CustomNet)) {
-        log.error("Could not set layers from zoomodel.", e);
+        Thread.currentThread().setContextClassLoader(
+                this.getClass().getClassLoader());
+        ComputationGraph tmpCg =
+                zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+        tmpCg.init();
+        layers =
+                Arrays.stream(tmpCg.getLayers())
+                        .map(l -> Layer.create(l.conf().getLayer()))
+                        .collect(Collectors.toList())
+                        .toArray(new Layer[tmpCg.getLayers().length]);
+
+      } catch (Exception e) {
+        if (!(zooModel instanceof CustomNet)) {
+          log.error("Could not set layers from zoomodel.", e);
+        }
+      } finally {
+        Thread.currentThread().setContextClassLoader(origLoader);
+        closeModelLoadingFrame(frame);
       }
-    } finally {
-      Thread.currentThread().setContextClassLoader(origLoader);
     }
   }
 
@@ -1619,6 +1792,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     cacheMode = cm;
   }
 
+  public boolean isFilterMode() { return filterMode; }
+
+  @ProgrammaticProperty
+  public void setFilterMode(boolean filterMode) { this.filterMode = filterMode; }
+
   /**
    * Performs efficient batch prediction
    *
@@ -1644,6 +1822,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     Instances data = new Instances(inst.dataset());
     data.add(inst);
     return distributionsForInstances(data)[0];
+  }
+
+  public boolean arithmeticUnderflow(INDArray array) {
+    return array.isNaN().any();
   }
 
   /**
@@ -1674,7 +1856,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     // Get predictions batch-wise
     while (next) {
-      INDArray predBatch = model.outputSingle(it.next().getFeatures());
+      INDArray predBatch = model.outputSingle(Utils.getNext(it).getFeatures());
+
+      if (arithmeticUnderflow(predBatch))
+        throw new DL4JException("NaNs in model output, likely caused by arithmetic underflow");
+
       int currentBatchSize = (int) predBatch.shape()[0];
 
       // Build weka distribution output
@@ -1778,36 +1964,115 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Returns the activations at a certain
+   * Overridden method - if no pooling type is given then set it to NONE
    *
-   * @param layerName Layer name to get the activations from
-   * @return Activations in form of instances
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @return Instances transformed to the image features
+   * @throws Exception
    */
-  public Instances getActivationsAtLayer(String layerName, Instances input)
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input) throws Exception {
+    return getActivationsAtLayers(layerNames, input, PoolingType.NONE);
+  }
+
+  /**
+   * Uses the DL4J TransferLearningHelper to featurize the instances using activations from the given layer
+   * @param layerName layer activations to use for instances
+   * @param iter iterator for the instances
+   * @param poolingType pooling type to be used (only necessary if using intermediary layers with 3D activations)
+   * @return INDArray containing the newly transformed instances
+   * @throws Exception
+   */
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
+    // TransferLearningHelper alters cmp graph in place so we need to clone it
+    TransferLearningHelper transferLearningHelper;
+    try {
+      ComputationGraph clonedGraph = model.clone();
+      transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
+    } catch (Exception e) {
+      throw new WekaException(String.format("Could not find features for layer %s, " +
+              "please ensure the name is correctly entered or append the -default-feature-layer flag to use " +
+              "the default extraction layer", layerName));
+    }
+    boolean checkedReshaping = false;
+    String initShape = "", reshapedShape = "";
+    iter.reset();
+
+    INDArray activationAtLayer, result = null;
+
+    while (iter.hasNext()) {
+      // Use the DL4J way of featurizing data
+      DataSet currentFeaturized = transferLearningHelper.featurize(Utils.getNext(iter));
+      activationAtLayer = currentFeaturized.getFeatures();
+
+      if (Utils.needsReshaping(activationAtLayer)) {
+        // permute from [1, 64, 64, 512] to [1, 512, 64, 64] (only necessary if model is in channels-last mode
+        if (Utils.isChannelsLast(activationAtLayer)) { // TODO refactor to check channels last only on first loop
+          activationAtLayer = activationAtLayer.permute(0, 3, 1, 2);
+
+          // Output info message once
+          if (!checkedReshaping) {
+            log.info("Received channels-last activations - permuting to standard channels first (NHWC -> NCHW)");
+          }
+        }
+
+        // Output an info message only once if we're reshaping
+        if (!checkedReshaping)
+          initShape = Arrays.toString(activationAtLayer.shape());
+
+        activationAtLayer = Utils.reshapeActivations(activationAtLayer, poolingType);
+
+        if (!checkedReshaping) {
+          reshapedShape = Arrays.toString(activationAtLayer.shape());
+          log.info(String.format("Reshaped batch from %s to %s using %s", initShape, reshapedShape, poolingType));
+          checkedReshaping = true;
+        }
+      }
+
+      if (result == null) {
+        result = activationAtLayer;
+      } else {
+        result = Nd4j.concat(0, result, activationAtLayer);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @param poolingType pooling type to use
+   * @return Instances transformed to the image features
+   */
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input, PoolingType poolingType)
       throws Exception {
     DataSetIterator iter = getDataSetIterator(input);
-    iter.reset();
-    DataSet next;
-    INDArray acts = null;
-    while (iter.hasNext()) {
-      next = iter.next();
-      INDArray features = next.getFeatures();
-      int layerIdx = model.getLayer(layerName).getIndex() - 1;
-      Map<String, INDArray> activations =
-          model.feedForward(features, layerIdx, false);
-      INDArray activationAtLayer = activations.get(layerName);
+    INDArray result = null;
+    Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
 
-      if (acts == null) {
-        acts = activationAtLayer;
+    log.info("Getting features from layers: " + Arrays.toString(layerNames));
+
+    for (String layerName : layerNames) {
+      if (attributesPerLayer.containsKey(layerName)) {
+        log.warn("Concatenating two identical layers not supported");
+        continue;
+      }
+
+      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+
+      attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
+      if (result == null) {
+        result = activationsAtLayer;
       } else {
-        acts = Nd4j.concat(0, acts, activationAtLayer);
+        // Concatenate the activations of this layer with the other feature extraction layers
+        result = Nd4j.concat(1, result, activationsAtLayer);
       }
     }
 
-    if (acts == null) {
-      return new Instances(input, 0);
-    } else {
-      return Utils.ndArrayToInstances(acts);
-    }
+    result = Utils.appendClasses(result, input);
+
+    return Utils.convertToInstances(result, input, attributesPerLayer);
   }
 }

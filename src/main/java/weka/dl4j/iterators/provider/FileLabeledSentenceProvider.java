@@ -26,7 +26,7 @@ import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.deeplearning4j.iterator.LabeledSentenceProvider;
-import org.nd4j.linalg.primitives.Pair;
+import org.nd4j.common.primitives.Pair;
 
 /**
  * Implement LabeledSentenceProvider for loading labeled files.

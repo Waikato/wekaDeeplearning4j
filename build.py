@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-CUDA_VERSIONS = ['9.2', '10.0', '10.1']
+CUDA_VERSIONS = ['10.0', '10.1', '10.2']
 BUILD_PROGRESS = 0.0
 
 
@@ -43,8 +43,8 @@ def update_progress():
 def get_max_progress_steps() -> int:
     """Get how many progress steps there are"""
     if opts.build_all:
-        # 1 main, 3 cuda, each three times in the build phase
-        return 4
+        # 1 main, 4 cuda, each three times in the build phase
+        return 1 + len(CUDA_VERSIONS)
     elif opts.cuda_version:  # 1 main, 1 cuda
         return 2
     else:  # 1 main, 1 installation

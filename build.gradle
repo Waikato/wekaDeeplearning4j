@@ -9,7 +9,7 @@ group 'nz.ac.waikato.cms.weka'
 version new File('version').text.replace("\n", "")
 description 'Deep learning for WEKA'
 def cuda_version = System.properties['cuda']
-def valid_cuda_versions = ['9.2', '10.0', '10.1']
+def valid_cuda_versions = ['10.0', '10.1', '10.2']
 def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
 // Set JDK compatibility
@@ -22,9 +22,9 @@ allprojects {
  * Dependency versions.
  */
 ext.versions = [
-        'nd4j'         : '1.0.0-beta5',
-        'dl4j'         : '1.0.0-beta5',
-        'weka'         : '3.8.1',
+        'nd4j'         : '1.0.0-beta7',
+        'dl4j'         : '1.0.0-beta7',
+        'weka'         : '3.8.4',
         'junit'        : '4.12',
         'log4j'        : '2.11.2',
         'ark_tweet_nlp': '0.3.2',
@@ -121,6 +121,7 @@ task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
         include 'GenericPropertiesCreator.props'
         include 'GUIEditors.props'
         include 'datasets/**'
+        include 'model-zoo/**'
         include 'doc/**'
         include 'src/main/**'
         exclude 'src/main/*.iml'
@@ -270,7 +271,6 @@ dependencies {
     implementation "org.deeplearning4j:deeplearning4j-nlp:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-zoo:$versions.dl4j"
     implementation "org.deeplearning4j:deeplearning4j-parallel-wrapper:$versions.dl4j"
-    implementation "org.nd4j:nd4j-jackson:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-platform:$versions.nd4j"
     implementation "org.nd4j:nd4j-native-api:$versions.nd4j"
     implementation "org.bytedeco.javacpp-presets:openblas-platform:$versions.openblas"

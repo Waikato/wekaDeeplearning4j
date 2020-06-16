@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -105,7 +106,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     Set<Integer> labels = new HashSet<>();
     for (Instance inst : data) {
       int label = Integer.parseInt(inst.stringValue(data.classIndex()));
-      final DataSet next = it.next();
+      final DataSet next = Utils.getNext(it);
       int itLabel = next.getLabels().argMax().getInt(0);
       Assert.assertEquals(label, itLabel);
       labels.add(label);
@@ -159,7 +160,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     for (int i = 0; i < data.size(); i++) {
       Instance inst = data.get(i);
       double label = inst.value(data.classIndex());
-      final DataSet next = it.next();
+      final DataSet next = Utils.getNext(it);
       double itLabel = next.getLabels().getDouble(0);
       Assert.assertEquals(label, itLabel, 1e-5);
       labels.add(label);
@@ -201,7 +202,7 @@ public class CnnTextEmbeddingInstanceIteratorTest {
     int count = 0;
     while (it.hasNext()) {
       count++;
-      it.next();
+      Utils.getNext(it);
     }
     return count;
   }

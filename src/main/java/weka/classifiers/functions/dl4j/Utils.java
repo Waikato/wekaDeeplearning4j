@@ -23,14 +23,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.WekaException;
+import weka.dl4j.PoolingType;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -138,11 +141,11 @@ public class Utils {
       DataSet next;
       if (iter instanceof AsyncDataSetIterator
           || iter instanceof CachingDataSetIterator) {
-        next = iter.next();
+        next = getNext(iter);
       } else {
         // TODO: figure out which batch size is feasible for inference
         final int batch = iter.batch() * 8;
-        next = iter.next(batch);
+        next = Utils.getNext(iter, batch);
       }
       scoreSum += model.score(next);
       numBatches++;
@@ -158,36 +161,91 @@ public class Utils {
   }
 
   /**
+   * Copies the attribute name and values of a given nominal attribute
+   * @param oldAttribute attribute to copy
+   * @return duplicated nominal attribute
+   */
+  public static Attribute copyNominalAttribute(Attribute oldAttribute) {
+    String[] classValues = new String[oldAttribute.numValues()];
+    for (int classValI = 0; classValI < oldAttribute.numValues(); classValI++) {
+      classValues[classValI] = oldAttribute.value(classValI);
+    }
+    return new Attribute(oldAttribute.name(), Arrays.asList(classValues));
+  }
+
+  /**
+   * Helper function for getting the new layer name when using the Dl4jMlpFilter
+   *
+   * The attributes are named after the layer they originated from, so this function
+   * counts throught the attributes per layer, comparing it with the given index
+   * to determine a) which layer the activation came from and b) which number activation
+   * this is
+   * @param attributesPerLayer
+   * @param i
+   * @return
+   */
+  public static String getAttributeName(Map<String, Long> attributesPerLayer, int i) {
+    if (attributesPerLayer == null) {
+      return "transformedAttribute" + i;
+    }
+
+    int layerSum = 0;
+    for (Map.Entry<String, Long> entry : attributesPerLayer.entrySet()) {
+      long numAttributesForLayer = entry.getValue();
+      if (layerSum + numAttributesForLayer > i) {
+        return String.format("%s-%d", entry.getKey(), i - layerSum);
+      }
+      layerSum += numAttributesForLayer;
+    }
+
+
+    return null;
+  }
+
+  /**
    * Convert an arbitrary NDArray to Weka instances
    *
    * @param ndArray Input array
+   * @param inputFormat Format to use for the instances
+   * @param attributesPerLayer Hashmap of layer names and how many attributes there are per layer
    * @return Instances object
    * @throws WekaException Invalid input
    */
-  public static Instances ndArrayToInstances(INDArray ndArray) throws WekaException {
-    int batchsize = (int) ndArray.size(0);
+  public static Instances ndArrayToInstances(INDArray ndArray, Instances inputFormat, Map<String, Long> attributesPerLayer) throws WekaException {
+    int numInstances = (int) ndArray.size(0);
     long[] shape = ndArray.shape();
     int dims = shape.length;
-    if (dims < 2) {
-      throw new WekaException("Invalid input, NDArray shape needs to be at least two dimensional "
+    if (dims != 2) {
+      throw new WekaException("Invalid input, NDArray shape needs to be two dimensional "
           + "but was " + Arrays.toString(shape));
     }
 
-    long prod = Arrays.stream(shape).reduce(1, (left, right) -> left * right);
-    prod = prod / batchsize;
-
-    ArrayList<Attribute> atts = new ArrayList<>();
-    for (int i = 0; i < prod; i++) {
-      atts.add(new Attribute("transformedAttribute" + i));
+    long numAttributes = shape[1];
+    int classI = -1;
+    if (inputFormat != null) {
+      classI = (int) (numAttributes - 1);
     }
-    Instances instances = new Instances("Transformed", atts, batchsize);
-    for (int i = 0; i < batchsize; i++) {
-      INDArray row = ndArray.get(NDArrayIndex.point(i));
-      INDArray flattenedRow = Nd4j.toFlattened(row);
-      Instance inst = new DenseInstance(atts.size());
-      for (int j = 0; j < flattenedRow.size(0); j++) {
-        inst.setValue(j, flattenedRow.getDouble(j));
+
+    // Create the new attribute names
+    ArrayList<Attribute> atts = new ArrayList<>();
+    for (int i = 0; i < numAttributes; i++) {
+      if (i == classI && inputFormat != null) {
+        if (inputFormat.classAttribute().isNominal())
+          atts.add(copyNominalAttribute(inputFormat.classAttribute()));
+        else
+          atts.add(new Attribute(inputFormat.classAttribute().name()));
+      } else {
+        atts.add(new Attribute(getAttributeName(attributesPerLayer, i)));
       }
+    }
+
+    // Actually create the instances from the values in the given NDArray
+    Instances instances = new Instances("Transformed", atts, numInstances);
+    instances.setClassIndex(classI);
+    for (int i = 0; i < numInstances; i++) {
+      INDArray row = ndArray.get(NDArrayIndex.point(i));
+      double[] instanceVals = row.toDoubleVector();
+      Instance inst = new DenseInstance(1.0, instanceVals);
       inst.setDataset(instances);
       instances.add(inst);
     }
@@ -281,5 +339,137 @@ public class Utils {
       // Switch back to the old loader
       Thread.currentThread().setContextClassLoader(origLoader);
     }
+  }
+
+  /**
+   * Determines if the activations need reshaping
+   * @param activationAtLayer Activations in question
+   * @return true if the activations need reshaping (too high dimensionality)
+   */
+  public static boolean needsReshaping(INDArray activationAtLayer) {
+    return activationAtLayer.shape().length != 2;
+  }
+
+  /**
+   * Applies the pooling function to the given feature map
+   * @param array feature map to pool
+   * @param poolingType pooling function to apply
+   * @return pooled value
+   */
+  public static float poolNDArray(INDArray array, PoolingType poolingType) {
+    if (poolingType == PoolingType.MAX) {
+      return array.maxNumber().floatValue();
+    } else if (poolingType == PoolingType.AVG) {
+      return array.meanNumber().floatValue();
+    } else if (poolingType == PoolingType.SUM) {
+      return  array.sumNumber().floatValue();
+    } else if (poolingType == PoolingType.MIN) {
+      return array.minNumber().floatValue();
+    } else {
+      throw new IllegalArgumentException(String.format("Pooling type %s not supported, only " +
+              "MAX, AVG, SUM, MIN supported", poolingType));
+    }
+  }
+
+  /**
+   * Shape will either be something like [1, 56, 56, 128] or [1, 128, 56, 56]
+   * If it's the former then return true
+   * @param activations
+   * @return true if the activations are in channels-last format
+   */
+  public static boolean isChannelsLast(INDArray activations) {
+    long[] shape = activations.shape();
+    long width = shape[2];
+    return shape[3] != width;
+  }
+
+  /**
+   * Reshape the activations, either by pooling or simply multiplying the extra dimensions together
+   * @param activationAtLayer 4d activations e.g., [batch_size, 512, 64, 64]
+   * @param poolingType Pooling type to use to lower the dimensionality
+   * @return 2D activations
+   */
+  public static INDArray reshapeActivations(INDArray activationAtLayer, PoolingType poolingType) {
+    long[] resultShape = activationAtLayer.shape();
+
+    int batchSize = (int) resultShape[0];
+    int numFeatureMaps = (int) resultShape[1];
+    int featureMapWidth = (int) resultShape[2];
+    int featureMapHeight = (int) resultShape[3];
+
+    // Simply multiply all the extra dimensions together if we're using no pooling
+    if (poolingType == PoolingType.NONE) {
+      int extraDimensions = numFeatureMaps * featureMapWidth * featureMapHeight;
+      return activationAtLayer.reshape(new int[] {batchSize, extraDimensions});
+    } else {
+      // Otherwise, create a pooled batch
+      float[][] pooledBatch = new float[batchSize][numFeatureMaps];
+
+      for (int batchItem = 0; batchItem < batchSize; batchItem++) {
+        INDArray batchItemActivations = activationAtLayer.get(NDArrayIndex.point(batchItem)); // 3D array e.g. shape = [512, 64, 64]
+        for (int featureMapIndex = 0; featureMapIndex < numFeatureMaps; featureMapIndex++) {
+          INDArray featureMap = batchItemActivations.get(NDArrayIndex.point(featureMapIndex));  // 2D array e.g. shape = [64, 64]
+          pooledBatch[batchItem][featureMapIndex] = poolNDArray(featureMap, poolingType);
+        }
+      }
+
+      return new NDArray(pooledBatch);
+    }
+  }
+
+  /**
+   * Appends the input Instances classes to the INDArray
+   * @param result activations
+   * @param input original Instances
+   * @return activations with class value appended
+   */
+  public static INDArray appendClasses(INDArray result, Instances input) {
+    INDArray classes = Nd4j.zeros(result.shape()[0], 1);
+    for (int i = 0; i < classes.length(); i++) {
+      Instance inst = input.instance(i);
+      classes.putScalar(i, inst.classValue());
+    }
+    return Nd4j.concat(1, result, classes);
+  }
+
+  /**
+   * Converts the newly transformed instances to an Instances object
+   * @param result activations generated from feature layers
+   * @param input original input Instances
+   * @param attributesPerLayer Hashmap stating the feature layers and how many attributes each has
+   * @return
+   * @throws Exception
+   */
+  public static Instances convertToInstances(INDArray result, Instances input, Map<String, Long> attributesPerLayer) throws Exception {
+    if (result == null) {
+      return new Instances(input, 0);
+    } else {
+      return Utils.ndArrayToInstances(result, input, attributesPerLayer);
+    }
+  }
+
+  /**
+   * Fix for issue with JVM crashing
+   * https://github.com/eclipse/deeplearning4j/issues/8976#issuecomment-639946904
+   *
+   * It is recommended to use this helper function in WekaDeeplearning4j rather than using iter.next() directly.
+   * @param iter DatasetIterator to get images from
+   * @return Next DataSet
+   */
+  public static DataSet getNext(DataSetIterator iter) {
+    return iter.next().copy();
+  }
+
+  /**
+   * Fix for issue with JVM crashing
+   * https://github.com/eclipse/deeplearning4j/issues/8976#issuecomment-639946904
+   *
+   * It is recommended to use this helper function in WekaDeeplearning4j rather than using iter.next() directly.
+   * @param iter DatasetIterator to get images from
+   * @param num Batch size to get
+   * @return Next DataSet
+   */
+  public static DataSet getNext(DataSetIterator iter, int num) {
+    return iter.next(num).copy();
   }
 }

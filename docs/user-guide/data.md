@@ -76,11 +76,13 @@ img_28642_0.jpg,0
 ```
 This file informs the internals about the association between the image files and their labels. Additionally it is mandatory to set the iterator to `ImageInstanceIterator`. 
 
+Newly included in WekaDeeplearning4j is a script to create an appropriate `.arff` file from a folder-organised dataset classes and instances are inferred from the folder they reside in.
+Instructions on use can be found in the [Getting Started](./getting-started.md) guide. TODO.
 #### Available parameters:
 
-- `height`: Height of the images
-- `width`: Width of the images
-- `numChannels`: Depth of the image (e.g.: RGB images have a depth of 3, whereas Greyscale images have a depth of 1)
+- `height`: Height of the images (ignored if using pretrained model)
+- `width`: Width of the images (ignored if using pretrained model)
+- `numChannels`: Depth of the image (e.g.: RGB images have a depth of 3, whereas Greyscale images have a depth of 1, ignored if using pretrained model)
 - `imagesLocation`: The absolute path to the location of the images listed in the meta-data ARFF file
 
 ![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
