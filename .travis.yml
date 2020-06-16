@@ -1,12 +1,9 @@
 language: java
 install: true
-#
-#jdk:
-#  - oraclejdk9
 
 matrix:
   include:
-    - jdk: oraclejdk11
+    - jdk: oraclejdk9
       before_install:
         - sudo rm "${JAVA_HOME}/lib/security/cacerts"
         - sudo ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
