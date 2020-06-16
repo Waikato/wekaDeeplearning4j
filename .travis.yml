@@ -1,15 +1,15 @@
 language: java
 install: true
-
-jdk:
-  - oraclejdk9
+#
+#jdk:
+#  - oraclejdk9
 
 matrix:
   include:
-    - jdk: openjdk10
+    - jdk: oraclejdk11
       before_install:
-        - rm "${JAVA_HOME}/lib/security/cacerts"
-        - ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
+        - sudo rm "${JAVA_HOME}/lib/security/cacerts"
+        - sudo ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
