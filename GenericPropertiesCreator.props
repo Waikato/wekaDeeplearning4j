@@ -1,6 +1,9 @@
 weka.dl4j.NeuralNetConfiguration =\
  weka.dl4j
 
+weka.dl4j.layers.DenseLayer =\
+ weka.dl4j.layers
+
 weka.dl4j.layers.Layer =\
  weka.dl4j.layers
 
@@ -25,7 +28,7 @@ weka.dl4j.iterators.instance.ImageInstanceIterator =\
 weka.dl4j.activations.Activation =\
  weka.dl4j.activations
 
-weka.dl4j.zoo.ZooModel =\
+weka.dl4j.zoo.AbstractZooModel =\
  weka.dl4j.zoo
 
 weka.dl4j.listener.TrainingListener =\

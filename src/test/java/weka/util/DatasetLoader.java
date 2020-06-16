@@ -195,7 +195,8 @@ public class DatasetLoader {
       String tmpDir = System.getProperty("java.io.tmpdir");
 
       // Download file
-      String downloadURL = "https://cfhcable.dl.sourceforge.net/project/weka/datasets/text-datasets/imdb-sentiment-2011.arff.gz";
+      // Fixed IMDB sentiment download link
+      String downloadURL = "https://downloads.sourceforge.net/project/weka/datasets/text-datasets/imdb-sentiment-2011.arff.gz";
       String gzipPath = Paths.get(tmpDir, "imdb.arff.gz").toString();
       String data = Internet.download(
           downloadURL,

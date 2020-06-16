@@ -11,5 +11,5 @@ if [[ ! -d "$weka_home/packages/wekaDeeplearning4j" ]]; then
   exit 1
 fi
 
-rm $WEKA_HOME/packages/wekaDeeplearning4j/lib/*cuda-*
+rm $weka_home/packages/wekaDeeplearning4j/lib/*cuda-*
 echo -e "Successfully removed the CUDA libraries from the wekaDeeplearning4j package!"

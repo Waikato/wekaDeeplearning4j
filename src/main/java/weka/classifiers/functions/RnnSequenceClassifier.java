@@ -36,6 +36,7 @@ import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.Classifier;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -48,8 +49,8 @@ import weka.core.OptionMetadata;
 import weka.core.WekaException;
 import weka.dl4j.CacheMode;
 import weka.dl4j.layers.Layer;
+import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.ZooModel;
 import weka.gui.ProgrammaticProperty;
 
 /**
@@ -255,7 +256,7 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
 
     // Get predictions batch-wise
     while (next) {
-      final DataSet ds = it.next();
+      final DataSet ds = Utils.getNext(it);
       final INDArray features = ds.getFeatures();
       final INDArray labelsMask = ds.getLabelsMaskArray();
       INDArray lastTimeStepIndices;
@@ -336,14 +337,14 @@ public class RnnSequenceClassifier extends Dl4jMlpClassifier
   @Override
   @Deprecated
   @ProgrammaticProperty
-  public ZooModel getZooModel() {
+  public AbstractZooModel getZooModel() {
     return new CustomNet();
   }
 
   @Override
   @Deprecated
   @ProgrammaticProperty
-  public void setZooModel(ZooModel zooModel) {
+  public void setZooModel(AbstractZooModel zooModel) {
     // Do nothing
   }
 

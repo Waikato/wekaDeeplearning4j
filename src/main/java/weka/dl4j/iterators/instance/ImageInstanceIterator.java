@@ -67,6 +67,11 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   protected int numChannels = 1;
 
   /**
+   * If true, swap the reader to supply image channels last
+   */
+  protected boolean channelsLast = false;
+
+  /**
    * The location of the folder containing the images
    */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
@@ -132,6 +137,22 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     this.numChannels = numChannels;
   }
 
+  @OptionMetadata(
+          displayName = "Image channels last",
+          description = "Set to true to supply image channels last. " +
+                  "The default value will usually be correct, so as an end user you shouldn't need to change this setting. " +
+                  "If you do be aware that it may break the model.",
+          commandLineParamName = "channelsLast",
+          commandLineParamSynopsis = "-channelsLast <boolean>"
+  )
+  public boolean getChannelsLast() {
+    return channelsLast;
+  }
+
+  public void setChannelsLast(boolean channelsLast) {
+    this.channelsLast = channelsLast;
+  }
+
   /**
    * Validates the input dataset
    *
@@ -150,10 +171,19 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     if (!imagesLoc.isDirectory()) {
       throw new InvalidInputDataException("Directory not valid: " + resolved);
     }
-    if (!(data.attribute(0).isString() && data.classIndex() == 1)) {
+    if (!isMetaArff(data)) {
       throw new InvalidInputDataException(
           "An ARFF is required with a string attribute and a class attribute");
     }
+  }
+
+  /**
+   * Are the input instances from a 'meta' arff (just points to the image location)
+   * @param data Instances to verify
+   * @return true if Instances are meta
+   */
+  public static boolean isMetaArff(Instances data) {
+    return (data.attribute(0).isString() && data.classIndex() == 1);
   }
 
 
@@ -197,6 +227,10 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     batchSize = Math.min(data.numInstances(), batchSize);
     validate(data);
     ImageRecordReader reader = getImageRecordReader(data);
+
+    // Required for supporting channels-last models (currently only EfficientNet)
+    if (getChannelsLast())
+      reader.setNchw_channels_first(false);
 
     final int labelIndex = 1; // Use explicit label index position
     final int numPossibleLabels = data.numClasses();

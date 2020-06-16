@@ -70,7 +70,7 @@ import weka.dl4j.listener.EpochListener;
 import weka.dl4j.lossfunctions.LossMCXENT;
 import weka.dl4j.lossfunctions.LossMSE;
 import weka.dl4j.updater.Adam;
-import weka.dl4j.zoo.LeNet;
+import weka.dl4j.zoo.Dl4jLeNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.util.DatasetLoader;
@@ -372,7 +372,7 @@ public class Dl4jMlpTest {
    */
   @Test(expected = WrongIteratorException.class)
   public void testZooModelWithoutImageIterator() throws Exception {
-    clf.setZooModel(new LeNet());
+    clf.setZooModel(new Dl4jLeNet());
     clf.setInstanceIterator(new DefaultInstanceIterator());
     clf.buildClassifier(dataIris);
   }

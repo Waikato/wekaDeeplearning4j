@@ -2,6 +2,10 @@ weka.dl4j.layers.Layer=weka.gui.GenericObjectEditor
 
 weka.dl4j.layers.Layer[]=weka.gui.GenericArrayEditor
 
+weka.dl4j.layers.DenseLayer[]=weka.gui.GenericArrayEditor
+
+weka.dl4j.layers.DenseLayer=weka.gui.GenericObjectEditor
+
 weka.dl4j.listener.TrainingListener=weka.gui.GenericObjectEditor
 
 weka.dl4j.distribution.Distribution=weka.gui.GenericObjectEditor
@@ -20,7 +24,7 @@ weka.dl4j.iterators.instance.sequence.AbstractSequenceInstanceIterator=weka.gui.
 
 weka.dl4j.activations.Activation=weka.gui.GenericObjectEditor
 
-weka.dl4j.zoo.ZooModel=weka.gui.GenericObjectEditor
+weka.dl4j.zoo.AbstractZooModel=weka.gui.GenericObjectEditor
 
 weka.dl4j.earlystopping.EarlyStopping=weka.gui.GenericObjectEditor
 

@@ -19,18 +19,19 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.zoo.PretrainedType;
 
 /**
  * A dummy ZooModel which is empty.
  *
  * @author Steven Lang
  */
-public class CustomNet implements ZooModel {
+public class CustomNet extends AbstractZooModel {
 
-  private static final long serialVersionUID = 7131900848379752732L;
+  private static final long serialVersionUID = -1211860593883280761L;
 
   @Override
-  public ComputationGraph init(int numLabels, long seed, int[] shape)
+  public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode)
       throws UnsupportedOperationException {
     throw new UnsupportedOperationException(
         "This model cannot be initialized as a MultiLayerNetwork.");

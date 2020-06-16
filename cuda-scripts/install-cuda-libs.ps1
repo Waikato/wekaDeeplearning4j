@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 # Get all necessary variables
 $platform = "windows"
-$version = "1.5.14"
+$version = "1.6.0"
 $nvcc_output = $( nvcc --version )
 $cuda_version = (($nvcc_output -split ",")[4] -split " ")[2]
 $zip_name = "wekaDeeplearning4j-cuda-$cuda_version-$version-$platform-x86_64.zip"
@@ -11,7 +11,7 @@ $url = "https://github.com/Waikato/wekaDeeplearning4j/releases/download/v$versio
 $output = $( Join-Path $PSScriptRoot $zip_name )
 
 # Check if cuda_version could be detected
-if ($cuda_version -ne "9.2" -and $cuda_version -ne "10.0" -and $cuda_version -ne "10.1")
+if ($cuda_version -ne "10.0" -and $cuda_version -ne "10.1" -and $cuda_version -ne "10.2")
 {
     Write-Output "Could not detect CUDA version. Is CUDA installed?"
     exit

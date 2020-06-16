@@ -30,6 +30,7 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
@@ -85,7 +86,7 @@ public class ConvolutionInstancesIteratorTest {
     for (int i = 0; i < mnistMiniArff.size(); i++) {
       Instance inst = mnistMiniArff.get(i);
       int instLabel = Integer.parseInt(inst.stringValue(inst.numAttributes() - 1));
-      final DataSet next = it.next();
+      final DataSet next = Utils.getNext(it);
       int dsLabel = next.getLabels().argMax().getInt(0);
       Assert.assertEquals(instLabel, dsLabel);
       labels.add(instLabel);
