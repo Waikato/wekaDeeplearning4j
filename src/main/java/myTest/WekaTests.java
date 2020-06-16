@@ -95,7 +95,7 @@ public class WekaTests {
         myFilter.setInstanceIterator(imgIter);
 
 // Load our pretrained model
-        Dl4JResNet50 zooModel = new Dl4JResNet50();
+        Dl4jResNet50 zooModel = new Dl4jResNet50();
         myFilter.setZooModelType(zooModel);
 
 // Run the filter, using the model as a feature extractor
