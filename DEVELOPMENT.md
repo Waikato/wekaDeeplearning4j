@@ -86,7 +86,7 @@ is not supported in WekaDeeplearning4j.
 
 The models typically have a dense layer as the final layer, with 1024/2048/some large number of inputs, and # 
 of classes outputs (e.g. 1000 for Imagenet). This is then stripped off (with the connections still intact) 
-and an OutputLayer attached with the sane number of inputs, and the number of output classes we want (e.g. only 10).
+and an OutputLayer attached with the same number of inputs, and the number of output classes we want (e.g. only 10).
 This works fine for most models, however, some don't reduce to a 2d Dense layer before the output layer, 
 so we have to attach an intermediary pooling layer (`requiresPooling` flag) before attaching the output layer.
 
@@ -122,9 +122,13 @@ In a recent release of DL4J, importing Keras models via `.h5` files broke for so
 
 [Github Issue](https://github.com/eclipse/deeplearning4j/issues/8976)
 
-To remedy this, Keras model loading is now done via the raw DL4J format.
+To remedy this, the native DL4J format (`.zip`) is used to load Keras models.
 
-All of these steps should be run from within the `weka/dl4j/scripts/keras_downloading` folder
+All of these steps should be run from within the `weka/dl4j/scripts/keras_downloading` folder.
+Check out the [Conversion README](src/main/java/weka/dl4j/scripts/keras_downloading/README.md) for more info.
+
+Note that you only need to do these steps if attempting to release new versions of the models (or new models) - 
+this is unlikely to be needed for the currently implemented models as the pretrained weights don't change.
 
 - Set up python environment. Recommended to use Anaconda.
 - Run the keras downloader: `python keras_download.py`. This downloads and saves Keras models as specified in `models.py`.
@@ -136,10 +140,6 @@ java KerasModelConverter src/main/weka/dl4j/scripts/output_h5 src/main/weka/dl4j
 ```
 - In the `dl4j_format` folder, you should now have `.zip` files for all models that were successfully converted.
 Check the logs for information on models that couldn't be converted.
-
-Check out the [Conversion README](src/main/java/weka/dl4j/scripts/keras_downloading/README.md) for more info.
-Note that you only need to do these steps if attempting to release new versions of the models - this is unlikely to be needed
-for the currently implemented models, as the pretrained weights don't change.
 
 ### Reverse Channels
 
