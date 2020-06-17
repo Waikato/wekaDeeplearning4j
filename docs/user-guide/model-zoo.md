@@ -34,7 +34,7 @@ Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`, and simi
 In addition, some models support different variations. Again, it is straightforward to do this via the GUI. 
 To do via command line you must add the `-variation` argument e.g.:
 
-```shell script
+```shell
 ...
 -ZooModel ".KerasResNet -variation RESNET152V2" 
 ...
