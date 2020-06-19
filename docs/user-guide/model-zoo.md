@@ -97,8 +97,3 @@ investigate famous model architectures.
 * Xception
     * [KerasXception](../model-zoo/keras/KerasXception.md)
 
-### Future Work
-
-In the next release of Deeplearning4j, the `swish` activation function will be supported, which will enable the **EfficientNet** family 
-of models to be used in Deeplearning4j (and therefore WekaDeeplearning4j).
-
