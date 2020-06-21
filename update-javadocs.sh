@@ -2,14 +2,16 @@
 set -x
 
 ./gradlew clean javaDoc
-git push origin --delete gh-pages
-git branch -D gh-pages
-git checkout --orphan gh-pages
-git rm -rf .
-git add build/docs/javadoc
-git mv build/docs/javadoc/* ./
+mkdir ../temp_jdoc
+cp -r build/docs/javadoc/* ../temp_jdoc
+git checkout gh-pages
+rm -rf *
+cp -r ../temp_jdoc/* .
+git add .
 git commit -m 'Update javadoc'
-git push --set-upstream origin gh-pages
+git push
 git checkout master
+
+rm -rf ../temp_jdoc
 
 echo "JavaDocs update was successful!"
