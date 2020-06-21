@@ -13,7 +13,7 @@ cp -r build/docs/javadoc/* $TMP_FOLDER
 git checkout gh-pages
 # Replace old docs with newly built ones
 rm -rf *
-cp -r TMP_FOLDER .
+cp -r $TMP_FOLDER/* .
 # Commit to the gh-pages branch
 git add .
 git commit -m 'Update javadoc'
