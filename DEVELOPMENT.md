@@ -72,6 +72,11 @@ documentation in the Java files) and pushed to the `gh-pages` branch via:
 $ ./update-javadocs.sh
 ```
 
+## Update Usage Docs
+
+The University of Waikato has a build script set up which runs nightly.
+It clones the repo, builds the docs, and deploys them at https://deeplearning.cms.waikato.ac.nz/.
+
 ## Correctly Setting Classpath
 If you run into a `The filename or extension is too long` error, make sure to set the `Shorten Command line`
 parameter in your run configuration to `@argfiles`.
