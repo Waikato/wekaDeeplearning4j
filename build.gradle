@@ -172,12 +172,12 @@ task makeMain(dependsOn: makeMainZip) {
 
 /**
  * Get the excluding platforms, given a specified platform.
- * E.g. given 'linux', the result would be ['macosx', 'windows']
+ * E.g. given 'linux', the result would be ['windows']
  * @param platform Specified platform.
  * @return Platforms that are not the specified platform
  */
 static def getExcludePlatform(platform) {
-    def platforms = ['linux', 'windows', 'macosx']
+    def platforms = ['linux', 'windows']
     platforms.remove(platform)
     return new Tuple(platforms[0], platforms[1])
 }
@@ -240,7 +240,7 @@ def createCudaZipTask(cuda_version, platform) {
  */
 if (is_cuda_version_valid) {
     def make_cuda_deps = [copyDependencies]
-    def platforms = ["linux", "macosx", "windows"]
+    def platforms = ["linux", "windows"]
     (platforms).each { pf ->
         make_cuda_deps = make_cuda_deps + "makeCuda-$cuda_version-$pf-zip"
         createCudaDirTask(cuda_version, pf)
