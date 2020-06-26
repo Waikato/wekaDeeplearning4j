@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 @Log4j2
 public class ImageDirectoryLoaderTest {
 
-  private Instances loadPlantSeedlings() {
+  public static Instances loadPlantSeedlings() {
     ImageDirectoryLoader loader = new ImageDirectoryLoader();
     loader.setInputDirectory(new File(DatasetLoader.FILE_PATH_PLANT_SEEDLINGS));
     Instances inst = loader.getDataSet();
