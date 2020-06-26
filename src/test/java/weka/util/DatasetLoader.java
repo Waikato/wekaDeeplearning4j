@@ -62,6 +62,11 @@ public class DatasetLoader {
   public static final int NUM_CLASSES_DIABETES = 1;
 
   /**
+   * Number of classes in the plant-seedlings-small dataset
+   */
+  public static final int NUM_CLASSES_PLANT_SEEDLINGS = 5;
+
+  /**
    * Number of instances in the iris dataset
    */
   public static final int NUM_INSTANCES_IRIS = 150;
@@ -75,6 +80,22 @@ public class DatasetLoader {
    * Number of instances in the diabetes dataset
    */
   public static final int NUM_INSTANCES_DIABETES = 43;
+
+  /**
+   * Number of instances in the small plant-seedlings dataset
+   */
+  public static final int NUM_INSTANCES_PLANT_SEEDLINGS = 25;
+
+  /**
+   * Filepath to the plant-seedlings dataset
+   */
+  public static final String FILE_PATH_PLANT_SEEDLINGS = "src/test/resources/nominal/plant-seedlings-small";
+
+  /**
+   * Number of attributes for a 'meta' arff - path to the image file, and class of the image
+   */
+  public static final int NUM_ATTRIBUTES_IMAGE_META = 2;
+
 
   /**
    * Load the mnist minimal dataset with an ImageInstanceIterator
