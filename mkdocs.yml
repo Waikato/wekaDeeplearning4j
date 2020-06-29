@@ -2,7 +2,7 @@ site_name: WekaDeeplearning4j
 theme: readthedocs
 repo_url: https://github.com/Waikato/wekaDeeplearning4j
 site_description: WekaDeeplearning4j Documentation
-pages:
+nav:
     - Home: index.md
     - Installation: install.md
 
