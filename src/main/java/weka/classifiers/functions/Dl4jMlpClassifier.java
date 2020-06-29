@@ -883,8 +883,13 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       return;
     }
 
-    // Can classifier handle the data?
-    getCapabilities().testWithFail(data);
+    try {
+      // Can classifier handle the data?
+      getCapabilities().testWithFail(data);
+    } catch (Exception e) {
+      // May throw an attribute exception if the instance iterator hasn't been set
+      throw new Exception("Have you set the instance iterator correctly?\n" + e);
+    }
 
     // Check basic network structure
     if (layers.length == 0) {
