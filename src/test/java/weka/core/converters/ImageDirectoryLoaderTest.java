@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * ActivationELUTest.java
+ * ImageDirectoryLoaderTest.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
