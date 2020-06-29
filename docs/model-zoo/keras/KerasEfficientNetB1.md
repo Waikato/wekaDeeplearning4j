@@ -1,4 +1,4 @@
-# KerasEfficientNetB0
+# KerasEfficientNetB1
 
 [Back to Model Zoo](../../user-guide/model-zoo.md)
 
