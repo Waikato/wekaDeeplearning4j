@@ -170,7 +170,7 @@ This example shows concatenating the activations from an intermediary convolutio
 to the default activations (from layer `flatten_1`) and using `PoolingType.AVG`
 to average pool the extra dimensions from `res4a_branch2b`.
 
-Check out the [model summary](../model-zoo/dl4j/DL4JResNet50.md) to look at other layers you could use.
+Check out the [model summary](../user-guide/model-zoo/dl4j/DL4JResNet50.md) to look at other layers you could use.
 
 ### GUI
 The first step is to open the MNIST meta ARFF file in the Weka Explorer `Preprocess` tab via `Open File`. 
