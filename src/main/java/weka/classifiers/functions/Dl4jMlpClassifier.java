@@ -740,9 +740,9 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   @OptionMetadata(
           description = "Set whether you want the GUI to load the layer specification when selecting " +
-                  "a model. This does not affect the model's function, but simply allows you to view the model's " +
+                  "a zoo model. This does not affect the model's function, but simply allows you to view the model's " +
                   "layers. You may need to click 'OK' and open this window again for this setting to come into effect.",
-          displayName = "Load layer specification in GUI",
+          displayName = "Preview zoo model layer specification in GUI",
           commandLineParamName = "load-layer-spec",
           commandLineParamSynopsis = "-load-layer-spec",
           commandLineParamIsFlag = true,
