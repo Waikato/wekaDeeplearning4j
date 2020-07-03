@@ -91,7 +91,7 @@ $ java -Xmx8g weka.Run \
         -c last \
         -decimal 20 \
         -iterator ".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12" \
-        -zooModel ".Dl4JResNet50"
+        -zooModel ".Dl4jResNet50"
         -default-feature-layer
 ```
 It should be noted that because we're using the default extraction layer (for this model) of `flatten_1`, we can simply specify the `-default-feature-layer`
@@ -114,7 +114,7 @@ weka.core.WekaPackageManager.loadPackages(true);
 // Load the dataset
 weka.core.Instances instances = new weka.core.Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
 instances.setClassIndex(1);
-String[] filterOptions = weka.core.Utils.splitOptions("-iterator \".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12\" -poolingType AVG -layer-extract \".DenseLayer -name flatten_1\" -zooModel \".Dl4JResNet50\"");
+String[] filterOptions = weka.core.Utils.splitOptions("-iterator \".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12\" -poolingType AVG -layer-extract \".DenseLayer -name flatten_1\" -zooModel \".Dl4jResNet50\"");
 weka.filters.Filter myFilter = (weka.filters.Filter) weka.core.Utils.forName(weka.filters.Filter.class, "weka.filters.unsupervised.attribute.Dl4jMlpFilter", filterOptions);
 
 // Run the filter, using the model as a feature extractor
@@ -227,7 +227,7 @@ $ java -Xmx8g weka.Run \
         -decimal 20 \
         -iterator ".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 16" \
         -poolingType AVG \
-        -zooModel ".Dl4JResNet50" \ 
+        -zooModel ".Dl4jResNet50" \ 
         -layer-extract ".DenseLayer -name res4a_branch2b" \
         -layer-extract ".DenseLayer -name flatten_1"         
 ```
@@ -244,7 +244,7 @@ weka.core.WekaPackageManager.loadPackages(true);
 // Load the dataset
 weka.core.Instances instances = new weka.core.Instances(new FileReader("datasets/nominal/mnist.meta.minimal.arff"));
 instances.setClassIndex(1);
-String[] filterOptions = weka.core.Utils.splitOptions("-iterator \".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12\" -poolingType AVG -layer-extract \".DenseLayer -name flatten_1\" -layer-extract \".DenseLayer -name res4a_branch2b\" -zooModel \".Dl4JResNet50\"");
+String[] filterOptions = weka.core.Utils.splitOptions("-iterator \".ImageInstanceIterator -imagesLocation datasets/nominal/mnist-minimal -bs 12\" -poolingType AVG -layer-extract \".DenseLayer -name flatten_1\" -layer-extract \".DenseLayer -name res4a_branch2b\" -zooModel \".Dl4jResNet50\"");
 weka.filters.Filter myFilter = (weka.filters.Filter) weka.core.Utils.forName(weka.filters.Filter.class, "weka.filters.unsupervised.attribute.Dl4jMlpFilter", filterOptions);
 
 // Run the filter, using the model as a feature extractor
