@@ -24,11 +24,13 @@ Values in **bold** are the defaults.
 | Keras     | VGG               | Yes                    | **ImageNet**                       | **16**, 19                           |
 | Keras     | Xception          | Yes                    | **ImageNet**                       | -                                    |
 
-The EfficientNet family of models will be added soon.
+Finetuning some of these models can result in `NaN` errors (returns `NaN` for all classes when performing prediction on an instance).
+Currently, the only fix for this is to retune the network: [DL4J Help](https://deeplearning4j.konduit.ai/tuning-and-training/troubleshooting-training#nan-not-a-number-errors)
 
+## Usage 
 To set a predefined model, e.g. ResNet50, from the model zoo in the GUI is straightforward via the corresponding pop-up menu. 
 To set a predefined model from the command-line or via the API, it is necessary to add the 
-`-zooModel ".Dl4JResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
+`-zooModel ".Dl4jResNet50"` option via commandline, or call the `setZooModel(new ResNet50())` on the `Dl4jMlpClassifier` object.
 
 Model names from Keras are prepended with `Keras`, i.e., `KerasResNet`, and similarly for Deeplearning4j models (e.g., `DL4JDarknet19`).
 In addition, some models support different variations. Again, it is straightforward to do this via the GUI. 
@@ -50,7 +52,7 @@ kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
 View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/classifying-your-own.md)
 for usage examples with the model zoo.
 
-### Model Summaries
+## Model Summaries
 
 The following summaries are generated from the pretrained zoo models included in WekaDeeplearning4j. 
 These may be useful as a reference for trying different feature extraction layers, or simply to
