@@ -1830,7 +1830,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   public boolean arithmeticUnderflow(INDArray array) {
-    return array.isNaN().any();
+    return array.isNaN().all();
   }
 
   /**
