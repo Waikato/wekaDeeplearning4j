@@ -7,6 +7,8 @@ import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.zoo.KerasEfficientNet;
 import weka.dl4j.zoo.keras.EfficientNet;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
 import java.io.File;
 import java.util.Random;
@@ -14,10 +16,33 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        dl4jResnet50();
+        train();
     }
 
-    private static void dl4jResnet50() throws Exception {
+    private static void filter() throws Exception {
+        String folderPath = "src/test/resources/nominal/plant-seedlings-small";
+        ImageDirectoryLoader loader = new ImageDirectoryLoader();
+        loader.setInputDirectory(new File(folderPath));
+        Instances inst = loader.getDataSet();
+        inst.setClassIndex(1);
+
+        Dl4jMlpFilter filter = new Dl4jMlpFilter();
+
+        ImageInstanceIterator iterator = new ImageInstanceIterator();
+        iterator.setImagesLocation(new File(folderPath));
+
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        filter.setZooModelType(kerasEfficientNet);
+
+        filter.setInstanceIterator(iterator);
+        filter.setInputFormat(inst);
+
+        Instances filteredInstances = Filter.useFilter(inst, filter);
+        System.out.println(filteredInstances);
+    }
+
+    private static void train() throws Exception {
         String folderPath = "src/test/resources/nominal/plant-seedlings-small";
         ImageDirectoryLoader loader = new ImageDirectoryLoader();
         loader.setInputDirectory(new File(folderPath));
@@ -43,14 +68,14 @@ public class WekaDeeplearning4jExamples {
         Instances train = inst.trainCV(5, 0);
         Instances test = inst.testCV(5, 0);
 
-// Build the classifier on the training data
+        // Build the classifier on the training data
         classifier.buildClassifier(train);
 
-// Evaluate the model on test data
+        // Evaluate the model on test data
         Evaluation eval = new Evaluation(test);
         eval.evaluateModel(classifier, test);
 
-// Output some summary statistics
+        // Output some summary statistics
         System.out.println(eval.toSummaryString());
         System.out.println(eval.toMatrixString());
     }
