@@ -18,22 +18,12 @@
 
 package weka.classifiers.functions;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.awt.*;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.log4j.Log4j2;
@@ -41,16 +31,16 @@ import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
 import org.deeplearning4j.exception.DL4JInvalidInputException;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.conf.ComputationGraphConfiguration.GraphBuilder;
 import org.deeplearning4j.nn.conf.graph.MergeVertex;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.ActivationLayer;
 import org.deeplearning4j.nn.conf.layers.BaseOutputLayer;
-import org.deeplearning4j.nn.conf.layers.LossLayer;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.deeplearning4j.parallelism.ParallelWrapper;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -83,14 +73,9 @@ import weka.core.Tag;
 import weka.core.WekaException;
 import weka.core.WekaPackageClassLoaderManager;
 import weka.core.WrongIteratorException;
-import weka.dl4j.CacheMode;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.NeuralNetConfiguration;
+import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
-import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.iterators.instance.DefaultInstanceIterator;
-import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.iterators.instance.ResizeImageInstanceIterator;
+import weka.dl4j.iterators.instance.*;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
@@ -101,8 +86,7 @@ import weka.dl4j.layers.OutputLayer;
 import weka.dl4j.layers.SubsamplingLayer;
 import weka.dl4j.listener.EpochListener;
 import weka.dl4j.listener.TrainingListener;
-import weka.dl4j.zoo.CustomNet;
-import weka.dl4j.zoo.ZooModel;
+import weka.dl4j.zoo.*;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.Normalize;
@@ -110,6 +94,9 @@ import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
+import weka.gui.ProgrammaticProperty;
+
+import javax.swing.*;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -120,1696 +107,1977 @@ import weka.filters.unsupervised.instance.RemovePercentage;
  */
 @Log4j2
 public class Dl4jMlpClassifier extends RandomizableClassifier implements
-        BatchPredictor, CapabilitiesHandler, IterativeClassifier {
+    BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
-    /**
-     * filter: Normalize training data
-     */
-    public static final int FILTER_NORMALIZE = 0;
-    /**
-     * filter: Standardize training data
-     */
-    public static final int FILTER_STANDARDIZE = 1;
-    /**
-     * filter: No normalization/standardization
-     */
-    public static final int FILTER_NONE = 2;
-    /**
-     * The filter to apply to the training data
-     */
-    public static final Tag[] TAGS_FILTER = {
-            new Tag(FILTER_NORMALIZE, "Normalize training data"),
-            new Tag(FILTER_STANDARDIZE, "Standardize training data"),
-            new Tag(FILTER_NONE, "No normalization/standardization"),};
-    /**
-     * The ID used for serializing this class.
-     */
-    private static final long serialVersionUID = -6363254116597574265L;
-    /**
-     * True once multi-gpu is set on CudaEnvironment.Configuration
-     */
-    protected static boolean s_cudaMultiGPUSet;
-    /**
-     * Filter used to replace missing values.
-     */
-    protected ReplaceMissingValues replaceMissingFilter;
-    /**
-     * Filter used to normalize or standardize the data.
-     */
-    protected Filter filter;
-    /**
-     * Filter used to convert nominal attributes to binary numeric attributes.
-     */
-    protected NominalToBinary nominalToBinaryFilter;
-    /**
-     * ZeroR classifier, just in case we don't actually have any data to train a network.
-     */
-    protected ZeroR zeroR;
-    /**
-     * The actual neural network model.
-     */
-    protected transient ComputationGraph model;
-    /**
-     * Used to leverage multiple GPUs (if available)
-     */
-    protected transient ParallelWrapper parallelWrapper;
-    /**
-     * The model zoo model.
-     */
-    protected ZooModel zooModel = new CustomNet();
-    /**
-     * The size of the serialized network model in bytes.
-     */
-    protected long modelSize;
-    /**
-     * The layers of the network.
-     */
-    protected transient Layer[] layers = new Layer[]{new OutputLayer()};
-    /**
-     * The configuration of the network.
-     */
-    protected NeuralNetConfiguration netConfig = new NeuralNetConfiguration();
-    /**
-     * The configuration for early stopping.
-     */
-    protected EarlyStopping earlyStopping = new EarlyStopping();
-    /**
-     * The number of epochs to perform.
-     */
-    protected int numEpochs = 10;
-    /**
-     * The current upper bound for the number of epochs
-     */
-    protected int maxEpochs = 0;
-    /**
-     * The total number of epochs that have been performed.
-     */
-    protected int numEpochsPerformed;
-    /**
-     * The number of epochs performed in this session of iterating
-     */
-    protected int numEpochsPerformedThisSession;
-    /**
-     * The dataset trainIterator.
-     */
-    protected transient DataSetIterator trainIterator;
-    /**
-     * The training instances (set to null when done() is called).
-     */
-    protected Instances trainData;
-    /**
-     * The instance iterator to use.
-     */
-    protected AbstractInstanceIterator instanceIterator =
-            new DefaultInstanceIterator();
-    /**
-     * Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used)
-     */
-    protected int queueSize = 0;
-    /**
-     * Whether to normalize/standardize/neither
-     */
-    protected int filterType = FILTER_STANDARDIZE;
-    /**
-     * Coefficient x0 used for normalizing the class
-     */
-    protected double x0 = 0.0;
-    /**
-     * Coefficient x1 used for normalizing the class
-     */
-    protected double x1 = 1.0;
-    /**
-     * Caching mode to use for loading data
-     */
-    protected CacheMode cacheMode = CacheMode.MEMORY;
-    /**
-     * Training listener list
-     */
-    protected TrainingListener iterationListener = new EpochListener();
-    /**
-     * Flag indicating if initialization is finished.
-     */
-    protected boolean isInitializationFinished = false;
-    /**
-     * List of indices to store the label order.
-     */
-    protected int[] labelSortIndex;
-    /**
-     * Logging configuration.
-     */
-    protected LogConfiguration logConfig = new LogConfiguration();
-    /**
-     * Whether to allow training to continue at a later point after the initial model is built.
-     */
-    protected boolean resume;
-    /**
-     * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching) when starting
-     * or resuming learning
-     */
-    protected boolean doNotClearFilesystemCache;
-    /**
-     * Number of physical GPUs available. If greater than 1, then data-parallel
-     * training + parameter averaging is used to leverage multiple GPUs. Ignored
-     * entirely if there is no GPU backend available.
-     */
-    protected int numGPUs = 1;
-    /**
-     * Size of the prefetch buffer when leveraging multiple GPUs. Ignored if there
-     * is only one GPU, or there is no GPU backend available.
-     */
-    protected int prefetchBufferSize = 24;
-    /**
-     * How often (in iterations, not epochs) to average model parameters when leveraging multiple
-     * GPUs. Ignored if there is only one GPU, or if there is no GPU backend
-     * available.
-     */
-    protected int averagingFrequency = 10;
-    /**
-     * True if the Cuda/GPU backend is available
-     */
-    protected boolean gpuBackendAvailable;
+  /**
+   * filter: Normalize training data
+   */
+  public static final int FILTER_NORMALIZE = 0;
+  /**
+   * filter: Standardize training data
+   */
+  public static final int FILTER_STANDARDIZE = 1;
+  /**
+   * filter: No normalization/standardization
+   */
+  public static final int FILTER_NONE = 2;
+  /**
+   * The filter to apply to the training data
+   */
+  public static final Tag[] TAGS_FILTER = {
+      new Tag(FILTER_NORMALIZE, "Normalize training data"),
+      new Tag(FILTER_STANDARDIZE, "Standardize training data"),
+      new Tag(FILTER_NONE, "No normalization/standardization"),};
+  /**
+   * The ID used for serializing this class.
+   */
+  private static final long serialVersionUID = -6363254116597574265L;
+  /**
+   * True once multi-gpu is set on CudaEnvironment.Configuration
+   */
+  protected static boolean s_cudaMultiGPUSet;
+  /**
+   * Filter used to replace missing values.
+   */
+  protected ReplaceMissingValues replaceMissingFilter;
+  /**
+   * Filter used to normalize or standardize the data.
+   */
+  protected Filter filter;
+  /**
+   * Filter used to convert nominal attributes to binary numeric attributes.
+   */
+  protected NominalToBinary nominalToBinaryFilter;
+  /**
+   * ZeroR classifier, just in case we don't actually have any data to train a network.
+   */
+  protected ZeroR zeroR;
+  /**
+   * The actual neural network model.
+   */
+  protected transient ComputationGraph model;
+  /**
+   * Used to leverage multiple GPUs (if available)
+   */
+  protected transient ParallelWrapper parallelWrapper;
+  /**
+   * The model zoo model.
+   */
+  protected AbstractZooModel zooModel = new CustomNet();
+  /**
+   * True if using the model for feature extraction
+   */
+  protected boolean filterMode = false;
+  /**
+   * The size of the serialized network model in bytes.
+   */
+  protected long modelSize;
+  /**
+   * The layers of the network.
+   */
+  protected transient Layer[] layers = new Layer[]{new OutputLayer()};
+  /**
+   * The configuration of the network.
+   */
+  protected NeuralNetConfiguration netConfig = new NeuralNetConfiguration();
+  /**
+   * The configuration for early stopping.
+   */
+  protected EarlyStopping earlyStopping = new EarlyStopping();
+  /**
+   * The number of epochs to perform.
+   */
+  protected int numEpochs = 10;
+  /**
+   * The current upper bound for the number of epochs
+   */
+  protected int maxEpochs = 0;
+  /**
+   * The total number of epochs that have been performed.
+   */
+  protected int numEpochsPerformed;
+  /**
+   * The number of epochs performed in this session of iterating
+   */
+  protected int numEpochsPerformedThisSession;
+  /**
+   * The dataset trainIterator.
+   */
+  protected transient DataSetIterator trainIterator;
+  /**
+   * The training instances (set to null when done() is called).
+   */
+  protected Instances trainData;
+  /**
+   * The instance iterator to use.
+   */
+  protected AbstractInstanceIterator instanceIterator =
+      new DefaultInstanceIterator();
+  /**
+   * Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used)
+   */
+  protected int queueSize = 0;
+  /**
+   * Whether to normalize/standardize/neither
+   */
+  protected int filterType = FILTER_STANDARDIZE;
+  /**
+   * Coefficient x0 used for normalizing the class
+   */
+  protected double x0 = 0.0;
+  /**
+   * Coefficient x1 used for normalizing the class
+   */
+  protected double x1 = 1.0;
+  /**
+   * Caching mode to use for loading data
+   */
+  protected CacheMode cacheMode = CacheMode.MEMORY;
+  /**
+   * Training listener list
+   */
+  protected TrainingListener iterationListener = new EpochListener();
+  /**
+   * Flag indicating if initialization is finished.
+   */
+  protected boolean isInitializationFinished = false;
+  /**
+   * List of indices to store the label order.
+   */
+  protected int[] labelSortIndex;
+  /**
+   * Logging configuration.
+   */
+  protected LogConfiguration logConfig = new LogConfiguration();
+  /**
+   * Whether to allow training to continue at a later point after the initial model is built.
+   */
+  protected boolean resume;
+  /**
+   * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching) when starting
+   * or resuming learning
+   */
+  protected boolean doNotClearFilesystemCache;
+  /**
+   * Only useful in the GUI - if set to true, the GUI will load the layer specification of the currently
+   * selected zoo model. This is off by default as it slows the GUI down considerably.
+   */
+  protected boolean loadLayerSpecification = false;
+  /**
+   * Number of physical GPUs available. If greater than 1, then data-parallel training + parameter
+   * averaging is used to leverage multiple GPUs. Ignored entirely if there is no GPU backend
+   * available.
+   */
+  protected int numGPUs = 1;
+  /**
+   * Size of the prefetch buffer when leveraging multiple GPUs. Ignored if there is only one GPU, or
+   * there is no GPU backend available.
+   */
+  protected int prefetchBufferSize = 24;
+  /**
+   * How often (in iterations, not epochs) to average model parameters when leveraging multiple
+   * GPUs. Ignored if there is only one GPU, or if there is no GPU backend available.
+   */
+  protected int averagingFrequency = 10;
+  /**
+   * True if the Cuda/GPU backend is available
+   */
+  protected boolean gpuBackendAvailable;
 
-    public Dl4jMlpClassifier() {
-        if (!s_cudaMultiGPUSet) {
-            try {
-                ClassLoader packageLoader = WekaPackageClassLoaderManager.getWekaPackageClassLoaderManager()
-                        .getLoaderForClass(this.getClass().getCanonicalName());
+  public Dl4jMlpClassifier() {
+    if (!s_cudaMultiGPUSet) {
+      try {
+        ClassLoader packageLoader = WekaPackageClassLoaderManager.getWekaPackageClassLoaderManager()
+            .getLoaderForClass(this.getClass().getCanonicalName());
 
-                Class<?> cudaEnvClass = Class
-                        .forName("org.nd4j.jita.conf.CudaEnvironment", true, packageLoader);
-                Method m = cudaEnvClass.getMethod("getInstance");
-                Object result = m.invoke(null);
-                if (result == null) {
-                    log.info("Unable to get CudaEnvironment instance");
-                } else {
-                    m = result.getClass().getMethod("getConfiguration");
-                    result = m.invoke(result);
-                    if (result == null) {
-                        log.info("Unable to get Configuration from CudaEnvironment");
-                    } else {
-                        log.info("Turning on multiple GPU support");
-                        m = result.getClass().getMethod("allowMultiGPU", boolean.class);
-                        m.invoke(result, true);
-
-                        m = result.getClass().getMethod("allowCrossDeviceAccess",
-                                boolean.class);
-                        m.invoke(result, true);
-                    }
-                }
-            } catch (Exception e) {
-                // don't make a fuss if no cuda
-            } finally {
-                // we only want to set it once (or try once).
-                s_cudaMultiGPUSet = true;
-            }
-        }
-    }
-
-    /**
-     * The main method for running this class.
-     *
-     * @param argv the command-line arguments
-     */
-    public static void main(String[] argv) {
-        runClassifier(new Dl4jMlpClassifier(), argv);
-    }
-
-    /**
-     * Split the dataset into p% train an (100-p)% test set
-     *
-     * @param data Input data
-     * @param p    train percentage
-     * @return Array of instances: (0) Train, (1) Test
-     * @throws Exception Filterapplication went wrong
-     */
-    public static Instances[] splitTrainVal(Instances data, double p)
-            throws Exception {
-        // Randomize data
-        Randomize rand = new Randomize();
-        rand.setInputFormat(data);
-        rand.setRandomSeed(42);
-        data = Filter.useFilter(data, rand);
-
-        // Remove testpercentage from data to get the train set
-        RemovePercentage rp = new RemovePercentage();
-        rp.setInputFormat(data);
-        rp.setPercentage(p);
-        Instances train = Filter.useFilter(data, rp);
-
-        // Remove trainpercentage from data to get the test set
-        rp = new RemovePercentage();
-        rp.setInputFormat(data);
-        rp.setPercentage(p);
-        rp.setInvertSelection(true);
-        Instances test = Filter.useFilter(data, rp);
-
-        return new Instances[]{train, test};
-    }
-
-    /**
-     * Get the log configuration.
-     *
-     * @return Log configuration
-     */
-    public LogConfiguration getLogConfig() {
-        return logConfig;
-    }
-
-    /**
-     * Set the log configuration.
-     *
-     * @param logConfig Log configuration
-     */
-    @OptionMetadata(displayName = "log config",
-            description = "The log configuration.", commandLineParamName = "logConfig",
-            commandLineParamSynopsis = "-logConfig <LogConfiguration>",
-            displayOrder = 1)
-    public void setLogConfig(LogConfiguration logConfig) {
-        this.logConfig = logConfig;
-    }
-
-    public String globalInfo() {
-        return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n"
-                + "Iterator usage\n"
-                + "- DefaultInstanceIterator: Simple ARFF files without spatial interpretation\n"
-                + "- ConvolutionalInstanceIterator: ARFF files with spatial interpretation\n"
-                + "- ImageInstanceIterator: ARFF files containing meta-data linking to actual images\n"
-                + "(See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )";
-    }
-
-    /**
-     * Returns default capabilities of the classifier.
-     *
-     * @return the capabilities of this classifier
-     */
-    public Capabilities getCapabilities() {
-        Capabilities result = super.getCapabilities();
-        result.disableAll();
-
-        // attributes
-        if (getInstanceIterator() instanceof ImageInstanceIterator
-                || getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
-            result.enable(Capability.STRING_ATTRIBUTES);
+        Class<?> cudaEnvClass = Class
+            .forName("org.nd4j.jita.conf.CudaEnvironment", true, packageLoader);
+        Method m = cudaEnvClass.getMethod("getInstance");
+        Object result = m.invoke(null);
+        if (result == null) {
+          log.info("Unable to get CudaEnvironment instance");
         } else {
-            result.enable(Capability.NOMINAL_ATTRIBUTES);
-            result.enable(Capability.NUMERIC_ATTRIBUTES);
-            result.enable(Capability.DATE_ATTRIBUTES);
-            result.enable(Capability.MISSING_VALUES);
-            result.enableDependency(Capability.STRING_ATTRIBUTES); // User might
-            // switch to
-            // ImageDSI in GUI
+          m = result.getClass().getMethod("getConfiguration");
+          result = m.invoke(result);
+          if (result == null) {
+            log.info("Unable to get Configuration from CudaEnvironment");
+          } else {
+            log.info("Turning on multiple GPU support");
+            m = result.getClass().getMethod("allowMultiGPU", boolean.class);
+            m.invoke(result, true);
+
+            m = result.getClass().getMethod("allowCrossDeviceAccess",
+                boolean.class);
+            m.invoke(result, true);
+          }
+        }
+      } catch (Exception e) {
+        // don't make a fuss if no cuda
+      } finally {
+        // we only want to set it once (or try once).
+        s_cudaMultiGPUSet = true;
+      }
+    }
+  }
+
+  /**
+   * The main method for running this class.
+   *
+   * @param argv the command-line arguments
+   */
+  public static void main(String[] argv) {
+    runClassifier(new Dl4jMlpClassifier(), argv);
+  }
+
+  /**
+   * Split the dataset into p% train an (100-p)% test set
+   *
+   * @param data Input data
+   * @param p train percentage
+   * @return Array of instances: (0) Train, (1) Test
+   * @throws Exception Filterapplication went wrong
+   */
+  public static Instances[] splitTrainVal(Instances data, double p)
+      throws Exception {
+    // Randomize data
+    Randomize rand = new Randomize();
+    rand.setInputFormat(data);
+    rand.setRandomSeed(42);
+    data = Filter.useFilter(data, rand);
+
+    // Remove testpercentage from data to get the train set
+    RemovePercentage rp = new RemovePercentage();
+    rp.setInputFormat(data);
+    rp.setPercentage(p);
+    Instances train = Filter.useFilter(data, rp);
+
+    // Remove trainpercentage from data to get the test set
+    rp = new RemovePercentage();
+    rp.setInputFormat(data);
+    rp.setPercentage(p);
+    rp.setInvertSelection(true);
+    Instances test = Filter.useFilter(data, rp);
+
+    return new Instances[]{train, test};
+  }
+
+  /**
+   * Get the log configuration.
+   *
+   * @return Log configuration
+   */
+  public LogConfiguration getLogConfig() {
+    return logConfig;
+  }
+
+  /**
+   * Set the log configuration.
+   *
+   * @param logConfig Log configuration
+   */
+  @OptionMetadata(displayName = "log config",
+      description = "The log configuration.", commandLineParamName = "logConfig",
+      commandLineParamSynopsis = "-logConfig <LogConfiguration>",
+      displayOrder = 1)
+  public void setLogConfig(LogConfiguration logConfig) {
+    this.logConfig = logConfig;
+  }
+
+  public String globalInfo() {
+    return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n"
+        + "Iterator usage\n"
+        + "- DefaultInstanceIterator: Simple ARFF files without spatial interpretation\n"
+        + "- ConvolutionalInstanceIterator: ARFF files with spatial interpretation\n"
+        + "- ImageInstanceIterator: ARFF files containing meta-data linking to actual images\n"
+        + "(See also https://deeplearning.cms.waikato.ac.nz/user-guide/data/ )";
+  }
+
+  /**
+   * Returns default capabilities of the classifier.
+   *
+   * @return the capabilities of this classifier
+   */
+  public Capabilities getCapabilities() {
+    Capabilities result = super.getCapabilities();
+    result.disableAll();
+
+    // attributes
+    if (getInstanceIterator() instanceof ImageInstanceIterator
+        || getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
+      result.enable(Capability.STRING_ATTRIBUTES);
+    } else {
+      result.enable(Capability.NOMINAL_ATTRIBUTES);
+      result.enable(Capability.NUMERIC_ATTRIBUTES);
+      result.enable(Capability.DATE_ATTRIBUTES);
+      result.enable(Capability.MISSING_VALUES);
+      result.enableDependency(Capability.STRING_ATTRIBUTES); // User might
+      // switch to
+      // ImageDSI in GUI
+    }
+
+    // class
+    result.enable(Capability.NOMINAL_CLASS);
+    result.enable(Capability.NUMERIC_CLASS);
+    result.enable(Capability.DATE_CLASS);
+    result.enable(Capability.MISSING_CLASS_VALUES);
+
+    return result;
+  }
+
+  /**
+   * Custom serialization method.
+   *
+   * @param oos the object output stream
+   */
+  private void writeObject(ObjectOutputStream oos) throws IOException {
+    // figure out size of the written network
+    CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
+    if (isInitializationFinished) {
+      ModelSerializer.writeModel(model, cos, false);
+    }
+    modelSize = cos.getByteCount();
+
+    // default serialization
+    oos.defaultWriteObject();
+
+    // Write layer configurations
+    String[] layerConfigs = new String[layers.length];
+    for (int i = 0; i < layers.length; i++) {
+      layerConfigs[i] =
+          layers[i].getClass().getName() + "::"
+              + weka.core.Utils.joinOptions(layers[i].getOptions());
+    }
+    oos.writeObject(layerConfigs);
+
+    // actually write the network
+    if (isInitializationFinished) {
+      ModelSerializer.writeModel(model, oos, false);
+    }
+  }
+
+  /**
+   * Custom deserialization method
+   *
+   * @param ois the object input stream
+   */
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
+      IOException {
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(
+          this.getClass().getClassLoader());
+      // default deserialization
+      ois.defaultReadObject();
+
+      // Restore the layers
+      String[] layerConfigs = (String[]) ois.readObject();
+      layers = new Layer[layerConfigs.length];
+      for (int i = 0; i < layerConfigs.length; i++) {
+        String layerConfigString = layerConfigs[i];
+        String[] split = layerConfigString.split("::");
+        String clsName = split[0];
+        String layerConfig = split[1];
+        String[] options = weka.core.Utils.splitOptions(layerConfig);
+        layers[i] =
+            (Layer) weka.core.Utils.forName(Layer.class, clsName, options);
+      }
+
+      // restore the network model
+      if (isInitializationFinished) {
+        File tmpFile = File.createTempFile("restore", "multiLayer");
+        tmpFile.deleteOnExit();
+        BufferedOutputStream bos =
+            new BufferedOutputStream(new FileOutputStream(tmpFile));
+        long remaining = modelSize;
+        while (remaining > 0) {
+          int bsize = 10024;
+          if (remaining < 10024) {
+            bsize = (int) remaining;
+          }
+          byte[] buffer = new byte[bsize];
+          int len = ois.read(buffer);
+          if (len == -1) {
+            throw new IOException(
+                "Reached end of network model prematurely during deserialization.");
+          }
+          bos.write(buffer, 0, len);
+          remaining -= len;
+        }
+        bos.flush();
+        model = ModelSerializer.restoreComputationGraph(tmpFile, false);
+      }
+    } catch (Exception e) {
+      log.error("Failed to restore serialized model. Error: " + e.getMessage());
+      e.printStackTrace();
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
+    }
+  }
+
+  /**
+   * Generate the, for this model type, typical output layer.
+   *
+   * @return New OutputLayer object
+   */
+  protected Layer<? extends BaseOutputLayer> createOutputLayer() {
+    return new OutputLayer();
+  }
+
+  public Layer[] getLayers() {
+    return layers;
+  }
+
+  @OptionMetadata(
+      displayName = "layer specification.",
+      description = "The specification of a layer. This option can be used multiple times.",
+      commandLineParamName = "layer",
+      commandLineParamSynopsis = "-layer <string>", displayOrder = 2)
+  public void setLayers(Layer... layers) {
+    // If something changed, set zoomodel to CustomNet
+    if (!Arrays.deepEquals(layers, this.layers)) {
+      setCustomNet();
+    }
+    fixDuplicateLayerNames(layers);
+    this.layers = layers;
+  }
+
+  /**
+   * Validate whether the layers comply with the currently chosen instance iterator
+   *
+   * @param layers New set of layers
+   */
+  protected void validateLayers(Layer[] layers)
+      throws InvalidNetworkArchitectureException {
+    // Check if the layers contain convolution/subsampling
+    Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
+    final boolean containsConvLayer =
+        layerSet.stream().allMatch(this::isNDLayer);
+
+    final boolean isConvItertor =
+        getInstanceIterator() instanceof ConvolutionalIterator;
+    if (containsConvLayer && !isConvItertor) {
+      throw new InvalidNetworkArchitectureException(
+          "A convolution/subsampling layer was set using "
+              + "the wrong instance iterator. Please select either "
+              + "ImageInstanceIterator for image files or "
+              + "ConvolutionInstanceIterator for ARFF files.");
+    }
+
+    // Check if conv layers have ConvolutionMode.Same for
+    // CnnTextEmbeddingInstanceIterator
+    if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
+      for (Layer l : layerSet) {
+        if (l instanceof ConvolutionLayer) {
+          final ConvolutionLayer conv = (ConvolutionLayer) l;
+          boolean correctMode =
+              conv.getConvolutionMode().equals(ConvolutionMode.Same);
+          if (!correctMode) {
+            throw new RuntimeException(
+                "CnnText iterators require ConvolutionMode.Same for all ConvolutionLayer. Layer "
+                    + conv.getLayerName()
+                    + " has ConvolutionMode: "
+                    + conv.getConvolutionMode());
+          }
+        }
+      }
+
+      // Check that layers start with convolution
+      if (layers.length > 0 && !(layers[0] instanceof ConvolutionLayer)) {
+        throw new InvalidNetworkArchitectureException(
+            "CnnText iterator requires ConvolutionLayer.");
+      }
+    }
+  }
+
+  /**
+   * Check if a given layer is a convolutional/subsampling layer
+   *
+   * @param layer Layer to check
+   * @return True if layer is convolutional/subsampling
+   */
+  protected boolean isNDLayer(Layer layer) {
+    return layer instanceof ConvolutionLayer
+        || layer instanceof SubsamplingLayer;
+  }
+
+  /**
+   * Check if layer names are duplicate. If so, correct them by appending indices
+   *
+   * @param layers Array of network layer
+   */
+  protected void fixDuplicateLayerNames(Layer[] layers) {
+    Set<String> names =
+        Arrays.stream(layers).map(Layer::getLayerName)
+            .collect(Collectors.toSet());
+
+    for (String name : names) {
+      // Find duplicates with the same name
+      List<Layer> duplicates =
+          Arrays.stream(layers).filter(l -> name.equals(l.getLayerName()))
+              .collect(Collectors.toList());
+
+      // If no duplicates were found, continue
+      if (duplicates.size() == 1) {
+        continue;
+      }
+
+      // For each duplicate add an index
+      for (int i = 0; i < duplicates.size(); i++) {
+        duplicates.get(i).setLayerName(name + " " + (i + 1));
+      }
+    }
+  }
+
+  public int getNumEpochs() {
+    return numEpochs;
+  }
+
+  @OptionMetadata(description = "The number of epochs to perform.",
+      displayName = "number of epochs", commandLineParamName = "numEpochs",
+      commandLineParamSynopsis = "-numEpochs <int>", displayOrder = 4)
+  public void setNumEpochs(int numEpochs) {
+    this.numEpochs = numEpochs;
+  }
+
+  @OptionMetadata(description = "The instance trainIterator to use.",
+      displayName = "instance iterator", commandLineParamName = "iterator",
+      commandLineParamSynopsis = "-iterator <string>", displayOrder = 6)
+  public AbstractInstanceIterator getInstanceIterator() {
+    return instanceIterator;
+  }
+
+  public void setInstanceIterator(AbstractInstanceIterator iterator) {
+    instanceIterator = iterator;
+  }
+
+  @OptionMetadata(description = "The neural network configuration to use.",
+      displayName = "network configuration", commandLineParamName = "config",
+      commandLineParamSynopsis = "-config <string>", displayOrder = 7)
+  public NeuralNetConfiguration getNeuralNetConfiguration() {
+    return netConfig;
+  }
+
+  public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
+    netConfig = config;
+  }
+
+  /**
+   * Reset zoomodel to CustomNet
+   */
+  protected void setCustomNet() {
+    if (useZooModel()) {
+      zooModel = new CustomNet();
+    }
+  }
+
+  @OptionMetadata(description = "The early stopping configuration to use.",
+      displayName = "early stopping",
+      commandLineParamName = "early-stopping",
+      commandLineParamSynopsis = "-early-stopping <string>", displayOrder = 7)
+  public EarlyStopping getEarlyStopping() {
+    return earlyStopping;
+  }
+
+  public void setEarlyStopping(EarlyStopping config) {
+    earlyStopping = config;
+  }
+
+  @OptionMetadata(description = "The type of normalization to perform.",
+      displayName = "attribute normalization",
+      commandLineParamName = "normalization",
+      commandLineParamSynopsis = "-normalization <int>", displayOrder = 12)
+  public SelectedTag getFilterType() {
+    return new SelectedTag(filterType, TAGS_FILTER);
+  }
+
+  public void setFilterType(SelectedTag newType) {
+    if (newType.getTags() == TAGS_FILTER) {
+      filterType = newType.getSelectedTag().getID();
+    }
+  }
+
+  public int getQueueSize() {
+    return queueSize;
+  }
+
+  @OptionMetadata(
+      description = "The queue size for asynchronous data transfer (default: 0, synchronous transfer).",
+      displayName = "data queue size",
+      commandLineParamName = "queueSize",
+      commandLineParamSynopsis = "-queueSize <int>", displayOrder = 30)
+  public void setQueueSize(int QueueSize) {
+    queueSize = QueueSize;
+  }
+
+  /**
+   * Returns true if the model is to be finalized (or has been finalized) after training.
+   *
+   * @return the current value of finalize
+   */
+  public boolean getResume() {
+    return resume;
+  }
+
+  /**
+   * If called with argument true, then the next time done() is called the model is effectively
+   * "frozen" and no further iterations can be performed
+   *
+   * @param resume true if the model is to be finalized after performing iterations
+   */
+
+  @OptionMetadata(
+      description = "Set whether training can be resumed at a later date",
+      displayName = "resume",
+      commandLineParamName = "resume", commandLineParamSynopsis = "-resume",
+      commandLineParamIsFlag = true, displayOrder = 31)
+  public void setResume(boolean resume) {
+    this.resume = resume;
+  }
+
+  public boolean getLoadLayerSpecification() {
+    return loadLayerSpecification;
+  }
+
+  @OptionMetadata(
+          description = "Set whether you want the GUI to load the layer specification when selecting " +
+                  "a zoo model. This does not affect the model's function, but simply allows you to view the model's " +
+                  "layers. You may need to click 'OK' and open this window again for this setting to come into effect.",
+          displayName = "Preview zoo model layer specification in GUI",
+          commandLineParamName = "load-layer-spec",
+          commandLineParamSynopsis = "-load-layer-spec",
+          commandLineParamIsFlag = true,
+          displayOrder = 3
+  )
+  public void setLoadLayerSpecification(boolean loadLayerSpecification) {
+    this.loadLayerSpecification = loadLayerSpecification;}
+
+  public boolean getDoNotClearFilesystemCache() {
+    return doNotClearFilesystemCache;
+  }
+
+  @OptionMetadata(displayName = "Preserve filesystem cache",
+      description = "If true, the filesystem cache will not be cleared when "
+          + "starting or resuming training of a model. This can save time on data "
+          + "preparation for a given problem, but will cause errors if a dataset "
+          + "different to that in the cache is used",
+      commandLineParamName = "preserve-file-cache",
+      commandLineParamSynopsis = "-preserve-file-cache",
+      commandLineParamIsFlag = true, displayOrder = 32)
+  public void setDoNotClearFilesystemCache(boolean clear) {
+    doNotClearFilesystemCache = clear;
+  }
+
+  public int getNumGPUs() {
+    return numGPUs;
+  }
+
+  @OptionMetadata(
+      displayName = "Number of GPUs",
+      description = "Number of available GPUs (ignored if no GPU backend available)",
+      commandLineParamName = "numGPUs",
+      commandLineParamSynopsis = "-numGPUs <integer>",
+      displayOrder = 33)
+  public void setNumGPUs(int numGPUs) {
+    this.numGPUs = numGPUs;
+  }
+
+  public int getPrefetchBufferSize() {
+    return prefetchBufferSize;
+  }
+
+  @OptionMetadata(displayName = "Size of prefetch buffer for multiple GPUs",
+      description = "Size of the prefetch buffer that will be used for background "
+          + "data prefetching (0 = disable prefetch). Ignored if there is only one "
+          + "GPU, or no GPU backend available.",
+      commandLineParamName = "prefetchSize",
+      commandLineParamSynopsis = "-prefetchSize <integer>",
+      displayOrder = 34)
+  public void setPrefetchBufferSize(int prefetchBufferSize) {
+    this.prefetchBufferSize = prefetchBufferSize;
+  }
+
+  public int getParameterAveragingFrequency() {
+    return averagingFrequency;
+  }
+
+  @OptionMetadata(displayName = "Model parameter averaging frequency",
+      description = "How often (in iterations, not epochs) to average model "
+          + "parameters when leveraging "
+          + "multiple GPUs (ignored if there is only one GPU, or no GPU backend "
+          + "available). Set no greater than num instances/num GPUs or no averaging "
+          + "will occur!",
+      commandLineParamName = "averagingFrequency",
+      commandLineParamSynopsis = "-averagingFrequency <integer>",
+      displayOrder = 35)
+  public void setParameterAveragingFrequency(int frequency) {
+    averagingFrequency = frequency;
+  }
+
+  /**
+   * The method used to train the classifier.
+   *
+   * @param data set of instances serving as training data
+   * @throws Exception if something goes wrong in the training process
+   */
+  @Override
+  public void buildClassifier(Instances data) throws Exception {
+    log.info("Building on {} training instances", data.numInstances());
+
+    // Initialize classifier
+    initializeClassifier(data);
+
+    if (getDebug()) {
+      log.info("Classifier: \n{}", toString());
+    }
+
+    boolean isContinue = true;
+    while (isContinue) {
+      // Next epoch
+      isContinue = next();
+    }
+
+    // Clean up
+    done();
+  }
+
+  /**
+   * Checks if the layer is a valid output layer
+   * @param filterMode true if the model is being used for a filter
+   * @param layer output layer of the model
+   * @return true if the model doesn't have a valid output layer (we need to add one on)
+   */
+  public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
+    return (!(filterMode) && !(layer instanceof BaseOutputLayer
+            //|| layer instanceof LossLayer || layer instanceof ActivationLayer
+            // The above two layers still throw errors from DL4j if they're the output
+            ));
+  }
+
+  /**
+   * The method used to initialize the classifier.
+   *
+   * @param data set of instances serving as training data
+   * @throws Exception if something goes wrong in the training process
+   */
+  @Override
+  public void initializeClassifier(Instances data) throws Exception {
+    // Set the logging configuration
+    logConfig.apply();
+
+    if (trainData != null && trainData.numInstances() > 0) {
+      // Resume run: only initialize iterator
+      trainIterator = getDataSetIterator(trainData);
+      return;
+    }
+
+    if (trainData != null) {
+      if (!trainData.equalHeaders(data) && resume) {
+        throw new WekaException(trainData.equalHeadersMsg(data));
+      }
+    }
+
+    // If only class is present, build zeroR
+    if (zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0) {
+      zeroR = new ZeroR();
+      zeroR.buildClassifier(data);
+      return;
+    }
+
+    try {
+      // Can classifier handle the data?
+      getCapabilities().testWithFail(data);
+    } catch (Exception e) {
+      // May throw an attribute exception if the instance iterator hasn't been set
+      throw new Exception("Have you set the instance iterator correctly?\n" + e);
+    }
+
+    // Check basic network structure
+    if (layers.length == 0) {
+      throw new MissingOutputLayerException("No layers have been added!");
+    }
+
+    final Layer lastLayer = layers[layers.length - 1];
+    org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
+        lastLayer.getBackend();
+    if (noOutputLayer(isFilterMode(), lastLayerBackend)) {
+      throw new MissingOutputLayerException(
+          "Last layer in network must be an output layer but was: "
+              + lastLayerBackend.getClass().getSimpleName());
+    }
+
+    // Check if layers are valid
+    validateLayers(layers);
+
+    // Apply preprocessing
+    data = preProcessInput(data);
+    data = initEarlyStopping(data);
+    saveLabelSortIndex(data);
+
+    if (data != null) {
+      trainData = data;
+    } else {
+      return;
+    }
+
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(
+          this.getClass().getClassLoader());
+
+      finishClassifierInitialization();
+
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
+    }
+  }
+
+  /**
+   * Wrap the model in a ParallelWrapper for data parallel training on multiple GPUs (if
+   * available).
+   */
+  protected void initParallelWrapperIfApplicable() {
+
+    Nd4jBackend b = Nd4j.getBackend();
+    if (b != null) {
+      gpuBackendAvailable = b.getClass().getCanonicalName()
+          .toLowerCase().contains("jcublas");
+    }
+
+    // only configure if the gpu backend is available and the user has requested
+    // more than one gpus
+    if (gpuBackendAvailable) {
+      log.info("GPU backend available");
+    }
+    if (gpuBackendAvailable && getNumGPUs() > 1) {
+
+      if (getNumGPUs() > Nd4j.getAffinityManager().getNumberOfDevices()) {
+        log.warn("Number of requested GPUs {}, is greater than number "
+            + "available {}", getNumGPUs(), Nd4j.getAffinityManager().getNumberOfDevices());
+      }
+
+      if (prefetchBufferSize > 0 && prefetchBufferSize < getNumGPUs()) {
+        prefetchBufferSize = getNumGPUs();
+      }
+
+      log.info("Initializing for parallel training on {} workers", getNumGPUs());
+      parallelWrapper = new ParallelWrapper.Builder(model)
+          .prefetchBuffer(getPrefetchBufferSize())
+          .workers(getNumGPUs())
+          .averagingFrequency(getParameterAveragingFrequency())
+          .build();
+    }
+  }
+
+  /**
+   * Finish the classifier initialization.
+   * <p>
+   * Contains common execution parts for both, Dl4jMlpClassifier and RnnSequence Classifier.
+   *
+   * @throws Exception Could not create model or could not get the dataset iterator.
+   */
+  protected void finishClassifierInitialization() throws Exception {
+    // Could be non-null due to resuming from a previous run
+    if (model == null || !resume) {
+      // If zoo model was set, use this model as internal MultiLayerNetwork
+      if (useZooModel()) {
+        createZooModel();
+      } else {
+        createModel();
+      }
+    }
+    // Initialize iterator
+    instanceIterator.initialize();
+
+    // Setup the datasetiterators (needs to be done after the model
+    // initialization)
+    trainIterator = getDataSetIterator(this.trainData);
+
+    // Update epoch counter
+    numEpochsPerformedThisSession = 0;
+    maxEpochs += numEpochs; // set the current upper bound
+
+    // Set the iteration listener
+    model.setListeners(getListener());
+
+    // Configure for parallel training on multiple GPUs (if applicable)
+    initParallelWrapperIfApplicable();
+
+    // Flag initialization as finished
+    isInitializationFinished = true;
+  }
+
+  /**
+   * Store the label sort index for mapping weka-labels to resorted dl4j-labels.
+   *
+   * @param data Input data
+   */
+  protected void saveLabelSortIndex(Instances data) {
+    if (data.classAttribute().isNominal()) {
+      // Save Label order as DL4J automatically sorts them
+      List<String> labels = new ArrayList<>();
+      int numClassValues = data.classAttribute().numValues();
+      for (int i = 0; i < numClassValues; i++) {
+        labels.add(data.classAttribute().value(i));
+      }
+      List<String> labelsSorted = new ArrayList<>(labels);
+      Collections.sort(labelsSorted);
+      labelSortIndex = new int[numClassValues];
+
+      for (int i = 0; i < numClassValues; i++) {
+        String label = labels.get(i);
+        int sortedIndex = labelsSorted.indexOf(label);
+        labelSortIndex[i] = sortedIndex;
+      }
+    }
+  }
+
+  /**
+   * Initialize early stopping with the given data
+   *
+   * @param data Data
+   * @return Augmented data - if early stopping applies, return train set without validation set
+   */
+  protected Instances initEarlyStopping(Instances data) throws Exception {
+    // Split train/validation
+    double valSplit = earlyStopping.getValidationSetPercentage();
+    Instances trainData;
+    Instances valData;
+    if (useEarlyStopping()) {
+      // Split in train and validation
+      Instances[] insts = splitTrainVal(data, valSplit);
+      trainData = insts[0];
+      valData = insts[1];
+      validateSplit(trainData, valData);
+      DataSetIterator valIterator =
+          getDataSetIterator(valData, cacheMode, "val");
+      earlyStopping.init(valIterator);
+    } else {
+      // Keep the full data
+      trainData = data;
+    }
+
+    return trainData;
+  }
+
+  /**
+   * Validate a data split of train and validation data
+   *
+   * @param trainData Training data
+   * @param valData Validation data
+   * @throws WekaException Invalid validation split
+   */
+  protected void validateSplit(Instances trainData, Instances valData)
+      throws WekaException {
+    if (earlyStopping.getValidationSetPercentage() < 10e-8) {
+      // Use no validation set at all
+      return;
+    }
+    int classIndex = trainData.classIndex();
+    int valDataNumDinstinctClassValues = valData.numDistinctValues(classIndex);
+    int trainDataNumDistinctClassValues =
+        trainData.numDistinctValues(classIndex);
+    if (trainData.numClasses() > 1
+        && valDataNumDinstinctClassValues != trainDataNumDistinctClassValues) {
+      throw new InvalidValidationPercentageException(
+          "The validation data did not contain the same classes as the training data. "
+              + "You should increase the validation percentage in the EarlyStopping configuration.");
+    }
+  }
+
+  /**
+   * Generates a DataSetIterator based on the given instances.
+   *
+   * @param data Input instances
+   * @param cm Cache mode for the datasets
+   * @param cacheDirSuffix suffix for the cache directory
+   * @return DataSetIterator Iterator over dataset objects
+   */
+  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm,
+      String cacheDirSuffix) throws Exception {
+    // Also set the instance iterator to use this zoo model's channel order
+    if (this.instanceIterator instanceof ImageInstanceIterator) {
+      ((ImageInstanceIterator) this.instanceIterator).setChannelsLast(this.zooModel.getChannelsLast());
+    }
+
+    DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
+
+    // Use caching if set
+    switch (cm) {
+      case MEMORY: // Use memory as cache
+        final InMemoryDataSetCache memCache = new InMemoryDataSetCache();
+        it = new CachingDataSetIterator(it, memCache);
+        break;
+      case FILESYSTEM: // use filesystem as cache
+        final String tmpDir = System.getProperty("java.io.tmpdir");
+        final String suffix =
+            cacheDirSuffix.isEmpty() ? "" : "-" + cacheDirSuffix;
+        final File cacheDir =
+            Paths.get(tmpDir, "dataset-cache" + suffix).toFile();
+        if (cacheDir.exists() && cacheDir.isDirectory() && !getDoNotClearFilesystemCache()) {
+          // delete contents then directory
+          File[] fs = cacheDir.listFiles();
+          for (File f : fs) {
+            f.delete();
+          }
+          if (!cacheDir.delete()) {
+            // remove old existing cache
+            System.err.println("Unable to delete cache dir "
+                + cacheDir.toString());
+          }
         }
 
-        // class
-        result.enable(Capability.NOMINAL_CLASS);
-        result.enable(Capability.NUMERIC_CLASS);
-        result.enable(Capability.DATE_CLASS);
-        result.enable(Capability.MISSING_CLASS_VALUES);
-
-        return result;
+        final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
+        it = new CachingDataSetIterator(it, fsCache);
+        break;
     }
 
-    /**
-     * Custom serialization method.
-     *
-     * @param oos the object output stream
-     */
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-        // figure out size of the written network
-        CountingOutputStream cos = new CountingOutputStream(new NullOutputStream());
-        if (isInitializationFinished) {
-            ModelSerializer.writeModel(model, cos, false);
-        }
-        modelSize = cos.getByteCount();
+    // Use async dataset iteration if queue size was set
+    if (queueSize > 0) {
+      it = new AsyncDataSetIterator(it, queueSize);
+      if (!it.hasNext()) {
+        throw new RuntimeException(
+            "AsyncDataSetIterator could not load any datasets.");
+      }
+    }
+    return it;
+  }
 
-        // default serialization
-        oos.defaultWriteObject();
+  /**
+   * Generates a DataSetIterator based on the given instances.
+   *
+   * @param data Input instances
+   * @param cm Cache mode for the datasets
+   * @return DataSetIterator Iterator over dataset objects
+   */
+  protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm)
+      throws Exception {
+    return getDataSetIterator(data, cm, "");
+  }
 
-        // Write layer configurations
-        String[] layerConfigs = new String[layers.length];
-        for (int i = 0; i < layers.length; i++) {
-            layerConfigs[i] =
-                    layers[i].getClass().getName() + "::"
-                            + weka.core.Utils.joinOptions(layers[i].getOptions());
-        }
-        oos.writeObject(layerConfigs);
+  /**
+   * Generates a DataSetIterator based on the given instances.
+   *
+   * @param data Input instances
+   * @return DataSetIterator
+   */
+  protected DataSetIterator getDataSetIterator(Instances data) throws Exception {
+    return getDataSetIterator(data, cacheMode);
+  }
 
-        // actually write the network
-        if (isInitializationFinished) {
-            ModelSerializer.writeModel(model, oos, false);
-        }
+  /**
+   * Apply weka filter preprocessing to the input data.
+   *
+   * @param data Data as weka instances
+   * @return Preprocessed instances
+   * @throws Exception Preprocessing failed
+   */
+  protected Instances preProcessInput(Instances data) throws Exception {
+    // Remove instances with missing class and check that instances and
+    // predictor attributes remain.
+    data = new Instances(data);
+    data.deleteWithMissingClass();
+    zeroR = null;
+    int numSamples = data.numInstances();
+    if (numSamples == 0 || data.numAttributes() < 2) {
+      zeroR = new ZeroR();
+      zeroR.buildClassifier(data);
+      return null;
     }
 
-    /**
-     * Custom deserialization method
-     *
-     * @param ois the object input stream
-     */
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
-            IOException {
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    this.getClass().getClassLoader());
-            // default deserialization
-            ois.defaultReadObject();
+    // Retrieve two different class values used to determine filter
+    // transformation
+    double y0 = data.instance(0).classValue();
+    int index = 1;
+    while (index < numSamples && data.instance(index).classValue() == y0) {
+      index++;
+    }
+    if (index == numSamples) {
+      // degenerate case, all class values are equal
+      // we don't want to deal with this, too much hassle
+      throw new Exception(
+          "All class values are the same. At least two class values should be different");
+    }
+    double y1 = data.instance(index).classValue();
 
-            // Restore the layers
-            String[] layerConfigs = (String[]) ois.readObject();
-            layers = new Layer[layerConfigs.length];
-            for (int i = 0; i < layerConfigs.length; i++) {
-                String layerConfigString = layerConfigs[i];
-                String[] split = layerConfigString.split("::");
-                String clsName = split[0];
-                String layerConfig = split[1];
-                String[] options = weka.core.Utils.splitOptions(layerConfig);
-                layers[i] =
-                        (Layer) weka.core.Utils.forName(Layer.class, clsName, options);
-            }
+    // Init and apply the filters
+    data = initFilters(data);
 
-            // restore the network model
-            if (isInitializationFinished) {
-                File tmpFile = File.createTempFile("restore", "multiLayer");
-                tmpFile.deleteOnExit();
-                BufferedOutputStream bos =
-                        new BufferedOutputStream(new FileOutputStream(tmpFile));
-                long remaining = modelSize;
-                while (remaining > 0) {
-                    int bsize = 10024;
-                    if (remaining < 10024) {
-                        bsize = (int) remaining;
-                    }
-                    byte[] buffer = new byte[bsize];
-                    int len = ois.read(buffer);
-                    if (len == -1) {
-                        throw new IOException(
-                                "Reached end of network model prematurely during deserialization.");
-                    }
-                    bos.write(buffer, 0, len);
-                    remaining -= len;
-                }
-                bos.flush();
-                model = ModelSerializer.restoreComputationGraph(tmpFile, false);
-            }
-        } catch (Exception e) {
-            log.error("Failed to restore serialized model. Error: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
+    double z0 = data.instance(0).classValue();
+    double z1 = data.instance(index).classValue();
+    x1 = (y0 - y1) / (z0 - z1); // no division by zero, since y0 != y1
+    // guaranteed => z0 != z1 ???
+    x0 = (y0 - x1 * z0); // = y1 - x1 * z1
+
+    // Randomize the data, just in case
+    Random rand = new Random(getSeed());
+    data.randomize(rand);
+    return data;
+  }
+
+  /**
+   * Initialize {@link ReplaceMissingValues}, {@link NominalToBinary} and {@link Standardize} or
+   * {@link Normalize} filters
+   *
+   * @param data Input data to set the input formal of the filters
+   * @return Transformed data
+   * @throws Exception Filter can not be initialized
+   */
+  protected Instances initFilters(Instances data) throws Exception {
+    // Replace missing values
+    replaceMissingFilter = new ReplaceMissingValues();
+    replaceMissingFilter.setInputFormat(data);
+    data = Filter.useFilter(data, replaceMissingFilter);
+
+    // Replace nominal attributes by binary numeric attributes.
+    nominalToBinaryFilter = new NominalToBinary();
+    nominalToBinaryFilter.setInputFormat(data);
+    data = Filter.useFilter(data, nominalToBinaryFilter);
+
+    // Standardize or normalize (as requested), including the class
+
+    if (filterType == FILTER_STANDARDIZE) {
+      filter = new Standardize();
+      filter.setOptions(new String[]{"-unset-class-temporarily"});
+      filter.setInputFormat(data);
+      data = Filter.useFilter(data, filter);
+    } else if (filterType == FILTER_NORMALIZE) {
+      filter = new Normalize();
+      filter.setOptions(new String[]{"-unset-class-temporarily"});
+      filter.setInputFormat(data);
+      data = Filter.useFilter(data, filter);
+    } else {
+      filter = null;
     }
 
-    /**
-     * Generate the, for this model type, typical output layer.
-     *
-     * @return New OutputLayer object
-     */
-    protected Layer<? extends BaseOutputLayer> createOutputLayer() {
-        return new OutputLayer();
+    return data;
+  }
+
+  /**
+   * Enforces the input image size if using a zoo model
+   * @param iii ImageInstanceIterator we're using
+   * @return iterator with image size fixed
+   */
+  private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
+    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
+    AbstractZooModel tmpZooModel = getZooModel();
+    if (tmpZooModel.isPretrained()) {
+      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
+        iii.setNumChannels(1);
+        iii.setHeight(28);
+        iii.setWidth(28);
+      } else {
+        int[] pretrainedShape = tmpZooModel.getShape()[0];
+        iii.setNumChannels(pretrainedShape[0]);
+        iii.setHeight(pretrainedShape[1]);
+        iii.setWidth(pretrainedShape[2]);
+      }
+      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
+              iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
+    }
+    return iii;
+  }
+
+  /**
+   * The only one-channel zoo model currently implemented is Dl4JLeNet.
+   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
+   * @param instanceIterator iterator we're wanting to use with the zoo model
+   */
+  private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
+    if (instanceIterator.getNumChannels() != 1) {
+      return;
+    }
+    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
+    Set<Class> oneChannelModels = new HashSet<>();
+    oneChannelModels.add(Dl4jLeNet.class);
+
+    AbstractZooModel tmpZooModel = getZooModel();
+    Class currModelClass = tmpZooModel.getClass();
+
+    // If we have a one channel model, continue;
+    if (oneChannelModels.contains(currModelClass)) {
+      return;
     }
 
-    public Layer[] getLayers() {
-        return layers;
+    throw new WrongIteratorException(
+            "You've used an instance iterator for instances of only one channel, however, " +
+                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
+                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
+    );
+  }
+
+  /**
+   * Build the Zoomodel instance
+   *
+   * @return ComputationGraph instance
+   * @throws WekaException Either the .init operation on the current zooModel was not supported or
+   * the data shape does not fit the chosen zooModel
+   */
+  protected void createZooModel() throws Exception {
+    final AbstractInstanceIterator it = getInstanceIterator();
+    final boolean isCorrectIterator = it instanceof ImageInstanceIterator || it instanceof ConvolutionInstanceIterator;
+
+    // Make sure data is convolutional
+    if (!isCorrectIterator) {
+      throw new WrongIteratorException(
+          "ZooModels currently only support images. "
+              + "Please setup an ImageInstanceIterator or ConvolutionalInstanceIterator.");
     }
 
-    @OptionMetadata(
-            displayName = "layer specification.",
-            description = "The specification of a layer. This option can be used multiple times.",
-            commandLineParamName = "layer",
-            commandLineParamSynopsis = "-layer <string>", displayOrder = 2)
-    public void setLayers(Layer... layers) {
-        // If something changed, set zoomodel to CustomNet
-        if (!Arrays.deepEquals(layers, this.layers)) {
-            setCustomNet();
-        }
-        fixDuplicateLayerNames(layers);
-        this.layers = layers;
+    boolean isImageIterator = it instanceof ImageInstanceIterator;
+    ImageInstanceIterator iii = null;
+    ConvolutionInstanceIterator cii = null;
+    int newWidth, newHeight, channels;
+
+    if (isImageIterator) {
+      iii = enforceZooModelSize((ImageInstanceIterator) it);
+      newWidth = iii.getWidth();
+      newHeight = iii.getHeight();
+      channels = iii.getNumChannels();
+    } else {
+      cii = (ConvolutionInstanceIterator) it;
+      enforceConvolutionIteratorZooModel(cii);
+      newWidth = cii.getWidth();
+      newHeight = cii.getHeight();
+      channels = cii.getNumChannels();
+
     }
 
-    /**
-     * Validate whether the layers comply with the currently chosen instance iterator
-     *
-     * @param layers New set of layers
-     */
-    protected void validateLayers(Layer[] layers)
-            throws InvalidNetworkArchitectureException {
-        // Check if the layers contain convolution/subsampling
-        Set<Layer> layerSet = new HashSet<>(Arrays.asList(layers));
-        final boolean containsConvLayer =
-                layerSet.stream().allMatch(this::isNDLayer);
 
-        final boolean isConvItertor =
-                getInstanceIterator() instanceof ConvolutionalIterator;
-        if (containsConvLayer && !isConvItertor) {
-            throw new InvalidNetworkArchitectureException(
-                    "A convolution/subsampling layer was set using "
-                            + "the wrong instance iterator. Please select either "
-                            + "ImageInstanceIterator for image files or "
-                            + "ConvolutionInstanceIterator for ARFF files.");
-        }
+    boolean initSuccessful = false;
+    int maxWidth = 10000;
+    while (!initSuccessful) {
+      if (newWidth > maxWidth) {
+        // Keeps looping until it succeeds - if it never succeeds in creating the model then this loop never breaks otherwise
+        throw new Exception("Error when creating model, your configuration may be incorrect - check logs for more info");
+      }
+      // Increase width and height
+      int[] newShape = new int[]{channels, newHeight, newWidth};
+      if (isImageIterator) {
+        setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth, newHeight));
+      } else {
+        setInstanceIterator(cii);
+      }
 
-        // Check if conv layers have ConvolutionMode.Same for
-        // CnnTextEmbeddingInstanceIterator
-        if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
-            for (Layer l : layerSet) {
-                if (l instanceof ConvolutionLayer) {
-                    final ConvolutionLayer conv = (ConvolutionLayer) l;
-                    boolean correctMode =
-                            conv.getConvolutionMode().equals(ConvolutionMode.Same);
-                    if (!correctMode) {
-                        throw new RuntimeException(
-                                "CnnText iterators require ConvolutionMode.Same for all ConvolutionLayer. Layer "
-                                        + conv.getLayerName()
-                                        + " has ConvolutionMode: "
-                                        + conv.getConvolutionMode());
-                    }
-                }
-            }
+      initSuccessful =
+          initZooModel(trainData.numClasses(), getSeed(), newShape);
 
-            // Check that layers start with convolution
-            if (layers.length > 0 && !(layers[0] instanceof ConvolutionLayer)) {
-                throw new InvalidNetworkArchitectureException(
-                        "CnnText iterator requires ConvolutionLayer.");
-            }
-        }
+      newWidth *= 1.2;
+      newHeight *= 1.2;
+      if (!initSuccessful) {
+        log.warn("The data's shape did not fit the chosen "
+                + "model's input. It was therefore resized to ({}x{}x{}).", channels,
+            newHeight, newWidth);
+      }
+    }
+  }
+
+  /**
+   * Attempts to initialize the zoo model
+   * @param numClasses
+   * @param seed
+   * @param newShape
+   * @return
+   * @throws Exception
+   */
+  protected boolean initZooModel(int numClasses, long seed, int[] newShape)
+      throws Exception {
+    try {
+      ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape, isFilterMode());
+      // Make a dummy feed forward pass to check if the model dimensions fit at
+      // each layer
+      Instances dummyData = new Instances(trainData);
+      for (int i = 0; i < instanceIterator.getTrainBatchSize(); i++) {
+        dummyData.add(trainData.get(i));
+      }
+      tmpModel.init();
+      DataSetIterator iter = getDataSetIterator(dummyData);
+      tmpModel.feedForward(Utils.getNext(iter).getFeatures(), false);
+
+      // No Exception thrown -> set model to this zoo model and return true
+      model = zooModel.init(numClasses, seed, newShape, isFilterMode());
+      return true;
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException(
+          "ZooModel was not set (CustomNet), but createZooModel could be called. Invalid situation",
+          e);
+    } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
+      e.printStackTrace();
+      return false;
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      throw new WekaException("Couldn't find the image file, have you set up the instance iterator correctly?");
+    }
+  }
+
+  /**
+   * Build the multilayer network defined by the networkconfiguration and the list of layers.
+   */
+  protected void createModel() throws Exception {
+    final INDArray features = getFirstBatchFeatures(trainData);
+    ComputationGraphConfiguration.GraphBuilder gb =
+        netConfig.builder().seed(getSeed()).graphBuilder();
+
+    // Set ouput size
+    final Layer lastLayer = layers[layers.length - 1];
+    final int nOut = trainData.numClasses();
+    if (lastLayer instanceof FeedForwardLayer) {
+      ((FeedForwardLayer) lastLayer).setNOut(nOut);
     }
 
-    /**
-     * Check if a given layer is a convolutional/subsampling layer
-     *
-     * @param layer Layer to check
-     * @return True if layer is convolutional/subsampling
-     */
-    protected boolean isNDLayer(Layer layer) {
-        return layer instanceof ConvolutionLayer
-                || layer instanceof SubsamplingLayer;
+    if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
+      makeCnnTextLayerSetup(gb);
+    } else {
+      makeDefaultLayerSetup(gb);
     }
 
-    /**
-     * Check if layer names are duplicate. If so, correct them by appending indices
-     *
-     * @param layers Array of network layer
-     */
-    protected void fixDuplicateLayerNames(Layer[] layers) {
-        Set<String> names =
-                Arrays.stream(layers).map(Layer::getLayerName)
-                        .collect(Collectors.toSet());
+    gb.setInputTypes(InputType.inferInputType(features));
+    ComputationGraphConfiguration conf =
+        gb.build();
+    ComputationGraph model = new ComputationGraph(conf);
+    model.init();
+    this.model = model;
+  }
 
-        for (String name : names) {
-            // Find duplicates with the same name
-            List<Layer> duplicates =
-                    Arrays.stream(layers).filter(l -> name.equals(l.getLayerName()))
-                            .collect(Collectors.toList());
+  /**
+   * Default layer setup: Create sequential layer network defined by the order of the layer list
+   *
+   * @param gb GraphBuilder object
+   */
+  protected void makeDefaultLayerSetup(GraphBuilder gb) {
+    String currentInput = "input";
+    gb.addInputs(currentInput);
+    // Collect layers
+    for (Layer layer : layers) {
+      String lName = layer.getLayerName();
+      gb.addLayer(lName, layer.getBackend().clone(), currentInput);
+      currentInput = lName;
+    }
+    gb.setOutputs(currentInput);
+  }
 
-            // If no duplicates were found, continue
-            if (duplicates.size() == 1) {
-                continue;
-            }
+  /**
+   * CnnText layer setup: Collect CNN layers and merge them in a {@link MergeVertex}.
+   *
+   * @param gb GraphBuilder object
+   */
+  protected void makeCnnTextLayerSetup(GraphBuilder gb)
+      throws InvalidNetworkArchitectureException,
+      InvalidLayerConfigurationException {
+    String currentInput = "input";
+    gb.addInputs(currentInput);
 
-            // For each duplicate add an index
-            for (int i = 0; i < duplicates.size(); i++) {
-                duplicates.get(i).setLayerName(name + " " + (i + 1));
-            }
-        }
+    // Collect all convolution layers defined until the first non conv layer
+    List<ConvolutionLayer> convLayers = new ArrayList<>();
+    int idx = 0;
+    for (Layer l : layers) {
+      if (l instanceof ConvolutionLayer) {
+        final ConvolutionLayer convLayer = (ConvolutionLayer) l;
+        validateCnnLayer(convLayer);
+        convLayers.add(convLayer);
+        gb.addLayer(convLayer.getLayerName(), convLayer.getBackend().clone(),
+            currentInput);
+        idx++;
+      } else {
+        break;
+      }
     }
 
-    public int getNumEpochs() {
-        return numEpochs;
+    // Check if next layer is GlobalPooling
+    if (idx < layers.length && !(layers[idx] instanceof GlobalPoolingLayer)) {
+      throw new InvalidNetworkArchitectureException(
+          "For a CNN text setup, the list of convolution"
+              + " layers must be followed by a GlobalPoolingLayer.");
     }
 
-    @OptionMetadata(description = "The number of epochs to perform.",
-            displayName = "number of epochs", commandLineParamName = "numEpochs",
-            commandLineParamSynopsis = "-numEpochs <int>", displayOrder = 4)
-    public void setNumEpochs(int numEpochs) {
-        this.numEpochs = numEpochs;
+    // Collect names
+    final String[] names =
+        convLayers.stream().map(ConvolutionLayer::getLayerName)
+            .toArray(String[]::new);
+
+    // Add merge vertex
+    if (names.length > 0) {
+      final String mergeVertexName = "merge";
+      gb.addVertex(mergeVertexName, new MergeVertex(), names);
+      currentInput = mergeVertexName;
     }
 
-    @OptionMetadata(description = "The instance trainIterator to use.",
-            displayName = "instance iterator", commandLineParamName = "iterator",
-            commandLineParamSynopsis = "-iterator <string>", displayOrder = 6)
-    public AbstractInstanceIterator getInstanceIterator() {
-        return instanceIterator;
+    // Collect layers
+    for (
+      /* use idx from above */; idx < layers.length; idx++) {
+      String lName = layers[idx].getLayerName();
+      gb.addLayer(lName, layers[idx].getBackend().clone(), currentInput);
+      currentInput = lName;
+    }
+    gb.setOutputs(currentInput);
+  }
+
+  /**
+   * Validate CNN layers when using {@link CnnTextEmbeddingInstanceIterator}.
+   *
+   * @param cl Convolution Layer
+   * @throws InvalidLayerConfigurationException Invalid configuration
+   */
+  protected void validateCnnLayer(ConvolutionLayer cl)
+      throws InvalidLayerConfigurationException {
+    final AbstractInstanceIterator iter = getInstanceIterator();
+    if (iter instanceof CnnTextEmbeddingInstanceIterator) {
+      CnnTextEmbeddingInstanceIterator cnnIter =
+          (CnnTextEmbeddingInstanceIterator) iter;
+      final int vectorSize =
+          cnnIter.getWordVectors().getWordVector(
+              cnnIter.getWordVectors().vocab().wordAtIndex(0)).length;
+
+      final int truncateLength = cnnIter.getTruncateLength();
+
+      if (truncateLength < cl.getKernelSizeX()) {
+        throw new InvalidLayerConfigurationException(
+            "Kernel row size must be smaller than truncation length. Truncation length was "
+                + truncateLength + ". Kernel row size was " + cl.getKernelSizeX(),
+            cl);
+      }
+      if (truncateLength < cl.getStrideRows()) {
+        throw new InvalidLayerConfigurationException(
+            "Stride row size must be smaller than truncation length. Truncation length was "
+                + truncateLength + ". Stride row size was " + cl.getStrideColumns(),
+            cl);
+      }
+
+      if (vectorSize % cl.getKernelSizeY() != 0) {
+        throw new InvalidLayerConfigurationException("Wordvector size ("
+            + vectorSize + ") must be divisible by kernel column size ("
+            + cl.getKernelSizeY() + ").", cl);
+      }
+
+      if (vectorSize % cl.getStrideColumns() != 0) {
+        throw new InvalidLayerConfigurationException("Wordvector size ("
+            + vectorSize + ") must be divisible by stride column size ("
+            + cl.getStrideColumns() + ").", cl);
+      }
+
+      if (!cl.getConvolutionMode().equals(ConvolutionMode.Same)) {
+        throw new InvalidLayerConfigurationException(
+            "ConvolutionMode must be ConvolutionMode.Same for ConvolutionLayers in CNN text "
+                + "architectures.", cl);
+      }
+    }
+  }
+
+  /**
+   * Get a peak at the features of the {@code iterator}'s first batch using the given instances.
+   *
+   * @return Features of the first batch
+   */
+  protected INDArray getFirstBatchFeatures(Instances data) throws Exception {
+    final DataSetIterator it = getDataSetIterator(data, CacheMode.NONE);
+    if (!it.hasNext()) {
+      throw new RuntimeException("Iterator was unexpectedly empty.");
+    }
+    final INDArray features = Utils.getNext(it).getFeatures();
+    it.reset();
+    return features;
+  }
+
+  /**
+   * Get the iterationlistener
+   */
+  protected TrainingListener getListener() throws Exception {
+    int numSamples = trainData.numInstances();
+    TrainingListener listener;
+
+    // Initialize weka listener
+    if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
+      // int numEpochs = getNumEpochs();
+      int numEpochs = maxEpochs;
+      iterationListener.init(trainData.numClasses(), numEpochsPerformed,
+          numEpochs, numSamples, trainIterator,
+          earlyStopping.getValDataSetIterator());
+    }
+    listener = iterationListener;
+    return listener;
+  }
+
+  /**
+   * Perform another epoch.
+   */
+  public boolean next() throws Exception {
+
+    if (numEpochsPerformedThisSession >= getNumEpochs() || zeroR != null
+        || trainData == null) {
+      return false;
     }
 
-    public void setInstanceIterator(AbstractInstanceIterator iterator) {
-        instanceIterator = iterator;
+    // Check if trainIterator was reset properly
+    if (!trainIterator.hasNext()) {
+      throw new EmptyIteratorException("The iterator has no next elements "
+          + "at the beginning of the epoch.");
     }
 
-    @OptionMetadata(description = "The neural network configuration to use.",
-            displayName = "network configuration", commandLineParamName = "config",
-            commandLineParamSynopsis = "-config <string>", displayOrder = 7)
-    public NeuralNetConfiguration getNeuralNetConfiguration() {
-        return netConfig;
-    }
-
-    public void setNeuralNetConfiguration(NeuralNetConfiguration config) {
-        if (!config.equals(netConfig)) {
-            setCustomNet();
-        }
-        netConfig = config;
-    }
-
-    /**
-     * Reset zoomodel to CustomNet
-     */
-    protected void setCustomNet() {
-        if (useZooModel()) {
-            zooModel = new CustomNet();
-        }
-    }
-
-    @OptionMetadata(description = "The early stopping configuration to use.",
-            displayName = "early stopping",
-            commandLineParamName = "early-stopping",
-            commandLineParamSynopsis = "-early-stopping <string>", displayOrder = 7)
-    public EarlyStopping getEarlyStopping() {
-        return earlyStopping;
-    }
-
-    public void setEarlyStopping(EarlyStopping config) {
-        earlyStopping = config;
-    }
-
-    @OptionMetadata(description = "The type of normalization to perform.",
-            displayName = "attribute normalization",
-            commandLineParamName = "normalization",
-            commandLineParamSynopsis = "-normalization <int>", displayOrder = 12)
-    public SelectedTag getFilterType() {
-        return new SelectedTag(filterType, TAGS_FILTER);
-    }
-
-    public void setFilterType(SelectedTag newType) {
-        if (newType.getTags() == TAGS_FILTER) {
-            filterType = newType.getSelectedTag().getID();
-        }
-    }
-
-    public int getQueueSize() {
-        return queueSize;
-    }
-
-    @OptionMetadata(
-            description = "The queue size for asynchronous data transfer (default: 0, synchronous transfer).",
-            displayName = "data queue size",
-            commandLineParamName = "queueSize",
-            commandLineParamSynopsis = "-queueSize <int>", displayOrder = 30)
-    public void setQueueSize(int QueueSize) {
-        queueSize = QueueSize;
-    }
-
-    /**
-     * Returns true if the model is to be finalized (or has been finalized) after training.
-     *
-     * @return the current value of finalize
-     */
-    public boolean getResume() {
-        return resume;
-    }
-
-    /**
-     * If called with argument true, then the next time done() is called the model is effectively
-     * "frozen" and no further iterations can be performed
-     *
-     * @param resume true if the model is to be finalized after performing iterations
-     */
-
-    @OptionMetadata(
-            description = "Set whether training can be resumed at a later date",
-            displayName = "resume",
-            commandLineParamName = "resume", commandLineParamSynopsis = "-resume",
-            commandLineParamIsFlag = true, displayOrder = 31)
-    public void setResume(boolean resume) {
-        this.resume = resume;
-    }
-
-    public boolean getDoNotClearFilesystemCache() {
-        return doNotClearFilesystemCache;
-    }
-
-    @OptionMetadata(displayName = "Preserve filesystem cache",
-            description = "If true, the filesystem cache will not be cleared when "
-                    + "starting or resuming training of a model. This can save time on data "
-                    + "preparation for a given problem, but will cause errors if a dataset "
-                    + "different to that in the cache is used",
-            commandLineParamName = "preserve-file-cache",
-            commandLineParamSynopsis = "-preserve-file-cache",
-            commandLineParamIsFlag = true, displayOrder = 32)
-    public void setDoNotClearFilesystemCache(boolean clear) {
-        doNotClearFilesystemCache = clear;
-    }
-
-    public int getNumGPUs() {
-        return numGPUs;
-    }
-
-    @OptionMetadata(
-            displayName = "Number of GPUs",
-            description = "Number of available GPUs (ignored if no GPU backend available)",
-            commandLineParamName = "numGPUs",
-            commandLineParamSynopsis = "-numGPUs <integer>",
-            displayOrder = 33)
-    public void setNumGPUs(int numGPUs) {
-        this.numGPUs = numGPUs;
-    }
-
-    public int getPrefetchBufferSize() {
-        return prefetchBufferSize;
-    }
-
-    @OptionMetadata(displayName = "Size of prefetch buffer for multiple GPUs",
-            description = "Size of the prefetch buffer that will be used for background "
-                    + "data prefetching (0 = disable prefetch). Ignored if there is only one "
-                    + "GPU, or no GPU backend available.",
-            commandLineParamName = "prefetchSize",
-            commandLineParamSynopsis = "-prefetchSize <integer>",
-            displayOrder = 34)
-    public void setPrefetchBufferSize(int prefetchBufferSize) {
-        this.prefetchBufferSize = prefetchBufferSize;
-    }
-
-    public int getParameterAveragingFrequency() {
-        return averagingFrequency;
-    }
-
-    @OptionMetadata(displayName = "Model parameter averaging frequency",
-            description = "How often (in iterations, not epochs) to average model "
-                    + "parameters when leveraging "
-                    + "multiple GPUs (ignored if there is only one GPU, or no GPU backend "
-                    + "available). Set no greater than num instances/num GPUs or no averaging "
-                    + "will occur!",
-            commandLineParamName = "averagingFrequency",
-            commandLineParamSynopsis = "-averagingFrequency <integer>",
-            displayOrder = 35)
-    public void setParameterAveragingFrequency(int frequency) {
-        averagingFrequency = frequency;
-    }
-
-    /**
-     * The method used to train the classifier.
-     *
-     * @param data set of instances serving as training data
-     * @throws Exception if something goes wrong in the training process
-     */
-    @Override
-    public void buildClassifier(Instances data) throws Exception {
-        log.info("Building on {} training instances", data.numInstances());
-
-        // Initialize classifier
-        initializeClassifier(data);
-
-        if (getDebug()) {
-            log.info("Classifier: \n{}", toString());
-        }
-
-        boolean isContinue = true;
-        while (isContinue) {
-            // Next epoch
-            isContinue = next();
-        }
-
-        // Clean up
-        done();
-    }
-
-    /**
-     * The method used to initialize the classifier.
-     *
-     * @param data set of instances serving as training data
-     * @throws Exception if something goes wrong in the training process
-     */
-    @Override
-    public void initializeClassifier(Instances data) throws Exception {
-        // Set the logging configuration
-        logConfig.apply();
-
-        if (trainData != null && trainData.numInstances() > 0) {
-            // Resume run: only initialize iterator
-            trainIterator = getDataSetIterator(trainData);
-            return;
-        }
-
-        if (trainData != null) {
-            if (!trainData.equalHeaders(data) && resume) {
-                throw new WekaException(trainData.equalHeadersMsg(data));
-            }
-        }
-
-        // If only class is present, build zeroR
-        if (zeroR == null && data.numAttributes() == 1 && data.classIndex() == 0) {
-            zeroR = new ZeroR();
-            zeroR.buildClassifier(data);
-            return;
-        }
-
-        // Can classifier handle the data?
-        getCapabilities().testWithFail(data);
-
-        // Check basic network structure
-        if (layers.length == 0) {
-            throw new MissingOutputLayerException("No layers have been added!");
-        }
-
-        final Layer lastLayer = layers[layers.length - 1];
-        org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
-                lastLayer.getBackend();
-        if (!(lastLayerBackend instanceof BaseOutputLayer
-                || lastLayerBackend instanceof LossLayer || lastLayerBackend instanceof ActivationLayer)) {
-            throw new MissingOutputLayerException(
-                    "Last layer in network must be an output layer but was: "
-                            + lastLayerBackend.getClass().getSimpleName());
-        }
-
-        // Check if layers are valid
-        validateLayers(layers);
-
-        // Apply preprocessing
-        data = preProcessInput(data);
-        data = initEarlyStopping(data);
-        saveLabelSortIndex(data);
-
-        if (data != null) {
-            trainData = data;
-        } else {
-            return;
-        }
-
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    this.getClass().getClassLoader());
-
-            finishClassifierInitialization();
-
-        } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
-    }
-
-    /**
-     * Wrap the model in a ParallelWrapper for data parallel training on multiple
-     * GPUs (if available).
-     */
-    protected void initParallelWrapperIfApplicable() {
-
-        Nd4jBackend b = Nd4j.getBackend();
-        if (b != null) {
-            gpuBackendAvailable = b.getClass().getCanonicalName()
-                    .toLowerCase().contains("jcublas");
-        }
-
-        // only configure if the gpu backend is available and the user has requested
-        // more than one gpus
-        if (gpuBackendAvailable) {
-            log.info("GPU backend available");
-        }
-        if (gpuBackendAvailable && getNumGPUs() > 1) {
-
-            if (getNumGPUs() > Nd4j.getAffinityManager().getNumberOfDevices()) {
-                log.warn("Number of requested GPUs {}, is greater than number "
-                        + "available {}", getNumGPUs(), Nd4j.getAffinityManager().getNumberOfDevices());
-            }
-
-            if (prefetchBufferSize > 0 && prefetchBufferSize < getNumGPUs()) {
-                prefetchBufferSize = getNumGPUs();
-            }
-
-            log.info("Initializing for parallel training on {} workers", getNumGPUs());
-            parallelWrapper = new ParallelWrapper.Builder(model)
-                    .prefetchBuffer(getPrefetchBufferSize())
-                    .workers(getNumGPUs())
-                    .averagingFrequency(getParameterAveragingFrequency())
-                    .build();
-        }
-    }
-
-    /**
-     * Finish the classifier initialization.
-     * <p>
-     * Contains common execution parts for both, Dl4jMlpClassifier and RnnSequence Classifier.
-     *
-     * @throws Exception Could not create model or could not get the dataset iterator.
-     */
-    protected void finishClassifierInitialization() throws Exception {
-        // Could be non-null due to resuming from a previous run
-        if (model == null || !resume) {
-            // If zoo model was set, use this model as internal MultiLayerNetwork
-            if (useZooModel()) {
-                createZooModel();
-            } else {
-                createModel();
-            }
-        }
-        // Initialize iterator
-        instanceIterator.initialize();
-
-        // Setup the datasetiterators (needs to be done after the model
-        // initialization)
-        trainIterator = getDataSetIterator(this.trainData);
-
-        // Update epoch counter
-        numEpochsPerformedThisSession = 0;
-        maxEpochs += numEpochs; // set the current upper bound
-
-        // Set the iteration listener
-        model.setListeners(getListener());
-
-        // Configure for parallel training on multiple GPUs (if applicable)
-        initParallelWrapperIfApplicable();
-
-        // Flag initialization as finished
-        isInitializationFinished = true;
-    }
-
-    /**
-     * Store the label sort index for mapping weka-labels to resorted dl4j-labels.
-     *
-     * @param data Input data
-     */
-    protected void saveLabelSortIndex(Instances data) {
-        if (data.classAttribute().isNominal()) {
-            // Save Label order as DL4J automatically sorts them
-            List<String> labels = new ArrayList<>();
-            int numClassValues = data.classAttribute().numValues();
-            for (int i = 0; i < numClassValues; i++) {
-                labels.add(data.classAttribute().value(i));
-            }
-            List<String> labelsSorted = new ArrayList<>(labels);
-            Collections.sort(labelsSorted);
-            labelSortIndex = new int[numClassValues];
-
-            for (int i = 0; i < numClassValues; i++) {
-                String label = labels.get(i);
-                int sortedIndex = labelsSorted.indexOf(label);
-                labelSortIndex[i] = sortedIndex;
-            }
-        }
-    }
-
-    /**
-     * Initialize early stopping with the given data
-     *
-     * @param data Data
-     * @return Augmented data - if early stopping applies, return train set without validation set
-     */
-    protected Instances initEarlyStopping(Instances data) throws Exception {
-        // Split train/validation
-        double valSplit = earlyStopping.getValidationSetPercentage();
-        Instances trainData;
-        Instances valData;
-        if (useEarlyStopping()) {
-            // Split in train and validation
-            Instances[] insts = splitTrainVal(data, valSplit);
-            trainData = insts[0];
-            valData = insts[1];
-            validateSplit(trainData, valData);
-            DataSetIterator valIterator =
-                    getDataSetIterator(valData, cacheMode, "val");
-            earlyStopping.init(valIterator);
-        } else {
-            // Keep the full data
-            trainData = data;
-        }
-
-        return trainData;
-    }
-
-    /**
-     * Validate a data split of train and validation data
-     *
-     * @param trainData Training data
-     * @param valData   Validation data
-     * @throws WekaException Invalid validation split
-     */
-    protected void validateSplit(Instances trainData, Instances valData)
-            throws WekaException {
-        if (earlyStopping.getValidationSetPercentage() < 10e-8) {
-            // Use no validation set at all
-            return;
-        }
-        int classIndex = trainData.classIndex();
-        int valDataNumDinstinctClassValues = valData.numDistinctValues(classIndex);
-        int trainDataNumDistinctClassValues =
-                trainData.numDistinctValues(classIndex);
-        if (trainData.numClasses() > 1
-                && valDataNumDinstinctClassValues != trainDataNumDistinctClassValues) {
-            throw new InvalidValidationPercentageException(
-                    "The validation data did not contain the same classes as the training data. "
-                            + "You should increase the validation percentage in the EarlyStopping configuration.");
-        }
-    }
-
-    /**
-     * Generates a DataSetIterator based on the given instances.
-     *
-     * @param data           Input instances
-     * @param cm             Cache mode for the datasets
-     * @param cacheDirSuffix suffix for the cache directory
-     * @return DataSetIterator Iterator over dataset objects
-     */
-    protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm,
-                                                 String cacheDirSuffix) throws Exception {
-        DataSetIterator it = instanceIterator.getDataSetIterator(data, getSeed());
-
-        // Use caching if set
-        switch (cm) {
-            case MEMORY: // Use memory as cache
-                final InMemoryDataSetCache memCache = new InMemoryDataSetCache();
-                it = new CachingDataSetIterator(it, memCache);
-                break;
-            case FILESYSTEM: // use filesystem as cache
-                final String tmpDir = System.getProperty("java.io.tmpdir");
-                final String suffix =
-                        cacheDirSuffix.isEmpty() ? "" : "-" + cacheDirSuffix;
-                final File cacheDir =
-                        Paths.get(tmpDir, "dataset-cache" + suffix).toFile();
-                if (cacheDir.exists() && cacheDir.isDirectory() && !getDoNotClearFilesystemCache()) {
-                    // delete contents then directory
-                    File[] fs = cacheDir.listFiles();
-                    for (File f : fs) {
-                        f.delete();
-                    }
-                    if (!cacheDir.delete()) {
-                        // remove old existing cache
-                        System.err.println("Unable to delete cache dir "
-                                + cacheDir.toString());
-                    }
-                }
-
-                final InFileDataSetCache fsCache = new InFileDataSetCache(cacheDir);
-                it = new CachingDataSetIterator(it, fsCache);
-                break;
-        }
-
-        // Use async dataset iteration if queue size was set
-        if (queueSize > 0) {
-            it = new AsyncDataSetIterator(it, queueSize);
-            if (!it.hasNext()) {
-                throw new RuntimeException(
-                        "AsyncDataSetIterator could not load any datasets.");
-            }
-        }
-        return it;
-    }
-
-    /**
-     * Generates a DataSetIterator based on the given instances.
-     *
-     * @param data Input instances
-     * @param cm   Cache mode for the datasets
-     * @return DataSetIterator Iterator over dataset objects
-     */
-    protected DataSetIterator getDataSetIterator(Instances data, CacheMode cm)
-            throws Exception {
-        return getDataSetIterator(data, cm, "");
-    }
-
-    /**
-     * Generates a DataSetIterator based on the given instances.
-     *
-     * @param data Input instances
-     * @return DataSetIterator
-     */
-    protected DataSetIterator getDataSetIterator(Instances data) throws Exception {
-        return getDataSetIterator(data, cacheMode);
-    }
-
-    /**
-     * Apply weka filter preprocessing to the input data.
-     *
-     * @param data Data as weka instances
-     * @return Preprocessed instances
-     * @throws Exception Preprocessing failed
-     */
-    protected Instances preProcessInput(Instances data) throws Exception {
-        // Remove instances with missing class and check that instances and
-        // predictor attributes remain.
-        data = new Instances(data);
-        data.deleteWithMissingClass();
-        zeroR = null;
-        int numSamples = data.numInstances();
-        if (numSamples == 0 || data.numAttributes() < 2) {
-            zeroR = new ZeroR();
-            zeroR.buildClassifier(data);
-            return null;
-        }
-
-        // Retrieve two different class values used to determine filter
-        // transformation
-        double y0 = data.instance(0).classValue();
-        int index = 1;
-        while (index < numSamples && data.instance(index).classValue() == y0) {
-            index++;
-        }
-        if (index == numSamples) {
-            // degenerate case, all class values are equal
-            // we don't want to deal with this, too much hassle
-            throw new Exception(
-                    "All class values are the same. At least two class values should be different");
-        }
-        double y1 = data.instance(index).classValue();
-
-        // Init and apply the filters
-        data = initFilters(data);
-
-        double z0 = data.instance(0).classValue();
-        double z1 = data.instance(index).classValue();
-        x1 = (y0 - y1) / (z0 - z1); // no division by zero, since y0 != y1
-        // guaranteed => z0 != z1 ???
-        x0 = (y0 - x1 * z0); // = y1 - x1 * z1
-
-        // Randomize the data, just in case
-        Random rand = new Random(getSeed());
-        data.randomize(rand);
-        return data;
-    }
-
-    /**
-     * Initialize {@link ReplaceMissingValues}, {@link NominalToBinary} and {@link Standardize} or
-     * {@link Normalize} filters
-     *
-     * @param data Input data to set the input formal of the filters
-     * @return Transformed data
-     * @throws Exception Filter can not be initialized
-     */
-    protected Instances initFilters(Instances data) throws Exception {
-        // Replace missing values
-        replaceMissingFilter = new ReplaceMissingValues();
-        replaceMissingFilter.setInputFormat(data);
-        data = Filter.useFilter(data, replaceMissingFilter);
-
-        // Replace nominal attributes by binary numeric attributes.
-        nominalToBinaryFilter = new NominalToBinary();
-        nominalToBinaryFilter.setInputFormat(data);
-        data = Filter.useFilter(data, nominalToBinaryFilter);
-
-        // Standardize or normalize (as requested), including the class
-
-        if (filterType == FILTER_STANDARDIZE) {
-            filter = new Standardize();
-            filter.setOptions(new String[]{"-unset-class-temporarily"});
-            filter.setInputFormat(data);
-            data = Filter.useFilter(data, filter);
-        } else if (filterType == FILTER_NORMALIZE) {
-            filter = new Normalize();
-            filter.setOptions(new String[]{"-unset-class-temporarily"});
-            filter.setInputFormat(data);
-            data = Filter.useFilter(data, filter);
-        } else {
-            filter = null;
-        }
-
-        return data;
-    }
-
-    /**
-     * Build the Zoomodel instance
-     *
-     * @return ComputationGraph instance
-     * @throws WekaException Either the .init operation on the current zooModel was not supported or
-     *                       the data shape does not fit the chosen zooModel
-     */
-    protected void createZooModel() throws Exception {
-        final AbstractInstanceIterator it = getInstanceIterator();
-        final boolean isImageIterator = it instanceof ImageInstanceIterator;
-
-        // Make sure data is convolutional
-        if (!isImageIterator) {
-            throw new WrongIteratorException(
-                    "ZooModels currently only support images. "
-                            + "Please setup an ImageInstanceIterator.");
-        }
-
-        // Get the new width/heigth/channels from the iterator
-        ImageInstanceIterator iii = (ImageInstanceIterator) it;
-        int newWidth = iii.getWidth();
-        int newHeight = iii.getHeight();
-        int channels = iii.getNumChannels();
-        boolean initSuccessful = false;
-        while (!initSuccessful) {
-            // Increase width and height
-            int[] newShape = new int[]{channels, newHeight, newWidth};
-            setInstanceIterator(new ResizeImageInstanceIterator(iii, newWidth,
-                    newHeight));
-            initSuccessful =
-                    initZooModel(trainData.numClasses(), getSeed(), newShape);
-
-            newWidth *= 1.2;
-            newHeight *= 1.2;
-            if (!initSuccessful) {
-                log.warn("The data's shape did not fit the chosen "
-                                + "model's input. It was therefore resized to ({}x{}x{}).", channels,
-                        newHeight, newWidth);
-            }
-        }
-    }
-
-    protected boolean initZooModel(int numClasses, long seed, int[] newShape)
-            throws Exception {
-        try {
-            ComputationGraph tmpModel = zooModel.init(numClasses, seed, newShape);
-            // Make a dummy feed forward pass to check if the model dimensions fit at
-            // each layer
-            Instances dummyData = new Instances(trainData);
-            for (int i = 0; i < instanceIterator.getTrainBatchSize(); i++) {
-                dummyData.add(trainData.get(i));
-            }
-            tmpModel.init();
-            DataSetIterator iter = getDataSetIterator(dummyData);
-            tmpModel.feedForward(iter.next().getFeatures(), false);
-
-            // No Exception thrown -> set model to this zoo model and return true
-            model = zooModel.init(numClasses, seed, newShape);
-            return true;
-        } catch (UnsupportedOperationException e) {
-            throw new UnsupportedOperationException(
-                    "ZooModel was not set (CustomNet), but createZooModel could be called. Invalid situation",
-                    e);
-        } catch (DL4JInvalidConfigException | DL4JInvalidInputException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Build the multilayer network defined by the networkconfiguration and the list of layers.
-     */
-    protected void createModel() throws Exception {
-        final INDArray features = getFirstBatchFeatures(trainData);
-        ComputationGraphConfiguration.GraphBuilder gb =
-                netConfig.builder().seed(getSeed()).graphBuilder();
-
-        // Set ouput size
-        final Layer lastLayer = layers[layers.length - 1];
-        final int nOut = trainData.numClasses();
-        if (lastLayer instanceof FeedForwardLayer) {
-            ((FeedForwardLayer) lastLayer).setNOut(nOut);
-        }
-
-        if (getInstanceIterator() instanceof CnnTextEmbeddingInstanceIterator) {
-            makeCnnTextLayerSetup(gb);
-        } else {
-            makeDefaultLayerSetup(gb);
-        }
-
-        gb.setInputTypes(InputType.inferInputType(features));
-        ComputationGraphConfiguration conf =
-                gb.pretrain(false).backprop(true).build();
-        ComputationGraph model = new ComputationGraph(conf);
-        model.init();
-        this.model = model;
-    }
-
-    /**
-     * Default layer setup: Create sequential layer network defined by the order of the layer list
-     *
-     * @param gb GraphBuilder object
-     */
-    protected void makeDefaultLayerSetup(GraphBuilder gb) {
-        String currentInput = "input";
-        gb.addInputs(currentInput);
-        // Collect layers
-        for (Layer layer : layers) {
-            String lName = layer.getLayerName();
-            gb.addLayer(lName, layer.getBackend().clone(), currentInput);
-            currentInput = lName;
-        }
-        gb.setOutputs(currentInput);
-    }
-
-    /**
-     * CnnText layer setup: Collect CNN layers and merge them in a {@link MergeVertex}.
-     *
-     * @param gb GraphBuilder object
-     */
-    protected void makeCnnTextLayerSetup(GraphBuilder gb)
-            throws InvalidNetworkArchitectureException,
-            InvalidLayerConfigurationException {
-        String currentInput = "input";
-        gb.addInputs(currentInput);
-
-        // Collect all convolution layers defined until the first non conv layer
-        List<ConvolutionLayer> convLayers = new ArrayList<>();
-        int idx = 0;
-        for (Layer l : layers) {
-            if (l instanceof ConvolutionLayer) {
-                final ConvolutionLayer convLayer = (ConvolutionLayer) l;
-                validateCnnLayer(convLayer);
-                convLayers.add(convLayer);
-                gb.addLayer(convLayer.getLayerName(), convLayer.getBackend().clone(),
-                        currentInput);
-                idx++;
-            } else {
-                break;
-            }
-        }
-
-        // Check if next layer is GlobalPooling
-        if (idx < layers.length && !(layers[idx] instanceof GlobalPoolingLayer)) {
-            throw new InvalidNetworkArchitectureException(
-                    "For a CNN text setup, the list of convolution"
-                            + " layers must be followed by a GlobalPoolingLayer.");
-        }
-
-        // Collect names
-        final String[] names =
-                convLayers.stream().map(ConvolutionLayer::getLayerName)
-                        .toArray(String[]::new);
-
-        // Add merge vertex
-        if (names.length > 0) {
-            final String mergeVertexName = "merge";
-            gb.addVertex(mergeVertexName, new MergeVertex(), names);
-            currentInput = mergeVertexName;
-        }
-
-        // Collect layers
-        for (
-            /* use idx from above */; idx < layers.length; idx++) {
-            String lName = layers[idx].getLayerName();
-            gb.addLayer(lName, layers[idx].getBackend().clone(), currentInput);
-            currentInput = lName;
-        }
-        gb.setOutputs(currentInput);
-    }
-
-    /**
-     * Validate CNN layers when using {@link CnnTextEmbeddingInstanceIterator}.
-     *
-     * @param cl Convolution Layer
-     * @throws InvalidLayerConfigurationException Invalid configuration
-     */
-    protected void validateCnnLayer(ConvolutionLayer cl)
-            throws InvalidLayerConfigurationException {
-        final AbstractInstanceIterator iter = getInstanceIterator();
-        if (iter instanceof CnnTextEmbeddingInstanceIterator) {
-            CnnTextEmbeddingInstanceIterator cnnIter =
-                    (CnnTextEmbeddingInstanceIterator) iter;
-            final int vectorSize =
-                    cnnIter.getWordVectors().getWordVector(
-                            cnnIter.getWordVectors().vocab().wordAtIndex(0)).length;
-
-            final int truncateLength = cnnIter.getTruncateLength();
-
-            if (truncateLength < cl.getKernelSizeX()) {
-                throw new InvalidLayerConfigurationException(
-                        "Kernel row size must be smaller than truncation length. Truncation length was "
-                                + truncateLength + ". Kernel row size was " + cl.getKernelSizeX(),
-                        cl);
-            }
-            if (truncateLength < cl.getStrideRows()) {
-                throw new InvalidLayerConfigurationException(
-                        "Stride row size must be smaller than truncation length. Truncation length was "
-                                + truncateLength + ". Stride row size was " + cl.getStrideColumns(),
-                        cl);
-            }
-
-            if (vectorSize % cl.getKernelSizeY() != 0) {
-                throw new InvalidLayerConfigurationException("Wordvector size ("
-                        + vectorSize + ") must be divisible by kernel column size ("
-                        + cl.getKernelSizeY() + ").", cl);
-            }
-
-            if (vectorSize % cl.getStrideColumns() != 0) {
-                throw new InvalidLayerConfigurationException("Wordvector size ("
-                        + vectorSize + ") must be divisible by stride column size ("
-                        + cl.getStrideColumns() + ").", cl);
-            }
-
-            if (!cl.getConvolutionMode().equals(ConvolutionMode.Same)) {
-                throw new InvalidLayerConfigurationException(
-                        "ConvolutionMode must be ConvolutionMode.Same for ConvolutionLayers in CNN text "
-                                + "architectures.", cl);
-            }
-        }
-    }
-
-    /**
-     * Get a peak at the features of the {@code iterator}'s first batch using the given instances.
-     *
-     * @return Features of the first batch
-     */
-    protected INDArray getFirstBatchFeatures(Instances data) throws Exception {
-        final DataSetIterator it = getDataSetIterator(data, CacheMode.NONE);
-        if (!it.hasNext()) {
-            throw new RuntimeException("Iterator was unexpectedly empty.");
-        }
-        final INDArray features = it.next().getFeatures();
-        it.reset();
-        return features;
-    }
-
-    /**
-     * Get the iterationlistener
-     */
-    protected TrainingListener getListener() throws Exception {
-        int numSamples = trainData.numInstances();
-        TrainingListener listener;
-
-        // Initialize weka listener
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      Thread.currentThread().setContextClassLoader(
+          this.getClass().getClassLoader());
+      StopWatch sw = new StopWatch();
+      sw.start();
+      if (parallelWrapper != null) {
+        parallelWrapper.fit(trainIterator);
+
+        // invoke this directly because (for some reason) ParallelWrapper does
+        // not seem to inform listeners after completing a call to fit()
         if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
-            // int numEpochs = getNumEpochs();
-            int numEpochs = maxEpochs;
-            iterationListener.init(trainData.numClasses(), numEpochsPerformed,
-                    numEpochs, numSamples, trainIterator,
-                    earlyStopping.getValDataSetIterator());
+          ((weka.dl4j.listener.EpochListener) iterationListener).onEpochEnd(model);
         }
-        listener = iterationListener;
-        return listener;
+      } else {
+        model.fit(trainIterator);
+      }
+      trainIterator.reset();
+      sw.stop();
+      numEpochsPerformed++;
+      numEpochsPerformedThisSession++;
+      log.info("Epoch [{}/{}] took {}", numEpochsPerformed, maxEpochs,
+          sw.toString());
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
     }
 
-    /**
-     * Perform another epoch.
-     */
-    public boolean next() throws Exception {
+    // Evaluate early stopping
+    if (useEarlyStopping()) {
+      boolean continueTraining = earlyStopping.evaluate(model);
+      if (!continueTraining) {
+        log.info("Early stopping has stopped the training process. The "
+            + "validation has not improved anymore after {} epochs. Training "
+            + "finished.", earlyStopping.getMaxEpochsNoImprovement());
+      }
+      return continueTraining;
+    }
 
-        if (numEpochsPerformedThisSession >= getNumEpochs() || zeroR != null
-                || trainData == null) {
-            return false;
+    return true;
+  }
+
+  /**
+   * Use early stopping only if valid split percentage
+   *
+   * @return True if early stopping should be used
+   */
+  public boolean useEarlyStopping() {
+    double p = earlyStopping.getValidationSetPercentage();
+    return 0 < p && p < 100;
+  }
+
+  /**
+   * Clean up after learning.
+   */
+  public void done() {
+    if (zeroR == null) {
+      trainData = new Instances(trainData, 0);
+    }
+  }
+
+
+  private static void checkIfRunByGUI() {
+    // Don't need to check if we've already set this
+    if (System.getProperty("weka.started.via.GUIChooser") != null) {
+      return;
+    }
+
+    StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    System.setProperty("weka.started.via.GUIChooser", "false");
+    for (StackTraceElement s : stack) {
+      if (s.getClassName().equals("weka.gui.GenericObjectEditor")) {
+        System.setProperty("weka.started.via.GUIChooser", "true");
+        log.debug("Weka started by GUIChooser");
+        break;
+      }
+    }
+  }
+
+  /**
+   * Creates a JFrame with the loading message. To be used while loading the zoo model layer spec
+   * @return reference to JFrame, so it can be destroyed later
+   */
+  private JFrame showModelLoadingFrame() {
+    checkIfRunByGUI();
+
+    javax.swing.JFrame frame = null;
+    String msg = "Downloading model weights and initializing model, please wait...";
+    log.info(msg);
+    if (!GraphicsEnvironment.isHeadless() && System.getProperty("weka.started.via.GUIChooser").equals("true")) {
+      frame = new javax.swing.JFrame("WekaDeeplearning4j Notification: " + msg);
+      frame.setPreferredSize(new java.awt.Dimension(850, 0));
+      frame.pack();
+      frame.setLocationRelativeTo(null);
+      frame.setVisible(true);
+      frame.setAutoRequestFocus(true);
+      frame.setAlwaysOnTop(true);
+    }
+    return frame;
+  }
+
+  /**
+   * Destroy the loading JFrame
+   * @param frame JFrame to be destroyed
+   */
+  private void closeModelLoadingFrame(JFrame frame) {
+    if (frame != null) {
+      frame.dispose();
+    }
+  }
+
+  /**
+   * Get the modelzoo model
+   *
+   * @return The modelzoo model object
+   */
+  public AbstractZooModel getZooModel() {
+    return zooModel;
+  }
+
+  /**
+   * Set the modelzoo zooModel
+   *
+   * @param zooModel The predefined zooModel
+   */
+  @OptionMetadata(displayName = "zooModel",
+      description = "The model-architecture to choose from the modelzoo "
+          + "(default = no model).", commandLineParamName = "zooModel",
+      commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
+  public void setZooModel(AbstractZooModel zooModel) {
+    this.zooModel = zooModel;
+
+    if (getLoadLayerSpecification()) {
+      JFrame frame = showModelLoadingFrame();
+
+      ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+      try {
+        // Try to parse the layers so the user can change them afterwards
+        final int dummyNumLabels = 2;
+
+        Thread.currentThread().setContextClassLoader(
+                this.getClass().getClassLoader());
+        ComputationGraph tmpCg =
+                zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+        tmpCg.init();
+        layers =
+                Arrays.stream(tmpCg.getLayers())
+                        .map(l -> Layer.create(l.conf().getLayer()))
+                        .collect(Collectors.toList())
+                        .toArray(new Layer[tmpCg.getLayers().length]);
+
+      } catch (Exception e) {
+        if (!(zooModel instanceof CustomNet)) {
+          log.error("Could not set layers from zoomodel.", e);
+        }
+      } finally {
+        Thread.currentThread().setContextClassLoader(origLoader);
+        closeModelLoadingFrame(frame);
+      }
+    }
+  }
+
+  public TrainingListener getIterationListener() {
+    return iterationListener;
+  }
+
+  @OptionMetadata(displayName = "set the iteration listener",
+      description = "Set the iteration listener.",
+      commandLineParamName = "iteration-listener",
+      commandLineParamSynopsis = "-iteration-listener <string>", displayOrder = 9)
+  public void setIterationListener(TrainingListener l) {
+    iterationListener = l;
+  }
+
+  public CacheMode getCacheMode() {
+    return cacheMode;
+  }
+
+  @OptionMetadata(displayName = "set the cache mode",
+      description = "Set the cache mode.", commandLineParamName = "cache-mode",
+      commandLineParamSynopsis = "-cache-mode <string>", displayOrder = 13)
+  public void setCacheMode(CacheMode cm) {
+    cacheMode = cm;
+  }
+
+  public boolean isFilterMode() { return filterMode; }
+
+  @ProgrammaticProperty
+  public void setFilterMode(boolean filterMode) { this.filterMode = filterMode; }
+
+  /**
+   * Performs efficient batch prediction
+   *
+   * @return true
+   */
+  @Override
+  public boolean implementsMoreEfficientBatchPrediction() {
+    return true;
+  }
+
+  /**
+   * The method to use when making a prediction for a test instance. Use distributionsForInstances()
+   * instead for speed if possible.
+   *
+   * @param inst the instance to get a prediction for
+   * @return the class probability estimates (if the class is nominal) or the numeric prediction (if
+   * it is numeric)
+   * @throws Exception if something goes wrong at prediction time
+   */
+  @Override
+  public double[] distributionForInstance(Instance inst) throws Exception {
+
+    Instances data = new Instances(inst.dataset());
+    data.add(inst);
+    return distributionsForInstances(data)[0];
+  }
+
+  public boolean arithmeticUnderflow(INDArray array) {
+    return array.isNaN().all();
+  }
+
+  /**
+   * The method to use when making predictions for test instances.
+   *
+   * @param insts the instances to get predictions for
+   * @return the class probability estimates (if the class is nominal) or the numeric predictions
+   * (if it is numeric)
+   * @throws Exception if something goes wrong at prediction time
+   */
+  @Override
+  public double[][] distributionsForInstances(Instances insts) throws Exception {
+
+    // Do we only have a ZeroR model?
+    if (zeroR != null) {
+      return zeroR.distributionsForInstances(insts);
+    }
+
+    // Process input data to have the same filters applied as the training data
+    insts = applyFilters(insts);
+
+    // Get predictions
+    final DataSetIterator it = getDataSetIterator(insts, CacheMode.NONE);
+    double[][] preds = new double[insts.numInstances()][insts.numClasses()];
+
+    int offset = 0;
+    boolean next = it.hasNext();
+
+    // Get predictions batch-wise
+    while (next) {
+      INDArray predBatch = model.outputSingle(Utils.getNext(it).getFeatures());
+
+      if (arithmeticUnderflow(predBatch))
+        throw new DL4JException("NaNs in model output, likely caused by arithmetic underflow");
+
+      int currentBatchSize = (int) predBatch.shape()[0];
+
+      // Build weka distribution output
+      for (int i = 0; i < currentBatchSize; i++) {
+        for (int j = 0; j < insts.numClasses(); j++) {
+          int jResorted = fixLabelIndexIfNominal(j, insts);
+          preds[i + offset][j] = predBatch.getDouble(i, jResorted);
+        }
+      }
+      offset += currentBatchSize; // add batchsize as offset
+      boolean hasInstancesLeft = offset < insts.numInstances();
+      next = it.hasNext() || hasInstancesLeft;
+    }
+
+    // Fix classes
+    for (int i = 0; i < preds.length; i++) {
+      // only normalise if we're dealing with classification
+      if (preds[i].length > 1) {
+        weka.core.Utils.normalize(preds[i]);
+      } else {
+        // Rescale numeric classes with the computed coefficients in the
+        // initialization phase
+        preds[i][0] = preds[i][0] * x1 + x0;
+      }
+    }
+    return preds;
+  }
+
+  /**
+   * Fixes nominal label indices. Dl4j sorts them during training time. A mapping from weka-labels
+   * resorted labels is stored in {@link this.labelsSortIndex}.
+   *
+   * @param j Original index
+   * @param insts Test dataset
+   * @return Remapped index if test dataset has nominal label. Else return {@code j}
+   */
+  protected int fixLabelIndexIfNominal(int j, Instances insts) {
+    if (insts.classAttribute().isNominal()
+        && getInstanceIterator() instanceof ImageInstanceIterator) {
+      return labelSortIndex[j];
+    } else {
+      return j;
+    }
+  }
+
+  /**
+   * Apply the filters to the given Instances
+   *
+   * @param insts Instances that are going to be filtered
+   * @return Filtered Instances
+   * @throws Exception Filter could not be applied
+   */
+  protected Instances applyFilters(Instances insts) throws Exception {
+    // Filter the instance
+    insts = Filter.useFilter(insts, replaceMissingFilter);
+    insts = Filter.useFilter(insts, nominalToBinaryFilter);
+    if (filter != null) {
+      insts = Filter.useFilter(insts, filter);
+    }
+    return insts;
+  }
+
+  /**
+   * Get the {@link ComputationGraph} model
+   *
+   * @return ComputationGraph model
+   */
+  public ComputationGraph getModel() {
+    return model;
+  }
+
+  /**
+   * Returns a string describing the model.
+   *
+   * @return the model string
+   */
+  @Override
+  public String toString() {
+    if (model == null || model.getConfiguration() == null) {
+      return "";
+    }
+
+    final String modelSummary = model.summary();
+    final String networkConfigurationString = netConfig.toString();
+    final StringBuilder sb = new StringBuilder();
+    sb.append("Network Configuration: \n");
+    sb.append(networkConfigurationString);
+    sb.append("\n");
+    sb.append("Model Summary: \n");
+    sb.append(modelSummary);
+    return sb.toString();
+  }
+
+  /**
+   * Check if the user has selected to use a zoomodel
+   *
+   * @return True if zoomodel is not CustomNet
+   */
+  protected boolean useZooModel() {
+    return !(zooModel instanceof CustomNet);
+  }
+
+  /**
+   * Overridden method - if no pooling type is given then set it to NONE
+   *
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @return Instances transformed to the image features
+   * @throws Exception
+   */
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input) throws Exception {
+    return getActivationsAtLayers(layerNames, input, PoolingType.NONE);
+  }
+
+  /**
+   * Uses the DL4J TransferLearningHelper to featurize the instances using activations from the given layer
+   * @param layerName layer activations to use for instances
+   * @param iter iterator for the instances
+   * @param poolingType pooling type to be used (only necessary if using intermediary layers with 3D activations)
+   * @return INDArray containing the newly transformed instances
+   * @throws Exception
+   */
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
+    // TransferLearningHelper alters cmp graph in place so we need to clone it
+    TransferLearningHelper transferLearningHelper;
+    try {
+      ComputationGraph clonedGraph = model.clone();
+      transferLearningHelper = new TransferLearningHelper(clonedGraph, layerName);
+    } catch (Exception e) {
+      throw new WekaException(String.format("Could not find features for layer %s, " +
+              "please ensure the name is correctly entered or append the -default-feature-layer flag to use " +
+              "the default extraction layer", layerName));
+    }
+    boolean checkedReshaping = false;
+    String initShape = "", reshapedShape = "";
+    iter.reset();
+
+    INDArray activationAtLayer, result = null;
+
+    while (iter.hasNext()) {
+      // Use the DL4J way of featurizing data
+      DataSet currentFeaturized = transferLearningHelper.featurize(Utils.getNext(iter));
+      activationAtLayer = currentFeaturized.getFeatures();
+
+      if (Utils.needsReshaping(activationAtLayer)) {
+        // permute from [1, 64, 64, 512] to [1, 512, 64, 64] (only necessary if model is in channels-last mode
+        if (Utils.isChannelsLast(activationAtLayer)) { // TODO refactor to check channels last only on first loop
+          activationAtLayer = activationAtLayer.permute(0, 3, 1, 2);
+
+          // Output info message once
+          if (!checkedReshaping) {
+            log.info("Received channels-last activations - permuting to standard channels first (NHWC -> NCHW)");
+          }
         }
 
-        // Check if trainIterator was reset properly
-        if (!trainIterator.hasNext()) {
-            throw new EmptyIteratorException("The iterator has no next elements "
-                    + "at the beginning of the epoch.");
+        // Output an info message only once if we're reshaping
+        if (!checkedReshaping)
+          initShape = Arrays.toString(activationAtLayer.shape());
+
+        activationAtLayer = Utils.reshapeActivations(activationAtLayer, poolingType);
+
+        if (!checkedReshaping) {
+          reshapedShape = Arrays.toString(activationAtLayer.shape());
+          log.info(String.format("Reshaped batch from %s to %s using %s", initShape, reshapedShape, poolingType));
+          checkedReshaping = true;
         }
+      }
 
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(
-                    this.getClass().getClassLoader());
-            StopWatch sw = new StopWatch();
-            sw.start();
-            if (parallelWrapper != null) {
-                parallelWrapper.fit(trainIterator);
+      if (result == null) {
+        result = activationAtLayer;
+      } else {
+        result = Nd4j.concat(0, result, activationAtLayer);
+      }
+    }
+    return result;
+  }
 
-                // invoke this directly because (for some reason) ParallelWrapper does
-                // not seem to inform listeners after completing a call to fit()
-                if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
-                    ((weka.dl4j.listener.EpochListener) iterationListener).onEpochEnd(model);
-                }
-            } else {
-                model.fit(trainIterator);
-            }
-            trainIterator.reset();
-            sw.stop();
-            numEpochsPerformed++;
-            numEpochsPerformedThisSession++;
-            log.info("Epoch [{}/{}] took {}", numEpochsPerformed, maxEpochs,
-                    sw.toString());
-        } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
+  /**
+   * Uses the given set of layers to extract features for the given dataset
+   * @param layerNames Layer
+   * @param input data to featurize
+   * @param poolingType pooling type to use
+   * @return Instances transformed to the image features
+   */
+  public Instances getActivationsAtLayers(String[] layerNames, Instances input, PoolingType poolingType)
+      throws Exception {
+    DataSetIterator iter = getDataSetIterator(input);
+    INDArray result = null;
+    Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
 
-        // Evaluate early stopping
-        if (useEarlyStopping()) {
-            boolean continueTraining = earlyStopping.evaluate(model);
-            if (!continueTraining) {
-                log.info("Early stopping has stopped the training process. The "
-                        + "validation has not improved anymore after {} epochs. Training "
-                        + "finished.", earlyStopping.getMaxEpochsNoImprovement());
-            }
-            return continueTraining;
-        }
+    log.info("Getting features from layers: " + Arrays.toString(layerNames));
 
-        return true;
+    for (String layerName : layerNames) {
+      if (attributesPerLayer.containsKey(layerName)) {
+        log.warn("Concatenating two identical layers not supported");
+        continue;
+      }
+
+      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+
+      attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
+      if (result == null) {
+        result = activationsAtLayer;
+      } else {
+        // Concatenate the activations of this layer with the other feature extraction layers
+        result = Nd4j.concat(1, result, activationsAtLayer);
+      }
     }
 
-    /**
-     * Use early stopping only if valid split percentage
-     *
-     * @return True if early stopping should be used
-     */
-    public boolean useEarlyStopping() {
-        double p = earlyStopping.getValidationSetPercentage();
-        return 0 < p && p < 100;
-    }
+    result = Utils.appendClasses(result, input);
 
-    /**
-     * Clean up after learning.
-     */
-    public void done() {
-        if (zeroR == null) {
-            trainData = new Instances(trainData, 0);
-        }
-    }
-
-    /**
-     * Get the modelzoo model
-     *
-     * @return The modelzoo model object
-     */
-    public ZooModel getZooModel() {
-        return zooModel;
-    }
-
-    /**
-     * Set the modelzoo zooModel
-     *
-     * @param zooModel The predefined zooModel
-     */
-    @OptionMetadata(displayName = "zooModel",
-            description = "The model-architecture to choose from the modelzoo "
-                    + "(default = no model).", commandLineParamName = "zooModel",
-            commandLineParamSynopsis = "-zooModel <string>", displayOrder = 11)
-    public void setZooModel(ZooModel zooModel) {
-        this.zooModel = zooModel;
-
-        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            // Try to parse the layers so the user can change them afterwards
-            final int dummyNumLabels = 2;
-
-            Thread.currentThread().setContextClassLoader(
-                    this.getClass().getClassLoader());
-            ComputationGraph tmpCg =
-                    zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0]);
-            tmpCg.init();
-            layers =
-                    Arrays.stream(tmpCg.getLayers())
-                            .map(l -> Layer.create(l.conf().getLayer()))
-                            .collect(Collectors.toList())
-                            .toArray(new Layer[tmpCg.getLayers().length]);
-
-        } catch (Exception e) {
-            if (!(zooModel instanceof CustomNet)) {
-                log.error("Could not set layers from zoomodel.", e);
-            }
-        } finally {
-            Thread.currentThread().setContextClassLoader(origLoader);
-        }
-    }
-
-    public TrainingListener getIterationListener() {
-        return iterationListener;
-    }
-
-    @OptionMetadata(displayName = "set the iteration listener",
-            description = "Set the iteration listener.",
-            commandLineParamName = "iteration-listener",
-            commandLineParamSynopsis = "-iteration-listener <string>", displayOrder = 9)
-    public void setIterationListener(TrainingListener l) {
-        iterationListener = l;
-    }
-
-    public CacheMode getCacheMode() {
-        return cacheMode;
-    }
-
-    @OptionMetadata(displayName = "set the cache mode",
-            description = "Set the cache mode.", commandLineParamName = "cache-mode",
-            commandLineParamSynopsis = "-cache-mode <string>", displayOrder = 13)
-    public void setCacheMode(CacheMode cm) {
-        cacheMode = cm;
-    }
-
-    /**
-     * Performs efficient batch prediction
-     *
-     * @return true
-     */
-    @Override
-    public boolean implementsMoreEfficientBatchPrediction() {
-        return true;
-    }
-
-    /**
-     * The method to use when making a prediction for a test instance. Use distributionsForInstances()
-     * instead for speed if possible.
-     *
-     * @param inst the instance to get a prediction for
-     * @return the class probability estimates (if the class is nominal) or the numeric prediction (if
-     * it is numeric)
-     * @throws Exception if something goes wrong at prediction time
-     */
-    @Override
-    public double[] distributionForInstance(Instance inst) throws Exception {
-
-        Instances data = new Instances(inst.dataset());
-        data.add(inst);
-        return distributionsForInstances(data)[0];
-    }
-
-    /**
-     * The method to use when making predictions for test instances.
-     *
-     * @param insts the instances to get predictions for
-     * @return the class probability estimates (if the class is nominal) or the numeric predictions
-     * (if it is numeric)
-     * @throws Exception if something goes wrong at prediction time
-     */
-    @Override
-    public double[][] distributionsForInstances(Instances insts) throws Exception {
-
-        // Do we only have a ZeroR model?
-        if (zeroR != null) {
-            return zeroR.distributionsForInstances(insts);
-        }
-
-        // Process input data to have the same filters applied as the training data
-        insts = applyFilters(insts);
-
-        // Get predictions
-        final DataSetIterator it = getDataSetIterator(insts, CacheMode.NONE);
-        double[][] preds = new double[insts.numInstances()][insts.numClasses()];
-
-        int offset = 0;
-        boolean next = it.hasNext();
-
-        // Get predictions batch-wise
-        while (next) {
-            INDArray predBatch = model.outputSingle(it.next().getFeatures());
-            int currentBatchSize = (int) predBatch.shape()[0];
-
-            // Build weka distribution output
-            for (int i = 0; i < currentBatchSize; i++) {
-                for (int j = 0; j < insts.numClasses(); j++) {
-                    int jResorted = fixLabelIndexIfNominal(j, insts);
-                    preds[i + offset][j] = predBatch.getDouble(i, jResorted);
-                }
-            }
-            offset += currentBatchSize; // add batchsize as offset
-            boolean hasInstancesLeft = offset < insts.numInstances();
-            next = it.hasNext() || hasInstancesLeft;
-        }
-
-        // Fix classes
-        for (int i = 0; i < preds.length; i++) {
-            // only normalise if we're dealing with classification
-            if (preds[i].length > 1) {
-                weka.core.Utils.normalize(preds[i]);
-            } else {
-                // Rescale numeric classes with the computed coefficients in the
-                // initialization phase
-                preds[i][0] = preds[i][0] * x1 + x0;
-            }
-        }
-        return preds;
-    }
-
-    /**
-     * Fixes nominal label indices. Dl4j sorts them during training time. A mapping from weka-labels
-     * resorted labels is stored in {@link this.labelsSortIndex}.
-     *
-     * @param j     Original index
-     * @param insts Test dataset
-     * @return Remapped index if test dataset has nominal label. Else return {@code j}
-     */
-    protected int fixLabelIndexIfNominal(int j, Instances insts) {
-        if (insts.classAttribute().isNominal()
-                && getInstanceIterator() instanceof ImageInstanceIterator) {
-            return labelSortIndex[j];
-        } else {
-            return j;
-        }
-    }
-
-    /**
-     * Apply the filters to the given Instances
-     *
-     * @param insts Instances that are going to be filtered
-     * @return Filtered Instances
-     * @throws Exception Filter could not be applied
-     */
-    protected Instances applyFilters(Instances insts) throws Exception {
-        // Filter the instance
-        insts = Filter.useFilter(insts, replaceMissingFilter);
-        insts = Filter.useFilter(insts, nominalToBinaryFilter);
-        if (filter != null) {
-            insts = Filter.useFilter(insts, filter);
-        }
-        return insts;
-    }
-
-    /**
-     * Get the {@link ComputationGraph} model
-     *
-     * @return ComputationGraph model
-     */
-    public ComputationGraph getModel() {
-        return model;
-    }
-
-    /**
-     * Returns a string describing the model.
-     *
-     * @return the model string
-     */
-    @Override
-    public String toString() {
-        if (model == null || model.getConfiguration() == null) {
-            return "";
-        }
-
-        final String modelSummary = model.summary();
-        final String networkConfigurationString = netConfig.toString();
-        final StringBuilder sb = new StringBuilder();
-        sb.append("Network Configuration: \n");
-        sb.append(networkConfigurationString);
-        sb.append("\n");
-        sb.append("Model Summary: \n");
-        sb.append(modelSummary);
-        return sb.toString();
-    }
-
-    /**
-     * Check if the user has selected to use a zoomodel
-     *
-     * @return True if zoomodel is not CustomNet
-     */
-    protected boolean useZooModel() {
-        return !(zooModel instanceof CustomNet);
-    }
-
-    /**
-     * Returns the activations at a certain
-     *
-     * @param layerName Layer name to get the activations from
-     * @return Activations in form of instances
-     */
-    public Instances getActivationsAtLayer(String layerName, Instances input)
-            throws Exception {
-        DataSetIterator iter = getDataSetIterator(input);
-        iter.reset();
-        DataSet next;
-        INDArray acts = null;
-        while (iter.hasNext()) {
-            next = iter.next();
-            INDArray features = next.getFeatures();
-            int layerIdx = model.getLayer(layerName).getIndex() - 1;
-            Map<String, INDArray> activations =
-                    model.feedForward(features, layerIdx, false);
-            INDArray activationAtLayer = activations.get(layerName);
-
-            if (acts == null) {
-                acts = activationAtLayer;
-            } else {
-                acts = Nd4j.concat(0, acts, activationAtLayer);
-            }
-        }
-
-        if (acts == null) {
-            return new Instances(input, 0);
-        } else {
-            return Utils.ndArrayToInstances(acts);
-        }
-    }
+    return Utils.convertToInstances(result, input, attributesPerLayer);
+  }
 }

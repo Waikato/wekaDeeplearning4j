@@ -26,12 +26,12 @@ import java.io.Serializable;
  * @author Felipe Bravo-Marquez
  */
 public class DefaultTokenizerFactoryImpl
-        extends org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory
-        implements Serializable {
+    extends org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory
+    implements Serializable {
 
-    /**
-     * For Serialization
-     */
-    private static final long serialVersionUID = 762619182220458182L;
+  /**
+   * For Serialization
+   */
+  private static final long serialVersionUID = 762619182220458182L;
 
 }

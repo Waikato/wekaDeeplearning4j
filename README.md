@@ -35,7 +35,7 @@ To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/rel
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 
 ```bash
-./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-9.2-1.5.9-linux-x86_64.zip
+./install-cuda.sh ~/Downloads/wekaDeeplearning4j-cuda-10.2-1.60-linux-x86_64.zip
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ All three ways are explained in the [getting-started](https://deeplearning.cms.w
 
 Example commandline scripts are provided in the `weka-run-test-scripts` directory, e.g. a simple network with one dense layer of 32 neurons and one output layer, classifying the iris dataset, would look like the following:
 ```bash
-$ java -cp ${WEKA_HOME}/weka.jar weka.Run \
+$ java weka.Run \
        .Dl4jMlpClassifier \
        -layer "weka.dl4j.layers.DenseLayer -nOut 32 -activation \"weka.dl4j.activations.ActivationReLU \" " \
        -layer "weka.dl4j.layers.OutputLayer -activation \"weka.dl4j.activations.ActivationSoftmax \" " \
@@ -111,7 +111,38 @@ The java documentation can be found [here](https://waikato.github.io/wekaDeeplea
 
 ## Contributing
 
-If you want to contribute to the project, check out the [contributing guide](https://github.com/Waikato/wekaDeeplearning4j/blob/master/CONTRIBUTING.md).
+If you want to contribute to the project, check out the [contributing guide](./CONTRIBUTING.md).
+
+## Development 
+
+Check out [DEVELOPMENT.md](./DEVELOPMENT.md) for further information.
+
+
+## Citation
+
+Please cite the following paper if using this package in an academic publication:
+
+S. Lang, F. Bravo-Marquez, C. Beckham, M. Hall, and E. Frank  [WekaDeeplearning4j: a Deep Learning Package for Weka based on  DeepLearning4j](https://www.sciencedirect.com/science/article/pii/S0950705119301789),  In *Knowledge-Based Systems*, Volume 178, 15 August 2019, Pages 48-50. DOI: 10.1016/j.knosys.2019.04.013  ([author version](https://felipebravom.com/publications/WDL4J_KBS2019.pdf))
+
+
+BibTex:
+
+```
+@article{lang2019wekadeeplearning4j,
+  title={WekaDeeplearning4j: A deep learning package for Weka based on Deeplearning4j},
+  author={Lang, Steven and Bravo-Marquez, Felipe and Beckham, Christopher and Hall, Mark and Frank, Eibe},
+  journal={Knowledge-Based Systems},
+  volume = "178",
+  pages = "48 - 50",
+  year = "2019",
+  issn = "0950-7051",
+  doi = "https://doi.org/10.1016/j.knosys.2019.04.013",
+  url = "http://www.sciencedirect.com/science/article/pii/S0950705119301789",
+  publisher={Elsevier}
+}
+
+```
+
 
 ## Misc.
 Original code by Mark Hall

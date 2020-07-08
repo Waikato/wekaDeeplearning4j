@@ -23,9 +23,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import weka.dl4j.PoolingType;
-import org.junit.Before;
 import org.junit.Test;
+import weka.dl4j.PoolingType;
 
 /**
  * A global pooling layer test.
@@ -35,41 +34,44 @@ import org.junit.Test;
 public class GlobalPoolingLayerTest extends AbstractLayerTest<GlobalPoolingLayer> {
 
 
-    @Override
-    public GlobalPoolingLayer getApiWrapper() {
-        return new GlobalPoolingLayer();
+  @Override
+  public GlobalPoolingLayer getApiWrapper() {
+    return new GlobalPoolingLayer();
+  }
+
+  @Test
+  public void testPoolingType() {
+    for (PoolingType type : PoolingType.values()) {
+      if (type.isCustom())
+        continue;
+
+      wrapper.setPoolingType(type);
+
+      assertEquals(type, wrapper.getPoolingType());
     }
+  }
 
-    @Test
-    public void testPoolingType() {
-        for (PoolingType type : PoolingType.values()) {
-            wrapper.setPoolingType(type);
+  @Test
+  public void testPoolingDimension() {
+    int[] dim = {25, 25};
+    wrapper.setPoolingDimensions(dim);
 
-            assertEquals(type, wrapper.getPoolingType());
-        }
-    }
+    assertArrayEquals(dim, wrapper.getPoolingDimensions());
+  }
 
-    @Test
-    public void testPoolingDimension() {
-        int[] dim = {25, 25};
-        wrapper.setPoolingDimensions(dim);
+  @Test
+  public void testCollapseDimensions() {
+    wrapper.setCollapseDimensions(true);
+    assertTrue(wrapper.isCollapseDimensions());
+    wrapper.setCollapseDimensions(false);
+    assertFalse(wrapper.isCollapseDimensions());
+  }
 
-        assertArrayEquals(dim, wrapper.getPoolingDimensions());
-    }
+  @Test
+  public void testPnorm() {
+    int p = 123;
+    wrapper.setPnorm(p);
 
-    @Test
-    public void testCollapseDimensions() {
-        wrapper.setCollapseDimensions(true);
-        assertTrue(wrapper.isCollapseDimensions());
-        wrapper.setCollapseDimensions(false);
-        assertFalse(wrapper.isCollapseDimensions());
-    }
-
-    @Test
-    public void testPnorm() {
-        int p = 123;
-        wrapper.setPnorm(p);
-
-        assertEquals(p, wrapper.getPnorm());
-    }
+    assertEquals(p, wrapper.getPnorm());
+  }
 }

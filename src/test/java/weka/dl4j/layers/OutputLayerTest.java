@@ -20,7 +20,6 @@ package weka.dl4j.layers;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 import weka.dl4j.lossfunctions.LossBinaryXENT;
 
@@ -31,16 +30,16 @@ import weka.dl4j.lossfunctions.LossBinaryXENT;
  */
 public class OutputLayerTest extends AbstractFeedForwardLayerTest<OutputLayer> {
 
-    @Override
-    public OutputLayer getApiWrapper() {
-        return new OutputLayer();
-    }
+  @Override
+  public OutputLayer getApiWrapper() {
+    return new OutputLayer();
+  }
 
-    @Test
-    public void testLossFunction() {
-        LossBinaryXENT loss = new LossBinaryXENT();
-        wrapper.setLossFn(loss);
+  @Test
+  public void testLossFunction() {
+    LossBinaryXENT loss = new LossBinaryXENT();
+    wrapper.setLossFn(loss);
 
-        assertEquals(loss, wrapper.getLossFn());
-    }
+    assertEquals(loss, wrapper.getLossFn());
+  }
 }

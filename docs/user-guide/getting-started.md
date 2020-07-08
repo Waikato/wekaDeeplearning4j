@@ -39,9 +39,9 @@ As explained further in the [data section](../user-guide/data.md), depending on 
 ![ImageInstanceIterator](../img/gui/image-instance-iterator.png)
 
 ## Commandline Interface
-A first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
+Assuming `weka.jar` is on the CLASSPATH, a first look for the available commandline options of the `Dl4jMlpClassifier` is shown with
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run .Dl4jMlpClassifier -h
+$ java weka.Run .Dl4jMlpClassifier -h
 ```
 Below the general options, the specific ones are listed:
 ```
@@ -79,9 +79,9 @@ Options specific to weka.classifiers.functions.Dl4jMlpClassifier:
 The most interesting option may be the `-layer` specification. This option can be used multiple times and defines the architecture of the network layer-wise. 
 
 ```bash
-$ java -cp $WEKA_HOME/weka.jar weka.Run \
+$ java weka.Run \
        .Dl4jMlpClassifier \
-       -layer "weka.dl4j.layers.DenseLayer \
+       -layer ".DenseLayer \
               -activation weka.dl4j.activations.ActivationReLU \
               -nOut 10" \
        -layer "weka.dl4j.layers.OutputLayer \
@@ -166,18 +166,9 @@ java -cp "$WEKA_HOME/weka.jar:$WEKA_HOME/packages/wekaDeeplearning4j/*:$WEKA_HOM
 
 
 # Model Zoo
-WekaDeeplearning4j adapts the model zoo of Deeplearning4j. That means it is possible to load predefined architectures as neural network and train it on a new dataset. Currently implemented architectures are:
 
-- AlexNet
-- LeNet
-- GoogLeNet
-- SimpleCNN
-- VGG16
-- VGG19
-
-This set of models will be extended over the time.
-
-To set a predefined model, e.g. LeNet, from the model zoo, it is necessary to add the `-zooModel "weka.dl4j.zoo.LeNet"` option via commandline, or call the `setZooModel(new LeNet())` on the `Dl4jMlpClassifier` object.
+WekaDeeplearning4j now contains a wide range of pretrained image classification models. 
+For more information, see the [Model Zoo](./model-zoo.md) guide.
 
 # Early Stopping
 Early stopping allows to stop the training process as soon as the network does not improve its loss on a validation set for `N` epochs. 

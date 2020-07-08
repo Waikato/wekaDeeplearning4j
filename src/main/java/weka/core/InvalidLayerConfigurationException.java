@@ -27,13 +27,13 @@ import weka.dl4j.layers.Layer;
  */
 public class InvalidLayerConfigurationException extends WekaException {
 
-    private static final long serialVersionUID = -8089134131947363159L;
+  private static final long serialVersionUID = -8089134131947363159L;
 
-    public InvalidLayerConfigurationException(String message, Layer layer) {
-        super("Layer=" + layer.getLayerName() + ": " + message);
-    }
+  public InvalidLayerConfigurationException(String message, Layer layer) {
+    super("Layer=" + layer.getLayerName() + ": " + message);
+  }
 
-    public InvalidLayerConfigurationException(String message, Layer layer, Throwable cause) {
-        super("Layer=" + layer.getLayerName() + ": " + message, cause);
-    }
+  public InvalidLayerConfigurationException(String message, Layer layer, Throwable cause) {
+    super("Layer=" + layer.getLayerName() + ": " + message, cause);
+  }
 }

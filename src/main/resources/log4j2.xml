@@ -8,7 +8,7 @@
   </Appenders>
   <Loggers>
     <!--Remove spam logs from reflection-->
-    <Logger name="org.reflections" level="OFF"/>
+    <Logger level="OFF" name="org.reflections"/>
 
     <!--Root level-->
     <Root level="debug">

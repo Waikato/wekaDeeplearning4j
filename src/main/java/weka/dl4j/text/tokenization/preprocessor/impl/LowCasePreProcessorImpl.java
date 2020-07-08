@@ -26,8 +26,8 @@ import java.io.Serializable;
  * @author Felipe Bravo-Marquez
  */
 public class LowCasePreProcessorImpl
-        extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor
-        implements Serializable {
+    extends org.deeplearning4j.text.tokenization.tokenizer.preprocessor.LowCasePreProcessor
+    implements Serializable {
 
-    private static final long serialVersionUID = 9207934726884484204L;
+  private static final long serialVersionUID = 9207934726884484204L;
 }

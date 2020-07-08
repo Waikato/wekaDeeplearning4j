@@ -32,21 +32,22 @@ import weka.dl4j.dropout.Disabled.DisabledDropoutImpl;
 @ToString
 public class Disabled extends AbstractDropout<DisabledDropoutImpl> {
 
-    private static final long serialVersionUID = 8082864981844682636L;
+  private static final long serialVersionUID = 8082864981844682636L;
 
-    @Override
-    public void initializeBackend() {
-        backend = null;
+  @Override
+  public void initializeBackend() {
+    backend = null;
+  }
+
+  /**
+   * Dummy dropout implementation.
+   */
+  protected class DisabledDropoutImpl extends Dropout {
+
+    private static final long serialVersionUID = 5933930276882455322L;
+
+    public DisabledDropoutImpl(double activationRetainProbability) {
+      super(activationRetainProbability);
     }
-
-    /**
-     * Dummy dropout implementation.
-     */
-    protected class DisabledDropoutImpl extends Dropout {
-        private static final long serialVersionUID = 5933930276882455322L;
-
-        public DisabledDropoutImpl(double activationRetainProbability) {
-            super(activationRetainProbability);
-        }
-    }
+  }
 }

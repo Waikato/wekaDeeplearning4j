@@ -24,13 +24,14 @@ package weka.core;
  * @author Steven Lang
  */
 public class MissingOutputLayerException extends WekaException {
-    private static final long serialVersionUID = 1038306995981039092L;
 
-    public MissingOutputLayerException(String message) {
-        super(message);
-    }
+  private static final long serialVersionUID = 1038306995981039092L;
 
-    public MissingOutputLayerException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public MissingOutputLayerException(String message) {
+    super(message);
+  }
+
+  public MissingOutputLayerException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

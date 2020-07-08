@@ -29,7 +29,7 @@ package weka.dl4j;
  * @author Steven Lang
  */
 public enum CacheMode {
-    NONE,
-    MEMORY,
-    FILESYSTEM
+  NONE,
+  MEMORY,
+  FILESYSTEM
 }
