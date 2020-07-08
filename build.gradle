@@ -120,13 +120,16 @@ task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
     from('./') {
         include 'GenericPropertiesCreator.props'
         include 'GUIEditors.props'
+        include 'Explorer-release.props'
         include 'datasets/**'
         include 'doc/**'
         include 'src/main/**'
         exclude 'src/main/*.iml'
     }
-
     into "dist/${project.name}/"
+
+    // Needs to be called 'Explorer.props' to be found by the Weka GUI
+    rename "Explorer-release.props", "Explorer.props"
 }
 
 /*
