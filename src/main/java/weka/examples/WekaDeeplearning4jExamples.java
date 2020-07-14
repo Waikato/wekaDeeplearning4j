@@ -5,6 +5,7 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.playground.Dl4jModelExplorer;
 import weka.dl4j.zoo.KerasEfficientNet;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.filters.Filter;
@@ -16,7 +17,7 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        train();
+        playground();
     }
 
     private static void filter() throws Exception {
@@ -78,5 +79,14 @@ public class WekaDeeplearning4jExamples {
         // Output some summary statistics
         System.out.println(eval.toSummaryString());
         System.out.println(eval.toMatrixString());
+    }
+
+    public static void playground() throws Exception {
+        Dl4jModelExplorer explorer = new Dl4jModelExplorer();
+
+        explorer.imageFile = new File("/home/rhys/Downloads/cat.jpeg");
+        explorer.init();
+
+        explorer.makePrediction();
     }
 }
