@@ -26,6 +26,7 @@ import java.util.Enumeration;
 
 import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
 import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
@@ -291,28 +292,10 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
 
   /**
    * @param data Sets up the filter by loading the model (either from file or from model zoo)
-   * @throws Exception From errors occuring during loading the model file, or from intializing from the data
+   * @throws Exception From errors occurring during loading the model file, or from intializing from the data
    */
   private void loadModel(Instances data) throws Exception {
-    if (userSuppliedModelFile()) {
-      // First try load from the WEKA binary model file
-      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
-        model = (Dl4jMlpClassifier) ois.readObject();
-      } catch (Exception e) {
-        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
-      }
-    } else {
-      // If that fails, try loading from selected zoo model (or keras file)
-      model = new Dl4jMlpClassifier();
-      model.setZooModel(zooModelType);
-    }
-    model.setFilterMode(true);
-    model.setInstanceIterator(instanceIterator);
-
-    // If we're loading from a previously trained model, we don't need to intialize the classifier again,
-    // We do need to, however, if we're loading from a fresh zoo model
-    if (!userSuppliedModelFile())
-      model.initializeClassifier(data);
+    model = Utils.loadModel(data, serializedModelFile, zooModelType, instanceIterator);
   }
 
   /**
