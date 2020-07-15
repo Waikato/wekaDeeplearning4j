@@ -516,6 +516,27 @@ public class Utils {
     return model;
   }
 
+  public static Dl4jMlpClassifier loadPlaygroundModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
+    Dl4jMlpClassifier model;
+    if (userSuppliedModelFile(serializedModelFile)) {
+      // First try load from the WEKA binary model file
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
+        model = (Dl4jMlpClassifier) ois.readObject();
+        model.setFilterMode(true);
+      } catch (Exception e) {
+        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
+      }
+    } else {
+      // If that fails, try loading from selected zoo model (or keras file)
+      model = new Dl4jMlpClassifier();
+      model.setZooModel(zooModelType);
+      model.setFilterMode(true);
+      model.loadZooModelNoData(1000, 1, new int[] {3, 224, 224});
+    }
+
+    return model;
+  }
+
   /**
    * Takes an INDArray containing an image loaded using the native image loader
    * libraries associated with DL4J, and converts it into a BufferedImage.
