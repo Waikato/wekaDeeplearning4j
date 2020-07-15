@@ -51,6 +51,7 @@ import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
+import org.nd4j.linalg.indexing.INDArrayIndex;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
@@ -1370,6 +1371,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
             newHeight, newWidth);
       }
     }
+  }
+
+  public void loadZooModelNoData(int numClasses, long seed, int[] newShape) {
+    model = zooModel.init(numClasses, seed, newShape, isFilterMode());
+  }
+
+  public INDArray outputSingle(INDArray image) {
+    return model.outputSingle(image);
   }
 
   /**
