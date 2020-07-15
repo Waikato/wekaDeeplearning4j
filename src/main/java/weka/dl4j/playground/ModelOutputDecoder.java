@@ -15,6 +15,8 @@ public class ModelOutputDecoder {
      * Constructors
      */
 
+    public ModelOutputDecoder() {}
+
     public ModelOutputDecoder(ClassMap classMap) {
         this.classMap = classMap;
     }
@@ -29,7 +31,7 @@ public class ModelOutputDecoder {
     /**
      * Class Functionality
      */
-    public Prediction[] decodePredictions(INDArray predictions) throws Exception {
+    public TopNPredictions[] decodePredictions(INDArray predictions) throws Exception {
         // Get number of instances to predict for
         long[] shape = predictions.shape();
 
@@ -41,30 +43,27 @@ public class ModelOutputDecoder {
         int numInstances = (int) shape[0];
 
         // Create the returning Prediction[]
-        Prediction[] result = new Prediction[numInstances];
-        String[] classes = classMap.getClasses();
+        TopNPredictions[] result = new TopNPredictions[numInstances];
 
         int dimension = 0;
         // Decode each prediction
         for (int i = 0; i < numInstances; i++) {
             INDArray thisInstance = predictions.get(NDArrayIndex.point(i));
 
-            int classIndex = thisInstance.argMax(dimension).getInt(0);
-            String className = classes[classIndex];
-            double classProb = thisInstance.getDouble(classIndex);
+            TopNPredictions topNPredictions = new TopNPredictions();
+            topNPredictions.process(thisInstance, classMap);
 
-            Prediction p = new Prediction(classIndex, className, classProb);
-            result[i] = p;
+            result[i] = topNPredictions;
         }
 
         return result;
     }
 
-    public Prediction[] decodePredictions(double[][] predictions) throws Exception {
+    public TopNPredictions[] decodePredictions(double[][] predictions) throws Exception {
         return decodePredictions(Nd4j.create(predictions));
     }
 
-    public Prediction[] decodePredictions(double[] predictions) throws Exception {
+    public TopNPredictions[] decodePredictions(double[] predictions) throws Exception {
         return decodePredictions(Nd4j.create(predictions));
     }
 
