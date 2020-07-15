@@ -1,6 +1,7 @@
 package weka.examples;
 
 import com.google.flatbuffers.FlatBufferBuilder;
+import org.apache.commons.math3.analysis.function.Abs;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.ZooModel;
@@ -18,11 +19,8 @@ import weka.core.Instances;
 import weka.core.Utils;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.playground.ClassMap;
-import weka.dl4j.playground.Dl4jModelExplorer;
-import weka.dl4j.playground.ModelOutputDecoder;
-import weka.dl4j.playground.Prediction;
-import weka.dl4j.zoo.KerasEfficientNet;
+import weka.dl4j.playground.*;
+import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
@@ -51,9 +49,9 @@ public class WekaDeeplearning4jExamples {
 
         ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
 
-        Prediction[] predictions = decoder.decodePredictions(array);
+        TopNPredictions[] predictions = decoder.decodePredictions(array);
 
-        for (Prediction p : predictions) {
+        for (TopNPredictions p : predictions) {
             System.out.println(p);
         }
     }
@@ -123,9 +121,11 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jModelExplorer explorer = new Dl4jModelExplorer();
 
-        explorer.imageFile = new File("river.jpg");
-        explorer.init();
+        AbstractZooModel kerasEfficientNet = new KerasResNet();
+        explorer.setZooModelType(kerasEfficientNet);
+        explorer.setImageFile(new File("src/test/resources/images/pufferfish.jpg"));
 
+        explorer.init();
         explorer.makePrediction();
     }
 }
