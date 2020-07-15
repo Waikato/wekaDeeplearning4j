@@ -1,5 +1,6 @@
 package weka.dl4j.playground;
 
+import com.sun.jna.platform.win32.OaIdl;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -11,7 +12,7 @@ import java.io.File;
 
 public class Dl4jModelExplorer {
 
-    public File imageFile;
+    protected File imageFile;
     /**
      * The classifier model this filter is based on.
      */
@@ -20,7 +21,7 @@ public class Dl4jModelExplorer {
     /**
      * The zoo model to use, if we're not loading from the serialized model file
      */
-    protected AbstractZooModel zooModelType = new Dl4jVGG();
+    protected AbstractZooModel zooModelType;
 
     /**
      * Model used for feature extraction
@@ -41,11 +42,30 @@ public class Dl4jModelExplorer {
         if (zooModelType.getChannelsLast())
             image = image.permute(0,2,3,1);
 
-        Prediction[] predictions = decoder.decodePredictions(result);
+        INDArray dup = image.dup();
+        INDArray result = model.outputSingle(dup);
 
-        for (Prediction p : predictions) {
-            System.out.println(p);
+        TopNPredictions[] predictions = decoder.decodePredictions(result);
+
+        // Only processing a single image at the moment, not batch processing
+        TopNPredictions thisPrediction = predictions[0];
+
+        String modelName; // TODO refactor into TopNPredictions (or Utils class)
+        if (Utils.userSuppliedModelFile(serializedModelFile)) {
+            modelName = "Custom trained Dl4jMlpClassifier";
+        } else {
+            modelName = zooModelType.getClass().getSimpleName() + " (" + zooModelType.getVariation() + ")";
         }
+
+        System.out.println(thisPrediction.toSummaryString(imageFile.getName(), modelName));
+    }
+
+    public File getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(File imageFile) {
+        this.imageFile = imageFile;
     }
 
     public File getSerializedModelFile() {
