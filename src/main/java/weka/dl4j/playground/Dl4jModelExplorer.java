@@ -38,7 +38,8 @@ public class Dl4jModelExplorer {
         NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
         INDArray image = loader.asMatrix(imageFile);
 
-        INDArray result = model.outputSingle(image);
+        if (zooModelType.getChannelsLast())
+            image = image.permute(0,2,3,1);
 
         Prediction[] predictions = decoder.decodePredictions(result);
 
