@@ -12,18 +12,23 @@ public class ModelOutputDecoderTest extends TestCase {
 
         ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
 
-        Prediction[] decoded = decoder.decodePredictions(modelPredictions);
+        TopNPredictions[] decoded = decoder.decodePredictions(modelPredictions);
 
         assertNotNull(decoded);
 
+        // Test there's only one in the batch
         assertEquals(decoded.length, 1);
 
-        Prediction carPrediction = decoded[0];
 
-        assertEquals(817, carPrediction.getClassID());
+        TopNPredictions carPrediction = decoded[0];
 
-        assertEquals("sports car, sport car", carPrediction.getClassName());
+        // Get the highest probability prediction
+        Prediction highestProbPrediction = carPrediction.getTopPrediction();
 
-        assertEquals(0.767, carPrediction.getClassProbability(), 0.001);
+        assertEquals(817, highestProbPrediction.getClassID());
+
+        assertEquals("sports car, sport car", highestProbPrediction.getClassName());
+
+        assertEquals(0.767, highestProbPrediction.getClassProbability(), 0.001);
     }
 }
