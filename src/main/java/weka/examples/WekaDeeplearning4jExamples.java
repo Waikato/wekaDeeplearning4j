@@ -1,5 +1,6 @@
 package weka.examples;
 
+import com.google.flatbuffers.FlatBufferBuilder;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.ZooModel;
@@ -7,13 +8,20 @@ import org.deeplearning4j.zoo.model.ResNet50;
 import org.deeplearning4j.zoo.model.SqueezeNet;
 import org.deeplearning4j.zoo.model.VGG16;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.custom.Flatten;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.PointIndex;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.playground.ClassMap;
 import weka.dl4j.playground.Dl4jModelExplorer;
+import weka.dl4j.playground.ModelOutputDecoder;
+import weka.dl4j.playground.Prediction;
 import weka.dl4j.zoo.KerasEfficientNet;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.filters.Filter;
@@ -29,30 +37,25 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        zooTest();
+        playground();
     }
 
     public static void zooTest() throws Exception {
-        ZooModel zooModel = SqueezeNet.builder().build();
+        ZooModel zooModel = ResNet50.builder().build();
         ComputationGraph computationGraph = (ComputationGraph) zooModel.initPretrained();
 
         NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
-        INDArray image = loader.asMatrix(new File("car.jpg"));
-
-        ImageIO.write(imageFromINDArray(image), "jpg", new File("scaled.jpg"));
+        INDArray image = loader.asMatrix(new File("dog.jpg"));
 
         INDArray array = computationGraph.outputSingle(image);
 
-        System.out.println(array.argMax(1));
-        System.out.println(array.max(1));
-    }
+        ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
 
+        Prediction[] predictions = decoder.decodePredictions(array);
 
-    /**
-     * Takes an INDArray containing an image loaded using the native image loader
-            }
+        for (Prediction p : predictions) {
+            System.out.println(p);
         }
-        return image;
     }
 
 
@@ -120,7 +123,7 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jModelExplorer explorer = new Dl4jModelExplorer();
 
-        explorer.imageFile = new File("/home/rhys/Downloads/cat.jpeg");
+        explorer.imageFile = new File("river.jpg");
         explorer.init();
 
         explorer.makePrediction();
