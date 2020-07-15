@@ -480,7 +480,7 @@ public class Utils {
   /**
    * @return true if the user has selected a file to load the model from
    */
-  private static boolean userSuppliedModelFile(File serializedModelFile) {
+  public static boolean userSuppliedModelFile(File serializedModelFile) {
     // Has the model file location been set to something other than the default
     return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
   }
