@@ -485,12 +485,7 @@ public class Utils {
     return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
   }
 
-  /**
-   * @param data Loads the model (either from file or from model zoo)
-   * @throws Exception From errors occurring during loading the model file, or from intializing from the data
-   */
-  public static Dl4jMlpClassifier loadModel(Instances data, File serializedModelFile,
-                                            AbstractZooModel zooModelType, AbstractInstanceIterator instanceIterator) throws Exception {
+  public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model;
     if (userSuppliedModelFile(serializedModelFile)) {
       // First try load from the WEKA binary model file
@@ -500,12 +495,25 @@ public class Utils {
         throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
       }
     } else {
+      if (zooModelType == null) {
+        throw new WekaException("No model file supplied nor zoo model specified");
+      }
       // If that fails, try loading from selected zoo model (or keras file)
       model = new Dl4jMlpClassifier();
       model.setZooModel(zooModelType);
     }
-
     model.setFilterMode(true);
+    return model;
+  }
+
+  /**
+   * @param data Loads the model (either from file or from model zoo)
+   * @throws Exception From errors occurring during loading the model file, or from intializing from the data
+   */
+  public static Dl4jMlpClassifier loadModel(Instances data, File serializedModelFile,
+                                            AbstractZooModel zooModelType, AbstractInstanceIterator instanceIterator) throws Exception {
+    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
+
     model.setInstanceIterator(instanceIterator);
 
     // If we're loading from a previously trained model, we don't need to intialize the classifier again,
@@ -517,22 +525,10 @@ public class Utils {
   }
 
   public static Dl4jMlpClassifier loadPlaygroundModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
-    Dl4jMlpClassifier model;
-    if (userSuppliedModelFile(serializedModelFile)) {
-      // First try load from the WEKA binary model file
-      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
-        model = (Dl4jMlpClassifier) ois.readObject();
-        model.setFilterMode(true);
-      } catch (Exception e) {
-        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
-      }
-    } else {
-      // If that fails, try loading from selected zoo model (or keras file)
-      model = new Dl4jMlpClassifier();
-      model.setZooModel(zooModelType);
-      model.setFilterMode(true);
+    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
+
+    if (!Utils.userSuppliedModelFile(serializedModelFile))
       model.loadZooModelNoData(1000, 1, new int[] {3, 224, 224});
-    }
 
     return model;
   }
