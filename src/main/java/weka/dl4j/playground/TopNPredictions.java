@@ -100,7 +100,7 @@ public class TopNPredictions {
         // Add each row to the output table
         for (Prediction p : topNPredictions) {
             String classID = "" + p.getClassID();
-            String probability = String.format("%.3f", p.getClassProbability());
+            String probability = String.format("%.3f", p.getClassProbability() * 100);
             text.append(String.format(lineFormat, classID, p.getClassName(), probability));
         }
 
