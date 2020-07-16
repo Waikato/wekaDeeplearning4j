@@ -1,35 +1,23 @@
 package weka.examples;
 
-import com.google.flatbuffers.FlatBufferBuilder;
-import org.apache.commons.math3.analysis.function.Abs;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.ZooModel;
 import org.deeplearning4j.zoo.model.ResNet50;
-import org.deeplearning4j.zoo.model.SqueezeNet;
-import org.deeplearning4j.zoo.model.VGG16;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.custom.Flatten;
-import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.PointIndex;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
-import weka.core.Utils;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.playground.*;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
+import weka.dl4j.zoo.keras.ResNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Random;
 
 public class WekaDeeplearning4jExamples {
@@ -119,13 +107,13 @@ public class WekaDeeplearning4jExamples {
     }
 
     public static void playground() throws Exception {
-        Dl4jModelExplorer explorer = new Dl4jModelExplorer();
+        Dl4jImageModelPlayground explorer = new Dl4jImageModelPlayground();
 
-        AbstractZooModel kerasEfficientNet = new KerasResNet();
+        KerasResNet kerasEfficientNet = new KerasResNet();
+        kerasEfficientNet.setVariation(ResNet.VARIATION.RESNET152);
         explorer.setZooModelType(kerasEfficientNet);
-        explorer.setImageFile(new File("src/test/resources/images/pufferfish.jpg"));
 
         explorer.init();
-        explorer.makePrediction();
+        explorer.makePrediction(new File("src/test/resources/images/pufferfish.jpg"));
     }
 }
