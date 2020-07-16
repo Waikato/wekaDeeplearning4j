@@ -10,9 +10,8 @@ import weka.dl4j.zoo.*;
 
 import java.io.File;
 
-public class Dl4jModelExplorer {
+public class Dl4jImageModelPlayground {
 
-    protected File imageFile;
     /**
      * The classifier model this filter is based on.
      */
@@ -33,7 +32,7 @@ public class Dl4jModelExplorer {
         model = Utils.loadPlaygroundModel(serializedModelFile, zooModelType);
     }
 
-    public void makePrediction() throws Exception {
+    public void makePrediction(File imageFile) throws Exception {
         ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
 
         NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
@@ -60,14 +59,11 @@ public class Dl4jModelExplorer {
         System.out.println(thisPrediction.toSummaryString(imageFile.getName(), modelName));
     }
 
-    public File getImageFile() {
-        return imageFile;
-    }
+    @OptionMetadata(
+            displayName = "Serialized model file",
+            description = "Pointer to file - saved Dl4jMlpClassifier"
 
-    public void setImageFile(File imageFile) {
-        this.imageFile = imageFile;
-    }
-
+    )
     public File getSerializedModelFile() {
         return serializedModelFile;
     }
