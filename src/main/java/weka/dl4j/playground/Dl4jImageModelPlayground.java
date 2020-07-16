@@ -27,6 +27,8 @@ public class Dl4jImageModelPlayground {
      */
     protected Dl4jMlpClassifier model;
 
+    private TopNPredictions currentPredictions;
+
     public void init() throws Exception {
         // TODO possibly refactor into makePrediction
         model = Utils.loadPlaygroundModel(serializedModelFile, zooModelType);
@@ -47,7 +49,7 @@ public class Dl4jImageModelPlayground {
         TopNPredictions[] predictions = decoder.decodePredictions(result);
 
         // Only processing a single image at the moment, not batch processing
-        TopNPredictions thisPrediction = predictions[0];
+        currentPredictions = predictions[0];
 
         String modelName; // TODO refactor into TopNPredictions (or Utils class)
         if (Utils.userSuppliedModelFile(serializedModelFile)) {
@@ -56,7 +58,7 @@ public class Dl4jImageModelPlayground {
             modelName = zooModelType.getClass().getSimpleName() + " (" + zooModelType.getVariation() + ")";
         }
 
-        System.out.println(thisPrediction.toSummaryString(imageFile.getName(), modelName));
+//        System.out.println(thisPrediction.toSummaryString(imageFile.getName(), modelName));
     }
 
     @OptionMetadata(
@@ -78,5 +80,13 @@ public class Dl4jImageModelPlayground {
 
     public void setZooModelType(AbstractZooModel zooModelType) {
         this.zooModelType = zooModelType;
+    }
+
+    public TopNPredictions getCurrentPredictions() {
+        return currentPredictions;
+    }
+
+    public void setCurrentPredictions(TopNPredictions currentPredictions) {
+        this.currentPredictions = currentPredictions;
     }
 }

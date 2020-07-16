@@ -1,7 +1,13 @@
 package weka.gui.explorer;
 
+import lombok.SneakyThrows;
+import weka.classifiers.*;
+import weka.classifiers.evaluation.output.prediction.AbstractOutput;
+import weka.classifiers.evaluation.output.prediction.Null;
 import weka.core.*;
 
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ConverterUtils;
 import weka.dl4j.playground.Dl4jImageModelPlayground;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.Dl4jResNet50;
@@ -18,6 +24,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel, LogHandler {
 
@@ -245,40 +255,18 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         m_modelFileRadio.addActionListener(m_RadioListener);
         m_ZooModelRadio.addActionListener(m_RadioListener);
 
-        m_setZooModelBut.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Opening Zoo model prompt");
+        m_setZooModelBut.addActionListener(e -> {
+//                System.out.println("Opening Zoo model prompt");
 //                setTestSet();
-            }
         });
 
-        m_setModelFileBut.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                System.out.println("Opening model file prompt...");
-            }
-        });
+        m_setModelFileBut.addActionListener(actionEvent -> System.out.println("Opening model file prompt..."));
 
-        m_OpenImageButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                openNewImage();
-            }
-        });
+        m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
 
         m_predictButton.setEnabled(false);
-        m_predictButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                boolean proceed = true;
-//                if (Explorer.m_Memory.memoryIsLow()) {
-//                    proceed = Explorer.m_Memory.showMemoryIsLow();
-//                }
-//                if (proceed) {
-////                    startClassifier();
-//                }
-            }
+        m_predictButton.addActionListener(e -> {
+            predict();
         });
     }
 
@@ -365,6 +353,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 if (h != lastHeight) { // i.e. an addition not just a user scrolling
                     lastHeight = h;
                     int x = h - vp.getExtentSize().height;
+                    System.out.println(x);
                     vp.setViewPosition(new Point(0, x));
                 }
             }
@@ -509,6 +498,37 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         }
 
         return new ImageIcon(icon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT));
+    }
+
+    private void predict() {
+        if (m_RunThread == null) {
+            synchronized (this) {
+                m_predictButton.setEnabled(false);
+            }
+            m_RunThread = new Thread() {
+                @SneakyThrows
+                @Override
+                public void run() {
+                    m_dl4jImageModelPlayground = new Dl4jImageModelPlayground();
+                    m_dl4jImageModelPlayground.setZooModelType(zooModel);
+                    try {
+                        m_dl4jImageModelPlayground.init();
+                    } catch (Exception ex) {
+                        System.err.println("Couldn't initialise model");
+                        ex.printStackTrace();
+                        return;
+                    }
+
+                    m_dl4jImageModelPlayground.makePrediction(new File(m_currentlyDisplayedImage));
+
+                    m_OutText.setText(m_dl4jImageModelPlayground.getCurrentPredictions().toSummaryString());
+
+                    m_predictButton.setEnabled(true);
+                }
+            };
+            m_RunThread.setPriority(Thread.MIN_PRIORITY);
+            m_RunThread.start();
+        }
     }
 
 
