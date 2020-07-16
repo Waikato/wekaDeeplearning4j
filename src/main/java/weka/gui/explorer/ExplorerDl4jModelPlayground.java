@@ -3,6 +3,8 @@ package weka.gui.explorer;
 import weka.core.*;
 
 import weka.dl4j.playground.Dl4jImageModelPlayground;
+import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.zoo.Dl4jResNet50;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
@@ -11,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.ImageView;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
@@ -30,6 +33,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
     protected Dl4jImageModelPlayground m_dl4jImageModelPlayground = new Dl4jImageModelPlayground();
 
+    protected String m_currentlyDisplayedImage = "";
+
     /**
      * UI Components
      */
@@ -40,7 +45,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     /** The filename extension that should be used for PMML xml files. */
     public static String PMML_FILE_EXTENSION = ".xml";
 
-    public static String[] IMAGE_FILE_EXTENSIONS = new String[] {"*.jpg", "*.jpeg", "*.png"};
+    public static String[] IMAGE_FILE_EXTENSIONS = new String[] {".jpg", ".jpeg", ".png"};
 
     /** The output area for classification results. */
     protected JTextArea m_OutText = new JTextArea(10, 40);
@@ -55,7 +60,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     protected JRadioButton m_ZooModelRadio = new JRadioButton("Zoo Model");
 
     /** Button for further output/visualize options. */
-    JButton m_MoreOptions = new JButton("Open Image...");
+    JButton m_OpenImageButton = new JButton("Open Image...");
 
     /** The button used to open a separate test dataset. */
     protected JButton m_setModelFileBut = new JButton("Set...");
@@ -89,6 +94,14 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     /** The file chooser for selecting model files. */
     protected WekaFileChooser m_FileChooser = new WekaFileChooser(new File(
             System.getProperty("user.dir")));
+
+    JLabel imageLabel;
+
+    JPanel imagePanel;
+
+    protected AbstractZooModel zooModel = new Dl4jResNet50();
+
+    protected Dl4jImageModelPlayground imageModelPlayground;
 
     /* Register the property editors we need */
     static {
@@ -171,7 +184,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         setupFileChooser();
 
-        setupRadioButtonListeners();
+        setupButtonListeners();
 
         JPanel optionsPanel = setupPlaygroundOptions();
 
@@ -220,11 +233,11 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     private void setupFileChooser() {
-        m_FileChooser.setFileFilter(m_ModelFilter);
+//        m_FileChooser.setFileFilter(m_ModelFilter);
         m_FileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     }
 
-    private void setupRadioButtonListeners() {
+    private void setupButtonListeners() {
         ButtonGroup bg = new ButtonGroup();
         bg.add(m_modelFileRadio);
         bg.add(m_ZooModelRadio);
@@ -247,17 +260,24 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             }
         });
 
+        m_OpenImageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                openNewImage();
+            }
+        });
+
         m_predictButton.setEnabled(false);
         m_predictButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean proceed = true;
-                if (Explorer.m_Memory.memoryIsLow()) {
-                    proceed = Explorer.m_Memory.showMemoryIsLow();
-                }
-                if (proceed) {
-//                    startClassifier();
-                }
+//                boolean proceed = true;
+//                if (Explorer.m_Memory.memoryIsLow()) {
+//                    proceed = Explorer.m_Memory.showMemoryIsLow();
+//                }
+//                if (proceed) {
+////                    startClassifier();
+//                }
             }
         });
     }
@@ -314,8 +334,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         gbC.weightx = 100;
         gbC.gridwidth = 3;
         gbC.insets = new Insets(3, 0, 1, 0);
-        gbL.setConstraints(m_MoreOptions, gbC);
-        optionsPanel.add(m_MoreOptions);
+        gbL.setConstraints(m_OpenImageButton, gbC);
+        optionsPanel.add(m_OpenImageButton);
 
         return optionsPanel;
     }
@@ -427,11 +447,68 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     private JPanel setupImagePanel() {
-        JPanel imagePanel = new JPanel();
+        imagePanel = new JPanel();
         imagePanel.setBorder(BorderFactory.createTitledBorder("Currently Selected Image"));
-
+        imageLabel = new JLabel("", JLabel.CENTER);
+        imagePanel.add(imageLabel, BorderLayout.CENTER);
 
         return imagePanel;
+    }
+
+    protected void openNewImage() {
+        m_FileChooser.setFileFilter(m_ImageFilter);
+
+        int returnCode = m_FileChooser.showOpenDialog(this);
+
+        if (returnCode == 1) {
+            System.err.println("User did not select a new image");
+            return;
+        }
+
+        File f = m_FileChooser.getSelectedFile();
+        m_currentlyDisplayedImage = f.getAbsolutePath();
+        refreshImagePanel();
+    }
+
+    protected void refreshImagePanel() {
+        if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage == "") {
+            return;
+        }
+
+        ImageIcon imageIcon = new ImageIcon(m_currentlyDisplayedImage);
+
+        int desiredWidth = imagePanel.getWidth()-50;
+        int desiredHeight = imagePanel.getHeight()-50;
+
+        ImageIcon scaledIcon = scaleImage(imageIcon, desiredWidth, desiredHeight);
+
+        imageLabel.setIcon(scaledIcon);
+
+        refreshPredictButtonEnabled();
+    }
+
+    protected void refreshPredictButtonEnabled() {
+        m_predictButton.setEnabled(true);
+    }
+
+    private ImageIcon scaleImage(ImageIcon icon, int desiredWidth, int desiredHeight)
+    {
+        int newWidth = icon.getIconWidth();
+        int newHeight = icon.getIconHeight();
+
+        if(newWidth > desiredWidth)
+        {
+            newWidth = desiredWidth;
+            newHeight = (newWidth * icon.getIconHeight()) / icon.getIconWidth();
+        }
+
+        if(newHeight > desiredHeight)
+        {
+            newHeight = desiredHeight;
+            newWidth = (icon.getIconWidth() * newHeight) / icon.getIconHeight();
+        }
+
+        return new ImageIcon(icon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT));
     }
 
 
