@@ -40,8 +40,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     /** The filename extension that should be used for PMML xml files. */
     public static String PMML_FILE_EXTENSION = ".xml";
 
+    public static String[] IMAGE_FILE_EXTENSIONS = new String[] {"*.jpg", "*.jpeg", "*.png"};
+
     /** The output area for classification results. */
-    protected JTextArea m_OutText = new JTextArea(20, 40);
+    protected JTextArea m_OutText = new JTextArea(10, 40);
 
     /** A panel controlling results viewing. */
     protected ResultHistoryPanel m_History = new ResultHistoryPanel(m_OutText);
@@ -69,7 +71,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
 
     /** Click to start running the classifier. */
-    protected JButton m_StartBut = new JButton("Start");
+    protected JButton m_predictButton = new JButton("Predict");
 
     /** A thread that classification runs in. */
     protected Thread m_RunThread;
@@ -82,7 +84,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             PMML_FILE_EXTENSION, "PMML model files");
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(
-            ".jpg,.png", "Image files");
+            IMAGE_FILE_EXTENSIONS, "Image files");
 
     /** The file chooser for selecting model files. */
     protected WekaFileChooser m_FileChooser = new WekaFileChooser(new File(
@@ -175,11 +177,13 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         JPanel buttons = setupStartButton();
 
-        JPanel modelOutput = setupModelOutput();
+        JPanel modelOutput = setupOutputPanel();
 
-        setupMainLayout(optionsPanel, buttons, historyPanel, modelOutput);
+        JPanel imagePanel = setupImagePanel();
 
-        setDefaultRadioBut();
+        setupMainLayout(optionsPanel, buttons, historyPanel, modelOutput, imagePanel);
+
+        setDefaultRadioButton();
     }
 
     private void setupOutputText() {
@@ -212,7 +216,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 + " is trained on");
 
         m_ZooModelRadio.setToolTipText("Test on a user-specified dataset");
-        m_StartBut.setToolTipText("Starts the classification");
+        m_predictButton.setToolTipText("Starts the classification");
     }
 
     private void setupFileChooser() {
@@ -243,8 +247,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             }
         });
 
-        m_StartBut.setEnabled(false);
-        m_StartBut.addActionListener(new ActionListener() {
+        m_predictButton.setEnabled(false);
+        m_predictButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean proceed = true;
@@ -320,17 +324,17 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         JPanel buttons = new JPanel();
         buttons.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER));
-        buttons.add(m_StartBut);
+        buttons.add(m_predictButton);
 
         return buttons;
     }
 
-    private JPanel setupModelOutput() {
-        JPanel p3 = new JPanel();
-        p3.setBorder(BorderFactory.createTitledBorder("Model output"));
-        p3.setLayout(new BorderLayout());
+    private JPanel setupOutputPanel() {
+        JPanel outputPanel = new JPanel();
+        outputPanel.setBorder(BorderFactory.createTitledBorder("Model output"));
+        outputPanel.setLayout(new BorderLayout());
         final JScrollPane js = new JScrollPane(m_OutText);
-        p3.add(js, BorderLayout.CENTER);
+        outputPanel.add(js, BorderLayout.CENTER);
         js.getViewport().addChangeListener(new ChangeListener() {
             private int lastHeight;
 
@@ -345,52 +349,89 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 }
             }
         });
-        return p3;
+        return outputPanel;
     }
 
-    private void setDefaultRadioBut() {
+    private void setDefaultRadioButton() {
         m_ZooModelRadio.setSelected(true);
         updateRadioLinks();
     }
 
-    private void setupMainLayout(JPanel optionsPanel, JPanel buttons, JPanel historyPanel, JPanel modelOutput) {
-        JPanel mondo = new JPanel();
-        GridBagLayout gbL = new GridBagLayout();
-        mondo.setLayout(gbL);
+    private void setupMainLayout(JPanel optionsPanel, JPanel buttons, JPanel historyPanel, JPanel outputPanel, JPanel imagePanel) {
+        JPanel mainPanel = new JPanel();
+        GridBagLayout mainLayout = new GridBagLayout();
+        mainPanel.setLayout(mainLayout);
+
         GridBagConstraints gbC = new GridBagConstraints();
-        // gbC.anchor = GridBagConstraints.WEST;
         gbC.fill = GridBagConstraints.HORIZONTAL;
         gbC.gridy = 0;
         gbC.gridx = 0;
-        gbL.setConstraints(optionsPanel, gbC);
-        mondo.add(optionsPanel);
+        mainLayout.setConstraints(optionsPanel, gbC);
+        mainPanel.add(optionsPanel);
+
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.NORTH;
         gbC.fill = GridBagConstraints.HORIZONTAL;
         gbC.gridy = 1;
         gbC.gridx = 0;
-        gbL.setConstraints(buttons, gbC);
-        mondo.add(buttons);
+        mainLayout.setConstraints(buttons, gbC);
+        mainPanel.add(buttons);
+
         gbC = new GridBagConstraints();
         // gbC.anchor = GridBagConstraints.NORTH;
         gbC.fill = GridBagConstraints.BOTH;
         gbC.gridy = 2;
         gbC.gridx = 0;
         gbC.weightx = 0;
-        gbL.setConstraints(historyPanel, gbC);
-        mondo.add(historyPanel);
+        mainLayout.setConstraints(historyPanel, gbC);
+        mainPanel.add(historyPanel);
+
+        // Setup second column
+        JPanel rightPanel = new JPanel();
+//        rightPanel.setBorder(BorderFactory.createTitledBorder("Right Panel"));
+        GridBagLayout rightLayout = new GridBagLayout();
+        rightPanel.setLayout(rightLayout);
+
+        // Add image panel
         gbC = new GridBagConstraints();
         gbC.fill = GridBagConstraints.BOTH;
-        gbC.gridy = 0;
         gbC.gridx = 1;
+        gbC.gridy = 0;
+        gbC.weightx = 100;
+        gbC.weighty = 100;
+        gbC.gridheight = 2;
+        rightLayout.setConstraints(imagePanel, gbC);
+        rightPanel.add(imagePanel);
+
+        // Add output panel
+        gbC = new GridBagConstraints();
+        gbC.fill = GridBagConstraints.BOTH;
+        gbC.gridy = 2;
+        gbC.gridx = 1;
+        gbC.gridheight = 1;
+        rightLayout.setConstraints(outputPanel, gbC);
+        rightPanel.add(outputPanel);
+
+        gbC = new GridBagConstraints();
+        gbC.fill = GridBagConstraints.BOTH;
+        gbC.gridx = 1;
+        gbC.gridy = 0;
         gbC.gridheight = 3;
         gbC.weightx = 100;
         gbC.weighty = 100;
-        gbL.setConstraints(modelOutput, gbC);
-        mondo.add(modelOutput);
+        mainLayout.setConstraints(rightPanel, gbC);
+        mainPanel.add(rightPanel);
 
         setLayout(new BorderLayout());
-        add(mondo, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel setupImagePanel() {
+        JPanel imagePanel = new JPanel();
+        imagePanel.setBorder(BorderFactory.createTitledBorder("Currently Selected Image"));
+
+
+        return imagePanel;
     }
 
 
