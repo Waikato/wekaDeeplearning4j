@@ -9,8 +9,10 @@ import weka.core.*;
 import weka.dl4j.zoo.*;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.Enumeration;
 
-public class Dl4jImageModelPlayground {
+public class Dl4jImageModelPlayground implements Serializable, OptionHandler, RevisionHandler, CommandlineRunnable {
 
     /**
      * The classifier model this filter is based on.
@@ -88,5 +90,77 @@ public class Dl4jImageModelPlayground {
 
     public void setCurrentPredictions(TopNPredictions currentPredictions) {
         this.currentPredictions = currentPredictions;
+    }
+
+    /**
+     * Perform any setup stuff that might need to happen before execution.
+     *
+     * @throws Exception if a problem occurs during setup
+     */
+    @Override
+    public void preExecution() throws Exception {
+
+    }
+
+    /**
+     * Execute the supplied object.
+     *
+     * @param toRun   the object to execute
+     * @param options any options to pass to the object
+     * @throws Exception if a problem occurs.
+     */
+    @Override
+    public void run(Object toRun, String[] options) throws Exception {
+
+    }
+
+    /**
+     * Perform any teardown stuff that might need to happen after execution.
+     *
+     * @throws Exception if a problem occurs during teardown
+     */
+    @Override
+    public void postExecution() throws Exception {
+
+    }
+
+    /**
+     * Returns an enumeration describing the available options.
+     *
+     * @return an enumeration of all the available options.
+     */
+    @Override
+    public Enumeration<Option> listOptions() {
+        return Option.listOptionsForClass(this.getClass()).elements();
+    }
+
+    /**
+     * Gets the current settings of the Classifier.
+     *
+     * @return an array of strings suitable for passing to setOptions
+     */
+    @Override
+    public String[] getOptions() {
+        return Option.getOptions(this, this.getClass());
+    }
+
+    /**
+     * Parses a given list of options.
+     *
+     * @param options the list of options as an array of strings
+     * @throws Exception if an option is not supported
+     */
+    public void setOptions(String[] options) throws Exception {
+        Option.setOptions(options, this, this.getClass());
+    }
+
+    /**
+     * Returns the revision string.
+     *
+     * @return the revision
+     */
+    @Override
+    public String getRevision() {
+        return null;
     }
 }
