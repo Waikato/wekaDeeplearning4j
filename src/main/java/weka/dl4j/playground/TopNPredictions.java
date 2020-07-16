@@ -66,6 +66,10 @@ public class TopNPredictions {
         return breakChar.repeat(len) + "\n";
     }
 
+    public String toSummaryString() {
+        return toSummaryString("", "");
+    }
+
     public String toSummaryString(String imageName, String zooModelName) {
         StringBuilder text = new StringBuilder();
 
