@@ -1,14 +1,9 @@
 package weka.gui.explorer;
 
 import lombok.SneakyThrows;
-import weka.classifiers.*;
-import weka.classifiers.evaluation.output.prediction.AbstractOutput;
-import weka.classifiers.evaluation.output.prediction.Null;
 import weka.core.*;
 
-import weka.core.converters.ArffLoader;
-import weka.core.converters.ConverterUtils;
-import weka.dl4j.playground.Dl4jImageModelPlayground;
+import weka.dl4j.playground.Dl4jCNNExplorer;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.dl4j.zoo.Dl4jResNet50;
 import weka.gui.*;
@@ -19,35 +14,33 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.ImageView;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
 
 public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel, LogHandler {
 
     /** the parent frame */
     protected Explorer m_Explorer = null;
 
-    /** sends notifications when the set of working instances gets changed*/
-    protected PropertyChangeSupport m_Support = new PropertyChangeSupport(this);
+//    /** sends notifications when the set of working instances gets changed*/
+//    protected PropertyChangeSupport m_Support = new PropertyChangeSupport(this);
 
     protected Instances m_Instances = null;
 
-    protected Logger m_Logger = null;
-
-    protected Dl4jImageModelPlayground m_dl4jImageModelPlayground = new Dl4jImageModelPlayground();
+    protected Logger m_Logger = new SysErrLog();
 
     protected String m_currentlyDisplayedImage = "";
 
     /**
      * UI Components
      */
+
+    /** Lets the user configure the classifier. */
+    protected GenericObjectEditor m_CNNExplorerEditor = new GenericObjectEditor();
+
+    /** The panel showing the current classifier selection. */
+    protected PropertyPanel m_playgroundEditorPanel = new PropertyPanel(m_CNNExplorerEditor);
 
     /** The filename extension that should be used for model files. */
     public static String MODEL_FILE_EXTENSION = ".model";
@@ -111,7 +104,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
     protected AbstractZooModel zooModel = new Dl4jResNet50();
 
-    protected Dl4jImageModelPlayground imageModelPlayground;
+    protected Dl4jCNNExplorer imageModelPlayground;
 
     /* Register the property editors we need */
     static {
@@ -186,6 +179,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     protected void initGUI() {
+        setupPlaygroundEditor();
+
         setupOutputText();
 
         JPanel historyPanel = setupHistoryPanel();
@@ -207,6 +202,11 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         setupMainLayout(optionsPanel, buttons, historyPanel, modelOutput, imagePanel);
 
         setDefaultRadioButton();
+    }
+
+    private void setupPlaygroundEditor() {
+        m_CNNExplorerEditor.setClassType(Dl4jCNNExplorer.class);
+        m_CNNExplorerEditor.setValue(new Dl4jCNNExplorer());
     }
 
     private void setupOutputText() {
@@ -371,6 +371,14 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         GridBagLayout mainLayout = new GridBagLayout();
         mainPanel.setLayout(mainLayout);
 
+        // Layout the GUI
+        JPanel topPanel = new JPanel();
+        topPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Model Settings"),
+                BorderFactory.createEmptyBorder(0, 5, 5, 5)));
+        topPanel.setLayout(new BorderLayout());
+        topPanel.add(m_playgroundEditorPanel, BorderLayout.NORTH);
+
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.fill = GridBagConstraints.HORIZONTAL;
         gbC.gridy = 0;
@@ -381,7 +389,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.NORTH;
         gbC.fill = GridBagConstraints.HORIZONTAL;
-        gbC.gridy = 1;
+//        gbC.gridy = 1;
         gbC.gridx = 0;
         mainLayout.setConstraints(buttons, gbC);
         mainPanel.add(buttons);
@@ -432,6 +440,9 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         mainPanel.add(rightPanel);
 
         setLayout(new BorderLayout());
+
+        add(topPanel, BorderLayout.NORTH);
+
         add(mainPanel, BorderLayout.CENTER);
     }
 
@@ -509,21 +520,27 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 @SneakyThrows
                 @Override
                 public void run() {
-                    m_dl4jImageModelPlayground = new Dl4jImageModelPlayground();
-                    m_dl4jImageModelPlayground.setZooModelType(zooModel);
+                    m_Logger.statusMessage("Initializing...");
+                    Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
+                    explorer.setZooModelType(zooModel);
                     try {
-                        m_dl4jImageModelPlayground.init();
+                        explorer.init();
                     } catch (Exception ex) {
                         System.err.println("Couldn't initialise model");
                         ex.printStackTrace();
                         return;
                     }
 
-                    m_dl4jImageModelPlayground.makePrediction(new File(m_currentlyDisplayedImage));
+                    m_Logger.statusMessage("Making prediction");
+                    explorer.makePrediction(new File(m_currentlyDisplayedImage));
 
-                    m_OutText.setText(m_dl4jImageModelPlayground.getCurrentPredictions().toSummaryString());
+                    m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
 
-                    m_predictButton.setEnabled(true);
+                    synchronized (this) {
+                        m_predictButton.setEnabled(true);
+                        m_Logger.statusMessage("OK");
+                        m_RunThread = null;
+                    }
                 }
             };
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
