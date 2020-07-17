@@ -56,30 +56,12 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     /** A panel controlling results viewing. */
     protected ResultHistoryPanel m_History = new ResultHistoryPanel(m_OutText);
 
-    /** Click to set test mode to test on training data. */
-    protected JRadioButton m_modelFileRadio = new JRadioButton("Use Model File");
-
-    /** Click to set test mode to a user-specified test set. */
-    protected JRadioButton m_ZooModelRadio = new JRadioButton("Zoo Model");
-
     /** Button for further output/visualize options. */
     JButton m_OpenImageButton = new JButton("Open Image...");
 
-    /** The button used to open a separate test dataset. */
-    protected JButton m_setModelFileBut = new JButton("Set...");
-
-    /** The button used to open a separate test dataset. */
-    protected JButton m_setZooModelBut = new JButton("Set...");
-
-    /**
-     * Alters the enabled/disabled status of elements associated with each radio
-     * button.
-     */
-    ActionListener m_RadioListener = e -> updateRadioLinks();
-
-
     /** Click to start running the classifier. */
     protected JButton m_predictButton = new JButton("Predict");
+
 
     /** A thread that classification runs in. */
     protected Thread m_RunThread;
@@ -149,7 +131,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
      */
     @Override
     public String getTabTitle() {
-        return "Dl4j Model Explorer";
+        return "Dl4j Model Playground";
     }
 
     /**
@@ -191,17 +173,15 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         setupButtonListeners();
 
-        JPanel optionsPanel = setupPlaygroundOptions();
+        JPanel optionsPanel = setupMainButtons();
 
-        JPanel buttons = setupStartButton();
+//        JPanel buttons = setupStartButton();
 
         JPanel modelOutput = setupOutputPanel();
 
         JPanel imagePanel = setupImagePanel();
 
-        setupMainLayout(optionsPanel, buttons, historyPanel, modelOutput, imagePanel);
-
-        setDefaultRadioButton();
+        setupMainLayout(optionsPanel, historyPanel, modelOutput, imagePanel);
     }
 
     private void setupPlaygroundEditor() {
@@ -235,11 +215,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     private void setupToolTipText() {
-        m_modelFileRadio.setToolTipText("Test on the same set that the classifier"
-                + " is trained on");
-
-        m_ZooModelRadio.setToolTipText("Test on a user-specified dataset");
-        m_predictButton.setToolTipText("Starts the classification");
+        m_OpenImageButton.setToolTipText("Open an image for prediction");
+        m_predictButton.setToolTipText("Run prediction on the image");
     }
 
     private void setupFileChooser() {
@@ -248,93 +225,39 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     private void setupButtonListeners() {
-        ButtonGroup bg = new ButtonGroup();
-        bg.add(m_modelFileRadio);
-        bg.add(m_ZooModelRadio);
-
-        m_modelFileRadio.addActionListener(m_RadioListener);
-        m_ZooModelRadio.addActionListener(m_RadioListener);
-
-        m_setZooModelBut.addActionListener(e -> {
-//                System.out.println("Opening Zoo model prompt");
-//                setTestSet();
-        });
-
-        m_setModelFileBut.addActionListener(actionEvent -> System.out.println("Opening model file prompt..."));
-
         m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
 
         m_predictButton.setEnabled(false);
-        m_predictButton.addActionListener(e -> {
-            predict();
-        });
+        m_predictButton.addActionListener(e -> predict());
     }
 
-    private JPanel setupPlaygroundOptions() {
-
+    private JPanel setupMainButtons() {
         JPanel optionsPanel = new JPanel();
         GridBagLayout gbL = new GridBagLayout();
         optionsPanel.setLayout(gbL);
-        optionsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Playground options"),
-                BorderFactory.createEmptyBorder(0, 5, 5, 5)));
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 5));
 
         GridBagConstraints gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.WEST;
-        gbC.gridy = 0;
-        gbC.gridx = 0;
-        gbL.setConstraints(m_modelFileRadio, gbC);
-        optionsPanel.add(m_modelFileRadio);
-
-        gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.EAST;
+        gbC.anchor = GridBagConstraints.CENTER;
         gbC.fill = GridBagConstraints.HORIZONTAL;
         gbC.gridy = 0;
-        gbC.gridx = 1;
-        gbC.gridwidth = 2;
-        gbC.insets = new Insets(2, 10, 2, 0);
-        gbL.setConstraints(m_setModelFileBut, gbC);
-        optionsPanel.add(m_setModelFileBut);
-
-
-        gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.WEST;
-        gbC.gridy = 1;
-        gbC.gridx = 0;
-        gbL.setConstraints(m_ZooModelRadio, gbC);
-        optionsPanel.add(m_ZooModelRadio);
-
-        gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.EAST;
-        gbC.fill = GridBagConstraints.HORIZONTAL;
-        gbC.gridy = 1;
-        gbC.gridx = 1;
-        gbC.gridwidth = 2;
-        gbC.insets = new Insets(2, 10, 2, 0);
-        gbL.setConstraints(m_setZooModelBut, gbC);
-        optionsPanel.add(m_setZooModelBut);
-
-        gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.WEST;
-        gbC.fill = GridBagConstraints.HORIZONTAL;
-        gbC.gridy = 4;
         gbC.gridx = 0;
         gbC.weightx = 100;
-        gbC.gridwidth = 3;
-        gbC.insets = new Insets(3, 0, 1, 0);
+        gbC.insets = new Insets(10, 10, 10, 10);
         gbL.setConstraints(m_OpenImageButton, gbC);
         optionsPanel.add(m_OpenImageButton);
 
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.fill = GridBagConstraints.HORIZONTAL;
+        gbC.gridy = 1;
+        gbC.gridx = 0;
+        gbC.weightx = 100;
+        gbC.insets = new Insets(0, 10, 10, 10);
+        gbL.setConstraints(m_predictButton, gbC);
+        optionsPanel.add(m_predictButton);
+
         return optionsPanel;
-    }
-
-    private JPanel setupStartButton() {
-        JPanel buttons = new JPanel();
-        buttons.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        buttons.setLayout(new FlowLayout(FlowLayout.CENTER));
-        buttons.add(m_predictButton);
-
-        return buttons;
     }
 
     private JPanel setupOutputPanel() {
@@ -361,12 +284,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return outputPanel;
     }
 
-    private void setDefaultRadioButton() {
-        m_ZooModelRadio.setSelected(true);
-        updateRadioLinks();
-    }
-
-    private void setupMainLayout(JPanel optionsPanel, JPanel buttons, JPanel historyPanel, JPanel outputPanel, JPanel imagePanel) {
+    private void setupMainLayout(JPanel optionsPanel, JPanel historyPanel, JPanel outputPanel, JPanel imagePanel) {
         JPanel mainPanel = new JPanel();
         GridBagLayout mainLayout = new GridBagLayout();
         mainPanel.setLayout(mainLayout);
@@ -387,25 +305,16 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         mainPanel.add(optionsPanel);
 
         gbC = new GridBagConstraints();
-        gbC.anchor = GridBagConstraints.NORTH;
-        gbC.fill = GridBagConstraints.HORIZONTAL;
-//        gbC.gridy = 1;
-        gbC.gridx = 0;
-        mainLayout.setConstraints(buttons, gbC);
-        mainPanel.add(buttons);
-
-        gbC = new GridBagConstraints();
-        // gbC.anchor = GridBagConstraints.NORTH;
         gbC.fill = GridBagConstraints.BOTH;
-        gbC.gridy = 2;
+        gbC.gridy = 1;
         gbC.gridx = 0;
         gbC.weightx = 0;
+        gbC.weighty = 100;
         mainLayout.setConstraints(historyPanel, gbC);
         mainPanel.add(historyPanel);
 
         // Setup second column
         JPanel rightPanel = new JPanel();
-//        rightPanel.setBorder(BorderFactory.createTitledBorder("Right Panel"));
         GridBagLayout rightLayout = new GridBagLayout();
         rightPanel.setLayout(rightLayout);
 
@@ -440,9 +349,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         mainPanel.add(rightPanel);
 
         setLayout(new BorderLayout());
-
         add(topPanel, BorderLayout.NORTH);
-
         add(mainPanel, BorderLayout.CENTER);
     }
 
@@ -477,8 +384,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         ImageIcon imageIcon = new ImageIcon(m_currentlyDisplayedImage);
 
-        int desiredWidth = imagePanel.getWidth()-50;
-        int desiredHeight = imagePanel.getHeight()-50;
+        int desiredWidth = imagePanel.getWidth()-100;
+        int desiredHeight = imagePanel.getHeight()-100;
 
         ImageIcon scaledIcon = scaleImage(imageIcon, desiredWidth, desiredHeight);
 
@@ -546,15 +453,5 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();
         }
-    }
-
-
-
-    /**
-     * Updates the enabled status of the input fields and labels.
-     */
-    protected void updateRadioLinks() {
-        m_setModelFileBut.setEnabled(m_modelFileRadio.isSelected());
-        m_setZooModelBut.setEnabled(m_ZooModelRadio.isSelected());
     }
 }
