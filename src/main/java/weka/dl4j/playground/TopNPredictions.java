@@ -10,10 +10,13 @@ public class TopNPredictions {
 
     protected Prediction[] topNPredictions;
 
+    protected String imageName = "", modelName = "";
+
     public TopNPredictions() { }
 
-    public TopNPredictions(int n) {
-        setN(n);
+    public TopNPredictions(String imageName, String modelName) {
+        this.imageName = imageName;
+        this.modelName = modelName;
     }
 
     protected void initPredArray() {
@@ -67,7 +70,7 @@ public class TopNPredictions {
     }
 
     public String toSummaryString() {
-        return toSummaryString("", "");
+        return toSummaryString(imageName, modelName);
     }
 
     public String toSummaryString(String imageName, String zooModelName) {
