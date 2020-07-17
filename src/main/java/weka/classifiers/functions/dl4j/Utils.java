@@ -480,14 +480,14 @@ public class Utils {
   /**
    * @return true if the user has selected a file to load the model from
    */
-  public static boolean userSuppliedModelFile(File serializedModelFile) {
+  public static boolean notDefaultFileLocation(File serializedModelFile) { // TODO refactor into default filelocation
     // Has the model file location been set to something other than the default
     return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
   }
 
   public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model;
-    if (userSuppliedModelFile(serializedModelFile)) {
+    if (notDefaultFileLocation(serializedModelFile)) {
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
@@ -518,7 +518,7 @@ public class Utils {
 
     // If we're loading from a previously trained model, we don't need to intialize the classifier again,
     // We do need to, however, if we're loading from a fresh zoo model
-    if (!userSuppliedModelFile(serializedModelFile))
+    if (!notDefaultFileLocation(serializedModelFile))
       model.initializeClassifier(data);
 
     return model;
@@ -527,7 +527,7 @@ public class Utils {
   public static Dl4jMlpClassifier loadPlaygroundModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
 
-    if (!Utils.userSuppliedModelFile(serializedModelFile))
+    if (!Utils.notDefaultFileLocation(serializedModelFile))
       model.loadZooModelNoData(1000, 1, new int[] {3, 224, 224});
 
     return model;
