@@ -1,6 +1,5 @@
 package weka.dl4j.playground;
 
-import com.sun.jna.platform.win32.OaIdl;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -12,7 +11,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
 
-public class Dl4jImageModelPlayground implements Serializable, OptionHandler, RevisionHandler, CommandlineRunnable {
+public class Dl4jCNNExplorer implements Serializable, OptionHandler, CommandlineRunnable {
 
     /**
      * The classifier model this filter is based on.
@@ -22,14 +21,20 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
     /**
      * The zoo model to use, if we're not loading from the serialized model file
      */
-    protected AbstractZooModel zooModelType;
+    protected AbstractZooModel zooModelType = new Dl4jResNet50();
+
+    /**
+     * Decodes the prediction IDs to human-readable format
+     * Defaults to a decoder for IMAGENET classes
+     */
+    protected ModelOutputDecoder modelOutputDecoder = new ModelOutputDecoder();
 
     /**
      * Model used for feature extraction
      */
     protected Dl4jMlpClassifier model;
 
-    private TopNPredictions currentPredictions;
+    protected TopNPredictions currentPredictions;
 
     public void init() throws Exception {
         // TODO possibly refactor into makePrediction
@@ -37,7 +42,6 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
     }
 
     public void makePrediction(File imageFile) throws Exception {
-        ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
 
         NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
         INDArray image = loader.asMatrix(imageFile);
@@ -45,28 +49,35 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
         if (zooModelType.getChannelsLast())
             image = image.permute(0,2,3,1);
 
-        INDArray dup = image.dup();
-        INDArray result = model.outputSingle(dup);
-
-        TopNPredictions[] predictions = decoder.decodePredictions(result);
+        INDArray result = model.outputSingle(image.dup());
 
         // Only processing a single image at the moment, not batch processing
-        currentPredictions = predictions[0];
+        currentPredictions = modelOutputDecoder.decodePredictions(result, imageFile.getName(), getModelName());
+    }
 
-        String modelName; // TODO refactor into TopNPredictions (or Utils class)
-        if (Utils.userSuppliedModelFile(serializedModelFile)) {
-            modelName = "Custom trained Dl4jMlpClassifier";
+    protected String getModelName() {
+        if (Utils.notDefaultFileLocation(serializedModelFile)) {
+            return "Custom trained Dl4jMlpClassifier";
         } else {
-            modelName = zooModelType.getClass().getSimpleName() + " (" + zooModelType.getVariation() + ")";
+            Enum variation = zooModelType.getVariation();
+            if (variation == null) {
+                return zooModelType.getClass().getSimpleName();
+            } else {
+                return zooModelType.getClass().getSimpleName() + " (" + variation + ")";
+            }
         }
+    }
 
-//        System.out.println(thisPrediction.toSummaryString(imageFile.getName(), modelName));
+    public TopNPredictions getCurrentPredictions() {
+        return currentPredictions;
     }
 
     @OptionMetadata(
             displayName = "Serialized model file",
-            description = "Pointer to file - saved Dl4jMlpClassifier"
-
+            description = "Pointer to file of saved Dl4jMlpClassifier",
+            commandLineParamName = "modelFile",
+            commandLineParamSynopsis = "-modelFile <file path>",
+            displayOrder = 1
     )
     public File getSerializedModelFile() {
         return serializedModelFile;
@@ -76,7 +87,14 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
         this.serializedModelFile = serializedModelFile;
     }
 
-    public AbstractZooModel getZooModelType() {
+    @OptionMetadata(
+            displayName = "Pretrained zoo model",
+            description = "Type of pretrained model to use for prediction (instead of trained Dl4jMlpClassifier)",
+            commandLineParamName = "zooModel",
+            commandLineParamSynopsis = "-zooModel <options>",
+            displayOrder = 2
+    )
+    public AbstractZooModel getZooModelType() { // TODO figure out why not applying any non-default models
         return zooModelType;
     }
 
@@ -84,13 +102,22 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
         this.zooModelType = zooModelType;
     }
 
-    public TopNPredictions getCurrentPredictions() {
-        return currentPredictions;
+    @OptionMetadata(
+            displayName = "Model output decoder",
+            description = "Handles decoding of the model predictions",
+            commandLineParamName = "decoder",
+            commandLineParamSynopsis = "-decoder <options>",
+            displayOrder = 3
+    )
+    public ModelOutputDecoder getModelOutputDecoder() {
+        return modelOutputDecoder;
     }
 
-    public void setCurrentPredictions(TopNPredictions currentPredictions) {
-        this.currentPredictions = currentPredictions;
+    public void setModelOutputDecoder(ModelOutputDecoder modelOutputDecoder) {
+        this.modelOutputDecoder = modelOutputDecoder;
     }
+
+
 
     /**
      * Perform any setup stuff that might need to happen before execution.
@@ -152,15 +179,5 @@ public class Dl4jImageModelPlayground implements Serializable, OptionHandler, Re
      */
     public void setOptions(String[] options) throws Exception {
         Option.setOptions(options, this, this.getClass());
-    }
-
-    /**
-     * Returns the revision string.
-     *
-     * @return the revision
-     */
-    @Override
-    public String getRevision() {
-        return null;
     }
 }
