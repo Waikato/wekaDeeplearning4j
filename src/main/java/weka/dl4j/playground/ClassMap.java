@@ -44,12 +44,16 @@ public class ClassMap {
         String classMapPath = null;
         switch (this.builtInClassMap) {
             case CUSTOM:
-                classMapPath = this.classMapFile.getPath();
-                break;
+                if (this.classMapFile != null) {
+                    classMapPath = this.classMapFile.getPath();
+                    break;
+                }
             case IMAGENET:
-                classMapPath = Paths.get(classMapFolder, "VGGFACE.txt").toString();
-            case VGGFACE:
                 classMapPath = Paths.get(classMapFolder, "IMAGENET.txt").toString();
+                break;
+            case VGGFACE:
+                classMapPath = Paths.get(classMapFolder, "VGGFACE.txt").toString();
+                break;
         }
 
         if (classMapPath == null) {
