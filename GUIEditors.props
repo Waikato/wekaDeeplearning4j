@@ -45,5 +45,13 @@ weka.dl4j.text.tokenization.tokenizer.factory.TokenizerFactory=weka.gui.GenericO
 weka.dl4j.text.stopwords.Dl4jAbstractStopwords=weka.gui.GenericObjectEditor
 
 
+### Playground ###
+weka.dl4j.playground.Dl4jCNNExplorer=weka.gui.GenericObjectEditor
+
+weka.dl4j.playground.ModelOutputDecoder=weka.gui.GenericObjectEditor
+
+weka.dl4j.playground.ClassMap=weka.gui.GenericObjectEditor
+
+
 ### Misc ###
 weka.core.LogConfiguration=weka.gui.GenericObjectEditor
