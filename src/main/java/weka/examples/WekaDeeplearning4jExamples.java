@@ -26,26 +26,7 @@ public class WekaDeeplearning4jExamples {
         playground();
     }
 
-    public static void zooTest() throws Exception {
-        ZooModel zooModel = ResNet50.builder().build();
-        ComputationGraph computationGraph = (ComputationGraph) zooModel.initPretrained();
-
-        NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
-        INDArray image = loader.asMatrix(new File("dog.jpg"));
-
-        INDArray array = computationGraph.outputSingle(image);
-
-        ModelOutputDecoder decoder = new ModelOutputDecoder(new ClassMap(ClassMap.BuiltInClassMap.IMAGENET));
-
-        TopNPredictions[] predictions = decoder.decodePredictions(array);
-
-        for (TopNPredictions p : predictions) {
-            System.out.println(p);
-        }
-    }
-
-
-        private static void filter() throws Exception {
+    private static void filter() throws Exception {
         String folderPath = "src/test/resources/nominal/plant-seedlings-small";
         ImageDirectoryLoader loader = new ImageDirectoryLoader();
         loader.setInputDirectory(new File(folderPath));
@@ -107,13 +88,17 @@ public class WekaDeeplearning4jExamples {
     }
 
     public static void playground() throws Exception {
-        Dl4jImageModelPlayground explorer = new Dl4jImageModelPlayground();
+        Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
         KerasResNet kerasEfficientNet = new KerasResNet();
         kerasEfficientNet.setVariation(ResNet.VARIATION.RESNET152);
         explorer.setZooModelType(kerasEfficientNet);
 
+
+
         explorer.init();
         explorer.makePrediction(new File("src/test/resources/images/pufferfish.jpg"));
+
+        System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }
 }
