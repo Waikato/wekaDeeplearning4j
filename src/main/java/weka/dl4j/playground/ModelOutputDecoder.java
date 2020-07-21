@@ -25,6 +25,10 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
 
     protected File classMapFile = new File(Utils.defaultFileLocation());
 
+    public TopNPredictions decodePredictions(INDArray predictions) throws Exception {
+        return decodePredictions(predictions, "", "");
+    }
+
     /**
      * Class Functionality
      */
