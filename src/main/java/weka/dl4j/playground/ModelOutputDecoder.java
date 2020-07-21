@@ -17,6 +17,7 @@ import java.util.Enumeration;
 public class ModelOutputDecoder implements Serializable, OptionHandler {
 
     protected ClassMap classMap = new ClassMap();
+    protected File classMapFile = new File(Utils.defaultFileLocation());
 
     /**
      * Class Functionality

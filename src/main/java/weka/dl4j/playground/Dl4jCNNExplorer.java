@@ -16,7 +16,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     /**
      * The classifier model this filter is based on.
      */
-    protected File serializedModelFile = new File(WekaPackageManager.getPackageHome().toURI());
+    protected File serializedModelFile = new File(Utils.defaultFileLocation());
 
     /**
      * The zoo model to use, if we're not loading from the serialized model file

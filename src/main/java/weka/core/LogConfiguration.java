@@ -35,6 +35,7 @@ import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.gui.FilePropertyMetadata;
 import weka.gui.knowledgeflow.KFGUIConsts;
 
@@ -244,7 +245,7 @@ public class LogConfiguration implements Serializable, OptionHandler {
     LoggerContext context = getLoggerContext();
     Configuration config = context.getConfiguration();
     ConfigurationSource configSource = config.getConfigurationSource();
-    String packageHomeDir = WekaPackageManager.getPackageHome().getPath();
+    String packageHomeDir = Utils.defaultFileLocation();
     if (ConfigurationSource.NULL_SOURCE.equals(configSource)) {
       // Use log4j2.xml shipped with the package ...
       URI uri = Paths.get(packageHomeDir, "wekaDeeplearning4j", "src", "main", "resources",

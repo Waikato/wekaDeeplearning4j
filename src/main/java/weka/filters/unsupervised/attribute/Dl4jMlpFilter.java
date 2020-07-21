@@ -85,7 +85,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   /**
    * The classifier model this filter is based on.
    */
-  protected File serializedModelFile = new File(WekaPackageManager.getPackageHome().toURI());
+  protected File serializedModelFile = new File(Utils.defaultFileLocation());
 
   /**
    * The zoo model to use, if we're not loading from the serialized model file
@@ -280,14 +280,6 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   @Override
   public boolean allowAccessToFullInputFormat() {
     return true;
-  }
-
-  /**
-   * @return true if the user has selected a file to load the model from
-   */
-  private boolean userSuppliedModelFile() {
-    // Has the model file location been set to something other than the default
-    return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
   }
 
   /**

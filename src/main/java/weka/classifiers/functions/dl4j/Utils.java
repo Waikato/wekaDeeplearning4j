@@ -482,7 +482,11 @@ public class Utils {
    */
   public static boolean notDefaultFileLocation(File serializedModelFile) { // TODO refactor into default filelocation
     // Has the model file location been set to something other than the default
-    return !serializedModelFile.getPath().equals(WekaPackageManager.getPackageHome().getPath());
+    return !serializedModelFile.getPath().equals(defaultFileLocation());
+  }
+
+  public static String defaultFileLocation() {
+    return WekaPackageManager.getPackageHome().getPath();
   }
 
   public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
