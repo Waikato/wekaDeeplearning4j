@@ -35,9 +35,8 @@ public class TopNPredictions {
         return topNPredictions[0];
     }
 
-    public void process(INDArray predictions, ClassMap classMap) throws Exception {
+    public void process(INDArray predictions, String[] classes) throws Exception {
         initPredArray();
-        String[] classes = classMap.getClasses();
 
         double[] predDouble = predictions.toDoubleVector();
         int[] bestNPredictions = getBestKIndices(predDouble, n);
