@@ -66,6 +66,3 @@ weka.dl4j.playground.Dl4jCNNExplorer =\
 
 weka.dl4j.playground.ModelOutputDecoder =\
  weka.dl4j
-
-weka.dl4j.playground.ClassMap =\
- weka.dl4j
