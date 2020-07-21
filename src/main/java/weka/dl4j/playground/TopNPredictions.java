@@ -1,6 +1,7 @@
 package weka.dl4j.playground;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import weka.core.WekaException;
 
 import java.util.Arrays;
 
@@ -39,6 +40,11 @@ public class TopNPredictions {
         initPredArray();
 
         double[] predDouble = predictions.toDoubleVector();
+
+        if (predDouble.length != classes.length) {
+            throw new WekaException(String.format("Number of prediction classes (%d) don't match size of class map (%d)!", predDouble.length, classes.length));
+        }
+
         int[] bestNPredictions = getBestKIndices(predDouble, n);
 
         for (int i = 0; i < bestNPredictions.length; i++) {
