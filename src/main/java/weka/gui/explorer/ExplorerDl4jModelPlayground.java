@@ -418,38 +418,36 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return new ImageIcon(icon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT));
     }
 
+    @SneakyThrows
+    private void runPlayground() {
+        m_Logger.statusMessage("Initializing...");
+        Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
+        try {
+            explorer.init();
+        } catch (Exception ex) {
+            System.err.println("Couldn't initialise model");
+            ex.printStackTrace();
+            return;
+        }
+
+        m_Logger.statusMessage("Making prediction");
+        explorer.makePrediction(new File(m_currentlyDisplayedImage));
+
+        m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
+
+        synchronized (this) {
+            m_predictButton.setEnabled(true);
+            m_Logger.statusMessage("OK");
+            m_RunThread = null;
+        }
+    }
+
     private void predict() {
         if (m_RunThread == null) {
             synchronized (this) {
                 m_predictButton.setEnabled(false);
             }
-            m_RunThread = new Thread() {
-                @SneakyThrows
-                @Override
-                public void run() {
-                    m_Logger.statusMessage("Initializing...");
-                    Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
-                    explorer.setZooModelType(zooModel);
-                    try {
-                        explorer.init();
-                    } catch (Exception ex) {
-                        System.err.println("Couldn't initialise model");
-                        ex.printStackTrace();
-                        return;
-                    }
-
-                    m_Logger.statusMessage("Making prediction");
-                    explorer.makePrediction(new File(m_currentlyDisplayedImage));
-
-                    m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
-
-                    synchronized (this) {
-                        m_predictButton.setEnabled(true);
-                        m_Logger.statusMessage("OK");
-                        m_RunThread = null;
-                    }
-                }
-            };
+            m_RunThread = new Thread(this::runPlayground);
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();
         }
