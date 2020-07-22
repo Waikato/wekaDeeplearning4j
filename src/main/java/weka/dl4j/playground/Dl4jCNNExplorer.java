@@ -5,6 +5,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
+import weka.core.converters.AbstractFileLoader;
+import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.zoo.*;
 
 import java.io.File;
@@ -42,7 +44,6 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     public void makePrediction(File imageFile) throws Exception {
-
         NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
         INDArray image = loader.asMatrix(imageFile);
 
@@ -138,7 +139,40 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      */
     @Override
     public void run(Object toRun, String[] options) throws Exception {
+        if (!(toRun instanceof Dl4jCNNExplorer)) {
+            throw new IllegalArgumentException("Object to execute is not a "
+                    + "Dl4jCNNExplorer!");
+        }
 
+        Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) toRun;
+
+        // Parse the command line options
+        String inputImagePath;
+        try {
+            inputImagePath = weka.core.Utils.getOption("i", options);
+            explorer.setOptions(options);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            printInfo();
+            return;
+        }
+
+        explorer.init();
+        explorer.makePrediction(new File(inputImagePath));
+        System.out.println(explorer.getCurrentPredictions().toSummaryString());
+    }
+
+    private void printInfo() {
+        System.err.println("\nUsage:\n" + "\tDl4jCNNExplorer [options]\n"
+                + "\n" + "Options:\n");
+
+        Enumeration<Option> enm =
+                ((OptionHandler) new Dl4jCNNExplorer()).listOptions();
+        while (enm.hasMoreElements()) {
+            Option option = enm.nextElement();
+            System.err.println(option.synopsis());
+            System.err.println(option.description());
+        }
     }
 
     /**
@@ -178,6 +212,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @throws Exception if an option is not supported
      */
     public void setOptions(String[] options) throws Exception {
-        Option.setOptions(options, this, this.getClass());
+        Option.setOptionsForHierarchy(options, this, this.getClass());
+        weka.core.Utils.checkForRemainingOptions(options);
     }
 }

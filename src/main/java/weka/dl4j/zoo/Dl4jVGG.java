@@ -64,7 +64,7 @@ public class Dl4jVGG extends AbstractZooModel {
     /**
      * Note that the OptionMetadata is specified here *as well as* in AbstractZooModel.
      * If it isn't specified here as well (on the overridden version of the method) then
-     * the pretrained type cannot be set from the GUI or command line. 
+     * the pretrained type cannot be set from the GUI or command line.
      */
     @OptionMetadata(
             description = "Pretrained Type (IMAGENET, VGGFACE, MNIST)",
