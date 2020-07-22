@@ -58,7 +58,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         currentPredictions = modelOutputDecoder.decodePredictions(result, imageFile.getName(), getModelName());
     }
 
-    protected String getModelName() {
+    public String getModelName() {
         if (Utils.notDefaultFileLocation(serializedModelFile)) {
             return "Custom trained Dl4jMlpClassifier";
         } else {
