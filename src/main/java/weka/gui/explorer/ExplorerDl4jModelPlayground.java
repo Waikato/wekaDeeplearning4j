@@ -439,12 +439,18 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
 
             synchronized (this) {
-                m_predictButton.setEnabled(true);
                 m_Logger.statusMessage("OK");
-                m_RunThread = null;
             }
+        } catch (Exception ex) {
+            m_Logger.statusMessage("Error occured");
+            ex.printStackTrace();
         } finally {
             Thread.currentThread().setContextClassLoader(origLoader);
+
+            synchronized (this) {
+                m_predictButton.setEnabled(true);
+                m_RunThread = null;
+            }
         }
     }
 
