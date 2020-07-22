@@ -276,7 +276,6 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 if (h != lastHeight) { // i.e. an addition not just a user scrolling
                     lastHeight = h;
                     int x = h - vp.getExtentSize().height;
-                    System.out.println(x);
                     vp.setViewPosition(new Point(0, x));
                 }
             }

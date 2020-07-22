@@ -57,11 +57,6 @@ public class Dl4jResNet50 extends AbstractZooModel {
         setOutputLayer("fc1000");
     }
 
-//    @Override
-//    public void setPretrainedType(PretrainedType pretrainedType) {
-//        setPretrainedType(pretrainedType, 2048, "flatten_1", "fc1000");
-//    }
-
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         org.deeplearning4j.zoo.model.ResNet50 net = org.deeplearning4j.zoo.model.ResNet50.builder()

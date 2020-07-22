@@ -9,11 +9,13 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
+import weka.dl4j.PretrainedType;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.playground.*;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.dl4j.zoo.keras.ResNet;
+import weka.dl4j.zoo.keras.VGG;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -90,14 +92,17 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        KerasResNet kerasEfficientNet = new KerasResNet();
-        kerasEfficientNet.setVariation(ResNet.VARIATION.RESNET152);
-        explorer.setZooModelType(kerasEfficientNet);
+        Dl4jVGG zooModel = new Dl4jVGG();
+        zooModel.setVariation(VGG.VARIATION.VGG16);
+        zooModel.setPretrainedType(PretrainedType.VGGFACE);
+        explorer.setZooModelType(zooModel);
 
-
+        ModelOutputDecoder decoder = new ModelOutputDecoder();
+        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
+        explorer.setModelOutputDecoder(decoder);
 
         explorer.init();
-        explorer.makePrediction(new File("src/test/resources/images/pufferfish.jpg"));
+        explorer.makePrediction(new File("src/test/resources/images/ben_stiller.jpg"));
 
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }
