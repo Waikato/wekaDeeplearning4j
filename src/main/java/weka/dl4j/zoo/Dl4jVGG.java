@@ -61,17 +61,6 @@ public class Dl4jVGG extends AbstractZooModel {
         setPretrainedType(m_pretrainedType);
     }
 
-    /**
-     * Note that the OptionMetadata is specified here *as well as* in AbstractZooModel.
-     * If it isn't specified here as well (on the overridden version of the method) then
-     * the pretrained type cannot be set from the GUI or command line.
-     */
-    @OptionMetadata(
-            description = "Pretrained Type (IMAGENET, VGGFACE, MNIST)",
-            displayName = "Pretrained Type",
-            commandLineParamName = "pretrained",
-            commandLineParamSynopsis = "-pretrained <string>"
-    )
     @Override
     public void setPretrainedType(PretrainedType pretrainedType) {
         super.setPretrainedType(pretrainedType);

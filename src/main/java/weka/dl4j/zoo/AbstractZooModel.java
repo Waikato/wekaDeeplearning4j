@@ -15,10 +15,8 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.core.Option;
-import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
-import weka.core.WekaException;
+import weka.core.*;
+import weka.core.converters.AbstractFileLoader;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.EfficientNet;
 import weka.gui.ProgrammaticProperty;
@@ -371,9 +369,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @return an enumeration of all the available options.
      */
-    @Override
     public Enumeration<Option> listOptions() {
-        return Option.listOptionsForClass(this.getClass()).elements();
+        return Option.listOptionsForClassHierarchy(this.getClass(), AbstractZooModel.class).elements();
     }
 
     /**
@@ -381,9 +378,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @return an array of strings suitable for passing to setOptions
      */
-    @Override
     public String[] getOptions() {
-        return Option.getOptions(this, this.getClass());
+        return Option.getOptionsForHierarchy(this, AbstractZooModel.class);
     }
 
     /**
@@ -393,6 +389,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @throws Exception if an option is not supported
      */
     public void setOptions(String[] options) throws Exception {
-        Option.setOptions(options, this, this.getClass());
+        Option.setOptionsForHierarchy(options, this, AbstractZooModel.class);
+
+        Utils.checkForRemainingOptions(options);
     }
 }
