@@ -13,10 +13,16 @@ import weka.gui.explorer.Explorer.LogHandler;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel, LogHandler {
 
@@ -175,8 +181,6 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         JPanel optionsPanel = setupMainButtons();
 
-//        JPanel buttons = setupStartButton();
-
         JPanel modelOutput = setupOutputPanel();
 
         JPanel imagePanel = setupImagePanel();
@@ -205,13 +209,30 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     private JPanel setupHistoryPanel() {
-        JPanel historyPanel = new JPanel(new BorderLayout());
-        historyPanel.setBorder(BorderFactory
-                .createTitledBorder("Result list (right-click for options)"));
-        historyPanel.add(m_History, BorderLayout.CENTER);
-        m_History.setHandleRightClicks(false);
+        JPanel historyHolder = new JPanel(new BorderLayout());
+        historyHolder.setBorder(BorderFactory.createTitledBorder("Result list (right-click for separate results panel)"));
+        historyHolder.add(m_History, BorderLayout.CENTER);
+        System.out.println(m_History.getList().getWidth());
+        m_History.getList().setFixedCellWidth(250);
+        m_History.setHandleRightClicks(true);
 
-        return historyPanel;
+        // Show the associated image when a results item is clicked on the results panel
+        // Showing the appropriate results output is already handled by the ResultHistoryPanel
+        m_History.getList().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                // Make sure only one item is selected
+                if (m_History.getList().getSelectedIndices().length == 1) {
+                    // Get the selected item from the list
+                    String selectedVal = m_History.getList().getSelectedValue().toString();
+                    // Get the image path (previously stored in saveResults()
+                    String imageToShow = m_History.getNamedObject(selectedVal).toString();
+                    // Show the image
+                    m_currentlyDisplayedImage = imageToShow;
+                    refreshImagePanel();
+                }
+            }
+        });
+        return historyHolder;
     }
 
     private void setupToolTipText() {
@@ -417,6 +438,11 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return new ImageIcon(icon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT));
     }
 
+    private void saveResults(String name, StringBuffer buffer) {
+        m_History.addResult(name, buffer);
+        m_History.addObject(name, m_currentlyDisplayedImage);
+    }
+
     @SneakyThrows
     private void runPlayground() {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -436,7 +462,13 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             m_Logger.statusMessage("Making prediction");
             explorer.makePrediction(new File(m_currentlyDisplayedImage));
 
-            m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
+            String name = new SimpleDateFormat("HH:mm:ss - ").format(new Date());
+            StringBuffer buffer = new StringBuffer(explorer.getCurrentPredictions().toSummaryString());
+
+            name += explorer.getModelName();
+
+            saveResults(name, buffer);
+            m_History.setSingle(name);
 
             synchronized (this) {
                 m_Logger.statusMessage("OK");
