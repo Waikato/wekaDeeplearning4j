@@ -1,22 +1,24 @@
 package weka.dl4j.playground;
 
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.functions.dl4j.Utils;
-import weka.core.Option;
-import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
-import weka.core.WekaPackageManager;
+import weka.core.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+@Log4j2
 public class ModelOutputDecoder implements Serializable, OptionHandler {
     // Built-in class maps for WDL4J
     public enum ClassmapType { IMAGENET, VGGFACE, CUSTOM }
@@ -66,11 +68,31 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         return array.reshape(1, numClasses);
     }
 
+    private boolean pathExists(String path) {
+        return new File(path).exists();
+    }
+
+    private String getClassMapFolder() throws Exception {
+        // Try the current directory
+        String classMapFolder = Paths.get("src", "main", "resources", "class-maps").toString();
+        if (pathExists(classMapFolder))
+            return classMapFolder;
+
+        // Otherwise try the package home directory
+        String packageHomeDir = Utils.defaultFileLocation();
+        classMapFolder = Paths.get(packageHomeDir, "wekaDeeplearning4j", classMapFolder).toString();
+        if (pathExists(classMapFolder))
+            return classMapFolder;
+
+        throw new WekaException("Cannot find Class map file");
+    }
+
     private String getClassMapPath() throws Exception {
         // Return the custom file path if the user has specified it
 
-        String classMapFolder = "src/main/resources/class-maps";
+        String classMapFolder = getClassMapFolder();
         String classMapPath = null;
+
         switch (this.builtInClassMap) {
             case CUSTOM:
                 if (this.classMapFile != null) {
