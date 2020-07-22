@@ -419,25 +419,32 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
     @SneakyThrows
     private void runPlayground() {
-        m_Logger.statusMessage("Initializing...");
-        Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
-            explorer.init();
-        } catch (Exception ex) {
-            System.err.println("Couldn't initialise model");
-            ex.printStackTrace();
-            return;
-        }
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
-        m_Logger.statusMessage("Making prediction");
-        explorer.makePrediction(new File(m_currentlyDisplayedImage));
+            m_Logger.statusMessage("Initializing...");
+            Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
+            try {
+                explorer.init();
+            } catch (Exception ex) {
+                System.err.println("Couldn't initialise model");
+                ex.printStackTrace();
+                return;
+            }
 
-        m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
+            m_Logger.statusMessage("Making prediction");
+            explorer.makePrediction(new File(m_currentlyDisplayedImage));
 
-        synchronized (this) {
-            m_predictButton.setEnabled(true);
-            m_Logger.statusMessage("OK");
-            m_RunThread = null;
+            m_OutText.setText(explorer.getCurrentPredictions().toSummaryString());
+
+            synchronized (this) {
+                m_predictButton.setEnabled(true);
+                m_Logger.statusMessage("OK");
+                m_RunThread = null;
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
     }
 

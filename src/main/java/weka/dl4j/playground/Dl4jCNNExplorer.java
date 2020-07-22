@@ -1,5 +1,6 @@
 package weka.dl4j.playground;
 
+import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.classifiers.functions.Dl4jMlpClassifier;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
 
+@Log4j2
 public class Dl4jCNNExplorer implements Serializable, OptionHandler, CommandlineRunnable {
 
     /**
@@ -130,19 +132,12 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     }
 
-    /**
-     * Execute the supplied object.
-     *
-     * @param toRun   the object to execute
-     * @param options any options to pass to the object
-     * @throws Exception if a problem occurs.
-     */
-    @Override
-    public void run(Object toRun, String[] options) throws Exception {
+    private void commandLineRun(Object toRun, String[] options) throws Exception {
         if (!(toRun instanceof Dl4jCNNExplorer)) {
             throw new IllegalArgumentException("Object to execute is not a "
                     + "Dl4jCNNExplorer!");
         }
+        weka.core.WekaPackageManager.loadPackages(true);
 
         Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) toRun;
 
@@ -150,6 +145,9 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         String inputImagePath;
         try {
             inputImagePath = weka.core.Utils.getOption("i", options);
+            if (inputImagePath.equals("")) {
+                throw new WekaException("Please supply an image file with the -i <image path> arg");
+            }
             explorer.setOptions(options);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -160,6 +158,25 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         explorer.init();
         explorer.makePrediction(new File(inputImagePath));
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
+    }
+
+    /**
+     * Execute the supplied object.
+     *
+     * @param toRun   the object to execute
+     * @param options any options to pass to the object
+     * @throws Exception if a problem occurs.
+     */
+    @Override
+    public void run(Object toRun, String[] options) throws Exception {
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+
+            commandLineRun(toRun, options);
+        } finally {
+            Thread.currentThread().setContextClassLoader(origLoader);
+        }
     }
 
     private void printInfo() {
