@@ -75,8 +75,6 @@ public class Dl4jVGG extends AbstractZooModel {
         }
     }
 
-    public PretrainedType getPretrainedType() {return m_pretrainedType;}
-
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         ZooModel net = null;
         if (m_variation == VGG.VARIATION.VGG16) {
