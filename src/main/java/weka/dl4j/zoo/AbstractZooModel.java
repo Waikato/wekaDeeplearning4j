@@ -118,6 +118,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     public abstract Enum getVariation();
 
+    /**
+     * Does the model require input images to have the ImageNet preprocessing?
+     * @return true if the model input should be rescaled
+     */
+    public abstract boolean requiresImageNetScaling();
+
     @OptionMetadata(
             displayName = "Image channels last",
             description = "Set to true to supply image channels last. " +

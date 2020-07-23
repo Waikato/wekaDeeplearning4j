@@ -30,6 +30,16 @@ public class KerasDenseNet extends AbstractZooModel {
         return variation;
     }
 
+    /**
+     * Does the model require input images to have the ImageNet preprocessing?
+     *
+     * @return true if the model input should be rescaled
+     */
+    @Override
+    public boolean requiresImageNetScaling() {
+        return true;
+    }
+
     public void setVariation(DenseNet.VARIATION var) {
         variation = var;
 

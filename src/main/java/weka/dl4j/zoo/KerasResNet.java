@@ -30,6 +30,23 @@ public class KerasResNet extends AbstractZooModel {
         return variation;
     }
 
+    /**
+     * Does the model require input images to have the ImageNet preprocessing?
+     *
+     * @return true if the model input should be rescaled
+     */
+    @Override
+    public boolean requiresImageNetScaling() {
+        ResNet.VARIATION variation = getVariation();
+
+        if (variation == ResNet.VARIATION.RESNET50V2 ||
+            variation == ResNet.VARIATION.RESNET101V2 ||
+            variation == ResNet.VARIATION.RESNET152V2)
+            return true;
+        else
+            return false;
+    }
+
     public void setVariation(ResNet.VARIATION var) {
         variation = var;
     }

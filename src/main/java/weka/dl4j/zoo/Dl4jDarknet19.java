@@ -57,6 +57,16 @@ public class Dl4jDarknet19 extends AbstractZooModel {
     return m_variation;
   }
 
+  /**
+   * Does the model require input images to have the ImageNet preprocessing?
+   *
+   * @return true if the model input should be rescaled
+   */
+  @Override
+  public boolean requiresImageNetScaling() {
+    return false;
+  }
+
   public void setVariation(VARIATION var) {
     m_variation = var;
   }

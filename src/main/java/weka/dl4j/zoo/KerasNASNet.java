@@ -29,6 +29,16 @@ public class KerasNASNet extends AbstractZooModel {
         return variation;
     }
 
+    /**
+     * Does the model require input images to have the ImageNet preprocessing?
+     *
+     * @return true if the model input should be rescaled
+     */
+    @Override
+    public boolean requiresImageNetScaling() {
+        return true;
+    }
+
     public void setVariation(NASNet.VARIATION var) {
         variation = var;
         int numFExtractOutputs = -1;
