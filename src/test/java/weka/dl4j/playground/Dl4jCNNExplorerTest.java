@@ -20,9 +20,9 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
     private final static String BEN_STILLER_PATH = "src/test/resources/images/ben_stiller.jpg";
 
-    private final static int DOG_ID = 235;
+    private final static int GERMAN_SHEPPARD_ID = 235;
 
-    private final static String DOG_PATH = "src/test/resources/images/dog.jpg";
+    private final static String GERMAN_SHEPPARD_PATH = "src/test/resources/images/dog.jpg";
 
     /**
      * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller
@@ -48,14 +48,15 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception
      */
     public void testDogResNet() throws Exception {
-        checkImageNetModel(new KerasResNet(), DOG_PATH, DOG_ID);
+        checkImageNetModel(new KerasResNet(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
+    // TODO add testValidDl4jModels()
 
     /**
      * Tests the Keras models with a simple dog picture - checks to see which models output correct predictions
      * @throws Exception
      */
-    private void checkValidKerasModels() throws Exception {
+    public void testValidKerasModels() throws Exception {
         List<AbstractZooModel> kerasModels = ZooModelTest.createKerasModels();
 
         testModelList(kerasModels);
@@ -66,7 +67,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
         for (AbstractZooModel zooModel : zooModels) {
             try {
-                checkImageNetModel(zooModel, DOG_PATH, DOG_ID);
+                checkImageNetModel(zooModel, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
             } catch (AssertionError ex) {
                 failedModels.add(zooModel);
             }
