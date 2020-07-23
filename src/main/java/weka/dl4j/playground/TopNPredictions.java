@@ -209,4 +209,6 @@ public class TopNPredictions {
     public Prediction getTopPrediction() {
         return topNPredictions[0];
     }
+
+    public Prediction[] getTopPredictions() { return topNPredictions; }
 }

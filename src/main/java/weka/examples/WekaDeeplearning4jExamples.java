@@ -61,8 +61,9 @@ public class WekaDeeplearning4jExamples {
         Dl4jMlpClassifier classifier = new Dl4jMlpClassifier();
         classifier.setNumEpochs(3);
 
-        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
-        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        KerasDenseNet kerasEfficientNet = new KerasDenseNet();
+//        kerasEfficientNet.setVariation(ResNet.VARIATION.RESNET50V2);
+//        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
         classifier.setZooModel(kerasEfficientNet);
 
         ImageInstanceIterator iterator = new ImageInstanceIterator();
@@ -92,17 +93,18 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        Dl4jVGG zooModel = new Dl4jVGG();
-        zooModel.setVariation(VGG.VARIATION.VGG16);
-        zooModel.setPretrainedType(PretrainedType.VGGFACE);
+        KerasResNet zooModel = new KerasResNet();
+        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
+//        zooModel.setVariation(VGG.VARIATION.VGG16);
+//        zooModel.setPretrainedType(PretrainedType.VGGFACE);
         explorer.setZooModelType(zooModel);
 
-        ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
-        explorer.setModelOutputDecoder(decoder);
+//        ModelOutputDecoder decoder = new ModelOutputDecoder();
+//        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
+//        explorer.setModelOutputDecoder(decoder);
 
         explorer.init();
-        explorer.makePrediction(new File("src/test/resources/images/ben_stiller.jpg"));
+        explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
 
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }

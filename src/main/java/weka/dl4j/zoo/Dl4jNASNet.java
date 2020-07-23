@@ -30,7 +30,7 @@ import weka.dl4j.PretrainedType;
  */
 public class Dl4jNASNet {
     // NASNet has a bug in the current version of DL4j (1.0.0-beta6)
-    // It should be fixed in the next release
+    // It should be fixed in the next release TODO check this
     // https://github.com/eclipse/deeplearning4j/issues/7319
 
 //public class Dl4jNASNet extends AbstractZooModel {
