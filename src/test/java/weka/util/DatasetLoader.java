@@ -98,6 +98,11 @@ public class DatasetLoader {
    */
   public static final int NUM_ATTRIBUTES_IMAGE_META = 2;
 
+  /**
+   * Load the car predictions binary file into an INDArray
+   *
+   * @return Loaded [1, 1000] INDArray
+   */
   public static INDArray loadCarPredictions() {
     try {
       return Nd4j.readBinary(new File("src/test/resources/predictions/carPredictions.bin"));

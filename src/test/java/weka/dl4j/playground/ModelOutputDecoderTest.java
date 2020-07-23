@@ -4,6 +4,10 @@ import junit.framework.TestCase;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.util.DatasetLoader;
 
+/**
+ * Test for the ModelOutputDecoder
+ * @author - Rhys Compton
+ */
 public class ModelOutputDecoderTest extends TestCase {
 
     public void testDecodePredictions() throws Exception {

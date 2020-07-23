@@ -5,13 +5,31 @@ import weka.core.WekaException;
 
 import java.util.Arrays;
 
+/**
+ * Holds an arbitrary number of predictions, ordered by class probability
+ * @author - Rhys Compton
+ */
 public class TopNPredictions {
 
+    /**
+     * Number of predictions to hold
+     */
     protected int n = 5;
 
+    /**
+     * Predictions, ordered by class probability
+     */
     protected Prediction[] topNPredictions;
 
-    protected String imageName = "", modelName = "";
+    /**
+     * Name of the image used for prediction
+     */
+    protected String imageName = "";
+
+    /**
+     * Name of the model used for prediction
+     */
+    protected String modelName = "";
 
     public TopNPredictions() { }
 
@@ -20,22 +38,19 @@ public class TopNPredictions {
         this.modelName = modelName;
     }
 
+    /**
+     * Initialize the prediction array
+     */
     protected void initPredArray() {
         this.topNPredictions = new Prediction[n];
     }
 
-    public void setN(int n) {
-        this.n = n;
-    }
-
-    public Prediction getPrediction(int n) {
-        return topNPredictions[n];
-    }
-
-    public Prediction getTopPrediction() {
-        return topNPredictions[0];
-    }
-
+    /**
+     * Main entrypoint, decodes predictions into a TopNPredictions object
+     * @param predictions Raw model predictions
+     * @param classes Class map
+     * @throws Exception
+     */
     public void process(INDArray predictions, String[] classes) throws Exception {
         initPredArray();
 
@@ -45,10 +60,12 @@ public class TopNPredictions {
             throw new WekaException(String.format("Number of prediction classes (%d) don't match size of class map (%d)!", predDouble.length, classes.length));
         }
 
-        int[] bestNPredictions = getBestKIndices(predDouble, n);
+        // Get the Top N prediction indices
+        int[] bestNIndices = getBestNIndices(predDouble);
 
-        for (int i = 0; i < bestNPredictions.length; i++) {
-            int topNIndex = bestNPredictions[i];
+        // Create Prediction objects for each index (starting from highest probability)
+        for (int i = 0; i < bestNIndices.length; i++) {
+            int topNIndex = bestNIndices[i];
             String className = classes[topNIndex];
             double classProb = predictions.getDouble(topNIndex);
 
@@ -58,6 +75,10 @@ public class TopNPredictions {
         }
     }
 
+    /**
+     * Calculate the longest predicted class name - used for formatting the output table
+     * @return Longest class name length
+     */
     private int getMaxLenClassName() {
         // Default length is 15
         int maxLen = 15;
@@ -70,15 +91,32 @@ public class TopNPredictions {
         return maxLen;
     }
 
+    /**
+     * Gets a string representing a <br> with the given breakChar
+     * @param breakChar Character to repeat
+     * @param len Length of the line break
+     * @return String of the given length
+     */
     private String getTableBreak(String breakChar, int len) {
         return breakChar.repeat(len) + "\n";
     }
 
+    /**
+     * Return a summary string of the stored predictions
+     * @return Results in table format
+     */
     public String toSummaryString() {
         return toSummaryString(imageName, modelName);
     }
 
+    /**
+     * Return a summary string of the stored predictions, headed with the given image and model name
+     * @param imageName Image used for prediction
+     * @param zooModelName Model used for prediction
+     * @return Results in table format
+     */
     public String toSummaryString(String imageName, String zooModelName) {
+        // Init some objects we'll need
         StringBuilder text = new StringBuilder();
 
         int maxLenClassName = getMaxLenClassName();
@@ -90,12 +128,13 @@ public class TopNPredictions {
         // The class name column should be based on the maximum length of the top 5 class names
         String formattedClassName = "%" + maxLenClassName + "s"; // --> " %20s "
 
-        // Format used for each line in the table, keeps all columns equal
-        String lineFormat = "%10s | " + formattedClassName + " | %10s\n";
+        // Format used for each line in the table, keeps all columns equally sized
+        String lineFormat = "%10s | " + formattedClassName + " | %10s\n"; // --> "%10s | %20s | %10s"
 
         // -> "Class ID |               Class Name |     Prob %"
         String columnHeaders = String.format(lineFormat, titleClassID, titleClassName, titleProbability);
 
+        // TOTAL length of the lines
         int lineLength = columnHeaders.length();
 
         // Add the top table break
@@ -106,22 +145,28 @@ public class TopNPredictions {
 
         // Generate the column headers
         text.append(columnHeaders);
-
+        // Append the header/content break
         text.append(getTableBreak("-", lineLength));
 
         // Add each row to the output table
-        for (Prediction p : topNPredictions) {
+        for (Prediction p : topNPredictions) { // TODO refactor into Prediction.toSummaryString()
             String classID = "" + p.getClassID();
             String probability = String.format("%.3f", p.getClassProbability() * 100);
             text.append(String.format(lineFormat, classID, p.getClassName(), probability));
         }
 
+        // Finish off with a bottom table break
         text.append(getTableBreak("=", lineLength));
 
         return text.toString();
     }
 
-    private int[] getBestKIndices(double[] array, int num) {
+    /**
+     * Get the indices of the top n highest values from the input array
+     * @param array Array to find highest values from
+     * @return indices of highest values
+     */
+    private int[] getBestNIndices(double[] array) {
         //create sort able array with index and value pair
         IndexValuePair[] pairs = new IndexValuePair[array.length];
         for (int i = 0; i < array.length; i++) {
@@ -132,13 +177,17 @@ public class TopNPredictions {
         Arrays.sort(pairs, (o1, o2) -> Double.compare(o2.value, o1.value));
 
         //extract the indices
-        int[] result = new int[num];
-        for (int i = 0; i < num; i++) {
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++) {
             result[i] = pairs[i].index;
         }
         return result;
     }
 
+    /**
+     * Helper class for finding highest indices
+     * @author - Rhys Compton
+     */
     private static class IndexValuePair {
         private final int index;
         private final double value;
@@ -147,5 +196,19 @@ public class TopNPredictions {
             this.index = index;
             this.value = value;
         }
+    }
+
+    public int getN() {return this.n;}
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public Prediction getPrediction(int n) {
+        return topNPredictions[n];
+    }
+
+    public Prediction getTopPrediction() {
+        return topNPredictions[0];
     }
 }

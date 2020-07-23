@@ -4,8 +4,6 @@ import lombok.SneakyThrows;
 import weka.core.*;
 
 import weka.dl4j.playground.Dl4jCNNExplorer;
-import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.Dl4jResNet50;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
@@ -13,32 +11,38 @@ import weka.gui.explorer.Explorer.LogHandler;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Explorer panel for the Dl4j Model Playground
+ * @author - Rhys Compton
+ */
 public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel, LogHandler {
 
     /** the parent frame */
     protected Explorer m_Explorer = null;
 
-//    /** sends notifications when the set of working instances gets changed*/
-//    protected PropertyChangeSupport m_Support = new PropertyChangeSupport(this);
-
+    /**
+     * The loaded instances
+     */
     protected Instances m_Instances = null;
 
+    /**
+     * The system logger
+     */
     protected Logger m_Logger = new SysErrLog();
 
+    /**
+     * File path of the currently displayed image
+     */
     protected String m_currentlyDisplayedImage = "";
 
-    /**
+    /*
      * UI Components
      */
 
@@ -86,13 +90,15 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     protected WekaFileChooser m_FileChooser = new WekaFileChooser(new File(
             System.getProperty("user.dir")));
 
+    /**
+     * Label used to display the image
+     */
     JLabel imageLabel;
 
+    /**
+     * Panel the imageLabel is displayed on
+     */
     JPanel imagePanel;
-
-    protected AbstractZooModel zooModel = new Dl4jResNet50();
-
-    protected Dl4jCNNExplorer imageModelPlayground;
 
     /* Register the property editors we need */
     static {
@@ -167,7 +173,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     }
 
     protected void initGUI() {
-        setupPlaygroundEditor();
+        setupCNNExplorerEditor();
 
         setupOutputText();
 
@@ -188,11 +194,17 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         setupMainLayout(optionsPanel, historyPanel, modelOutput, imagePanel);
     }
 
-    private void setupPlaygroundEditor() {
+    /**
+     * Setup the top bar in the window - the explorer editor
+     */
+    private void setupCNNExplorerEditor() {
         m_CNNExplorerEditor.setClassType(Dl4jCNNExplorer.class);
         m_CNNExplorerEditor.setValue(new Dl4jCNNExplorer());
     }
 
+    /**
+     * Setup the output text panel
+     */
     private void setupOutputText() {
         // Connect / configure the components
         m_OutText.setEditable(false);
@@ -208,11 +220,14 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         });
     }
 
+    /**
+     * Setup the Historical results panel
+     * @return Loaded results panel
+     */
     private JPanel setupHistoryPanel() {
         JPanel historyHolder = new JPanel(new BorderLayout());
         historyHolder.setBorder(BorderFactory.createTitledBorder("Result list (right-click for separate results panel)"));
         historyHolder.add(m_History, BorderLayout.CENTER);
-        System.out.println(m_History.getList().getWidth());
         m_History.getList().setFixedCellWidth(250);
         m_History.setHandleRightClicks(true);
 
@@ -235,16 +250,24 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return historyHolder;
     }
 
+    /**
+     * Setup all tooltip texts
+     */
     private void setupToolTipText() {
         m_OpenImageButton.setToolTipText("Open an image for prediction");
         m_predictButton.setToolTipText("Run prediction on the image");
     }
 
+    /**
+     * Setup the file chooser object
+     */
     private void setupFileChooser() {
-//        m_FileChooser.setFileFilter(m_ModelFilter);
         m_FileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     }
 
+    /**
+     * Setup listeners for the two buttons
+     */
     private void setupButtonListeners() {
         m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
 
@@ -252,6 +275,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         m_predictButton.addActionListener(e -> predict());
     }
 
+    /**
+     * Setup the layout for the two buttons
+     * @return
+     */
     private JPanel setupMainButtons() {
         JPanel optionsPanel = new JPanel();
         GridBagLayout gbL = new GridBagLayout();
@@ -281,6 +308,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return optionsPanel;
     }
 
+    /**
+     * Set the layout for the text output panel
+     * @return Loaded output panel
+     */
     private JPanel setupOutputPanel() {
         JPanel outputPanel = new JPanel();
         outputPanel.setBorder(BorderFactory.createTitledBorder("Model output"));
@@ -304,6 +335,13 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return outputPanel;
     }
 
+    /**
+     * Setup the layout of the entire explorer window
+     * @param optionsPanel Options panel
+     * @param historyPanel History panel
+     * @param outputPanel Text output panel
+     * @param imagePanel Image display panel
+     */
     private void setupMainLayout(JPanel optionsPanel, JPanel historyPanel, JPanel outputPanel, JPanel imagePanel) {
         JPanel mainPanel = new JPanel();
         GridBagLayout mainLayout = new GridBagLayout();
@@ -373,6 +411,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         add(mainPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Setup the objects for the image display panel
+     * @return Loaded image panel
+     */
     private JPanel setupImagePanel() {
         imagePanel = new JPanel();
         imagePanel.setBorder(BorderFactory.createTitledBorder("Currently Selected Image"));
@@ -382,6 +424,9 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return imagePanel;
     }
 
+    /**
+     * Launches the "Open Image" popup, saves the image path, and shows it in the image panel
+     */
     protected void openNewImage() {
         m_FileChooser.setFileFilter(m_ImageFilter);
 
@@ -397,6 +442,9 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         refreshImagePanel();
     }
 
+    /**
+     * Refresh the image panel to show the currently selected image
+     */
     protected void refreshImagePanel() {
         if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage == "") {
             return;
@@ -404,6 +452,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         ImageIcon imageIcon = new ImageIcon(m_currentlyDisplayedImage);
 
+        // Does some weird resizing if you use the full width and height of the image panel
         int desiredWidth = imagePanel.getWidth()-100;
         int desiredHeight = imagePanel.getHeight()-100;
 
@@ -411,13 +460,16 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
         imageLabel.setIcon(scaledIcon);
 
-        refreshPredictButtonEnabled();
-    }
-
-    protected void refreshPredictButtonEnabled() {
         m_predictButton.setEnabled(true);
     }
 
+    /**
+     * Scale the image to the desired width and height, maintaining aspect ratio
+     * @param icon Raw image
+     * @param desiredWidth Desired width to resize to
+     * @param desiredHeight Desired height to resize to
+     * @return Resized image icon
+     */
     private ImageIcon scaleImage(ImageIcon icon, int desiredWidth, int desiredHeight)
     {
         int newWidth = icon.getIconWidth();
@@ -438,11 +490,19 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         return new ImageIcon(icon.getImage().getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT));
     }
 
+    /**
+     * Save the results in the ResultHistoryPanel
+     * @param name Run name
+     * @param buffer String buffer containing the output
+     */
     private void saveResults(String name, StringBuffer buffer) {
         m_History.addResult(name, buffer);
         m_History.addObject(name, m_currentlyDisplayedImage);
     }
 
+    /**
+     * Main run method - loads the Dl4jCNNExplorer, runs it on the image, and displays the output
+     */
     @SneakyThrows
     private void runPlayground() {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
@@ -461,13 +521,14 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
 
             m_Logger.statusMessage("Making prediction");
             explorer.makePrediction(new File(m_currentlyDisplayedImage));
-
-            String name = new SimpleDateFormat("HH:mm:ss - ").format(new Date());
+            // Get the predictions
             StringBuffer buffer = new StringBuffer(explorer.getCurrentPredictions().toSummaryString());
 
+            String name = new SimpleDateFormat("HH:mm:ss - ").format(new Date());
             name += explorer.getModelName();
 
             saveResults(name, buffer);
+            // Show these results
             m_History.setSingle(name);
 
             synchronized (this) {
@@ -486,6 +547,9 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         }
     }
 
+    /**
+     * Using a separate thread, runs the model prediction
+     */
     private void predict() {
         if (m_RunThread == null) {
             synchronized (this) {
