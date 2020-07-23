@@ -54,4 +54,14 @@ public class Dl4jAlexNet extends AbstractZooModel {
   public int[][] getShape() {
     return org.deeplearning4j.zoo.model.AlexNet.builder().build().metaData().getInputShape();
   }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
 }

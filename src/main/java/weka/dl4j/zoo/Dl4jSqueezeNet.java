@@ -40,14 +40,6 @@ public class Dl4jSqueezeNet extends AbstractZooModel {
         setOutputLayer("loss");
     }
 
-//    @Override
-//    public void setPretrainedType(PretrainedType pretrainedType) {
-//        setPretrainedType(pretrainedType,
-//                1000,
-//                "global_average_pooling2d_5",
-//                "loss");
-//    }
-
     @Override
     public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
         org.deeplearning4j.zoo.model.SqueezeNet net = org.deeplearning4j.zoo.model.SqueezeNet.builder()
@@ -66,5 +58,15 @@ public class Dl4jSqueezeNet extends AbstractZooModel {
     @Override
     public int[][] getShape() {
         return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
+    }
+
+    /**
+     * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+     *
+     * @return Variation
+     */
+    @Override
+    public Enum getVariation() {
+        return null;
     }
 }

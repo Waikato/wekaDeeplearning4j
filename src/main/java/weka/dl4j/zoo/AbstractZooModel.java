@@ -102,9 +102,10 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     public abstract int[][] getShape();
 
-    public Enum getVariation() {
-        return null;
+    public String getPrettyName() {
+        Enum variation = getVariation();
     }
+    public abstract Enum getVariation();
 
     @OptionMetadata(
             displayName = "Image channels last",

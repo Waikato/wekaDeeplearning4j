@@ -41,4 +41,14 @@ public class CustomNet extends AbstractZooModel {
   public int[][] getShape() {
     return new int[0][0];
   }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
 }

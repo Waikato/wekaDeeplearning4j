@@ -61,13 +61,6 @@ public class Dl4jDarknet19 extends AbstractZooModel {
     m_variation = var;
   }
 
-//  @Override
-//  public void setPretrainedType(PretrainedType pretrainedType) {
-//    setPretrainedType(pretrainedType, 1000,
-//            "globalpooling", "softmax",
-//            new String[]{"loss"});
-//  }
-
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
     org.deeplearning4j.zoo.model.Darknet19 net = org.deeplearning4j.zoo.model.Darknet19.builder()

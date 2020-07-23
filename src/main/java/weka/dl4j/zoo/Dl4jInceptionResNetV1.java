@@ -56,4 +56,14 @@ public class Dl4jInceptionResNetV1 extends AbstractZooModel {
     return org.deeplearning4j.zoo.model.InceptionResNetV1.builder().build().metaData()
         .getInputShape();
   }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
 }

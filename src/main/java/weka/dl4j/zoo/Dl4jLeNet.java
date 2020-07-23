@@ -42,15 +42,6 @@ public class Dl4jLeNet extends AbstractZooModel {
     setOutputLayer("8");
     setExtraLayersToRemove(new String[] {"9"});
   }
-//
-//  @Override
-//  public void setPretrainedType(PretrainedType pretrainedType) {
-//    setPretrainedType(pretrainedType,
-//            500,
-//            "7",
-//            "8",
-//            new String[] {"9"});
-//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
@@ -69,5 +60,15 @@ public class Dl4jLeNet extends AbstractZooModel {
   @Override
   public int[][] getShape() {
     return org.deeplearning4j.zoo.model.LeNet.builder().build().metaData().getInputShape();
+  }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
   }
 }

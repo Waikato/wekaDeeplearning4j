@@ -75,4 +75,14 @@ public class Dl4jResNet50 extends AbstractZooModel {
     public int[][] getShape() {
         return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
     }
+
+    /**
+     * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+     *
+     * @return Variation
+     */
+    @Override
+    public Enum getVariation() {
+        return null;
+    }
 }

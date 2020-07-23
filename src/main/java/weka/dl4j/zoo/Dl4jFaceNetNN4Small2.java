@@ -57,4 +57,14 @@ public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
     return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
         .getInputShape();
   }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
 }
