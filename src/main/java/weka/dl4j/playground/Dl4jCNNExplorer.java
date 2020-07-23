@@ -74,6 +74,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         }
 
         if (zooModelType.requiresImageNetScaling()) {
+            log.info("Applying ImageNet scaling");
             ImageNetPreprocessor preprocessor = new ImageNetPreprocessor();
             DataSet dataSet = new org.nd4j.linalg.dataset.DataSet(image, Nd4j.zeros(0));
             preprocessor.preProcess(dataSet);
