@@ -312,9 +312,6 @@ public class NeuralNetConfigurationTest {
     }
   }
 
-  // TODO: Should be fixed when
-  //       https://github.com/eclipse/deeplearning4j/pull/8243
-  //       gets merged.
   @Test
   public void testUpdater() throws Exception {
     for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
@@ -324,9 +321,6 @@ public class NeuralNetConfigurationTest {
     }
   }
 
-  // TODO: Should be fixed when
-  //       https://github.com/eclipse/deeplearning4j/pull/8243
-  //       gets merged.
   @Test
   public void testWeightInit() throws Exception {
     List<WeightInit> skipWeightInits = new ArrayList<>();

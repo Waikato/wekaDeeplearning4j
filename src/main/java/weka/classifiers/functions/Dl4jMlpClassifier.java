@@ -2042,7 +2042,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
       if (Utils.needsReshaping(activationAtLayer)) {
         // permute from [1, 64, 64, 512] to [1, 512, 64, 64] (only necessary if model is in channels-last mode
-        if (Utils.isChannelsLast(activationAtLayer)) { // TODO refactor to check channels last only on first loop
+        if (Utils.isChannelsLast(activationAtLayer)) {
           activationAtLayer = activationAtLayer.permute(0, 3, 1, 2);
 
           // Output info message once
