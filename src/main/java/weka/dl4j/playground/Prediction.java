@@ -1,12 +1,25 @@
 package weka.dl4j.playground;
 
+/**
+ * Simple class to hold the necessary values for prediction
+ * @author - Rhys Compton
+ */
 public class Prediction {
 
-    private int classID;
+    /**
+     * ID of the class prediction
+     */
+    protected int classID;
 
-    private String className;
+    /**
+     * Human readable class name
+     */
+    protected String className;
 
-    private double classProbability;
+    /**
+     * Probability of the predicted class
+     */
+    protected double classProbability;
 
     public Prediction(int classID, String className, double classProbability) {
         this.classID = classID;

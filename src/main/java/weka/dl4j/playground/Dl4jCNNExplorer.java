@@ -14,6 +14,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
 
+/**
+ * Tool to allow easy experimentation and exploration of a trained ComputationGraph - either from a previously trained
+ * Dl4jMlpClassifier, or from a pretrained Zoo Model (default).
+ * @author - Rhys Compton
+ */
 @Log4j2
 public class Dl4jCNNExplorer implements Serializable, OptionHandler, CommandlineRunnable {
 
@@ -23,7 +28,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     protected File serializedModelFile = new File(Utils.defaultFileLocation());
 
     /**
-     * The zoo model to use, if we're not loading from the serialized model file
+     * The zoo model to use, if we're not loading from the serialized model file (default)
      */
     protected AbstractZooModel zooModelType = new Dl4jResNet50();
 
@@ -38,26 +43,44 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      */
     protected Dl4jMlpClassifier model;
 
+    /**
+     * Predictions for the current image
+     */
     protected TopNPredictions currentPredictions;
 
+    /**
+     * Initialize the ComputationGraph
+     * @throws Exception Exceptions from loading the ComputationGraph
+     */
     public void init() throws Exception {
-        // TODO possibly refactor into makePrediction
         model = Utils.loadPlaygroundModel(serializedModelFile, zooModelType);
     }
 
+    /**
+     * Main entrypoint - Runs the loaded ComputationGraph on the supplied image, saving the predictions
+     * @param imageFile Image to run prediction on
+     * @throws Exception
+     */
     public void makePrediction(File imageFile) throws Exception {
-        NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
+        // Load the image
+        NativeImageLoader loader = new NativeImageLoader(224, 224, 3); // TODO take shape from loaded model
         INDArray image = loader.asMatrix(imageFile);
 
+        // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
         if (zooModelType.getChannelsLast())
             image = image.permute(0,2,3,1);
 
+        // Run prediction
         INDArray result = model.outputSingle(image.dup());
 
-        // Only processing a single image at the moment, not batch processing
+        // Decode and store the predictions
         currentPredictions = modelOutputDecoder.decodePredictions(result, imageFile.getName(), getModelName());
     }
 
+    /**
+     * Get the name of the loaded model
+     * @return Model name
+     */
     public String getModelName() {
         if (Utils.notDefaultFileLocation(serializedModelFile)) {
             return "Custom trained Dl4jMlpClassifier";
@@ -132,12 +155,17 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     }
 
+    /**
+     * Run this tool from the command line
+     * @param toRun Object to run
+     * @param options Command line options
+     * @throws Exception
+     */
     private void commandLineRun(Object toRun, String[] options) throws Exception {
         if (!(toRun instanceof Dl4jCNNExplorer)) {
             throw new IllegalArgumentException("Object to execute is not a "
                     + "Dl4jCNNExplorer!");
         }
-        weka.core.WekaPackageManager.loadPackages(true);
 
         Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) toRun;
 
@@ -155,8 +183,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             return;
         }
 
+        // Run the explorer
         explorer.init();
         explorer.makePrediction(new File(inputImagePath));
+        // Output the results to the command line
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }
 
@@ -179,6 +209,9 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         }
     }
 
+    /**
+     * Print the usage options to standard err
+     */
     private void printInfo() {
         System.err.println("\nUsage:\n" + "\tDl4jCNNExplorer [options]\n"
                 + "\n" + "Options:\n");
@@ -219,7 +252,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      */
     @Override
     public String[] getOptions() {
-        return Option.getOptions(this, this.getClass());
+        return Option.getOptionsForHierarchy(this, this.getClass());
     }
 
     /**

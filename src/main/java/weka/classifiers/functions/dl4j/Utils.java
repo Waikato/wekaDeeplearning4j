@@ -478,17 +478,38 @@ public class Utils {
   }
 
   /**
+   * Checks whether the path exists - a little tidier than the code it wraps
+   * @param path Path to check
+   * @return True if the path exists, false otherwise
+   */
+  public static boolean pathExists(String path) {
+    return new File(path).exists();
+  }
+
+  /**
+   * @param serializedModelFile File to check
    * @return true if the user has selected a file to load the model from
    */
-  public static boolean notDefaultFileLocation(File serializedModelFile) { // TODO refactor into default filelocation
+  public static boolean notDefaultFileLocation(File serializedModelFile) {
     // Has the model file location been set to something other than the default
     return !serializedModelFile.getPath().equals(defaultFileLocation());
   }
 
+  /**
+   * The default location for a file parameter
+   * @return Default file path
+   */
   public static String defaultFileLocation() {
     return WekaPackageManager.getPackageHome().getPath();
   }
 
+  /**
+   * Tries to load from a saved model file (if it exists), otherwise loads the given zoo model
+   * @param serializedModelFile Saved model path
+   * @param zooModelType Type of Zoo Model
+   * @return Dl4jMlpClassifier with the loaded ComputationGraph
+   * @throws WekaException From errors occurring during loading the model file
+   */
   public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model;
     if (notDefaultFileLocation(serializedModelFile)) {
@@ -511,7 +532,12 @@ public class Utils {
   }
 
   /**
-   * @param data Loads the model (either from file or from model zoo)
+   * Load a Dl4jMlpClassifier for use with the given instances and iterator
+   * @param data Instances to prime the model with
+   * @param serializedModelFile Saved model file
+   * @param zooModelType Type of Zoo Model
+   * @param instanceIterator Instance iterator to prime the model with
+   * @return Dl4jMlpClassifier setup with the instances and iterator
    * @throws Exception From errors occurring during loading the model file, or from intializing from the data
    */
   public static Dl4jMlpClassifier loadModel(Instances data, File serializedModelFile,
@@ -528,11 +554,18 @@ public class Utils {
     return model;
   }
 
+  /**
+   * Load a Dl4jMlpClassifier for use in the Playground - no need to supply Instances or InstanceIterators
+   * @param serializedModelFile Saved model file
+   * @param zooModelType Type of Zoo Model
+   * @return Dl4jMlpClassifier ready to be used in the Playground
+   * @throws WekaException From errors occurring during loading the model file, or from intializing from the data
+   */
   public static Dl4jMlpClassifier loadPlaygroundModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
 
     if (!Utils.notDefaultFileLocation(serializedModelFile))
-      model.loadZooModelNoData(1000, 1, new int[] {3, 224, 224});
+      model.loadZooModelNoData(2, 1, zooModelType.getShape()[0]);
 
     return model;
   }

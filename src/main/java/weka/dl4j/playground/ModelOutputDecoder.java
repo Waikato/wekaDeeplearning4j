@@ -18,13 +18,26 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * Decodes model outputs into a human-readable and more workable format.
+ * Holds the class map to be used for decoding
+ * @author - Rhys Compton
+ */
 @Log4j2
 public class ModelOutputDecoder implements Serializable, OptionHandler {
-    // Built-in class maps for WDL4J
+    /**
+     * Built-in class maps for WDL4J
+    */
     public enum ClassmapType { IMAGENET, VGGFACE, CUSTOM }
 
+    /**
+     * Class Map to use to decode the model output
+     */
     protected ClassmapType builtInClassMap = ClassmapType.IMAGENET;
 
+    /**
+     * Path to custom class map file
+     */
     protected File classMapFile = new File(Utils.defaultFileLocation());
 
     public TopNPredictions decodePredictions(INDArray predictions) throws Exception {
@@ -32,7 +45,12 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
     }
 
     /**
-     * Class Functionality
+     * Main entrypoint - decode the model predictions, saving the image and model name alongside it
+     * @param predictions Predictions to decode
+     * @param imageName Name of the image used for prediction
+     * @param modelName Name of the model used for prediction
+     * @return TopNPredictions object, parsed from the predictions
+     * @throws Exception
      */
     public TopNPredictions decodePredictions(INDArray predictions, String imageName, String modelName) throws Exception {
         // Get number of instances to predict for
@@ -43,6 +61,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
             predictions = reshapeSingleInstanceToBatch(predictions);
         }
 
+        // Should only be 1 at the moment - only single image prediction is supported
         int numInstances = (int) shape[0];
 
         // Create the returning Prediction[]
@@ -62,31 +81,41 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         return result[0];
     }
 
+    /**
+     * Reshape the single instance INDArray to a batch of size 1
+     * @param array Array to reshape
+     * @return Reshaped activation
+     */
     private INDArray reshapeSingleInstanceToBatch(INDArray array) {
-        // TODO test this works
         long numClasses = array.shape()[0];
         return array.reshape(1, numClasses);
     }
 
-    private boolean pathExists(String path) {
-        return new File(path).exists();
-    }
-
+    /**
+     * Attempts to look in a couple of locations for the class-maps resource folder
+     * @return Correct class map folder
+     * @throws Exception If the class map folder cannot be found
+     */
     private String getClassMapFolder() throws Exception {
         // Try the current directory
         String classMapFolder = Paths.get("src", "main", "resources", "class-maps").toString();
-        if (pathExists(classMapFolder))
+        if (Utils.pathExists(classMapFolder))
             return classMapFolder;
 
         // Otherwise try the package home directory
         String packageHomeDir = Utils.defaultFileLocation();
         classMapFolder = Paths.get(packageHomeDir, "wekaDeeplearning4j", classMapFolder).toString();
-        if (pathExists(classMapFolder))
+        if (Utils.pathExists(classMapFolder))
             return classMapFolder;
 
-        throw new WekaException("Cannot find Class map file");
+        throw new WekaException("Cannot find Class map folder");
     }
 
+    /**
+     * Gets the path of the class map file - either the custom path or one of the built-in files
+     * @return Correct class map path
+     * @throws Exception If the class map file cannot be found
+     */
     private String getClassMapPath() throws Exception {
         // Return the custom file path if the user has specified it
 
@@ -116,6 +145,11 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         return classMapPath;
     }
 
+    /**
+     * Parses the classmap file into a String[]
+     * @return String[], one item for each class
+     * @throws Exception
+     */
     public String[] getClasses() throws Exception {
         // TODO add support for arff files
         List<String> classes = new ArrayList<>();

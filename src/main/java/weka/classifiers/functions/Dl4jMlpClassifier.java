@@ -1373,10 +1373,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
+  /**
+   * Load a ComputationGraph without any data - used in the Playground
+   * @param numClasses Number of classes to load with
+   * @param seed Random seed
+   * @param newShape Input shape
+   */
   public void loadZooModelNoData(int numClasses, long seed, int[] newShape) {
     model = zooModel.init(numClasses, seed, newShape, isFilterMode());
   }
 
+  /**
+   * Convenience method to allow the Playground to call outputSingle for a single image
+   * @param image Image to predict for
+   * @return Model predictions
+   */
   public INDArray outputSingle(INDArray image) {
     return model.outputSingle(image);
   }
@@ -1590,7 +1601,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * Get the iterationlistener
    */
-  protected TrainingListener getListener() throws Exception {
+  protected TrainingListener getListener() {
     int numSamples = trainData.numInstances();
     TrainingListener listener;
 
@@ -1634,7 +1645,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         // invoke this directly because (for some reason) ParallelWrapper does
         // not seem to inform listeners after completing a call to fit()
         if (iterationListener instanceof weka.dl4j.listener.EpochListener) {
-          ((weka.dl4j.listener.EpochListener) iterationListener).onEpochEnd(model);
+          iterationListener.onEpochEnd(model);
         }
       } else {
         model.fit(trainIterator);
@@ -1683,6 +1694,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
 
+  /**
+   * Checks the stacktrace for a call to GenericObjectEditor.
+   * If that exists, WEKA was started by the GUIChooser
+   */
   private static void checkIfRunByGUI() {
     // Don't need to check if we've already set this
     if (System.getProperty("weka.started.via.GUIChooser") != null) {
@@ -1838,6 +1853,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return distributionsForInstances(data)[0];
   }
 
+  /**
+   * Checks the array (as output from ComputationGraph.outputSingle()) for arithmetic underflow
+   * @param array Array to check
+   * @return True if the model returned an arithmetic underflow
+   */
   public boolean arithmeticUnderflow(INDArray array) {
     return array.isNaN().all();
   }
