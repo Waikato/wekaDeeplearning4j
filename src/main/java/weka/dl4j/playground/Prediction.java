@@ -39,6 +39,12 @@ public class Prediction {
         return classProbability;
     }
 
+    public String toTableRowString(String lineFormat) {
+        String classID = "" + getClassID();
+        String probability = String.format("%.3f", getClassProbability() * 100);
+        return String.format(lineFormat, classID, getClassName(), probability);
+    }
+
     @Override
     public String toString() {
         return String.format("Class ID = %d, Class name = %s, Class prob = %.3f",
