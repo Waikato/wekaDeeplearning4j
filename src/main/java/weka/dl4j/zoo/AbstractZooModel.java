@@ -104,7 +104,18 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
     public String getPrettyName() {
         Enum variation = getVariation();
+        if (variation == null) {
+            return this.getClass().getSimpleName();
+        } else {
+            return this.getClass().getSimpleName() + " (" + variation + ")";
+        }
     }
+
+    /**
+     * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+     *
+     * @return Variation
+     */
     public abstract Enum getVariation();
 
     @OptionMetadata(

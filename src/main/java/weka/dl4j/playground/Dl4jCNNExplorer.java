@@ -85,12 +85,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         if (Utils.notDefaultFileLocation(serializedModelFile)) {
             return "Custom trained Dl4jMlpClassifier";
         } else {
-            Enum variation = zooModelType.getVariation();
-            if (variation == null) {
-                return zooModelType.getClass().getSimpleName();
-            } else {
-                return zooModelType.getClass().getSimpleName() + " (" + variation + ")";
-            }
+            return zooModelType.getPrettyName();
         }
     }
 
