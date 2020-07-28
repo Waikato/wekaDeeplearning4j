@@ -3,12 +3,10 @@ package weka.dl4j.playground;
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.api.DataSet;
-import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
-import weka.dl4j.preprocessors.ImageNetPreprocessor;
 import weka.dl4j.zoo.*;
 
 import java.io.File;
@@ -73,11 +71,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             image = image.permute(0,2,3,1);
         }
 
-        if (zooModelType.requiresImageNetScaling()) {
-            log.info("Applying ImageNet scaling");
-            ImageNetPreprocessor preprocessor = new ImageNetPreprocessor();
-            DataSet dataSet = new org.nd4j.linalg.dataset.DataSet(image, Nd4j.zeros(0));
-            preprocessor.preProcess(dataSet);
+        if (zooModelType.requiresPreProcessing()) {
+            log.info("Applying image preprocessing...");
+            ImagePreProcessingScaler preprocessor = zooModelType.getImagePreprocessingScaler();
+            preprocessor.transform(image);
         }
 
         // Run prediction
