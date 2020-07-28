@@ -3,9 +3,7 @@ package weka.dl4j.playground;
 import junit.framework.TestCase;
 import lombok.extern.log4j.Log4j2;
 import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.Dl4jVGG;
-import weka.dl4j.zoo.KerasResNet;
+import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.VGG;
 import weka.zoo.ZooModelTest;
 
@@ -26,7 +24,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
     /**
      * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller
-     * @throws Exception
+     * @throws Exception If an exception occurs during testing
      */
     public void testBenStillerVGGFACE() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
@@ -45,16 +43,58 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
     /**
      * Test the explorer with a pretrained ResNet on ImageNet and a photo of a trombone
-     * @throws Exception
+     * @throws Exception If an exception occurs during testing
      */
     public void testDogResNet() throws Exception {
         checkImageNetModel(new KerasResNet(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
-    // TODO add testValidDl4jModels()
+
+    /**
+     * Test the explorer with a pretrained Darknet19 model - it uses a different class mapping
+     * hence why it's in a separate method
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testValidDarknet() throws Exception {
+        final int DARKNET_GERMAN_SHEPPARD_ID = 210;
+
+        Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
+
+        Dl4jDarknet19 zooModel = new Dl4jDarknet19();
+        zooModel.setVariation(Dl4jDarknet19.VARIATION.INPUT448);
+        explorer.setZooModelType(zooModel);
+
+        ModelOutputDecoder decoder = new ModelOutputDecoder();
+        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.DARKNET_IMAGENET);
+        explorer.setModelOutputDecoder(decoder);
+
+        checkPredictionInTopN(explorer, GERMAN_SHEPPARD_PATH, DARKNET_GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the Deeplearning4j zoo models with a simple dog picture
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testValidDl4jModels() throws Exception {
+        List<AbstractZooModel> dl4jModels = ZooModelTest.createDL4JModels();
+
+        // LeNet only takes images of shape [28, 28, 1]
+        dl4jModels.removeIf(x -> x.getClass() == Dl4jLeNet.class);
+
+        // VGGFace model can't detect dogs/cars/other ImageNet classes
+        dl4jModels.removeIf(x -> x.getClass() == Dl4jVGG.class && x.getPretrainedType() == PretrainedType.VGGFACE);
+
+        // Need to test DarkNet separately -- has different class mappings
+        dl4jModels.removeIf(x -> x.getClass() == Dl4jDarknet19.class);
+
+        // Dl4jXception just straight up gives weird predictions - can't figure out what preprocessing is required
+        dl4jModels.removeIf(x -> x.getClass() == Dl4jXception.class);
+
+        testModelList(dl4jModels);
+    }
 
     /**
      * Tests the Keras models with a simple dog picture - checks to see which models output correct predictions
-     * @throws Exception
+     * @throws Exception If an exception occurs during testing
      */
     public void testValidKerasModels() throws Exception {
         List<AbstractZooModel> kerasModels = ZooModelTest.createKerasModels();
@@ -62,6 +102,11 @@ public class Dl4jCNNExplorerTest extends TestCase {
         testModelList(kerasModels);
     }
 
+    /**
+     * Test a set of zoo models against the german sheppard image
+     * @param zooModels models to test
+     * @throws Exception If an exception occurs during testing
+     */
     private void testModelList(List<AbstractZooModel> zooModels) throws Exception {
         List<AbstractZooModel> failedModels = new ArrayList<>();
 
@@ -79,7 +124,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
             return;
         }
 
-        System.err.println(String.format("%d/%d models failed the check:", failedModels.size(), zooModels.size()));
+        System.err.printf("%d/%d models failed the check:%n", failedModels.size(), zooModels.size());
         for (AbstractZooModel zooModel : failedModels) {
             System.err.println(zooModel.getPrettyName());
         }
@@ -88,7 +133,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
     /**
      * Simply tests a pretrained (on IMAGENET) zoo model
-     * @param zooModel
+     * @param zooModel Model to test
      */
     private void checkImageNetModel(AbstractZooModel zooModel, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
@@ -97,6 +142,14 @@ public class Dl4jCNNExplorerTest extends TestCase {
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
+    /**
+     * Checks that the expected class ID is in the top N predictions - the model has (at least somewhat) correctly
+     * predicted the image
+     * @param explorer Explorer to run the prediction with
+     * @param imagePath Image to predict on
+     * @param expectedClassID Expected class ID of the prediction
+     * @throws Exception If an exception occurs during testing
+     */
     private void checkPredictionInTopN(Dl4jCNNExplorer explorer, String imagePath, int expectedClassID) throws Exception {
         try {
             explorer.init();
