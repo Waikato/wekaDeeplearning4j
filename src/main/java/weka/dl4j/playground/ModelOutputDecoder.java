@@ -28,7 +28,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
     /**
      * Built-in class maps for WDL4J
     */
-    public enum ClassmapType { IMAGENET, VGGFACE, CUSTOM }
+    public enum ClassmapType { IMAGENET, DARKNET_IMAGENET, VGGFACE, CUSTOM }
 
     /**
      * Class Map to use to decode the model output
@@ -130,6 +130,9 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
                 }
             case IMAGENET:
                 classMapPath = Paths.get(classMapFolder, "IMAGENET.txt").toString();
+                break;
+            case DARKNET_IMAGENET:
+                classMapPath = Paths.get(classMapFolder, "DARKNET_IMAGENET.txt").toString();
                 break;
             case VGGFACE:
                 classMapPath = Paths.get(classMapFolder, "VGGFACE.txt").toString();
