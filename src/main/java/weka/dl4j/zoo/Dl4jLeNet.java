@@ -21,7 +21,7 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import weka.classifiers.functions.MultilayerPerceptron;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 
@@ -72,13 +72,8 @@ public class Dl4jLeNet extends AbstractZooModel {
     return null;
   }
 
-  /**
-   * Does the model require input images to have the ImageNet preprocessing?
-   *
-   * @return true if the model input should be rescaled
-   */
   @Override
-  public boolean requiresImageNetScaling() {
-    return false;
+  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+    return null;
   }
 }

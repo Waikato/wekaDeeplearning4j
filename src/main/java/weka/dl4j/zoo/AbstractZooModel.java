@@ -1,8 +1,6 @@
 package weka.dl4j.zoo;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.NotImplementedException;
-import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
 import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
@@ -12,16 +10,15 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
-import weka.core.converters.AbstractFileLoader;
 import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.EfficientNet;
 import weka.gui.ProgrammaticProperty;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
@@ -119,10 +116,18 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     public abstract Enum getVariation();
 
     /**
-     * Does the model require input images to have the ImageNet preprocessing?
+     * Does the model require input images to be preprocessed?
      * @return true if the model input should be rescaled
      */
-    public abstract boolean requiresImageNetScaling();
+    public boolean requiresPreProcessing() {
+        return getImagePreprocessingScaler() != null;
+    }
+
+    /**
+     * Get the preprocessor to process this model's data with
+     * @return DataSetPreprocessor
+     */
+    public abstract ImagePreProcessingScaler getImagePreprocessingScaler();
 
     @OptionMetadata(
             displayName = "Image channels last",

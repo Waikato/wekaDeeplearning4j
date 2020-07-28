@@ -1,9 +1,8 @@
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
-import weka.dl4j.Preferences;
 import weka.dl4j.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
 
@@ -28,16 +27,6 @@ public class KerasDenseNet extends AbstractZooModel {
     )
     public DenseNet.VARIATION getVariation() {
         return variation;
-    }
-
-    /**
-     * Does the model require input images to have the ImageNet preprocessing?
-     *
-     * @return true if the model input should be rescaled
-     */
-    @Override
-    public boolean requiresImageNetScaling() {
-        return true;
     }
 
     public void setVariation(DenseNet.VARIATION var) {
@@ -72,5 +61,10 @@ public class KerasDenseNet extends AbstractZooModel {
         int[][] shape = new int[1][];
         shape[0] = DenseNet.inputShape;
         return shape;
+    }
+
+    @Override
+    public ImagePreProcessingScaler getImagePreprocessingScaler() {
+        return new ImagePreProcessingScaler(-1, 1);
     }
 }
