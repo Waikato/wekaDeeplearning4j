@@ -124,6 +124,7 @@ task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
         include 'datasets/**'
         include 'doc/**'
         include 'src/main/**'
+        include 'src/test/resources/images/**'
         exclude 'src/main/*.iml'
     }
     into "dist/${project.name}/"
