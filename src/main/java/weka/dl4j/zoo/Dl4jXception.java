@@ -73,7 +73,7 @@ public class Dl4jXception extends AbstractZooModel {
   }
 
   @Override
-  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+  public ImagePreProcessingScaler getImagePreprocessingScaler() { // TODO figure out the correct image preprocessing
     return new ImagePreProcessingScaler(0, 1);
   }
 }

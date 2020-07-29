@@ -93,15 +93,15 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        KerasResNet zooModel = new KerasResNet();
-        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
+        Dl4jXception zooModel = new Dl4jXception();
+//        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
 //        zooModel.setVariation(VGG.VARIATION.VGG16);
 //        zooModel.setPretrainedType(PretrainedType.VGGFACE);
         explorer.setZooModelType(zooModel);
 
-//        ModelOutputDecoder decoder = new ModelOutputDecoder();
-//        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
-//        explorer.setModelOutputDecoder(decoder);
+        ModelOutputDecoder decoder = new ModelOutputDecoder();
+        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.IMAGENET);
+        explorer.setModelOutputDecoder(decoder);
 
         explorer.init();
         explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));

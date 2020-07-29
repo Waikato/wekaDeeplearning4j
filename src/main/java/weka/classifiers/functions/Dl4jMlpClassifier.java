@@ -96,8 +96,11 @@ import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.gui.ProgrammaticProperty;
+import weka.gui.explorer.ProgressBar;
 
 import javax.swing.*;
+
+import static weka.core.PopupManager.checkIfRunByGUI;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -1693,28 +1696,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
   }
 
-
-  /**
-   * Checks the stacktrace for a call to GenericObjectEditor.
-   * If that exists, WEKA was started by the GUIChooser
-   */
-  private static void checkIfRunByGUI() {
-    // Don't need to check if we've already set this
-    if (System.getProperty("weka.started.via.GUIChooser") != null) {
-      return;
-    }
-
-    StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-    System.setProperty("weka.started.via.GUIChooser", "false");
-    for (StackTraceElement s : stack) {
-      if (s.getClassName().equals("weka.gui.GenericObjectEditor")) {
-        System.setProperty("weka.started.via.GUIChooser", "true");
-        log.debug("Weka started by GUIChooser");
-        break;
-      }
-    }
-  }
-
   /**
    * Creates a JFrame with the loading message. To be used while loading the zoo model layer spec
    * @return reference to JFrame, so it can be destroyed later
@@ -2018,7 +1999,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @return INDArray containing the newly transformed instances
    * @throws Exception
    */
-  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType, ProgressBar progressBar) throws Exception {
     // TransferLearningHelper alters cmp graph in place so we need to clone it
     TransferLearningHelper transferLearningHelper;
     try {
@@ -2069,6 +2050,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       } else {
         result = Nd4j.concat(0, result, activationAtLayer);
       }
+      progressBar.increment();
     }
     return result;
   }
@@ -2088,13 +2070,17 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     log.info("Getting features from layers: " + Arrays.toString(layerNames));
 
+    ProgressBar progressBar = new ProgressBar();
+    int numInstances = input.numInstances() * layerNames.length;
+    progressBar.setMax(numInstances);
+
     for (String layerName : layerNames) {
       if (attributesPerLayer.containsKey(layerName)) {
         log.warn("Concatenating two identical layers not supported");
         continue;
       }
 
-      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType, progressBar);
 
       attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
       if (result == null) {
