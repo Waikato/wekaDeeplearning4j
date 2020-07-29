@@ -14,8 +14,8 @@ def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
 // Set JDK compatibility
 allprojects {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 }
 
 /*
