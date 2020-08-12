@@ -1,10 +1,20 @@
 package weka.core.progress;
 
 // TODO document
-
+// TODO calculate ETA
 public abstract class AbstractProgressBar {
 
+    public AbstractProgressBar() { }
+
+    public AbstractProgressBar(double maxProgress, String progressMessage) {
+        reset();
+        setMax(maxProgress);
+        m_progressMessage = progressMessage;
+    }
+
     protected boolean m_indeterminate = false; // TODO implement
+
+    protected String m_progressMessage;
 
     protected double m_actualProgress = 0;
 
@@ -13,10 +23,9 @@ public abstract class AbstractProgressBar {
 
     protected double m_maxProgress = 0;
 
-    public void reset(double maxProgress) {
+    public void reset() {
         m_normalizedProgress = 0;
         m_actualProgress = 0;
-        setMax(maxProgress);
     }
 
     public void setProgress(double progress) {
@@ -30,7 +39,7 @@ public abstract class AbstractProgressBar {
 
     public abstract void show();
 
-    public abstract void hide();
+    public abstract void finish();
 
     public abstract void refreshDisplay();
 
@@ -39,6 +48,9 @@ public abstract class AbstractProgressBar {
     }
 
     public void setMax(double max) {
+        if (max < 0) {
+            m_indeterminate = true;
+        }
         this.m_maxProgress = max;
     }
 }

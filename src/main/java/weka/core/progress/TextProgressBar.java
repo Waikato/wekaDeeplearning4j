@@ -5,10 +5,8 @@ import weka.gui.SysErrLog;
 // TODO document
 public class TextProgressBar extends AbstractProgressBar {
 
-    public TextProgressBar() {}
-
-    public TextProgressBar(double maxProgress) {
-        reset(maxProgress);
+    public TextProgressBar(double maxProgress, String progressMessage) {
+        super(maxProgress, progressMessage);
     }
 
     private String progressChar = "-";
