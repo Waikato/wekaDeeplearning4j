@@ -29,19 +29,16 @@ public class TextProgressBar extends AbstractProgressBar {
 
     public void refreshDisplay() {
         System.err.print(String.format("\r%s: [%s%s]", m_progressMessage, progressChar.repeat(numDots), progressRemainingChar.repeat(progressBarSize - numDots)));
-
-        if (numDots == progressBarSize) {
-            System.err.println("\nDone!");
-        }
     }
 
     @Override
     public void show() {
-
+        System.err.println("\n\n");
+        refreshDisplay();
     }
 
     @Override
-    public void hide() {
-
+    public void finish() {
+        System.err.println("\nDone!\n");
     }
 }
