@@ -18,7 +18,6 @@
 
 package weka.classifiers.functions;
 
-import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
@@ -51,29 +50,13 @@ import org.nd4j.linalg.dataset.api.iterator.cache.InFileDataSetCache;
 import org.nd4j.linalg.dataset.api.iterator.cache.InMemoryDataSetCache;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
-import org.nd4j.linalg.indexing.INDArrayIndex;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
-import weka.core.BatchPredictor;
-import weka.core.Capabilities;
+import weka.core.*;
 import weka.core.Capabilities.Capability;
-import weka.core.CapabilitiesHandler;
-import weka.core.EmptyIteratorException;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.InvalidLayerConfigurationException;
-import weka.core.InvalidNetworkArchitectureException;
-import weka.core.InvalidValidationPercentageException;
-import weka.core.LogConfiguration;
-import weka.core.MissingOutputLayerException;
-import weka.core.OptionMetadata;
-import weka.core.SelectedTag;
-import weka.core.Tag;
-import weka.core.WekaException;
-import weka.core.WekaPackageClassLoaderManager;
-import weka.core.WrongIteratorException;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.*;
@@ -96,11 +79,6 @@ import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.gui.ProgrammaticProperty;
-import weka.gui.explorer.ProgressBar;
-
-import javax.swing.*;
-
-import static weka.core.PopupManager.checkIfRunByGUI;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -287,6 +265,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * True if the Cuda/GPU backend is available
    */
   protected boolean gpuBackendAvailable;
+  /**
+   * Displays progress of the current process (feature extraction, training, etc.)
+   */
+  protected ProgressManager progressManager;
 
   public Dl4jMlpClassifier() {
     if (!s_cudaMultiGPUSet) {
@@ -1697,38 +1679,6 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Creates a JFrame with the loading message. To be used while loading the zoo model layer spec
-   * @return reference to JFrame, so it can be destroyed later
-   */
-  private JFrame showModelLoadingFrame() {
-    checkIfRunByGUI();
-
-    javax.swing.JFrame frame = null;
-    String msg = "Downloading model weights and initializing model, please wait...";
-    log.info(msg);
-    if (!GraphicsEnvironment.isHeadless() && System.getProperty("weka.started.via.GUIChooser").equals("true")) {
-      frame = new javax.swing.JFrame("WekaDeeplearning4j Notification: " + msg);
-      frame.setPreferredSize(new java.awt.Dimension(850, 0));
-      frame.pack();
-      frame.setLocationRelativeTo(null);
-      frame.setVisible(true);
-      frame.setAutoRequestFocus(true);
-      frame.setAlwaysOnTop(true);
-    }
-    return frame;
-  }
-
-  /**
-   * Destroy the loading JFrame
-   * @param frame JFrame to be destroyed
-   */
-  private void closeModelLoadingFrame(JFrame frame) {
-    if (frame != null) {
-      frame.dispose();
-    }
-  }
-
-  /**
    * Get the modelzoo model
    *
    * @return The modelzoo model object
@@ -1750,7 +1700,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     this.zooModel = zooModel;
 
     if (getLoadLayerSpecification()) {
-      JFrame frame = showModelLoadingFrame();
+      progressManager = new ProgressManager(-1, "Downloading model weights and initializing model");
+      progressManager.getProgressBar().show();
 
       ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
       try {
@@ -1774,7 +1725,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         }
       } finally {
         Thread.currentThread().setContextClassLoader(origLoader);
-        closeModelLoadingFrame(frame);
+        progressManager.getProgressBar().finish();
       }
     }
   }
@@ -1999,7 +1950,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * @return INDArray containing the newly transformed instances
    * @throws Exception
    */
-  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType, ProgressBar progressBar) throws Exception {
+  public INDArray featurizeForLayer(String layerName, DataSetIterator iter, PoolingType poolingType) throws Exception {
     // TransferLearningHelper alters cmp graph in place so we need to clone it
     TransferLearningHelper transferLearningHelper;
     try {
@@ -2050,7 +2001,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       } else {
         result = Nd4j.concat(0, result, activationAtLayer);
       }
-      progressBar.increment();
+      progressManager.getProgressBar().increment();
     }
     return result;
   }
@@ -2070,9 +2021,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     log.info("Getting features from layers: " + Arrays.toString(layerNames));
 
-    ProgressBar progressBar = new ProgressBar();
     int numInstances = input.numInstances() * layerNames.length;
-    progressBar.setMax(numInstances);
+    progressManager = new ProgressManager(numInstances, "Performing feature extraction");
 
     for (String layerName : layerNames) {
       if (attributesPerLayer.containsKey(layerName)) {
@@ -2080,7 +2030,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         continue;
       }
 
-      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType, progressBar);
+      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
 
       attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
       if (result == null) {
@@ -2092,7 +2042,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
 
     result = Utils.appendClasses(result, input);
+    Instances newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
 
-    return Utils.convertToInstances(result, input, attributesPerLayer);
+    progressManager.getProgressBar().finish();
+
+    return newInstances;
   }
 }
