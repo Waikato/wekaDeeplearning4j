@@ -1,9 +1,8 @@
 package weka.core.progress;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.NotImplementedException;
-
 import java.util.Arrays;
+
 // TODO document
 
 @Log4j2
@@ -21,7 +20,6 @@ public class ProgressManager {
      */
     public boolean checkIfRunByGUI() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-        System.out.println(Arrays.toString(stack));
         boolean tmpRunningInGUI = false;
         for (StackTraceElement s : stack) {
             if (s.getClassName().contains("weka.gui.")) {
@@ -33,7 +31,7 @@ public class ProgressManager {
         return tmpRunningInGUI;
     }
 
-    private void init(double maxProgress) {
+    private void init(double maxProgress, String progressMessage) {
         runningInGUI = checkIfRunByGUI();
 
         if (runningInGUI) {
@@ -41,12 +39,12 @@ public class ProgressManager {
             System.exit(1);
         } else {
             // Create the text progress bar as we're running it from code/command line
-            progressBar = new TextProgressBar(maxProgress);
+            progressBar = new TextProgressBar(maxProgress, progressMessage);
         }
     }
 
-    public ProgressManager(double maxProgress) {
-        init(maxProgress);
+    public ProgressManager(double maxProgress, String progressMessage) {
+        init(maxProgress, progressMessage);
     }
 
     public AbstractProgressBar getProgressBar() {
