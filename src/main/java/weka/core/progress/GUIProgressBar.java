@@ -11,23 +11,26 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
     protected JFrame currentFrame;
 
+    protected JProgressBar progressBar;
+
     public GUIProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
         init();
     }
 
     private void init() {
+        show();
 //        currentFrame = new JFrame();
 //        currentFrame.setTitle("WekaDeeplearning4j Notification");
     }
 
     @Override
     protected void onSetProgress() {
-
+        progressBar.setValue((int) m_actualProgress);
     }
 
     @Override
-    public void show() {
+    public void show() { // TODO refactor this
         // Create frame with title Registration Demo
         currentFrame = new JFrame();
         currentFrame.setTitle("WekaDeeplearning4j Notification");
@@ -54,9 +57,10 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         constr.gridx=0;
         constr.gridy=0;
 
-        JProgressBar progressBar = new JProgressBar();
-        progressBar.setIndeterminate(true);
+        progressBar = new JProgressBar();
+//        progressBar.setIndeterminate(true);
         progressBar.setPreferredSize(new Dimension(300, 50));
+        progressBar.setMaximum((int) getMax());
 
         panel.add(progressBar, constr);
 
@@ -70,8 +74,6 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         currentFrame.setLocationRelativeTo(null);
 
         currentFrame.setVisible(true);
-
-        System.out.println("SHOWING");
     }
 
     @Override
