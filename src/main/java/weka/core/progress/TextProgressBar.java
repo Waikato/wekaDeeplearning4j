@@ -20,13 +20,12 @@ public class TextProgressBar extends AbstractProgressBar {
 
     private int numDots = 0;
 
-    public void setProgress(double progress) {
-        super.setProgress(progress);
+    @Override
+    protected void onSetProgress() {
         numDots = (int) (m_normalizedProgress * progressBarSize);
-
-        refreshDisplay();
     }
 
+    @Override
     public void refreshDisplay() {
         System.err.print(String.format("\r%s: [%s%s]", m_progressMessage, progressChar.repeat(numDots), progressRemainingChar.repeat(progressBarSize - numDots)));
     }
