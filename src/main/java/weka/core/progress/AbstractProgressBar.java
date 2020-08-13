@@ -31,11 +31,15 @@ public abstract class AbstractProgressBar {
     public void setProgress(double progress) {
         m_actualProgress = progress;
         m_normalizedProgress = m_actualProgress / m_maxProgress;
+        onSetProgress();
+        refreshDisplay();
     }
 
     public void increment() {
         setProgress(m_actualProgress + 1);
     }
+
+    protected abstract void onSetProgress();
 
     public abstract void show();
 
