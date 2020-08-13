@@ -1699,34 +1699,42 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
-    if (getLoadLayerSpecification()) {
+    if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
+
       progressManager = new ProgressManager(-1, "Downloading model weights and initializing model");
       progressManager.getProgressBar().show();
 
-      ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
-      try {
-        // Try to parse the layers so the user can change them afterwards
-        final int dummyNumLabels = 2;
+//      parseLayers();
+      // Parse the layers in a separate thread so as to not lock the GUI thread
+      Thread thread = new Thread(this::parseLayers);
+      thread.setPriority(Thread.MIN_PRIORITY);
+      thread.start();
+    }
+  }
 
-        Thread.currentThread().setContextClassLoader(
-                this.getClass().getClassLoader());
-        ComputationGraph tmpCg =
-                zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
-        tmpCg.init();
-        layers =
-                Arrays.stream(tmpCg.getLayers())
-                        .map(l -> Layer.create(l.conf().getLayer()))
-                        .collect(Collectors.toList())
-                        .toArray(new Layer[tmpCg.getLayers().length]);
+  private void parseLayers() {
+    ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    try {
+      // Try to parse the layers so the user can change them afterwards
+      final int dummyNumLabels = 2;
 
-      } catch (Exception e) {
-        if (!(zooModel instanceof CustomNet)) {
-          log.error("Could not set layers from zoomodel.", e);
-        }
-      } finally {
-        Thread.currentThread().setContextClassLoader(origLoader);
-        progressManager.getProgressBar().finish();
+      Thread.currentThread().setContextClassLoader(
+              this.getClass().getClassLoader());
+      ComputationGraph tmpCg =
+              zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+      tmpCg.init();
+      layers =
+              Arrays.stream(tmpCg.getLayers())
+                      .map(l -> Layer.create(l.conf().getLayer()))
+                      .collect(Collectors.toList())
+                      .toArray(new Layer[tmpCg.getLayers().length]);
+    } catch (Exception e) {
+      if (!(zooModel instanceof CustomNet)) {
+        log.error("Could not set layers from zoomodel.", e);
       }
+    } finally {
+      Thread.currentThread().setContextClassLoader(origLoader);
+      progressManager.getProgressBar().finish();
     }
   }
 
