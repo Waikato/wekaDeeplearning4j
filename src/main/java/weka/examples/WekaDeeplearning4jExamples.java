@@ -23,6 +23,7 @@ import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.PretrainedType;
+import weka.dl4j.interpretability.ScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.playground.*;
 import weka.dl4j.zoo.*;
@@ -43,7 +44,15 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        scoreCamTest();
+        scoreCamTest2();
+    }
+
+    private static void scoreCamTest2() {
+        Dl4jResNet50 resNet50 = new Dl4jResNet50();
+        ComputationGraph computationGraph = resNet50.init(2, 1, resNet50.getShape()[0], true);
+
+        ScoreCAM scoreCAM = new ScoreCAM(computationGraph, "res5c_branch2c");
+        scoreCAM.generateForImage(new File("src/test/resources/images/dog.jpg"), 235);
     }
 
     private static void printArr(long[] arr) {
