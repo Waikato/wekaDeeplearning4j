@@ -104,7 +104,7 @@ public class Dl4JMlpFilterTest {
     Files.delete(Paths.get(clfPath));
   }
 
-//  @Test //TODO figure out why test failing on Travis CI, but not locally
+  @Test
   public void testProcessMnist() throws Exception {
     // Init data
     Instances dataMnist = DatasetLoader.loadMiniMnistMeta();
