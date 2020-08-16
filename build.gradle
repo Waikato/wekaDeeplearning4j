@@ -306,6 +306,9 @@ dependencies {
             throw new GradleException("Invalid CUDA Version: $cuda_version - Must be one of $valid_cuda_versions")
         }
     }
+
+    // Annotation Processors
+    annotationProcessor "org.projectlombok:lombok:$versions.lombok"
 }
 
 test {
