@@ -143,48 +143,43 @@ public class Dl4JMlpFilterTest {
   }
 
   protected void checkZooModelMNIST(AbstractZooModel zooModel, boolean isMeta) throws Exception {
-    try {
-      Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
-      Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
-      Instances instances = null;
-      AbstractInstanceIterator iterator = null;
-      // Load the MNIST meta arff with ImageInstanceIterator
-      if (isMeta) {
-        instances = DatasetLoader.loadMiniMnistMeta();
-        iterator = DatasetLoader.loadMiniMnistImageIterator();
-      } else {
-        // Load the Convolutional version of MNIST
-        instances = DatasetLoader.loadMiniMnistArff();
-        iterator = new ConvolutionInstanceIterator();
-        ((ConvolutionInstanceIterator) iterator).setNumChannels(1);
-        ((ConvolutionInstanceIterator) iterator).setHeight(28);
-        ((ConvolutionInstanceIterator) iterator).setWidth(28);
+    Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
+    Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
+    Instances instances = null;
+    AbstractInstanceIterator iterator = null;
+    // Load the MNIST meta arff with ImageInstanceIterator
+    if (isMeta) {
+      instances = DatasetLoader.loadMiniMnistMeta();
+      iterator = DatasetLoader.loadMiniMnistImageIterator();
+    } else {
+      // Load the Convolutional version of MNIST
+      instances = DatasetLoader.loadMiniMnistArff();
+      iterator = new ConvolutionInstanceIterator();
+      ((ConvolutionInstanceIterator) iterator).setNumChannels(1);
+      ((ConvolutionInstanceIterator) iterator).setHeight(28);
+      ((ConvolutionInstanceIterator) iterator).setWidth(28);
+    }
+
+    clf.setInstanceIterator(iterator);
+    myFilter.setInstanceIterator(iterator);
+
+    // Testing pretrained model, no point training for 1 epoch
+    clf.setNumEpochs(0);
+    clf.setZooModel(zooModel);
+    clf.buildClassifier(instances);
+
+    Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, instances);
+
+    myFilter.setZooModelType(zooModel);
+    myFilter.setInputFormat(instances);
+    Instances activationsActual = Filter.useFilter(instances, myFilter);
+
+    for (int i = 0; i < activationsActual.size(); i++) {
+      Instance expected = activationsExpected.get(i);
+      Instance actual = activationsActual.get(i);
+      for (int j = 0; j < expected.numAttributes(); j++) {
+        assertEquals(expected.value(j), actual.value(j), 1e-6);
       }
-
-      clf.setInstanceIterator(iterator);
-      myFilter.setInstanceIterator(iterator);
-
-      // Testing pretrained model, no point training for 1 epoch
-      clf.setNumEpochs(0);
-      clf.setZooModel(zooModel);
-      clf.buildClassifier(instances);
-
-      Instances activationsExpected = clf.getActivationsAtLayers(new String[] { zooModel.getFeatureExtractionLayer() }, instances);
-
-      myFilter.setZooModelType(zooModel);
-      myFilter.setInputFormat(instances);
-      Instances activationsActual = Filter.useFilter(instances, myFilter);
-
-      for (int i = 0; i < activationsActual.size(); i++) {
-        Instance expected = activationsExpected.get(i);
-        Instance actual = activationsActual.get(i);
-        for (int j = 0; j < expected.numAttributes(); j++) {
-          assertEquals(expected.value(j), actual.value(j), 1e-6);
-        }
-      }
-    } catch (OutOfMemoryError ex) {
-      log.warn("Dl4jMlpFilter test ran out of memory, possibly due to running multiple tests.\n" +
-              " Please run this test individually to ensure this is the case and no other exceptions have occured.");
     }
   }
 
