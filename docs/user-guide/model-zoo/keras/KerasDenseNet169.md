@@ -1,6 +1,6 @@
 # KerasDenseNet169
 
-[Back to Model Zoo](../../model-zoo.md)
+[Back to Model Zoo](../../model-zoo.md#model-summaries)
 
 ```text
 Model: "densenet169"

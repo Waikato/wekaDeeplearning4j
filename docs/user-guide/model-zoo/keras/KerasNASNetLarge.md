@@ -1,6 +1,6 @@
 # KerasNASNetLarge
 
-[Back to Model Zoo](../../model-zoo.md)
+[Back to Model Zoo](../../model-zoo.md#model-summaries)
 
 ```text
 Model: "NASNet"
