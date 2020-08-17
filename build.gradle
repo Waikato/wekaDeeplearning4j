@@ -329,8 +329,10 @@ test {
 
 task travisTest(type: Test) {
     filter {
+        // Excluded from travis due to taking too long
         excludeTestsMatching 'ZooModelTest'
         excludeTestsMatching 'Dl4jCNNExplorerTest'
+        excludeTestsMatching 'Dl4jMlpFilterTest'
         // TODO fix failing tests
         excludeTest('weka.classifiers.functions.RnnSequenceClassifierAbstractTest', 'testAttributes')
         excludeTest('weka.classifiers.functions.RnnSequenceClassifierAbstractTest', 'testRegression')
