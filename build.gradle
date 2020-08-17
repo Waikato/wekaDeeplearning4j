@@ -323,6 +323,8 @@ test {
         println "If this is a one-off/short-term exclusion then ignore this message"
         exclude project.property('excludeTests')
     }
+
+    maxHeapSize = "4g"
 }
 
 task travisTest(type: Test) {
@@ -336,6 +338,8 @@ task travisTest(type: Test) {
         //TODO figure out why test failing on Travis CI, but not locally
         excludeTest 'weka.filters.unsupervised.attribute.Dl4JMlpFilterTest', 'testProcessMnist'
     }
+
+    maxHeapSize = "4g"
 }
 
 /*
