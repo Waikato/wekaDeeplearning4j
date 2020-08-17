@@ -22,6 +22,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -46,6 +47,8 @@ import weka.core.*;
 import weka.dl4j.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.zoo.AbstractZooModel;
+
+import javax.imageio.ImageIO;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
@@ -570,26 +573,56 @@ public class Utils {
     return model;
   }
 
+  public static void saveNDArray(INDArray array, String filenamePrefix) {
+    BufferedImage img = Utils.imageFromINDArray(array);
+    try {
+      ImageIO.write(img, "png", new File(filenamePrefix + ".png"));
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+  }
+
   /**
    * Takes an INDArray containing an image loaded using the native image loader
    * libraries associated with DL4J, and converts it into a BufferedImage.
    * The INDArray contains the color values split up across three channels (RGB)
    * and in the integer range 0-255.
    *
-   * @param array INDArray containing an image
+   * @param array INDArray containing an image in order [N, C, H, W] or [C, H, W]
    * @return BufferedImage
    */
-  private static BufferedImage imageFromINDArray(INDArray array) {
+  public static BufferedImage imageFromINDArray(INDArray array) {
     long[] shape = array.shape();
 
-    long height = shape[2];
-    long width = shape[3];
+    boolean is4d = false;
+
+    if (shape.length == 4) {
+      is4d = true;
+      System.out.println("Map is 4d");
+    }
+
+    long height = shape[1];
+    long width = shape[2];
+
+    if (is4d) {
+      height = shape[2];
+      width = shape[3];
+    }
+
     BufferedImage image = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
-        int red = array.getInt(0, 2, y, x);
-        int green = array.getInt(0, 1, y, x);
-        int blue = array.getInt(0, 0, y, x);
+        int red, green, blue;
+
+        if (is4d) {
+          red = array.getInt(0, 2, y, x);
+          green = array.getInt(0, 1, y, x);
+          blue = array.getInt(0, 0, y, x);
+        } else {
+          red = array.getInt(2, y, x);
+          green = array.getInt(1, y, x);
+          blue = array.getInt(0, y, x);
+        }
 
         //handle out of bounds pixel values
         red = Math.min(red, 255);

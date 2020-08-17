@@ -59,74 +59,9 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     }
 
     private void saveResults(INDArray imageArr, INDArray saliencyMap, String filename) {
-        saveNDArray(imageArr, filename);
+        Utils.saveNDArray(imageArr, filename);
         INDArray masked = imageArr.mul(saliencyMap);
-        saveNDArray(masked, filename + "_masked");
-    }
-
-    private static void saveNDArray(INDArray array, String filenamePrefix) {
-        BufferedImage img = imageFromINDArray(array);
-        try {
-            ImageIO.write(img, "png", new File(filenamePrefix + ".png"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Takes an INDArray containing an image loaded using the native image loader
-     * libraries associated with DL4J, and converts it into a BufferedImage.
-     * The INDArray contains the color values split up across three channels (RGB)
-     * and in the integer range 0-255.
-     *
-     * @param array INDArray containing an image
-     * @return BufferedImage
-     */
-    private static BufferedImage imageFromINDArray(INDArray array) {
-        long[] shape = array.shape();
-
-        boolean is4d = false;
-
-        if (shape.length == 4) {
-            is4d = true;
-            System.out.println("Map is 4d");
-        }
-
-        long height = shape[1];
-        long width = shape[2];
-
-        if (is4d) {
-            height = shape[2];
-            width = shape[3];
-        }
-
-        BufferedImage image = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int red, green, blue;
-
-                if (is4d) {
-                    red = array.getInt(0, 2, y, x);
-                    green = array.getInt(0, 1, y, x);
-                    blue = array.getInt(0, 0, y, x);
-                } else {
-                    red = array.getInt(2, y, x);
-                    green = array.getInt(1, y, x);
-                    blue = array.getInt(0, y, x);
-                }
-
-                //handle out of bounds pixel values
-                red = Math.min(red, 255);
-                green = Math.min(green, 255);
-                blue = Math.min(blue, 255);
-
-                red = Math.max(red, 0);
-                green = Math.max(green, 0);
-                blue = Math.max(blue, 0);
-                image.setRGB(x, y, new Color(red, green, blue).getRGB());
-            }
-        }
-        return image;
+        Utils.saveNDArray(masked, filename + "_masked");
     }
 
     private INDArray postprocessActivations(INDArray weightedActivationMaps) {
@@ -225,21 +160,19 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return upsampledActivations;
     }
 
-    private INDArray reshapeUpsampledActivations(INDArray upsampledActivations) {
-        // Drop the 1 from [1, 224, 224, 512]
-        upsampledActivations = Nd4j.squeeze(upsampledActivations, 0);
-
-        // Reshape back to [C, H, W] (easier to iterate over)
-        return upsampledActivations.permute(2, 0, 1);
-    }
-
     private INDArray upsampleActivations(INDArray rawActivations) {
         // Create the new size array
         INDArray newSize = Nd4j.create(new int[] {224, 224}, new long[] {2}, DataType.INT32);
 
         // Upsample the activations to match original image size
         NDImage ndImage = new NDImage();
-        return ndImage.imageResize(rawActivations, newSize, ImageResizeMethod.ResizeBicubic); // TODO try BiLinear
+        INDArray upsampledActivations = ndImage.imageResize(rawActivations, newSize, ImageResizeMethod.ResizeBicubic); // TODO try BiLinear
+
+        // Drop the mini-batch size (1) from [1, 224, 224, 512]
+        upsampledActivations = Nd4j.squeeze(upsampledActivations, 0);
+
+        // Reshape back to [C, H, W] (easier to iterate over feature maps)
+        return upsampledActivations.permute(2, 0, 1);
     }
 
     private INDArray getActivationsForImage(TransferLearningHelper transferLearningHelper, INDArray imageArr) {
