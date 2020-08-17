@@ -34,25 +34,26 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
     @Override
     public void generateForImage(File imageFile, int targetClassID) {
+        // Set up the model and image
         TransferLearningHelper transferLearningHelper = new TransferLearningHelper(
                 this.model.clone(), activationMapLayer);
 
         INDArray imageArr = loadImage(imageFile);
 
+        // Get the original set of activation maps by taking the activations
+        // from the final convolution layer when running the image through the model
         INDArray rawActivations = getActivationsForImage(transferLearningHelper, imageArr);
-
+        // Upsample the activations to match the original image size
         INDArray upsampledActivations = upsampleActivations(rawActivations);
-
-        upsampledActivations = reshapeUpsampledActivations(upsampledActivations);
-
+        // Normalise them between 0 and 1 (so they can be multiplied with the images)
         INDArray normalisedActivations = normalizeActivations(upsampledActivations);
-
+        // Create the set of masked images by multiplying each (upsampled, normalized) activation map with the original image
         INDArray maskedImages = createMaskedImages(normalisedActivations, imageArr);
-
+        // Get the softmax score for the target class ID when running the masked images through the model
         INDArray targetClassWeights = getTargetClassWeights(maskedImages, targetClassID);
-
+        // Weight each activation map using the previously acquired softmax scores
         INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
-
+        // Sum the activation maps into one, and normalise the values to between [0, 1]
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
         saveResults(imageArr, postprocessedActivations, imageFile.getName() + "_processed");
