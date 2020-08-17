@@ -320,7 +320,7 @@ test {
 
     if (project.hasProperty('excludeTests')) {
         println "For consistency, please add your test exclusion to the travisTest task"
-        println "If this is a one-off/short-term exclusion then ignore this message"
+        println "If this is an ad-hoc/short-term exclusion then ignore this message"
         exclude project.property('excludeTests')
     }
 
