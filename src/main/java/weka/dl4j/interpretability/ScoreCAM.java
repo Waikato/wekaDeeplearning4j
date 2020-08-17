@@ -14,6 +14,7 @@ import org.nd4j.linalg.factory.ops.NDImage;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.ops.transforms.Transforms;
+import weka.classifiers.functions.dl4j.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -84,9 +85,8 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         double currMin = activationMap.minNumber().doubleValue();
         System.out.println(String.format("Prev max: %.4f, prev min: %.4f", currMax, currMin));
 
-//        NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(0.0, 1.0);
-//        normalizer.fit(new DataSet(activationMap, Nd4j.zeros(1)));
-//        normalizer.transform(activationMap);
+        activationMap.subi(currMin);
+        activationMap.divi(currMax - currMin);
 
         double newMax = activationMap.maxNumber().doubleValue();
         double newMin = activationMap.minNumber().doubleValue();
