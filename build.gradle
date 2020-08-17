@@ -314,6 +314,8 @@ dependencies {
 }
 
 test {
+    maxHeapSize = "4g"
+
     testLogging {
         events "passed", "skipped", "failed"
     }
@@ -321,17 +323,22 @@ test {
     if (project.hasProperty('excludeTests')) {
         println "For consistency, please add your test exclusion to the travisTest task"
         println "If this is an ad-hoc/short-term exclusion then ignore this message"
-        exclude project.property('excludeTests')
+        excludeTestsMatching project.property('excludeTests')
     }
 
-    maxHeapSize = "4g"
 }
 
 task travisTest(type: Test) {
+    maxHeapSize = "4g"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
     filter {
         // Excluded from travis due to taking too long
         excludeTestsMatching 'ZooModelTest'
-        excludeTestsMatching 'Dl4jCNNExplorerTest'
+//        excludeTestsMatching 'Dl4jCNNExplorerTest'
         excludeTestsMatching 'Dl4jMlpFilterTest'
         // TODO fix failing tests
         excludeTest('weka.classifiers.functions.RnnSequenceClassifierAbstractTest', 'testAttributes')
@@ -341,7 +348,7 @@ task travisTest(type: Test) {
         excludeTest 'weka.filters.unsupervised.attribute.Dl4JMlpFilterTest', 'testProcessMnist'
     }
 
-    maxHeapSize = "4g"
+
 }
 
 /*
