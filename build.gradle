@@ -324,7 +324,7 @@ test {
         exclude project.property('excludeTests')
     }
 
-    maxHeapSize = "4g"
+    maxHeapSize = "2g"
 }
 
 task travisTest(type: Test) {
@@ -339,7 +339,7 @@ task travisTest(type: Test) {
         excludeTest 'weka.filters.unsupervised.attribute.Dl4JMlpFilterTest', 'testProcessMnist'
     }
 
-    maxHeapSize = "4g"
+    maxHeapSize = "2g"
 }
 
 /*
