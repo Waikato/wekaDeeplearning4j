@@ -54,7 +54,7 @@ import weka.util.TestUtil;
  * @author Steven Lang, Rhys Compton
  */
 @Log4j2
-public class Dl4JMlpFilterTest {
+public class Dl4jMlpFilterTest {
 
   @Test
   public void testProcessMnistResNet() throws Exception {

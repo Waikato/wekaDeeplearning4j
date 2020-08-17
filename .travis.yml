@@ -19,4 +19,4 @@ cache:
 
 script:
   - ./gradlew build -x test
-  - travis_wait ./gradlew travisTest --fail-fast
+  - ./gradlew travisTest --fail-fast
