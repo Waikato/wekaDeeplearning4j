@@ -640,4 +640,32 @@ public class Utils {
     }
     return image;
   }
+
+  public static InputType.InputTypeConvolutional decodeCNNShape (int[] shape) {
+    return decodeCNNShape(Arrays.stream(shape).asLongStream().toArray());
+  }
+
+  public static InputType.InputTypeConvolutional decodeCNNShape (long[] shape) {
+    long val0 = shape[0];
+    long val1 = shape[1];
+    long val2 = shape[2];
+    long channels, width, height;
+
+    // Check for channels first
+    if (val1 == val2) {
+      // shape = [channels, width, height]
+      channels = val0;
+      width = val1;
+      height = val2;
+    } else if (val0 == val1) { // check for channels last
+      // shape = [width, height, channels]
+      width = val0;
+      height = val1;
+      channels = val2;
+    } else {
+      throw new IllegalArgumentException(String.format("Input array '%s' is not of valid shape", Arrays.toString(shape)));
+    }
+
+    return (InputType.InputTypeConvolutional) InputType.convolutional(height, width, channels);
+  }
 }
