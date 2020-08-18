@@ -115,7 +115,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         postNormaliseMap(reluActivations);
 
         // Reshape for saving
-        return reluActivations.reshape(1, 224, 224);
+        return reluActivations.reshape(1, modelInputShape.getHeight(), modelInputShape.getWidth());
     }
 
     private void postNormaliseMap(INDArray activationMap) {
@@ -173,13 +173,13 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         // [1, 3, 224, 224] -> [3, 224, 224] - remove the minibatch dimension
         imageArr = Nd4j.squeeze(imageArr, 0);
 
-        INDArray allMaskedImages = Nd4j.zeros(numActivationMaps, 3, 224, 224);
+        INDArray allMaskedImages = Nd4j.zeros(numActivationMaps, modelInputShape.getChannels(), modelInputShape.getHeight(), modelInputShape.getWidth());
         // Create the 512 masked images -
         // Multiply each normalized activation map with the image
         for (int i = 0; i < numActivationMaps; i++) {
             INDArray iActivationMap = normalisedActivations.get(NDArrayIndex.point(i));
             // [224, 224] -> [1, 224, 224] (is then broadcasted in the multiply method)
-            iActivationMap = iActivationMap.reshape(1, 224, 224);
+            iActivationMap = iActivationMap.reshape(1, modelInputShape.getHeight(), modelInputShape.getWidth());
 
             // [3, 224, 224] . [1, 224, 224] - actually create the masked image
             INDArray multiplied = imageArr.mul(iActivationMap);
@@ -210,7 +210,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
     private INDArray upsampleActivations(INDArray rawActivations) {
         // Create the new size array
-        INDArray newSize = Nd4j.create(new int[] {224, 224}, new long[] {2}, DataType.INT32);
+        INDArray newSize = Nd4j.create(new int[] {(int) modelInputShape.getHeight(), (int) modelInputShape.getWidth()}, new long[] {2}, DataType.INT32);
 
         // Upsample the activations to match original image size
         NDImage ndImage = new NDImage();
@@ -235,7 +235,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
     private INDArray loadImage(File imageFile) {
         // Load the image
-        NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
+        NativeImageLoader loader = new NativeImageLoader(modelInputShape.getHeight(), modelInputShape.getWidth(), modelInputShape.getChannels());
         try {
             return loader.asMatrix(imageFile);
         } catch (IOException ex) {
@@ -244,6 +244,23 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         }
     }
 
+    public InputType.InputTypeConvolutional getModelInputShape() {
+        return modelInputShape;
+    }
+
+    public void setModelInputShape(int[] shape) {
+        setModelInputShape(Utils.decodeCNNShape(shape));
+    }
+
+    public void setModelInputShape(InputType.InputTypeConvolutional modelInputShape) {
+        this.modelInputShape = modelInputShape;
+    }
+
+    /**
+     * Assuming arr is in order [channels, height, width]
+     * @param activationMaps
+     * @return
+     */
     private int getNumActivationMaps(INDArray activationMaps) {
         return (int) activationMaps.shape()[0];
     }
