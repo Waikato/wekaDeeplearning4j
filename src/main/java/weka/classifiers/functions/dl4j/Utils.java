@@ -31,7 +31,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.nn.api.Layer;
+import org.deeplearning4j.nn.conf.CNN2DFormat;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
@@ -55,12 +59,8 @@ import javax.imageio.ImageIO;
  *
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
  */
+@Log4j2
 public class Utils {
-
-  /**
-   * Logger instance
-   */
-  private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   /**
    * Converts a set of training instances to a DataSet. Assumes that the instances have been
@@ -595,11 +595,14 @@ public class Utils {
     long[] shape = array.shape();
 
     boolean is4d = false;
+    String dimString = "3D";
 
     if (shape.length == 4) {
       is4d = true;
-      System.out.println("Map is 4d");
+      dimString = "4D";
     }
+
+    log.debug(String.format("Converting %s INDArray to image...", dimString));
 
     long height = shape[1];
     long width = shape[2];
