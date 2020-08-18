@@ -141,6 +141,22 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return normalisedActivations.mul(weights);
     }
 
+    private int getNumIterations(int numActivationMaps) {
+        if (numActivationMaps % batchSize == 0) {
+            return numActivationMaps / batchSize;
+        } else {
+            return (numActivationMaps / batchSize) + 1;
+        }
+    }
+
+    private int getSafeToIndex(int fromIndex, int numActivationMaps) {
+        int toIndex = fromIndex + batchSize;
+        if (toIndex >= numActivationMaps) {
+            toIndex = numActivationMaps;
+        }
+        return toIndex;
+    }
+
     private INDArray predictTargetClassWeights(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
@@ -148,16 +164,19 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
         ComputationGraph computationGraph = getComputationGraph();
 
-        int totalIterations = numActivationMaps / batchSize;
+        int totalIterations = getNumIterations(numActivationMaps);
 
         for (int iteration = 0; iteration < totalIterations; iteration++) {
             int fromIndex = iteration * batchSize;
-            int toIndex = fromIndex + batchSize;
+            int toIndex = getSafeToIndex(fromIndex, numActivationMaps);
+            // In the case of a partial batch (e.g., the final batch using a batch size of 10 with 2048 activation maps,
+            // we need to know what the *actual* batch size of this iteration is (8, in this example)
+            int actualBatchSize = toIndex - fromIndex;
             INDArray maskedImageBatch = maskedImages.get(NDArrayIndex.interval(fromIndex, toIndex));
             // Run prediction
             INDArray output = computationGraph.outputSingle(maskedImageBatch);
             // Parse each prediction
-            for (int miniBatchI = 0; miniBatchI < batchSize; miniBatchI++) {
+            for (int miniBatchI = 0; miniBatchI < actualBatchSize; miniBatchI++) {
                 // Save the probability for the target class
                 double classProbVal = output.getDouble(miniBatchI, targetClassID);
                 targetClassWeights[fromIndex + miniBatchI] = classProbVal;
