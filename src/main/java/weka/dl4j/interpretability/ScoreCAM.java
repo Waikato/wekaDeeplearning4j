@@ -141,23 +141,30 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return normalisedActivations.mul(weights);
     }
 
-    private INDArray getTargetClassWeights(INDArray maskedImages, int targetClassID) {
+    private INDArray predictTargetClassWeights(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
+        log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
+//        INDArray targetClassWeights = Nd4j.zeros(numActivationMaps);
+        double[] targetClassWeights = new double[numActivationMaps];
 
-        INDArray targetClassWeights = Nd4j.zeros(numActivationMaps);
+        ComputationGraph computationGraph = getComputationGraph();
 
-        for (int i = 0; i < numActivationMaps; i++) {
-            INDArray maskedImage = maskedImages.get(NDArrayIndex.point(i));
-            // Needs the minibatch added back in for prediction
-            maskedImage = maskedImage.reshape(1, 3, 224, 224);
+        int totalIterations = numActivationMaps / batchSize;
 
+        for (int iteration = 0; iteration < totalIterations; iteration++) {
+            int fromIndex = iteration * batchSize;
+            int toIndex = fromIndex + batchSize;
+            INDArray maskedImageBatch = maskedImages.get(NDArrayIndex.interval(fromIndex, toIndex));
             // Run prediction
-            INDArray output = model.outputSingle(maskedImage);
-            // Save the probability for the target class
-            double classProbVal = output.getDouble(targetClassID);
-            targetClassWeights.putScalar(i, classProbVal);
+            INDArray output = computationGraph.outputSingle(maskedImageBatch);
+            // Parse each prediction
+            for (int miniBatchI = 0; miniBatchI < batchSize; miniBatchI++) {
+                // Save the probability for the target class
+                double classProbVal = output.getDouble(miniBatchI, targetClassID);
+                targetClassWeights[fromIndex + miniBatchI] = classProbVal;
+            }
         }
-        return targetClassWeights;
+        return Nd4j.create(targetClassWeights);
     }
 
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
