@@ -88,6 +88,16 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         int argMax = output.argMax(1).getNumber(0).intValue();
         setTargetClassID(argMax);
     }
+
+    /**
+     * Gets the activation map layer to use as the image masks - this is taken as the final convolution layer
+     * @return
+     */
+    private String getActivationMapLayer() {
+        Layer[] layers = getComputationGraph().getLayers();
+        Layer[] convLayers = Arrays.stream(layers).filter(x -> x instanceof ConvolutionLayer).toArray(Layer[]::new);
+        int count = convLayers.length;
+        return convLayers[count - 1].getConfig().getLayerName();
     }
 
     private void saveResults(INDArray imageArr, INDArray saliencyMap, String filename) {
