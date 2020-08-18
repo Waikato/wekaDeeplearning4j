@@ -93,6 +93,14 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             throws UnsupportedOperationException;
 
     /**
+     * Convenience method to returns a default pretrained graph for this zoo model
+     * @return
+     */
+    public ComputationGraph getDefaultGraph() {
+        return this.init(2, 1, this.getShape()[0], true);
+    }
+
+    /**
      * Get the input shape of this zoomodel
      *
      * @return Input shape of this zoomodel
