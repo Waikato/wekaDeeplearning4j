@@ -15,6 +15,8 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Random;
 
 public class WekaDeeplearning4jExamples {
@@ -23,17 +25,45 @@ public class WekaDeeplearning4jExamples {
         scoreCamTest();
     }
 
+    public static void commandLineProgressTest() throws Exception {
+        String folderPath = "datasets/nominal/mnist-minimal";
+        Instances inst = new Instances(new FileReader("datasets/nominal/mnist.meta.tiny.arff"));
+        inst.setClassIndex(1);
+
+        Dl4jMlpFilter filter = new Dl4jMlpFilter();
+
+        ImageInstanceIterator iterator = new ImageInstanceIterator();
+        iterator.setTrainBatchSize(3);
+        iterator.setImagesLocation(new File(folderPath));
+
+        KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
+        kerasEfficientNet.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        filter.setZooModelType(kerasEfficientNet);
+
+        filter.setUseDefaultFeatureLayer(false);
+        filter.setTransformationLayerNames(new String[] {
+                "top_dropout",
+                "block7b_se_expand"
+        });
+
+        filter.setInstanceIterator(iterator);
+        filter.setInputFormat(inst);
+
+        Instances filteredInstances = Filter.useFilter(inst, filter);
+        System.out.println(filteredInstances);
+    }
+
     private static void scoreCamTest() {
         KerasResNet pretrainedModel = new KerasResNet();
-//        pretrainedModel.setVariation(ResNet.VARIATION.RESNET50V2);
+        pretrainedModel.setVariation(ResNet.VARIATION.RESNET101V2);
         ComputationGraph computationGraph = pretrainedModel.getDefaultGraph();
 
         ScoreCAM scoreCAM = new ScoreCAM();
-        scoreCAM.setBatchSize(4);
+        scoreCAM.setBatchSize(8);
         scoreCAM.setComputationGraph(computationGraph);
         scoreCAM.setModelInputShape(pretrainedModel.getShape()[0]);
         scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-        scoreCAM.generateForImage("src/test/resources/images/pufferfish.jpg", null);
+        scoreCAM.generateForImage("src/test/resources/images/dog.jpg", null);
     }
 
     private static void filter() throws Exception {
