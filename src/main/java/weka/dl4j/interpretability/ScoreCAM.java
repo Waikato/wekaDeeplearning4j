@@ -58,6 +58,16 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
         saveResults(imageArr, postprocessedActivations, imageFile.getName() + "_processed");
+    private void calculateTargetClassID(INDArray imageArr) {
+        if (getTargetClassID() != -1) {
+            // Target class has already been set, don't calculate it
+            return;
+        }
+        // Otherwise run the model on the image, and choose argmax as the target class
+        INDArray output = getComputationGraph().outputSingle(imageArr);
+        int argMax = output.argMax(1).getNumber(0).intValue();
+        setTargetClassID(argMax);
+    }
     }
 
     private void saveResults(INDArray imageArr, INDArray saliencyMap, String filename) {
