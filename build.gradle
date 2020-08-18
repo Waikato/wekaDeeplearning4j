@@ -325,7 +325,6 @@ test {
         println "If this is an ad-hoc/short-term exclusion then ignore this message"
         excludeTestsMatching project.property('excludeTests')
     }
-
 }
 
 task travisTest(type: Test) {
@@ -347,8 +346,6 @@ task travisTest(type: Test) {
         //TODO figure out why test failing on Travis CI, but not locally
         excludeTest 'weka.filters.unsupervised.attribute.Dl4JMlpFilterTest', 'testProcessMnist'
     }
-
-
 }
 
 /*

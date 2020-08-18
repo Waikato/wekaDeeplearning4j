@@ -144,7 +144,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     private INDArray predictTargetClassWeights(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
-//        INDArray targetClassWeights = Nd4j.zeros(numActivationMaps);
         double[] targetClassWeights = new double[numActivationMaps];
 
         ComputationGraph computationGraph = getComputationGraph();
