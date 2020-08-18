@@ -2,13 +2,16 @@ package weka.dl4j.interpretability;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
+import org.deeplearning4j.nn.api.Layer;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.deeplearning4j.nn.layers.convolution.ConvolutionLayer;
 import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.nd4j.enums.ImageResizeMethod;
 import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.ops.NDImage;
 import org.nd4j.linalg.indexing.INDArrayIndex;
@@ -16,48 +19,65 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import weka.classifiers.functions.dl4j.Utils;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 // TODO document
 @Log4j2
 public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
-    protected String activationMapLayer;
-
-    public ScoreCAM(ComputationGraph model, String activationMapLayer) {
-        super(model);
-        this.activationMapLayer = activationMapLayer;
-    }
+    protected InputType.InputTypeConvolutional modelInputShape;
 
     @Override
-    public void generateForImage(File imageFile, int targetClassID) {
+    public void generateForImage(String inputImagePath, String outputImagePath) {
         // Set up the model and image
+        String activationMapLayer = getActivationMapLayer();
+
         TransferLearningHelper transferLearningHelper = new TransferLearningHelper(
-                this.model.clone(), activationMapLayer);
+                getComputationGraph().clone(), activationMapLayer);
 
-        INDArray imageArr = loadImage(imageFile);
+        File imageFile = new File(inputImagePath);
 
+        INDArray originalImage = loadImage(imageFile);
+        // Preprocess the image if the model requires it
+        INDArray preprocessedImage = preprocessImage(originalImage);
+
+        calculateTargetClassID(preprocessedImage);
         // Get the original set of activation maps by taking the activations
         // from the final convolution layer when running the image through the model
-        INDArray rawActivations = getActivationsForImage(transferLearningHelper, imageArr);
+        INDArray rawActivations = getActivationsForImage(transferLearningHelper, preprocessedImage);
         // Upsample the activations to match the original image size
         INDArray upsampledActivations = upsampleActivations(rawActivations);
         // Normalise them between 0 and 1 (so they can be multiplied with the images)
         INDArray normalisedActivations = normalizeActivations(upsampledActivations);
         // Create the set of masked images by multiplying each (upsampled, normalized) activation map with the original image
-        INDArray maskedImages = createMaskedImages(normalisedActivations, imageArr);
+        INDArray maskedImages = createMaskedImages(normalisedActivations, preprocessedImage);
         // Get the softmax score for the target class ID when running the masked images through the model
-        INDArray targetClassWeights = getTargetClassWeights(maskedImages, targetClassID);
+        INDArray targetClassWeights = predictTargetClassWeights(maskedImages);
         // Weight each activation map using the previously acquired softmax scores
         INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
         // Sum the activation maps into one, and normalise the values to between [0, 1]
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
-        saveResults(imageArr, postprocessedActivations, imageFile.getName() + "_processed");
+        saveResults(originalImage, postprocessedActivations, imageFile.getName() + "_processed");
+    }
+
+    private INDArray preprocessImage(INDArray imageArr) {
+        ImagePreProcessingScaler scaler = getImagePreProcessingScaler();
+
+        if (scaler == null) {
+            log.info("No image preprocessing required");
+            return imageArr;
+        }
+
+        INDArray preprocessed = imageArr.dup();
+
+        log.info("Applying image preprocessing...");
+        scaler.transform(preprocessed);
+        return preprocessed;
+    }
+
     private void calculateTargetClassID(INDArray imageArr) {
         if (getTargetClassID() != -1) {
             // Target class has already been set, don't calculate it
