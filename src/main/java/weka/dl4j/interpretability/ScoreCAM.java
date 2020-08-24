@@ -96,10 +96,56 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return convLayers[count - 1].getConfig().getLayerName();
     }
 
-    private void saveResults(INDArray imageArr, INDArray saliencyMap, String filename) {
-        Utils.saveNDArray(imageArr, filename);
-        INDArray masked = imageArr.mul(saliencyMap);
-        Utils.saveNDArray(masked, filename + "_masked");
+    private void createHeatmap(INDArray postprocessedActivations) {
+        Color[] gradientColors = Gradient.GRADIENT_PLASMA;
+        heatmap = new BufferedImage(
+                (int) modelInputShape.getWidth(),
+                (int) modelInputShape.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g = heatmap.createGraphics();
+        for (int row = 0; row < modelInputShape.getHeight(); row++) {
+            for (int col = 0; col < modelInputShape.getWidth(); col++) {
+                double normVal = postprocessedActivations.getDouble(row, col);
+                int colorIndex = (int) Math.floor(normVal * (gradientColors.length - 1));
+
+                Color color = gradientColors[colorIndex];
+                g.setColor(color);
+                g.fillRect(col, row, 1, 1);
+            }
+        }
+        g.dispose();
+    }
+
+    private void createOriginalImage(INDArray imageArr) {
+        originalImage = imageFromINDArray(imageArr);
+    }
+
+    private void createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
+        createHeatmap(postprocessedActivations);
+        createOriginalImage(imageArr);
+        createOverlaidHeatmap();
+    }
+
+    private void createOverlaidHeatmap() {
+        // From https://www.reddit.com/r/javahelp/comments/2ufc0m/how_do_i_overlay_2_bufferedimages_and_set_the/co7yrv9?utm_source=share&utm_medium=web2x&context=3
+        heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = heatmapOnImage.createGraphics();
+
+        // Clear the image (optional)
+        g.setComposite(AlphaComposite.Clear);
+        g.fillRect(0,0, 224, 224);
+
+        // Draw the background image
+        g.setComposite(AlphaComposite.SrcOver);
+        g.drawImage(originalImage, 0, 0, null);
+
+        // Draw the overlay image
+        float alpha = 0.7f;
+        g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+        g.drawImage(heatmap, 0, 0, null);
+
+        g.dispose();
     }
 
     private INDArray postprocessActivations(INDArray weightedActivationMaps) {
