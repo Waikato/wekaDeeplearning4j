@@ -3,6 +3,7 @@ package weka.dl4j.interpretability;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 // TODO document
@@ -16,7 +17,13 @@ public abstract class AbstractSaliencyMapGenerator {
 
     protected ImagePreProcessingScaler imagePreProcessingScaler = null;
 
-    public abstract void generateForImage(String inputImagePath, String outputImagePath);
+    protected BufferedImage originalImage;
+
+    protected BufferedImage heatmap;
+
+    protected BufferedImage heatmapOnImage;
+
+    public abstract void generateForImage(String inputImagePath);
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;
@@ -48,5 +55,17 @@ public abstract class AbstractSaliencyMapGenerator {
 
     public void setImagePreProcessingScaler(ImagePreProcessingScaler imagePreProcessingScaler) {
         this.imagePreProcessingScaler = imagePreProcessingScaler;
+    }
+
+    public BufferedImage getOriginalImage() {
+        return originalImage;
+    }
+
+    public BufferedImage getHeatmap() {
+        return heatmap;
+    }
+
+    public BufferedImage getHeatmapOnImage() {
+        return heatmapOnImage;
     }
 }
