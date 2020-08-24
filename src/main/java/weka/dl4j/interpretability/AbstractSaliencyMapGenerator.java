@@ -17,6 +17,9 @@ public abstract class AbstractSaliencyMapGenerator {
 
     protected ImagePreProcessingScaler imagePreProcessingScaler = null;
 
+
+    protected boolean imageChannelsLast = false;
+
     protected BufferedImage originalImage;
 
     protected BufferedImage heatmap;
@@ -67,5 +70,13 @@ public abstract class AbstractSaliencyMapGenerator {
 
     public BufferedImage getHeatmapOnImage() {
         return heatmapOnImage;
+    }
+
+    public boolean isImageChannelsLast() {
+        return imageChannelsLast;
+    }
+
+    public void setImageChannelsLast(boolean imageChannelsLast) {
+        this.imageChannelsLast = imageChannelsLast;
     }
 }
