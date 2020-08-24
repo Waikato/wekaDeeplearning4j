@@ -30,19 +30,11 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     protected InputType.InputTypeConvolutional modelInputShape;
 
     @Override
-    public void generateForImage(String inputImagePath, String outputImagePath) {
-        // Set up the model and image
-        String activationMapLayer = getActivationMapLayer();
-
-        TransferLearningHelper transferLearningHelper = new TransferLearningHelper(
-                getComputationGraph().clone(), activationMapLayer);
-
+    public void generateForImage(String inputImagePath) {
         File imageFile = new File(inputImagePath);
-
         INDArray originalImage = loadImage(imageFile);
         // Preprocess the image if the model requires it
         INDArray preprocessedImage = preprocessImage(originalImage);
-
         calculateTargetClassID(preprocessedImage);
         // Get the original set of activation maps by taking the activations
         // from the final convolution layer when running the image through the model
@@ -162,8 +154,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
         double[] targetClassWeights = new double[numActivationMaps];
 
-        ComputationGraph computationGraph = getComputationGraph();
-
         int totalIterations = getNumIterations(numActivationMaps);
 
         for (int iteration = 0; iteration < totalIterations; iteration++) {
@@ -210,22 +200,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return allMaskedImages;
     }
 
-    private INDArray normalizeActivations(INDArray upsampledActivations) {
-        // Normalize each of the 512 activation maps
-        int numActivationMaps = getNumActivationMaps(upsampledActivations);
-
-        for (int i = 0; i < numActivationMaps; i++) {
-            INDArray tmpActivationMap = upsampledActivations.get(NDArrayIndex.point(i));
-            double maxVal = tmpActivationMap.maxNumber().doubleValue();
-            double minVal = tmpActivationMap.minNumber().doubleValue();
-            double fudgeVal = 1e-5;
-            double divisor = (maxVal - minVal) + fudgeVal;
-
-            tmpActivationMap.divi(divisor);
-        }
-        return upsampledActivations;
-    }
-
     private INDArray upsampleActivations(INDArray rawActivations) {
         // Create the new size array
         INDArray newSize = Nd4j.create(new int[] {(int) modelInputShape.getHeight(), (int) modelInputShape.getWidth()}, new long[] {2}, DataType.INT32);
@@ -264,10 +238,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
     public InputType.InputTypeConvolutional getModelInputShape() {
         return modelInputShape;
-    }
-
-    public void setModelInputShape(int[] shape) {
-        setModelInputShape(Utils.decodeCNNShape(shape));
     }
 
     public void setModelInputShape(InputType.InputTypeConvolutional modelInputShape) {
