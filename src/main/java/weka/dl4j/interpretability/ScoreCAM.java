@@ -4,7 +4,6 @@ import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
 import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.layers.convolution.ConvolutionLayer;
 import org.deeplearning4j.nn.transferlearning.TransferLearningHelper;
 import org.nd4j.enums.ImageResizeMethod;
@@ -17,8 +16,9 @@ import org.nd4j.linalg.factory.ops.NDImage;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.ops.transforms.Transforms;
-import weka.classifiers.functions.dl4j.Utils;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,23 +36,30 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         // Preprocess the image if the model requires it
         INDArray preprocessedImage = preprocessImage(originalImage);
         calculateTargetClassID(preprocessedImage);
+
         // Get the original set of activation maps by taking the activations
         // from the final convolution layer when running the image through the model
-        INDArray rawActivations = getActivationsForImage(transferLearningHelper, preprocessedImage);
+        INDArray rawActivations = getActivationsForImage(preprocessedImage);
+
         // Upsample the activations to match the original image size
         INDArray upsampledActivations = upsampleActivations(rawActivations);
+
         // Normalise them between 0 and 1 (so they can be multiplied with the images)
-        INDArray normalisedActivations = normalizeActivations(upsampledActivations);
+        INDArray normalisedActivations = normalizeINDArray(upsampledActivations);
+
         // Create the set of masked images by multiplying each (upsampled, normalized) activation map with the original image
         INDArray maskedImages = createMaskedImages(normalisedActivations, preprocessedImage);
+
         // Get the softmax score for the target class ID when running the masked images through the model
         INDArray targetClassWeights = predictTargetClassWeights(maskedImages);
+
         // Weight each activation map using the previously acquired softmax scores
         INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
-        // Sum the activation maps into one, and normalise the values to between [0, 1]
+
+        // Sum the activation maps into one map and normalise the saliency map values to between [0, 1]
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
-        saveResults(originalImage, postprocessedActivations, imageFile.getName() + "_processed");
+        createFinalImages(originalImage, postprocessedActivations);
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
@@ -154,25 +161,26 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         // Perform pixel-wise RELU
         INDArray reluActivations = Transforms.relu(summed);
 
-        postNormaliseMap(reluActivations);
-
-        // Reshape for saving
-        return reluActivations.reshape(1, modelInputShape.getHeight(), modelInputShape.getWidth());
+        return normalizeINDArray(reluActivations);
     }
 
-    private void postNormaliseMap(INDArray activationMap) {
+    private INDArray normalizeINDArray(INDArray activationMap) {
+        INDArray normalized = activationMap.dup();
+
         // Perform any normalizing of the activation maps
         // Scale the map to between 0 and 1 (so it can be multiplied on the image)
-        double currMax = activationMap.maxNumber().doubleValue();
-        double currMin = activationMap.minNumber().doubleValue();
+        double currMax = normalized.maxNumber().doubleValue();
+        double currMin = normalized.minNumber().doubleValue();
         System.out.println(String.format("Prev max: %.4f, prev min: %.4f", currMax, currMin));
 
-        activationMap.subi(currMin);
-        activationMap.divi(currMax - currMin);
+        normalized.subi(currMin);
+        normalized.divi(currMax - currMin);
 
-        double newMax = activationMap.maxNumber().doubleValue();
-        double newMin = activationMap.minNumber().doubleValue();
+        double newMax = normalized.maxNumber().doubleValue();
+        double newMin = normalized.minNumber().doubleValue();
         System.out.println(String.format("new max: %.4f, new min: %.4f", newMax, newMin));
+
+        return normalized;
     }
 
     private INDArray applyActivationMapWeights(INDArray normalisedActivations, INDArray weights) {
@@ -274,7 +282,15 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return upsampledActivations.permute(2, 0, 1);
     }
 
-    private INDArray getActivationsForImage(TransferLearningHelper transferLearningHelper, INDArray imageArr) {
+    private INDArray getActivationsForImage(INDArray imageArr) {
+        // Set up the model and image
+        String activationMapLayer = getActivationMapLayer();
+
+        TransferLearningHelper transferLearningHelper = new TransferLearningHelper(
+                getComputationGraph().clone(), activationMapLayer);
+
+        imageArr = getSafeModelInput(imageArr);
+
         // Run the model on the image to get the activation maps
         DataSet imageDataset = new DataSet(imageArr, Nd4j.zeros(1));
         DataSet result = transferLearningHelper.featurize(imageDataset);

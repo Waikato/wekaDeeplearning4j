@@ -3,6 +3,7 @@ package weka.examples;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.interpretability.ScoreCAM;
@@ -14,9 +15,11 @@ import weka.dl4j.zoo.keras.ResNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 public class WekaDeeplearning4jExamples {
@@ -33,7 +36,7 @@ public class WekaDeeplearning4jExamples {
         Dl4jMlpFilter filter = new Dl4jMlpFilter();
 
         ImageInstanceIterator iterator = new ImageInstanceIterator();
-        iterator.setTrainBatchSize(3);
+        iterator.setTrainBatchSize(4);
         iterator.setImagesLocation(new File(folderPath));
 
         KerasEfficientNet kerasEfficientNet = new KerasEfficientNet();
@@ -54,16 +57,25 @@ public class WekaDeeplearning4jExamples {
     }
 
     private static void scoreCamTest() {
-        KerasResNet pretrainedModel = new KerasResNet();
-        pretrainedModel.setVariation(ResNet.VARIATION.RESNET101V2);
+        KerasEfficientNet pretrainedModel = new KerasEfficientNet();
+//        pretrainedModel.setVariation(ResNet.VARIATION.RESNET101V2);
         ComputationGraph computationGraph = pretrainedModel.getDefaultGraph();
 
         ScoreCAM scoreCAM = new ScoreCAM();
         scoreCAM.setBatchSize(8);
         scoreCAM.setComputationGraph(computationGraph);
-        scoreCAM.setModelInputShape(pretrainedModel.getShape()[0]);
+        scoreCAM.setImageChannelsLast(pretrainedModel.getChannelsLast());
+        scoreCAM.setModelInputShape(Utils.decodeCNNShape(pretrainedModel.getShape()[0]));
         scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-        scoreCAM.generateForImage("src/test/resources/images/dog.jpg", null);
+        scoreCAM.generateForImage("src/test/resources/images/dog.jpg");
+
+        try {
+            ImageIO.write(scoreCAM.getOriginalImage(), "png", new File("original.png"));
+            ImageIO.write(scoreCAM.getHeatmap(), "png", new File("heatmap.png"));
+            ImageIO.write(scoreCAM.getHeatmapOnImage(), "png", new File("heatmapOnImage.png"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static void filter() throws Exception {
