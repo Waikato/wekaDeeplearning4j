@@ -76,9 +76,13 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
             return;
         }
         // Otherwise run the model on the image, and choose argmax as the target class
-        INDArray output = getComputationGraph().outputSingle(imageArr);
+        INDArray output = modelOutputSingle(imageArr);
         int argMax = output.argMax(1).getNumber(0).intValue();
         setTargetClassID(argMax);
+    }
+
+    private INDArray modelOutputSingle(INDArray in) {
+        return getComputationGraph().outputSingle(getSafeModelInput(in));
     }
 
     /**
@@ -164,7 +168,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
             int actualBatchSize = toIndex - fromIndex;
             INDArray maskedImageBatch = maskedImages.get(NDArrayIndex.interval(fromIndex, toIndex));
             // Run prediction
-            INDArray output = computationGraph.outputSingle(maskedImageBatch);
+            INDArray output = modelOutputSingle(maskedImageBatch);
             // Parse each prediction
             for (int miniBatchI = 0; miniBatchI < actualBatchSize; miniBatchI++) {
                 // Save the probability for the target class
@@ -173,6 +177,15 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
             }
         }
         return Nd4j.create(targetClassWeights);
+    }
+
+    private INDArray getSafeModelInput(INDArray in) {
+        // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
+        if (isImageChannelsLast()) {
+            log.info("Permuting channel order of input...");
+            in = in.permute(0,2,3,1);
+        }
+        return in.dup();
     }
 
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
