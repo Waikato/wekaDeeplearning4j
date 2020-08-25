@@ -12,6 +12,17 @@ public class ProgressManager {
 
     protected boolean runningInGUI = false;
 
+    public void show() {
+        progressBar.show();
+    }
+
+    public void increment() {
+        progressBar.increment();
+    }
+
+    public void finish() {
+        progressBar.finish();
+    }
     /**
      * Checks the stacktrace for a call to anything in the weka.gui package.
      * If that exists, WEKA was started by the GUIChooser
@@ -42,9 +53,5 @@ public class ProgressManager {
 
     public ProgressManager(double maxProgress, String progressMessage) {
         init(maxProgress, progressMessage);
-    }
-
-    public AbstractProgressBar getProgressBar() {
-        return progressBar;
     }
 }

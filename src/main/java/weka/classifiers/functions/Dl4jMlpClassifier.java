@@ -1702,7 +1702,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
 
       progressManager = new ProgressManager(-1, "Downloading model weights and initializing model");
-      progressManager.getProgressBar().show();
+      progressManager.show();
 
 //      parseLayers();
       // Parse the layers in a separate thread so as to not lock the GUI thread
@@ -1734,7 +1734,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       }
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
-      progressManager.getProgressBar().finish();
+      progressManager.finish();
     }
   }
 
@@ -2009,7 +2009,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       } else {
         result = Nd4j.concat(0, result, activationAtLayer);
       }
-      progressManager.getProgressBar().increment();
+      progressManager.increment();
     }
     return result;
   }
@@ -2053,7 +2053,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     result = Utils.appendClasses(result, input);
     Instances newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
 
-    progressManager.getProgressBar().finish();
+    progressManager.finish();
 
     return newInstances;
   }
