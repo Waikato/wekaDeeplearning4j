@@ -234,18 +234,8 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         // Show the associated image when a results item is clicked on the results panel
         // Showing the appropriate results output is already handled by the ResultHistoryPanel
         m_History.getList().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                // Make sure only one item is selected
-                if (m_History.getList().getSelectedIndices().length == 1) {
-                    // Get the selected item from the list
-                    String selectedVal = m_History.getList().getSelectedValue().toString();
-                    // Get the image path (previously stored in saveResults()
-                    String imageToShow = m_History.getNamedObject(selectedVal).toString();
-                    // Show the image
-                    m_currentlyDisplayedImage = imageToShow;
-                    refreshImagePanel();
-                }
-            }
+            m_currentlyDisplayedImage = (String) m_History.getSelectedObject();
+            refreshImagePanel();
         });
         return historyHolder;
     }
