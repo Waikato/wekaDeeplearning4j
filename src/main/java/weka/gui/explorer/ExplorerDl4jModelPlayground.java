@@ -500,6 +500,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
             m_Logger.statusMessage("Initializing...");
+            if (m_Logger instanceof TaskLogger) {
+                ((TaskLogger) m_Logger).taskStarted();
+            }
+
             Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
             try {
                 explorer.init();
@@ -509,7 +513,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 return;
             }
 
-            m_Logger.statusMessage("Making prediction");
+            m_Logger.statusMessage("Processing image");
             explorer.makePrediction(new File(m_currentlyDisplayedImage));
             // Get the predictions
             StringBuffer buffer = new StringBuffer(explorer.getCurrentPredictions().toSummaryString());
@@ -533,6 +537,10 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             synchronized (this) {
                 m_predictButton.setEnabled(true);
                 m_RunThread = null;
+
+                if (m_Logger instanceof TaskLogger) {
+                    ((TaskLogger) m_Logger).taskFinished();
+                }
             }
         }
     }
