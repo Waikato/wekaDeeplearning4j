@@ -105,7 +105,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         if (!getGenerateSaliencyMap()) {
             log.debug("No saliency map generated");
             return;
-    }
+        }
 
         log.info("Generating saliency map...");
         scoreCam = new ScoreCAM();
@@ -116,8 +116,24 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         scoreCam.setModelInputShape(Utils.decodeCNNShape(zooModelType.getShape()[0]));
         scoreCam.setImagePreProcessingScaler(zooModelType.getImagePreprocessingScaler());
 
+        scoreCam.addIterationsStartedListener(this::onIterationsStarted);
+        scoreCam.addIterationIncrementListener(this::onIterationIncremented);
+        scoreCam.addIterationsFinishedListeners(this::onIterationsFinished);
+
         scoreCam.generateForImage(imageFile);
     }
+
+    private void onIterationsStarted(int maxIterations) {
+        progressManager = new ProgressManager(maxIterations, "Calculating Saliency Map...");
+        progressManager.show();
+    }
+
+    private void onIterationIncremented() {
+        progressManager.increment();
+    }
+
+    private void onIterationsFinished() {
+        progressManager.finish();
     }
 
     /**
