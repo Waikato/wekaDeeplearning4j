@@ -2,11 +2,14 @@ package weka.dl4j.playground;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
+import weka.core.progress.ProgressManager;
+import weka.dl4j.interpretability.ScoreCAM;
 import weka.dl4j.zoo.*;
 
 import java.io.File;
@@ -38,6 +41,11 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     protected ModelOutputDecoder modelOutputDecoder = new ModelOutputDecoder();
 
     /**
+     * Flag for ScoreCAM saliency map generation
+     */
+    protected boolean generateSaliencyMap = false;
+
+    /**
      * Model used for feature extraction
      */
     protected Dl4jMlpClassifier model;
@@ -46,6 +54,13 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * Predictions for the current image
      */
     protected TopNPredictions currentPredictions;
+
+    /**
+     * Displays progress of the current process (feature extraction, training, etc.)
+     */
+    protected ProgressManager progressManager;
+
+    protected ScoreCAM scoreCam;
 
     /**
      * Initialize the ComputationGraph
@@ -82,6 +97,27 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
         // Decode and store the predictions
         currentPredictions = modelOutputDecoder.decodePredictions(result, imageFile.getName(), getModelName());
+
+        generateSaliencyMap(imageFile);
+    }
+
+    private void generateSaliencyMap(File imageFile) {
+        if (!getGenerateSaliencyMap()) {
+            log.debug("No saliency map generated");
+            return;
+    }
+
+        log.info("Generating saliency map...");
+        scoreCam = new ScoreCAM();
+        ComputationGraph computationGraph = model.getModel();
+        scoreCam.setBatchSize(8);
+        scoreCam.setComputationGraph(computationGraph);
+        scoreCam.setImageChannelsLast(zooModelType.getChannelsLast());
+        scoreCam.setModelInputShape(Utils.decodeCNNShape(zooModelType.getShape()[0]));
+        scoreCam.setImagePreProcessingScaler(zooModelType.getImagePreprocessingScaler());
+
+        scoreCam.generateForImage(imageFile);
+    }
     }
 
     /**
@@ -145,6 +181,21 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         this.modelOutputDecoder = modelOutputDecoder;
     }
 
+    @OptionMetadata(
+            displayName = "Generate saliency map",
+            description = "Should the model explorer generate a ScoreCAM saliency map?",
+            commandLineParamName = "saliency-map",
+            commandLineParamSynopsis = "-saliency-map",
+            commandLineParamIsFlag = true,
+            displayOrder = 4
+    )
+    public boolean getGenerateSaliencyMap() {
+        return generateSaliencyMap;
+    }
+
+    public void setGenerateSaliencyMap(boolean generateSaliencyMap) {
+        this.generateSaliencyMap = generateSaliencyMap;
+    }
 
 
     /**
@@ -190,7 +241,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         explorer.makePrediction(new File(inputImagePath));
         // Output the results to the command line
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
+        generateSaliencyMap(new File(inputImagePath));
     }
+
+
 
     /**
      * Execute the supplied object.
