@@ -16,18 +16,41 @@ import org.nd4j.linalg.factory.ops.NDImage;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.ops.transforms.Transforms;
+import weka.dl4j.interpretability.listeners.IterationIncrementListener;
+import weka.dl4j.interpretability.listeners.IterationsStartedListener;
+import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 // TODO document
 @Log4j2
 public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
-    protected InputType.InputTypeConvolutional modelInputShape;
+
+    protected List<IterationsStartedListener> iterationsStartedListeners = new ArrayList<>();
+
+    protected List<IterationIncrementListener> iterationIncrementListeners = new ArrayList<>();
+
+    protected List<IterationsFinishedListener> iterationsFinishedListeners = new ArrayList<>();
+
+    public void addIterationsStartedListener(IterationsStartedListener listener) {
+        iterationsStartedListeners.add(listener);
+    }
+
+    public void addIterationIncrementListener(IterationIncrementListener listener) {
+        iterationIncrementListeners.add(listener);
+    }
+
+    public void addIterationsFinishedListeners(IterationsFinishedListener listener) {
+        iterationsFinishedListeners.add(listener);
+    }
 
     @Override
     public void generateForImage(String inputImagePath) {
@@ -60,6 +83,14 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
         createFinalImages(originalImage, postprocessedActivations);
+
+        try {
+            ImageIO.write(getOriginalImage(), "png", new File("original.png"));
+            ImageIO.write(getHeatmap(), "png", new File("heatmap.png"));
+            ImageIO.write(getHeatmapOnImage(), "png", new File("heatmapOnImage.png"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
@@ -207,12 +238,33 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return toIndex;
     }
 
+    private void broadcastIterationsStarted(int totalIterations) {
+        for (IterationsStartedListener listener : iterationsStartedListeners) {
+            listener.iterationsStarted(totalIterations);
+        }
+    }
+
+    private void broadcastIterationIncremented() {
+        for (IterationIncrementListener listener : iterationIncrementListeners) {
+            listener.iterationIncremented();
+        }
+    }
+
+    private void broadcastIterationsFinished() {
+        for (IterationsFinishedListener listener : iterationsFinishedListeners) {
+            listener.iterationsFinished();
+        }
+    }
+
     private INDArray predictTargetClassWeights(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
         double[] targetClassWeights = new double[numActivationMaps];
 
         int totalIterations = getNumIterations(numActivationMaps);
+
+        // Fire the iterations started listeners
+        broadcastIterationsStarted(totalIterations);
 
         for (int iteration = 0; iteration < totalIterations; iteration++) {
             int fromIndex = iteration * batchSize;
@@ -229,7 +281,11 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
                 double classProbVal = output.getDouble(miniBatchI, targetClassID);
                 targetClassWeights[fromIndex + miniBatchI] = classProbVal;
             }
+            // Fire the iteration increment listeners
+            broadcastIterationIncremented();
         }
+        // Finish the iterations
+        broadcastIterationsFinished();
         return Nd4j.create(targetClassWeights);
     }
 
