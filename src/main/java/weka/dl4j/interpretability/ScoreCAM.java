@@ -53,8 +53,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     }
 
     @Override
-    public void generateForImage(String inputImagePath) {
-        File imageFile = new File(inputImagePath);
+    public void generateForImage(File imageFile) {
         INDArray originalImage = loadImage(imageFile);
         // Preprocess the image if the model requires it
         INDArray preprocessedImage = preprocessImage(originalImage);

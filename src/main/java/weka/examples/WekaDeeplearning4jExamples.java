@@ -25,7 +25,7 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        scoreCamTest();
+        playground();
     }
 
     public static void commandLineProgressTest() throws Exception {
@@ -57,7 +57,7 @@ public class WekaDeeplearning4jExamples {
     }
 
     private static void scoreCamTest() {
-        KerasEfficientNet pretrainedModel = new KerasEfficientNet();
+        Dl4jResNet50 pretrainedModel = new Dl4jResNet50();
 //        pretrainedModel.setVariation(ResNet.VARIATION.RESNET101V2);
         ComputationGraph computationGraph = pretrainedModel.getDefaultGraph();
 
@@ -67,15 +67,7 @@ public class WekaDeeplearning4jExamples {
         scoreCAM.setImageChannelsLast(pretrainedModel.getChannelsLast());
         scoreCAM.setModelInputShape(Utils.decodeCNNShape(pretrainedModel.getShape()[0]));
         scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-        scoreCAM.generateForImage("src/test/resources/images/dog.jpg");
-
-        try {
-            ImageIO.write(scoreCAM.getOriginalImage(), "png", new File("original.png"));
-            ImageIO.write(scoreCAM.getHeatmap(), "png", new File("heatmap.png"));
-            ImageIO.write(scoreCAM.getHeatmapOnImage(), "png", new File("heatmapOnImage.png"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        scoreCAM.generateForImage(new File("src/test/resources/images/dog.jpg"));
     }
 
     private static void filter() throws Exception {
@@ -149,7 +141,7 @@ public class WekaDeeplearning4jExamples {
     public static void playground() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        Dl4jVGG zooModel = new Dl4jVGG();
+        Dl4jResNet50 zooModel = new Dl4jResNet50();
 //        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
 //        zooModel.setVariation(VGG.VARIATION.VGG16);
 //        zooModel.setPretrainedType(PretrainedType.VGGFACE);
@@ -158,6 +150,8 @@ public class WekaDeeplearning4jExamples {
         ModelOutputDecoder decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.IMAGENET);
         explorer.setModelOutputDecoder(decoder);
+
+        explorer.setGenerateSaliencyMap(true);
 
         explorer.init();
         explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
