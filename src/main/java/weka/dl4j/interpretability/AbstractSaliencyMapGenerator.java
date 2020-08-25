@@ -1,5 +1,6 @@
 package weka.dl4j.interpretability;
 
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 
@@ -17,8 +18,9 @@ public abstract class AbstractSaliencyMapGenerator {
 
     protected ImagePreProcessingScaler imagePreProcessingScaler = null;
 
-
     protected boolean imageChannelsLast = false;
+
+    protected InputType.InputTypeConvolutional modelInputShape;
 
     protected BufferedImage originalImage;
 
@@ -26,7 +28,7 @@ public abstract class AbstractSaliencyMapGenerator {
 
     protected BufferedImage heatmapOnImage;
 
-    public abstract void generateForImage(String inputImagePath);
+    public abstract void generateForImage(File imageFile);
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;
@@ -78,5 +80,13 @@ public abstract class AbstractSaliencyMapGenerator {
 
     public void setImageChannelsLast(boolean imageChannelsLast) {
         this.imageChannelsLast = imageChannelsLast;
+    }
+
+    public InputType.InputTypeConvolutional getModelInputShape() {
+        return modelInputShape;
+    }
+
+    public void setModelInputShape(InputType.InputTypeConvolutional modelInputShape) {
+        this.modelInputShape = modelInputShape;
     }
 }
