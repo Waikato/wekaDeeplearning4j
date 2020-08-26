@@ -2,14 +2,13 @@ package weka.dl4j.playground;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
-import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
-import weka.core.progress.ProgressManager;
-import weka.dl4j.interpretability.ScoreCAM;
+import weka.dl4j.interpretability.AbstractSaliencyMapWrapper;
+import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.zoo.*;
 
 import java.io.File;
@@ -46,6 +45,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     protected boolean generateSaliencyMap = false;
 
     /**
+     * // TODO
+     */
+    protected AbstractSaliencyMapWrapper saliencyMapGenerator = new WekaScoreCAM();
+    /**
      * Model used for feature extraction
      */
     protected Dl4jMlpClassifier model;
@@ -55,12 +58,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      */
     protected TopNPredictions currentPredictions;
 
-    /**
-     * Displays progress of the current process (feature extraction, training, etc.)
-     */
-    protected ProgressManager progressManager;
-
-    protected ScoreCAM scoreCam;
+//    protected ScoreCAM scoreCam;
 
     /**
      * Initialize the ComputationGraph
@@ -108,33 +106,12 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         }
 
         log.info("Generating saliency map...");
-        scoreCam = new ScoreCAM();
-        ComputationGraph computationGraph = model.getModel();
-        scoreCam.setBatchSize(8);
-        scoreCam.setComputationGraph(computationGraph);
-        scoreCam.setImageChannelsLast(zooModelType.getChannelsLast());
-        scoreCam.setModelInputShape(Utils.decodeCNNShape(zooModelType.getShape()[0]));
-        scoreCam.setImagePreProcessingScaler(zooModelType.getImagePreprocessingScaler());
-
-        scoreCam.addIterationsStartedListener(this::onIterationsStarted);
-        scoreCam.addIterationIncrementListener(this::onIterationIncremented);
-        scoreCam.addIterationsFinishedListeners(this::onIterationsFinished);
-
-        scoreCam.generateForImage(imageFile);
+        saliencyMapGenerator.setComputationGraph(model.getModel());
+        saliencyMapGenerator.setZooModel(zooModelType);
+        saliencyMapGenerator.run(imageFile);
     }
 
-    private void onIterationsStarted(int maxIterations) {
-        progressManager = new ProgressManager(maxIterations, "Calculating Saliency Map...");
-        progressManager.show();
-    }
 
-    private void onIterationIncremented() {
-        progressManager.increment();
-    }
-
-    private void onIterationsFinished() {
-        progressManager.finish();
-    }
 
     /**
      * Get the name of the loaded model
@@ -200,8 +177,8 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     @OptionMetadata(
             displayName = "Generate saliency map",
             description = "Should the model explorer generate a ScoreCAM saliency map?",
-            commandLineParamName = "saliency-map",
-            commandLineParamSynopsis = "-saliency-map",
+            commandLineParamName = "generate-map",
+            commandLineParamSynopsis = "-generate-map",
             commandLineParamIsFlag = true,
             displayOrder = 4
     )
@@ -211,6 +188,21 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     public void setGenerateSaliencyMap(boolean generateSaliencyMap) {
         this.generateSaliencyMap = generateSaliencyMap;
+    }
+
+    @OptionMetadata(
+            displayName = "Saliency map generator",
+            description = "Saliency map options",
+            commandLineParamName = "saliency-map",
+            commandLineParamSynopsis = "-saliency-map <options>",
+            displayOrder = 5
+    )
+    public AbstractSaliencyMapWrapper getSaliencyMapGenerator() {
+        return saliencyMapGenerator;
+    }
+
+    public void setSaliencyMapGenerator(AbstractSaliencyMapWrapper saliencyMapGenerator) {
+        this.saliencyMapGenerator = saliencyMapGenerator;
     }
 
 
