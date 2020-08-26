@@ -49,9 +49,14 @@ public abstract class AbstractProgressBar implements Serializable {
 
     public abstract void refreshDisplay();
 
-    public abstract void show();
+    private void calculate() {
+        m_normalizedProgress = m_actualProgress / m_maxProgress;
+        long eta = (long) ((m_maxProgress - m_actualProgress) * (System.currentTimeMillis() - startTime) / m_actualProgress);
 
-    public abstract void finish();
+        etaHms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(eta),
+                TimeUnit.MILLISECONDS.toMinutes(eta) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(eta) % TimeUnit.MINUTES.toSeconds(1));
+    }
 
     public void setProgress(double progress) {
         // Limit the progress to the max previously set
