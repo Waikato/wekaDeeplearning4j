@@ -23,6 +23,10 @@ public class ProgressManager {
     public void finish() {
         progressBar.finish();
     }
+
+    public void setProgress(double progress) {
+        progressBar.setProgress(progress);
+    }
     /**
      * Checks the stacktrace for a call to anything in the weka.gui package.
      * If that exists, WEKA was started by the GUIChooser
