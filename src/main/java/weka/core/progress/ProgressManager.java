@@ -3,10 +3,9 @@ package weka.core.progress;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 // TODO document
-
+// Exposes a few methods in the progress bar implementation
 @Log4j2
 public class ProgressManager implements Serializable {
 
@@ -14,21 +13,18 @@ public class ProgressManager implements Serializable {
 
     protected boolean runningInGUI = false;
 
-    public void show() {
-        progressBar.show();
+    public ProgressManager(double maxProgress, String progressMessage) {
+        init(maxProgress, progressMessage);
     }
 
-    public void increment() {
-        progressBar.increment();
+    public ProgressManager(String progressMessage) {
+        init(-1, progressMessage);
     }
 
-    public void finish() {
-        progressBar.finish();
+    public ProgressManager() {
+        init(-1, "");
     }
 
-    public void setProgress(double progress) {
-        progressBar.setProgress(progress);
-    }
     /**
      * Checks the stacktrace for a call to anything in the weka.gui package.
      * If that exists, WEKA was started by the GUIChooser
