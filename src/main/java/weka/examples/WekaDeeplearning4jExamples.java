@@ -6,7 +6,10 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
+import weka.dl4j.interpretability.AbstractSaliencyMapGenerator;
+import weka.dl4j.interpretability.AbstractSaliencyMapWrapper;
 import weka.dl4j.interpretability.ScoreCAM;
+import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.playground.*;
 import weka.dl4j.zoo.*;
@@ -152,6 +155,9 @@ public class WekaDeeplearning4jExamples {
         explorer.setModelOutputDecoder(decoder);
 
         explorer.setGenerateSaliencyMap(true);
+        AbstractSaliencyMapWrapper wrapper = new WekaScoreCAM();
+        wrapper.setBatchSize(8);
+        explorer.setSaliencyMapGenerator(wrapper);
 
         explorer.init();
         explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
