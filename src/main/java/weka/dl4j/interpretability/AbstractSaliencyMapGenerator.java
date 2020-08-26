@@ -28,6 +28,8 @@ public abstract class AbstractSaliencyMapGenerator {
 
     protected BufferedImage heatmapOnImage;
 
+    protected BufferedImage compositeImage;
+
     public abstract void generateForImage(File imageFile);
 
     public ComputationGraph getComputationGraph() {
@@ -72,6 +74,10 @@ public abstract class AbstractSaliencyMapGenerator {
 
     public BufferedImage getHeatmapOnImage() {
         return heatmapOnImage;
+    }
+
+    public BufferedImage getCompositeImage() {
+        return compositeImage;
     }
 
     public boolean isImageChannelsLast() {

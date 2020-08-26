@@ -33,6 +33,9 @@ import java.util.List;
 @Log4j2
 public class ScoreCAM extends AbstractSaliencyMapGenerator {
 
+    protected int outsideBorder = 25;
+
+    protected int insidePadding = 20;
 
     protected List<IterationsStartedListener> iterationsStartedListeners = new ArrayList<>();
 
@@ -84,9 +87,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         createFinalImages(originalImage, postprocessedActivations);
 
         try {
-            ImageIO.write(getOriginalImage(), "png", new File("original.png"));
-            ImageIO.write(getHeatmap(), "png", new File("heatmap.png"));
-            ImageIO.write(getHeatmapOnImage(), "png", new File("heatmapOnImage.png"));
+            ImageIO.write(getCompositeImage(), "png", new File("composite.png"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -162,6 +163,46 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         createHeatmap(postprocessedActivations);
         createOriginalImage(imageArr);
         createOverlaidHeatmap();
+        createCompositeImage();
+    }
+
+    private int calculateCompositeWidth() {
+        return outsideBorder * 2 + (insidePadding * 2) + ((int) modelInputShape.getWidth() * 3);
+    }
+
+    private int calculateCompositeHeight() {
+        return outsideBorder * 2 + (int) modelInputShape.getHeight();
+    }
+
+    private void createCompositeImage() {
+        int width = calculateCompositeWidth();
+        int height = calculateCompositeHeight();
+
+
+
+        compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = compositeImage.createGraphics();
+
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, width, height);
+        g.setComposite(AlphaComposite.SrcOver);
+
+        int leftX = outsideBorder;
+        int leftY = outsideBorder;
+        // Draw the left image
+        g.drawImage(getOriginalImage(), leftX, leftY, null);
+
+        // Draw the center image
+        int midX = (int) (outsideBorder + modelInputShape.getWidth() + insidePadding);
+        int midY = outsideBorder;
+        g.drawImage(getHeatmap(), midX, midY, null);
+
+        // Draw the right image
+        int rightX = (int) (outsideBorder + (modelInputShape.getWidth() * 2) + (insidePadding * 2));
+        int rightY = outsideBorder;
+        g.drawImage(getHeatmapOnImage(), rightX, rightY, null);
+
+        g.dispose();
     }
 
     private void createOverlaidHeatmap() {
