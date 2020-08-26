@@ -1363,7 +1363,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Load a ComputationGraph without any data - used in the Playground
+   * Load a ComputationGraph without any data - used in the Dl4j Inference panel
    * @param numClasses Number of classes to load with
    * @param seed Random seed
    * @param newShape Input shape
@@ -1373,7 +1373,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Convenience method to allow the Playground to call outputSingle for a single image
+   * Convenience method to allow the Dl4j Inference panel to call outputSingle for a single image
    * @param image Image to predict for
    * @return Model predictions
    */

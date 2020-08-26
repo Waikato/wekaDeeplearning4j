@@ -558,13 +558,13 @@ public class Utils {
   }
 
   /**
-   * Load a Dl4jMlpClassifier for use in the Playground - no need to supply Instances or InstanceIterators
+   * Load a Dl4jMlpClassifier for use in the Inference Panel - no need to supply Instances or InstanceIterators
    * @param serializedModelFile Saved model file
    * @param zooModelType Type of Zoo Model
-   * @return Dl4jMlpClassifier ready to be used in the Playground
+   * @return Dl4jMlpClassifier ready to be used in the Inference Panel
    * @throws WekaException From errors occurring during loading the model file, or from intializing from the data
    */
-  public static Dl4jMlpClassifier loadPlaygroundModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
+  public static Dl4jMlpClassifier loadInferenceModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
     Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
 
     if (!Utils.notDefaultFileLocation(serializedModelFile))

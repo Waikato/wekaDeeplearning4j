@@ -1,4 +1,4 @@
-package weka.dl4j.playground;
+package weka.dl4j.inference;
 
 import junit.framework.TestCase;
 import lombok.extern.log4j.Log4j2;

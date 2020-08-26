@@ -61,10 +61,10 @@ weka.dl4j.text.stopwords.Dl4jAbstractStopwords =\
 weka.core.LogConfiguration =\
  weka.core
 
-weka.dl4j.playground.Dl4jCNNExplorer =\
+weka.dl4j.inference.Dl4jCNNExplorer =\
  weka.dl4j
 
-weka.dl4j.playground.ModelOutputDecoder =\
+weka.dl4j.inference.ModelOutputDecoder =\
  weka.dl4j
 
 weka.dl4j.interpretability.AbstractSaliencyMapWrapper =\

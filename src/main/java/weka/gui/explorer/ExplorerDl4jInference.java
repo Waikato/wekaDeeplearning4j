@@ -3,7 +3,7 @@ package weka.gui.explorer;
 import lombok.SneakyThrows;
 import weka.core.*;
 
-import weka.dl4j.playground.Dl4jCNNExplorer;
+import weka.dl4j.inference.Dl4jCNNExplorer;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
@@ -19,10 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Explorer panel for the Dl4j Model Playground
+ * Explorer panel for the Dl4j Model Inference Window
  * @author - Rhys Compton
  */
-public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel, LogHandler {
+public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogHandler {
 
     /** the parent frame */
     protected Explorer m_Explorer = null;
@@ -50,7 +50,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
     protected GenericObjectEditor m_CNNExplorerEditor = new GenericObjectEditor();
 
     /** The panel showing the current classifier selection. */
-    protected PropertyPanel m_playgroundEditorPanel = new PropertyPanel(m_CNNExplorerEditor);
+    protected PropertyPanel m_ExplorerPropertiesPanel = new PropertyPanel(m_CNNExplorerEditor);
 
     /** The filename extension that should be used for model files. */
     public static String MODEL_FILE_EXTENSION = ".model";
@@ -143,7 +143,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
      */
     @Override
     public String getTabTitle() {
-        return "Dl4j Model Playground";
+        return "Dl4j Inference";
     }
 
     /**
@@ -153,7 +153,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
      */
     @Override
     public String getTabTitleToolTip() {
-        return "A playground for trying different trained classification models on individual images.";
+        return "An explorer for trying different trained classification models on individual images.";
     }
 
     /**
@@ -166,7 +166,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
         m_Logger = newLog;
     }
 
-    public ExplorerDl4jModelPlayground() {
+    public ExplorerDl4jInference() {
         super();
 
         initGUI();
@@ -343,7 +343,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
                 BorderFactory.createTitledBorder("Model Settings"),
                 BorderFactory.createEmptyBorder(0, 5, 5, 5)));
         topPanel.setLayout(new BorderLayout());
-        topPanel.add(m_playgroundEditorPanel, BorderLayout.NORTH);
+        topPanel.add(m_ExplorerPropertiesPanel, BorderLayout.NORTH);
 
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.fill = GridBagConstraints.HORIZONTAL;
@@ -494,7 +494,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
      * Main run method - loads the Dl4jCNNExplorer, runs it on the image, and displays the output
      */
     @SneakyThrows
-    private void runPlayground() {
+    private void runInference() {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
@@ -553,7 +553,7 @@ public class ExplorerDl4jModelPlayground extends JPanel implements ExplorerPanel
             synchronized (this) {
                 m_predictButton.setEnabled(false);
             }
-            m_RunThread = new Thread(this::runPlayground);
+            m_RunThread = new Thread(this::runInference);
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();
         }

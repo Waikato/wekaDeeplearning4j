@@ -1,4 +1,4 @@
-package weka.dl4j.playground;
+package weka.dl4j.inference;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
@@ -65,7 +65,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @throws Exception Exceptions from loading the ComputationGraph
      */
     public void init() throws Exception {
-        model = Utils.loadPlaygroundModel(serializedModelFile, zooModelType);
+        model = Utils.loadInferenceModel(serializedModelFile, zooModelType);
     }
 
     /**

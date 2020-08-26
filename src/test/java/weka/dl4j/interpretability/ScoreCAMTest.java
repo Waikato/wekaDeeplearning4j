@@ -28,7 +28,7 @@ public class ScoreCAMTest extends TestCase {
             scoreCAM.setModelInputShape(Utils.decodeCNNShape(pretrainedModel.getShape()[0]));
             scoreCAM.setImageChannelsLast(pretrainedModel.getChannelsLast());
             scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-            scoreCAM.generateForImage("src/test/resources/images/dog.jpg");
+            scoreCAM.generateForImage(new File("src/test/resources/images/dog.jpg"));
 
             String modelName = pretrainedModel.getPrettyName();
 

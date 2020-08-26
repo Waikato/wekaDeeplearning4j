@@ -1,7 +1,6 @@
-package weka.dl4j.playground;
+package weka.dl4j.inference;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.classifiers.functions.dl4j.Utils;
@@ -11,8 +10,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;

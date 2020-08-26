@@ -6,29 +6,24 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
-import weka.dl4j.interpretability.AbstractSaliencyMapGenerator;
 import weka.dl4j.interpretability.AbstractSaliencyMapWrapper;
 import weka.dl4j.interpretability.ScoreCAM;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
-import weka.dl4j.playground.*;
+import weka.dl4j.inference.*;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
-import weka.dl4j.zoo.keras.ResNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        playground();
+        inference();
     }
 
     public static void commandLineProgressTest() throws Exception {
@@ -141,7 +136,7 @@ public class WekaDeeplearning4jExamples {
         System.out.println(eval.toMatrixString());
     }
 
-    public static void playground() throws Exception {
+    public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
         Dl4jResNet50 zooModel = new Dl4jResNet50();

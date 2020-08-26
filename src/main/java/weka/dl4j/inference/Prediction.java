@@ -1,4 +1,4 @@
-package weka.dl4j.playground;
+package weka.dl4j.inference;
 
 /**
  * Simple class to hold the necessary values for prediction

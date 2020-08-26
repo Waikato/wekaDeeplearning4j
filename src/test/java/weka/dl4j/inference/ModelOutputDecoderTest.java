@@ -1,4 +1,4 @@
-package weka.dl4j.playground;
+package weka.dl4j.inference;
 
 import junit.framework.TestCase;
 import org.nd4j.linalg.api.ndarray.INDArray;
