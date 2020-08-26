@@ -2036,6 +2036,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int numInstances = input.numInstances() * layerNames.length;
     int numIterations = numInstances / iter.batch();
     progressManager = new ProgressManager(numIterations, "Performing feature extraction");
+    progressManager.show();
 
     for (String layerName : layerNames) {
       if (attributesPerLayer.containsKey(layerName)) {
