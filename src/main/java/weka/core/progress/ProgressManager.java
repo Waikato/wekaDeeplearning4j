@@ -1,12 +1,14 @@
 package weka.core.progress;
 
 import lombok.extern.log4j.Log4j2;
+
+import java.io.Serializable;
 import java.util.Arrays;
 
 // TODO document
 
 @Log4j2
-public class ProgressManager {
+public class ProgressManager implements Serializable {
 
     protected AbstractProgressBar progressBar;
 

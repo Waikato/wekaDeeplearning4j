@@ -1,8 +1,10 @@
 package weka.core.progress;
 
+import java.io.Serializable;
+
 // TODO document
 // TODO calculate ETA
-public abstract class AbstractProgressBar {
+public abstract class AbstractProgressBar implements Serializable {
 
     public AbstractProgressBar() { }
 
