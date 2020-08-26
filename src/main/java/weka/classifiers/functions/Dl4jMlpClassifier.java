@@ -1705,7 +1705,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
 
-      progressManager = new ProgressManager(-1, "Downloading model weights and initializing model");
+      progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)");
       progressManager.start();
 
 //      parseLayers();
@@ -2035,7 +2035,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     int numInstances = input.numInstances() * layerNames.length;
     int numIterations = numInstances / iter.batch();
-    progressManager = new ProgressManager(numIterations, "Performing feature extraction");
+    progressManager = new ProgressManager(numIterations, "Performing feature extraction...");
     progressManager.start();
 
     for (String layerName : layerNames) {

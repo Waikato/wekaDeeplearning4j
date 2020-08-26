@@ -17,8 +17,8 @@ public class ProgressManager implements Serializable {
         init(maxProgress, progressMessage);
     }
 
-    public ProgressManager(String progressMessage) {
-        init(-1, progressMessage);
+    public ProgressManager(String indeterminateProgressMessage) {
+        init(-1, indeterminateProgressMessage);
     }
 
     public ProgressManager() {
