@@ -135,13 +135,15 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     }
 
     private void createHeatmap(INDArray postprocessedActivations) {
-        Color[] gradientColors = Gradient.GRADIENT_PLASMA;
+//        Color[] gradientColors = Gradient.GRADIENT_PLASMA;
+        Color[] gradientColors = Gradient.GRADIENT_ALPHA;
         heatmap = new BufferedImage(
                 (int) modelInputShape.getWidth(),
                 (int) modelInputShape.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
+                BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g = heatmap.createGraphics();
+
         for (int row = 0; row < modelInputShape.getHeight(); row++) {
             for (int col = 0; col < modelInputShape.getWidth(); col++) {
                 double normVal = postprocessedActivations.getDouble(row, col);

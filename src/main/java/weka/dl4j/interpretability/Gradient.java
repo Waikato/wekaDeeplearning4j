@@ -68,6 +68,8 @@ public class Gradient
      * From https://revolution-computing.typepad.com/.a/6a010534b1db25970b01bb0931cd68970d-pi
      */
     public final static Color[] GRADIENT_PLASMA = createMultiGradient(new Color[]{new Color(11, 1, 116), new Color(188, 46, 102), new Color(240, 250, 29)}, 500);
+
+    public final static Color[] GRADIENT_ALPHA = createGradient(new Color(0, 0, 0, 255), new Color(0, 0, 0, 0), 500);
     /**
      *Produces a gradient through the rainbow: violet, blue, green, yellow, orange, red
      */
