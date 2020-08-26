@@ -23,7 +23,7 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        inference();
+        commandLineProgressTest();
     }
 
     public static void commandLineProgressTest() throws Exception {

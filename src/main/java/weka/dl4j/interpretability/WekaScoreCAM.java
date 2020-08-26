@@ -1,19 +1,9 @@
 package weka.dl4j.interpretability;
 
 import weka.classifiers.functions.dl4j.Utils;
-import weka.core.Capabilities;
-import weka.core.CapabilitiesHandler;
-import weka.core.Option;
-import weka.core.OptionHandler;
 import weka.core.progress.ProgressManager;
-import weka.dl4j.interpretability.listeners.IterationIncrementListener;
-import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
-import weka.dl4j.interpretability.listeners.IterationsStartedListener;
-import weka.dl4j.zoo.AbstractZooModel;
 
 import java.io.File;
-import java.io.Serializable;
-import java.util.Enumeration;
 
 // TODO Document
 public class WekaScoreCAM extends AbstractSaliencyMapWrapper {
@@ -43,7 +33,7 @@ public class WekaScoreCAM extends AbstractSaliencyMapWrapper {
 
     private void onIterationsStarted(int maxIterations) {
         progressManager = new ProgressManager(maxIterations, "Calculating Saliency Map...");
-        progressManager.show();
+        progressManager.start();
     }
 
     private void onIterationIncremented() {

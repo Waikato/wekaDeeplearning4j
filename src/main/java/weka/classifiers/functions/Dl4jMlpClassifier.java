@@ -816,8 +816,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       log.info("Classifier: \n{}", toString());
     }
 
-    progressManager = new ProgressManager(maxEpochs, "Training Dl4jMlpClassifier...");
-    progressManager.show();
+    progressManager = new ProgressManager(getNumEpochs(), "Training Dl4jMlpClassifier...");
+    progressManager.start();
     boolean isContinue = true;
     while (isContinue) {
       // Next epoch
@@ -1706,7 +1706,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
 
       progressManager = new ProgressManager(-1, "Downloading model weights and initializing model");
-      progressManager.show();
+      progressManager.start();
 
 //      parseLayers();
       // Parse the layers in a separate thread so as to not lock the GUI thread
@@ -2036,7 +2036,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int numInstances = input.numInstances() * layerNames.length;
     int numIterations = numInstances / iter.batch();
     progressManager = new ProgressManager(numIterations, "Performing feature extraction");
-    progressManager.show();
+    progressManager.start();
 
     for (String layerName : layerNames) {
       if (attributesPerLayer.containsKey(layerName)) {

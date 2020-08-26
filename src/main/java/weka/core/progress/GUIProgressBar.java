@@ -4,8 +4,6 @@ package weka.core.progress;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
@@ -13,15 +11,61 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
     protected JProgressBar progressBar;
 
+    protected JLabel progressMessageLabel;
+
+    protected JLabel etaLabel;
+
     public GUIProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
-        init();
+        initGUIElements();
     }
 
-    private void init() {
-//        show();
-//        currentFrame = new JFrame();
-//        currentFrame.setTitle("WekaDeeplearning4j Notification");
+    private void initGUIElements() {
+        // Create frame with title Registration Demo
+        currentFrame = new JFrame();
+        currentFrame.setTitle("WekaDeeplearning4j Notification");
+
+        progressMessageLabel = new JLabel(getProgressMessage());
+
+        etaLabel = new JLabel(getETAString());
+
+        progressBar = new JProgressBar();
+        progressBar.setIndeterminate(m_indeterminate);
+        progressBar.setPreferredSize(new Dimension(400, 30));
+        progressBar.setMaximum((int) getMaxProgress());
+
+        // Panel to define the layout. We are using GridBagLayout
+        JPanel mainPanel = new JPanel();
+        GridBagLayout gbL = new GridBagLayout();
+        mainPanel.setLayout(gbL);
+        mainPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Progress"),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+
+        GridBagConstraints gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridx = 0;
+        gbC.gridy = 0;
+        gbL.setConstraints(progressMessageLabel, gbC);
+        mainPanel.add(progressMessageLabel);
+
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridy = 1;
+        gbC.gridx = 0;
+        gbC.insets = new Insets(0, 0, 20, 0);
+        gbL.setConstraints(etaLabel, gbC);
+        mainPanel.add(etaLabel);
+
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridy = 2;
+        gbC.gridx = 0;
+        gbL.setConstraints(progressBar, gbC);
+        mainPanel.add(progressBar);
+
+        // Add panel to frame
+        currentFrame.add(mainPanel);
     }
 
     @Override
@@ -30,49 +74,9 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
     }
 
     @Override
-    public void show() { // TODO refactor this
-        // Create frame with title Registration Demo
-        currentFrame = new JFrame();
-        currentFrame.setTitle("WekaDeeplearning4j Notification");
-
-        // Panel to define the layout. We are using GridBagLayout
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-        JPanel headingPanel = new JPanel();
-        GridBagConstraints constr = new GridBagConstraints();
-        constr.insets = new Insets(5, 5, 5, 5);
-
-        JLabel headingLabel = new JLabel(m_progressMessage);
-        headingPanel.add(headingLabel, constr);
-
-        // Panel to define the layout. We are using GridBagLayout
-        JPanel panel = new JPanel(new GridBagLayout());
-        // Constraints for the layout
-        constr = new GridBagConstraints();
-        constr.insets = new Insets(5, 5, 5, 5);
-        constr.anchor = GridBagConstraints.NORTH;
-
-        // Set the initial grid values to 0,0
-        constr.gridx=0;
-        constr.gridy=0;
-
-        progressBar = new JProgressBar();
-        progressBar.setIndeterminate(m_indeterminate);
-        progressBar.setPreferredSize(new Dimension(300, 50));
-        progressBar.setMaximum((int) getMax());
-
-        panel.add(progressBar, constr);
-
-        mainPanel.add(headingPanel);
-        mainPanel.add(panel);
-
-        // Add panel to frame
-        currentFrame.add(mainPanel);
+    protected void onStart() {
         currentFrame.pack();
-        currentFrame.setSize(400, 200);
         currentFrame.setLocationRelativeTo(null);
-
         currentFrame.setVisible(true);
     }
 
@@ -86,11 +90,14 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
     @Override
     public void refreshDisplay() {
-
+        SwingUtilities.invokeLater(() -> {
+            etaLabel.setText(getETAString());
+            currentFrame.pack();
+        });
     }
 
     @Override
     public void run() {
-        show();
+        start();
     }
 }

@@ -57,7 +57,30 @@ public class ProgressManager implements Serializable {
         }
     }
 
-    public ProgressManager(double maxProgress, String progressMessage) {
-        init(maxProgress, progressMessage);
+    /**
+     * Progress Bar passthrough methods
+     */
+    public void start() {
+        progressBar.start();
+    }
+
+    public void increment() {
+        progressBar.increment();
+    }
+
+    public void setProgress(double progress) {
+        progressBar.setProgress(progress);
+    }
+
+    public void finish() {
+        progressBar.finish();
+    }
+
+    public void setMaxProgress(double maxProgress) {
+        progressBar.setMaxProgress(maxProgress);
+    }
+
+    public void setProgressMessage(String progressMessage) {
+        progressBar.setProgressMessage(progressMessage);
     }
 }

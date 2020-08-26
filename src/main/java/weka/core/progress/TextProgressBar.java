@@ -12,28 +12,30 @@ public class TextProgressBar extends AbstractProgressBar {
         super(maxProgress, progressMessage);
     }
 
-    private String progressChar = "=";
-
-    private String progressRemainingChar = " ";
-
     protected int progressBarSize = 60;
 
-    private int numDots = 0;
+    private int currNumDots = 0;
 
     @Override
     protected void onSetProgress() {
-        numDots = (int) (m_normalizedProgress * progressBarSize);
+        currNumDots = (int) (m_normalizedProgress * progressBarSize);
     }
 
     @Override
     public void refreshDisplay() {
-        System.err.print(String.format("\r%s: [%s%s]", m_progressMessage, progressChar.repeat(numDots), progressRemainingChar.repeat(progressBarSize - numDots)));
+        String progressChar = "=";
+        String progressRemainingChar = " ";
+
+        System.err.print(String.format("\r%s: [%s%s] %s",
+                getProgressMessage(),
+                progressChar.repeat(currNumDots),
+                progressRemainingChar.repeat(progressBarSize - currNumDots),
+                getETAString()));
     }
 
     @Override
-    public void show() {
+    protected void onStart() {
         System.err.println("\n\n");
-        refreshDisplay();
     }
 
     @Override
