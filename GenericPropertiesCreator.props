@@ -66,3 +66,6 @@ weka.dl4j.playground.Dl4jCNNExplorer =\
 
 weka.dl4j.playground.ModelOutputDecoder =\
  weka.dl4j
+
+weka.dl4j.interpretability.AbstractSaliencyMapWrapper =\
+ weka.dl4j.interpretability

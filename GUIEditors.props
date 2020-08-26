@@ -50,6 +50,8 @@ weka.dl4j.playground.Dl4jCNNExplorer=weka.gui.GenericObjectEditor
 
 weka.dl4j.playground.ModelOutputDecoder=weka.gui.GenericObjectEditor
 
+weka.dl4j.interpretability.AbstractSaliencyMapWrapper=weka.gui.GenericObjectEditor
+
 
 ### Misc ###
 weka.core.LogConfiguration=weka.gui.GenericObjectEditor
