@@ -816,14 +816,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       log.info("Classifier: \n{}", toString());
     }
 
+    progressManager = new ProgressManager(maxEpochs, "Training Dl4jMlpClassifier...");
+    progressManager.show();
     boolean isContinue = true;
     while (isContinue) {
       // Next epoch
       isContinue = next();
+      progressManager.increment();
     }
 
     // Clean up
     done();
+    progressManager.finish();
   }
 
   /**
