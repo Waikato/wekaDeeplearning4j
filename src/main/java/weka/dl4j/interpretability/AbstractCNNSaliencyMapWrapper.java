@@ -16,7 +16,7 @@ import java.util.Enumeration;
 
 // TODO Document
 
-public abstract class AbstractSaliencyMapWrapper implements Serializable, OptionHandler {
+public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, OptionHandler {
 
     protected int batchSize = 1;
 

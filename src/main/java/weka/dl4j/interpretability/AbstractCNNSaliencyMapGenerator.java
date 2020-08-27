@@ -3,12 +3,17 @@ package weka.dl4j.interpretability;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import weka.dl4j.interpretability.listeners.IterationIncrementListener;
+import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
+import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO document
-public abstract class AbstractSaliencyMapGenerator {
+public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected ComputationGraph computationGraph = null;
 
@@ -29,6 +34,24 @@ public abstract class AbstractSaliencyMapGenerator {
     protected BufferedImage heatmapOnImage;
 
     protected BufferedImage compositeImage;
+
+    protected List<IterationsStartedListener> iterationsStartedListeners = new ArrayList<>();
+
+    protected List<IterationIncrementListener> iterationIncrementListeners = new ArrayList<>();
+
+    protected List<IterationsFinishedListener> iterationsFinishedListeners = new ArrayList<>();
+
+    public void addIterationsStartedListener(IterationsStartedListener listener) {
+        iterationsStartedListeners.add(listener);
+    }
+
+    public void addIterationIncrementListener(IterationIncrementListener listener) {
+        iterationIncrementListeners.add(listener);
+    }
+
+    public void addIterationsFinishedListeners(IterationsFinishedListener listener) {
+        iterationsFinishedListeners.add(listener);
+    }
 
     public abstract void generateForImage(File imageFile);
 

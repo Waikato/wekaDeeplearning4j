@@ -7,7 +7,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.*;
-import weka.dl4j.interpretability.AbstractSaliencyMapWrapper;
+import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.zoo.*;
 
@@ -47,7 +47,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     /**
      * // TODO
      */
-    protected AbstractSaliencyMapWrapper saliencyMapGenerator = new WekaScoreCAM();
+    protected AbstractCNNSaliencyMapWrapper saliencyMapGenerator = new WekaScoreCAM();
     /**
      * Model used for feature extraction
      */
@@ -197,11 +197,11 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             commandLineParamSynopsis = "-saliency-map <options>",
             displayOrder = 5
     )
-    public AbstractSaliencyMapWrapper getSaliencyMapGenerator() {
+    public AbstractCNNSaliencyMapWrapper getSaliencyMapGenerator() {
         return saliencyMapGenerator;
     }
 
-    public void setSaliencyMapGenerator(AbstractSaliencyMapWrapper saliencyMapGenerator) {
+    public void setSaliencyMapGenerator(AbstractCNNSaliencyMapWrapper saliencyMapGenerator) {
         this.saliencyMapGenerator = saliencyMapGenerator;
     }
 

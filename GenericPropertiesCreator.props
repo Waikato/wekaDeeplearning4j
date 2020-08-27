@@ -67,5 +67,5 @@ weka.dl4j.inference.Dl4jCNNExplorer =\
 weka.dl4j.inference.ModelOutputDecoder =\
  weka.dl4j
 
-weka.dl4j.interpretability.AbstractSaliencyMapWrapper =\
+weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper =\
  weka.dl4j.interpretability
