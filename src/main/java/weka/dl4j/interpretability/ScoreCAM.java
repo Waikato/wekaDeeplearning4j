@@ -119,8 +119,49 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         setTargetClassID(argMax);
     }
 
+    private boolean isNDArrayChannelsLast(INDArray in) {
+        long[] shape = in.shape();
+        long minibatch = shape[0];
+        long val1 = shape[1];
+        long val2 = shape[2];
+        long val3 = shape[3];
+
+        // Returns true for in = [1, 224, 224, 3] (224 == 224 and 224 != 3)
+        return val1 == val2 && val2 != val3;
+    }
+
+    private INDArray permuteToSuit(INDArray in, boolean shouldBeChannelsLast) {
+        // Check if the array we're being passed is is channels last
+        boolean inChannelsLast = isNDArrayChannelsLast(in);
+
+        // If 'in' is channels last and it should be channels last then leave it
+        // (and similarly for if it's channels first and we're expecting channels first
+        if (inChannelsLast == shouldBeChannelsLast) {
+            log.debug("No permutation necessary");
+            return in;
+        }
+
+        INDArray permuted = in.permute(0,3,2,1);
+        log.debug(String.format("Permuted NDArray from %s to %s",
+                Arrays.toString(in.shape()), Arrays.toString(permuted.shape())));
+        return permuted.dup();
+    }
+
+    private INDArray preModelCheck(INDArray in) {
+        boolean modelExpectsChannelsLast = isImageChannelsLast();
+        return permuteToSuit(in, modelExpectsChannelsLast);
+    }
+
+    private INDArray postModelCheck(INDArray in) {
+        return permuteToSuit(in, false);
+    }
+
     private INDArray modelOutputSingle(INDArray in) {
-        return getComputationGraph().outputSingle(getSafeModelInput(in));
+        // Transform it before we pass to the model if necessary
+        // Default should be [NCHW] but may need to permute to [NHWC]
+        INDArray preChecked = preModelCheck(in);
+        INDArray results = getComputationGraph().outputSingle(preChecked);
+        return results;
     }
 
     /**
@@ -131,7 +172,9 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         Layer[] layers = getComputationGraph().getLayers();
         Layer[] convLayers = Arrays.stream(layers).filter(x -> x instanceof ConvolutionLayer).toArray(Layer[]::new);
         int count = convLayers.length;
-        return convLayers[count - 1].getConfig().getLayerName();
+        String layerName = convLayers[count - 1].getConfig().getLayerName();
+        log.debug("Auto selected activation layer name is " + layerName);
+        return layerName;
     }
 
     private void createHeatmap(INDArray postprocessedActivations) {
@@ -341,15 +384,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         return Nd4j.create(targetClassWeights);
     }
 
-    private INDArray getSafeModelInput(INDArray in) {
-        // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
-        if (isImageChannelsLast()) {
-            log.info("Permuting channel order of input...");
-            in = in.permute(0,2,3,1);
-        }
-        return in.dup();
-    }
-
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
         int numActivationMaps = getNumActivationMaps(normalisedActivations);
 
@@ -397,12 +431,14 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         TransferLearningHelper transferLearningHelper = new TransferLearningHelper(
                 getComputationGraph().clone(), activationMapLayer);
 
-        imageArr = getSafeModelInput(imageArr);
-
+        imageArr = preModelCheck(imageArr);
         // Run the model on the image to get the activation maps
         DataSet imageDataset = new DataSet(imageArr, Nd4j.zeros(1));
         DataSet result = transferLearningHelper.featurize(imageDataset);
         INDArray rawActivations = result.getFeatures();
+        rawActivations = postModelCheck(rawActivations);
+
+        log.debug("Raw activation shape is " + Arrays.toString(rawActivations.shape()));
 
         // Must be channels last for the imageResize method
         return rawActivations.permute(0, 2, 3, 1);

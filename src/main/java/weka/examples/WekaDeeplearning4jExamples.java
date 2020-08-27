@@ -139,10 +139,8 @@ public class WekaDeeplearning4jExamples {
     public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        Dl4jResNet50 zooModel = new Dl4jResNet50();
-//        zooModel.setVariation(ResNet.VARIATION.RESNET152V2);
-//        zooModel.setVariation(VGG.VARIATION.VGG16);
-//        zooModel.setPretrainedType(PretrainedType.VGGFACE);
+        KerasEfficientNet zooModel = new KerasEfficientNet();
+        zooModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
         explorer.setZooModelType(zooModel);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
