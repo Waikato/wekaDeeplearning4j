@@ -70,7 +70,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         INDArray upsampledActivations = upsampleActivations(rawActivations);
 
         // Normalise them between 0 and 1 (so they can be multiplied with the images)
-        INDArray normalisedActivations = normalizeINDArray(upsampledActivations);
+        INDArray normalisedActivations = normalizeActivationMaps(upsampledActivations);
 
         // Create the set of masked images by multiplying each (upsampled, normalized) activation map with the original image
         INDArray maskedImages = createMaskedImages(normalisedActivations, preprocessedImage);
@@ -135,8 +135,7 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     }
 
     private void createHeatmap(INDArray postprocessedActivations) {
-//        Color[] gradientColors = Gradient.GRADIENT_PLASMA;
-        Color[] gradientColors = Gradient.GRADIENT_ALPHA;
+        Color[] gradientColors = Gradient.GRADIENT_PLASMA;
         heatmap = new BufferedImage(
                 (int) modelInputShape.getWidth(),
                 (int) modelInputShape.getHeight(),
@@ -179,8 +178,6 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
     private void createCompositeImage() {
         int width = calculateCompositeWidth();
         int height = calculateCompositeHeight();
-
-
 
         compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = compositeImage.createGraphics();
@@ -234,26 +231,39 @@ public class ScoreCAM extends AbstractSaliencyMapGenerator {
         // Perform pixel-wise RELU
         INDArray reluActivations = Transforms.relu(summed);
 
-        return normalizeINDArray(reluActivations);
+        normalize2x2ArrayI(reluActivations);
+
+        return reluActivations;
     }
 
-    private INDArray normalizeINDArray(INDArray activationMap) {
-        INDArray normalized = activationMap.dup();
+    private INDArray normalizeActivationMaps(INDArray upsampledActivations) {
+        // Normalize each of the 512 activation maps
+        int numActivationMaps = getNumActivationMaps(upsampledActivations);
 
         // Perform any normalizing of the activation maps
         // Scale the map to between 0 and 1 (so it can be multiplied on the image)
-        double currMax = normalized.maxNumber().doubleValue();
-        double currMin = normalized.minNumber().doubleValue();
-        System.out.println(String.format("Prev max: %.4f, prev min: %.4f", currMax, currMin));
+        double currMax = upsampledActivations.maxNumber().doubleValue();
+        double currMin = upsampledActivations.minNumber().doubleValue();
+        log.debug(String.format("All activation maps: prev max: %.4f, prev min: %.4f", currMax, currMin));
 
-        normalized.subi(currMin);
-        normalized.divi(currMax - currMin);
+        for (int i = 0; i < numActivationMaps; i++) {
+            INDArray tmpActivationMap = upsampledActivations.get(NDArrayIndex.point(i));
+            normalize2x2ArrayI(tmpActivationMap);
+        }
 
-        double newMax = normalized.maxNumber().doubleValue();
-        double newMin = normalized.minNumber().doubleValue();
-        System.out.println(String.format("new max: %.4f, new min: %.4f", newMax, newMin));
+        double newMax = upsampledActivations.maxNumber().doubleValue();
+        double newMin = upsampledActivations.minNumber().doubleValue();
+        log.debug(String.format("All activation maps: new max: %.4f, new min: %.4f", newMax, newMin));
 
-        return normalized;
+        return upsampledActivations;
+    }
+
+    private void normalize2x2ArrayI(INDArray array) {
+        double currMax = array.maxNumber().doubleValue();
+        double currMin = array.minNumber().doubleValue();
+
+        array.subi(currMin);
+        array.divi(currMax - currMin);
     }
 
     private INDArray applyActivationMapWeights(INDArray normalisedActivations, INDArray weights) {

@@ -23,7 +23,7 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        commandLineProgressTest();
+        inference();
     }
 
     public static void commandLineProgressTest() throws Exception {
@@ -149,10 +149,10 @@ public class WekaDeeplearning4jExamples {
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.IMAGENET);
         explorer.setModelOutputDecoder(decoder);
 
-        explorer.setGenerateSaliencyMap(true);
         AbstractSaliencyMapWrapper wrapper = new WekaScoreCAM();
         wrapper.setBatchSize(8);
         explorer.setSaliencyMapGenerator(wrapper);
+        explorer.setGenerateSaliencyMap(true);
 
         explorer.init();
         explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
