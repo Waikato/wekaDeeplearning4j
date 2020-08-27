@@ -25,35 +25,15 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 // TODO document
 @Log4j2
-public class ScoreCAM extends AbstractSaliencyMapGenerator {
+public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     protected int outsideBorder = 25;
 
     protected int insidePadding = 20;
-
-    protected List<IterationsStartedListener> iterationsStartedListeners = new ArrayList<>();
-
-    protected List<IterationIncrementListener> iterationIncrementListeners = new ArrayList<>();
-
-    protected List<IterationsFinishedListener> iterationsFinishedListeners = new ArrayList<>();
-
-    public void addIterationsStartedListener(IterationsStartedListener listener) {
-        iterationsStartedListeners.add(listener);
-    }
-
-    public void addIterationIncrementListener(IterationIncrementListener listener) {
-        iterationIncrementListeners.add(listener);
-    }
-
-    public void addIterationsFinishedListeners(IterationsFinishedListener listener) {
-        iterationsFinishedListeners.add(listener);
-    }
 
     @Override
     public void generateForImage(File imageFile) {

@@ -6,7 +6,7 @@ import weka.core.progress.ProgressManager;
 import java.io.File;
 
 // TODO Document
-public class WekaScoreCAM extends AbstractSaliencyMapWrapper {
+public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
     /**
      * Displays progress of the current process (feature extraction, training, etc.)
