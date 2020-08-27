@@ -1708,16 +1708,35 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)");
       progressManager.start();
 
-//      parseLayers();
-      // Parse the layers in a separate thread so as to not lock the GUI thread
-      Thread thread = new Thread(this::parseLayers);
-      thread.setPriority(Thread.MIN_PRIORITY);
-      thread.start();
+      layerSwingWorker = new SwingWorker<>() {
+        @Override
+        protected Layer[] doInBackground() throws Exception {
+          return parseLayers();
+        }
+
+        @SneakyThrows
+        @Override
+        protected void done() {
+          super.done();
+          try {
+            System.out.println("Done reached");
+            layers = get();
+            System.out.println("Layers updated");
+          } catch (ExecutionException ex) {
+            System.err.println("Error while getting layer results!");
+            ex.printStackTrace();
+          }
+          progressManager.finish();
+        }
+      };
+      layerSwingWorker.execute();
     }
   }
 
-  private void parseLayers() {
+  private Layer[] parseLayers() {
+    System.out.println("Starting parse layers");
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+    Layer[] tmpLayers = new Layer[0];
     try {
       // Try to parse the layers so the user can change them afterwards
       final int dummyNumLabels = 2;
@@ -1727,19 +1746,21 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       ComputationGraph tmpCg =
               zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
       tmpCg.init();
-      layers =
+       tmpLayers =
               Arrays.stream(tmpCg.getLayers())
                       .map(l -> Layer.create(l.conf().getLayer()))
                       .collect(Collectors.toList())
                       .toArray(new Layer[tmpCg.getLayers().length]);
+
     } catch (Exception e) {
       if (!(zooModel instanceof CustomNet)) {
         log.error("Could not set layers from zoomodel.", e);
       }
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
-      progressManager.finish();
     }
+    System.out.println("Finishing parse layers");
+    return tmpLayers;
   }
 
   public TrainingListener getIterationListener() {
