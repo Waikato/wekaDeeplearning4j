@@ -33,9 +33,7 @@ public class ScoreCAMTest extends TestCase {
             String modelName = pretrainedModel.getPrettyName();
 
             try {
-                ImageIO.write(scoreCAM.getOriginalImage(), "png", new File(String.format("tmp/%s_original.png", modelName)));
-                ImageIO.write(scoreCAM.getHeatmap(), "png", new File(String.format("tmp/%s_heatmap.png", modelName)));
-                ImageIO.write(scoreCAM.getHeatmapOnImage(), "png", new File(String.format("tmp/%s_heatmapOnImage.png", modelName)));
+                ImageIO.write(scoreCAM.getCompositeImage(), "png", new File(String.format("tmp/%s_composite.png", modelName)));
             } catch (OutOfMemoryError error) {
                 error.printStackTrace();
             } catch (Exception ex) {
