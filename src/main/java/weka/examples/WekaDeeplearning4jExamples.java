@@ -6,13 +6,14 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
-import weka.dl4j.interpretability.AbstractSaliencyMapWrapper;
+import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.dl4j.interpretability.ScoreCAM;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.inference.*;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
+import weka.dl4j.zoo.keras.ResNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -139,15 +140,15 @@ public class WekaDeeplearning4jExamples {
     public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        KerasEfficientNet zooModel = new KerasEfficientNet();
-        zooModel.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
+        KerasResNet zooModel = new KerasResNet();
+        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
         explorer.setZooModelType(zooModel);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.IMAGENET);
         explorer.setModelOutputDecoder(decoder);
 
-        AbstractSaliencyMapWrapper wrapper = new WekaScoreCAM();
+        AbstractCNNSaliencyMapWrapper wrapper = new WekaScoreCAM();
         wrapper.setBatchSize(8);
         explorer.setSaliencyMapGenerator(wrapper);
         explorer.setGenerateSaliencyMap(true);
