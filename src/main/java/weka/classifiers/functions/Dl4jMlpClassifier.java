@@ -23,8 +23,10 @@ import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
@@ -79,6 +81,8 @@ import weka.filters.unsupervised.attribute.Standardize;
 import weka.filters.unsupervised.instance.Randomize;
 import weka.filters.unsupervised.instance.RemovePercentage;
 import weka.gui.ProgrammaticProperty;
+
+import javax.swing.*;
 
 /**
  * A wrapper for DeepLearning4j that can be used to train a multi-layer perceptron.
@@ -269,6 +273,8 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * Displays progress of the current process (feature extraction, training, etc.)
    */
   protected ProgressManager progressManager;
+
+  private SwingWorker<Layer[], Layer> layerSwingWorker;
 
   public Dl4jMlpClassifier() {
     if (!s_cudaMultiGPUSet) {
@@ -818,16 +824,20 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     progressManager = new ProgressManager(getNumEpochs(), "Training Dl4jMlpClassifier...");
     progressManager.start();
-    boolean isContinue = true;
-    while (isContinue) {
-      // Next epoch
-      isContinue = next();
-      progressManager.increment();
+    try {
+      boolean isContinue = true;
+      while (isContinue) {
+        // Next epoch
+        isContinue = next();
+        progressManager.increment();
+      }
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    } finally {
+      // Clean up
+      done();
+      progressManager.finish();
     }
-
-    // Clean up
-    done();
-    progressManager.finish();
   }
 
   /**
@@ -1705,7 +1715,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
 
-      progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)");
+      progressManager = new ProgressManager("Initializing pretrained model and parsing layers (may require downloading weights)");
       progressManager.start();
 
       layerSwingWorker = new SwingWorker<>() {
