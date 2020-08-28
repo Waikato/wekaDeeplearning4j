@@ -150,6 +150,7 @@ public class WekaDeeplearning4jExamples {
 
         AbstractCNNSaliencyMapWrapper wrapper = new WekaScoreCAM();
         wrapper.setBatchSize(8);
+        wrapper.setOutputFile(new File("resnet101v2.png"));
         explorer.setSaliencyMapGenerator(wrapper);
         explorer.setGenerateSaliencyMap(true);
 

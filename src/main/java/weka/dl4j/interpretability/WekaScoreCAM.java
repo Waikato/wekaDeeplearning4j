@@ -3,6 +3,7 @@ package weka.dl4j.interpretability;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.progress.ProgressManager;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 
 // TODO Document
@@ -29,6 +30,20 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.addIterationsFinishedListeners(this::onIterationsFinished);
 
         scoreCAM.generateForImage(imageFile);
+
+        saveResult(scoreCAM);
+    }
+
+    private void saveResult(ScoreCAM scoreCAM) {
+        if (Utils.notDefaultFileLocation(getOutputFile())) {
+            try {
+                ImageIO.write(scoreCAM.getCompositeImage(), "png", getOutputFile());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            System.err.println("No output file location given - not saving saliency map");
+        }
     }
 
     private void onIterationsStarted(int maxIterations) {
