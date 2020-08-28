@@ -20,7 +20,6 @@ import weka.dl4j.interpretability.listeners.IterationIncrementListener;
 import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -35,36 +34,33 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     protected int insidePadding = 20;
 
+    protected INDArray originalImageArr, preprocessedImageArr, softmaxOnMaskedImages, normalisedActivations;
+
     public void processMaskedImages(File imageFile) {
-
-    }
-
-    public void createHeatmaps() {
-
-    }
-
-    @Override
-    public void generateForImage(File imageFile) {
-        INDArray originalImage = loadImage(imageFile);
+        originalImageArr = loadImage(imageFile);
         // Preprocess the image if the model requires it
-        INDArray preprocessedImage = preprocessImage(originalImage);
-        calculateTargetClassID(preprocessedImage);
-
+        preprocessedImageArr = preprocessImage(originalImageArr);
         // Get the original set of activation maps by taking the activations
         // from the final convolution layer when running the image through the model
-        INDArray rawActivations = getActivationsForImage(preprocessedImage);
+        INDArray rawActivations = getActivationsForImage(preprocessedImageArr);
 
         // Upsample the activations to match the original image size
         INDArray upsampledActivations = upsampleActivations(rawActivations);
 
         // Normalise them between 0 and 1 (so they can be multiplied with the images)
-        INDArray normalisedActivations = normalizeActivationMaps(upsampledActivations);
+        normalisedActivations = normalizeActivationMaps(upsampledActivations);
 
         // Create the set of masked images by multiplying each (upsampled, normalized) activation map with the original image
-        INDArray maskedImages = createMaskedImages(normalisedActivations, preprocessedImage);
+        INDArray maskedImages = createMaskedImages(normalisedActivations, preprocessedImageArr);
 
         // Get the softmax score for the target class ID when running the masked images through the model
-        INDArray targetClassWeights = predictTargetClassWeights(maskedImages);
+        softmaxOnMaskedImages = predictOnMaskedImages(maskedImages);
+    }
+
+    public void createHeatmaps() {
+        calculateTargetClassID(preprocessedImageArr);
+
+        INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages);
 
         // Weight each activation map using the previously acquired softmax scores
         INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
@@ -72,7 +68,13 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         // Sum the activation maps into one map and normalise the saliency map values to between [0, 1]
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
-        createFinalImages(originalImage, postprocessedActivations);
+        createFinalImages(originalImageArr, postprocessedActivations);
+    }
+
+    @Override
+    public void generateForImage(File imageFile) {
+        processMaskedImages(imageFile);
+        createHeatmaps();
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
@@ -99,6 +101,10 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         INDArray output = modelOutputSingle(imageArr);
         int argMax = output.argMax(1).getNumber(0).intValue();
         setTargetClassID(argMax);
+    }
+
+    private INDArray calculateTargetClassWeights(INDArray softmaxOutput) {
+        return softmaxOutput.getColumn(targetClassID).dup();
     }
 
     private boolean isNDArrayChannelsLast(INDArray in) {
@@ -333,10 +339,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         }
     }
 
-    private INDArray predictTargetClassWeights(INDArray maskedImages) {
+    private INDArray predictOnMaskedImages(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images with a batch size of %d", numActivationMaps, batchSize));
         double[] targetClassWeights = new double[numActivationMaps];
+        INDArray softmaxOnMaskedImages = null;
 
         int totalIterations = getNumIterations(numActivationMaps);
 
@@ -352,18 +359,27 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
             INDArray maskedImageBatch = maskedImages.get(NDArrayIndex.interval(fromIndex, toIndex));
             // Run prediction
             INDArray output = modelOutputSingle(maskedImageBatch);
+
+            if (softmaxOnMaskedImages == null) {
+                int numClasses = (int) output.shape()[1];
+                softmaxOnMaskedImages = Nd4j.zeros(numActivationMaps, numClasses);
+            }
+
             // Parse each prediction
             for (int miniBatchI = 0; miniBatchI < actualBatchSize; miniBatchI++) {
+                INDArray row = output.getRow(miniBatchI);
+                softmaxOnMaskedImages.putRow(fromIndex + miniBatchI, row);
                 // Save the probability for the target class
-                double classProbVal = output.getDouble(miniBatchI, targetClassID);
-                targetClassWeights[fromIndex + miniBatchI] = classProbVal;
+//                double classProbVal = output.getDouble(miniBatchI, targetClassID);
+//                targetClassWeights[fromIndex + miniBatchI] = classProbVal;
             }
             // Fire the iteration increment listeners
             broadcastIterationIncremented();
         }
         // Finish the iterations
         broadcastIterationsFinished();
-        return Nd4j.create(targetClassWeights);
+        return softmaxOnMaskedImages;
+//        return Nd4j.create(targetClassWeights);
     }
 
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
