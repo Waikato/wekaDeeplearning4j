@@ -1,14 +1,11 @@
 package weka.dl4j.interpretability;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.dl4j.interpretability.listeners.IterationIncrementListener;
-import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
-import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 import weka.dl4j.zoo.AbstractZooModel;
-import weka.gui.ProgrammaticProperty;
 
 import java.io.File;
 import java.io.Serializable;
@@ -22,6 +19,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected int targetClassID = -1;
 
+    protected File outputFile = new File(Utils.defaultFileLocation());
 
     public abstract void run(File imageFile);
 
@@ -73,6 +71,21 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     public void setTargetClassID(int targetClassID) {
         this.targetClassID = targetClassID;
+    }
+
+    @OptionMetadata(
+            displayName = "Output file location",
+            description = "File for the saliency map to be saved in",
+            commandLineParamName = "output",
+            commandLineParamSynopsis = "-output <file location>",
+            displayOrder = 3
+    )
+    public File getOutputFile() {
+        return outputFile;
+    }
+
+    public void setOutputFile(File outputFileLocation) {
+        this.outputFile = outputFileLocation;
     }
 
     /**

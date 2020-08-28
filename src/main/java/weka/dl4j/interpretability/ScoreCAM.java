@@ -65,12 +65,6 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
         createFinalImages(originalImage, postprocessedActivations);
-
-        try {
-            ImageIO.write(getCompositeImage(), "png", new File("composite.png"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
