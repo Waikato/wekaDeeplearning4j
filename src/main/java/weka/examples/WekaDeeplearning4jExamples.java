@@ -140,8 +140,8 @@ public class WekaDeeplearning4jExamples {
     public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        KerasResNet zooModel = new KerasResNet();
-        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
+        Dl4jResNet50 zooModel = new Dl4jResNet50();
+//        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
         explorer.setZooModelType(zooModel);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
@@ -149,13 +149,14 @@ public class WekaDeeplearning4jExamples {
         explorer.setModelOutputDecoder(decoder);
 
         AbstractCNNSaliencyMapWrapper wrapper = new WekaScoreCAM();
-        wrapper.setBatchSize(8);
-        wrapper.setOutputFile(new File("resnet101v2.png"));
+        wrapper.setBatchSize(6);
+        wrapper.setTargetClassID(222);
+        wrapper.setOutputFile(new File("targetDog.png"));
         explorer.setSaliencyMapGenerator(wrapper);
         explorer.setGenerateSaliencyMap(true);
 
         explorer.init();
-        explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
+        explorer.makePrediction(new File("C:\\Users\\comptonr\\Desktop\\catAndDog.jpg"));
 
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }

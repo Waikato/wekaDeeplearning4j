@@ -67,11 +67,13 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     protected ResultHistoryPanel m_History = new ResultHistoryPanel(m_OutText);
 
     /** Button for further output/visualize options. */
-    JButton m_OpenImageButton = new JButton("Open Image...");
+    protected JButton m_OpenImageButton = new JButton("Open Image...");
 
     /** Click to start running the classifier. */
     protected JButton m_predictButton = new JButton("Predict");
 
+    /** Click to view Saliency Map */
+    protected JButton m_saliencyMapButton = new JButton("View Saliency Map...");
 
     /** A thread that classification runs in. */
     protected Thread m_RunThread;
@@ -246,6 +248,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     private void setupToolTipText() {
         m_OpenImageButton.setToolTipText("Open an image for prediction");
         m_predictButton.setToolTipText("Run prediction on the image");
+        m_saliencyMapButton.setToolTipText("View the saliency map for this image and model");
     }
 
     /**
@@ -263,6 +266,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         m_predictButton.setEnabled(false);
         m_predictButton.addActionListener(e -> predict());
+
+//        m_saliencyMapButton.setEnabled(false);
+        m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
     }
 
     /**
@@ -294,6 +300,16 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.insets = new Insets(0, 10, 10, 10);
         gbL.setConstraints(m_predictButton, gbC);
         optionsPanel.add(m_predictButton);
+
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.fill = GridBagConstraints.HORIZONTAL;
+        gbC.gridy = 2;
+        gbC.gridx = 0;
+        gbC.weightx = 100;
+        gbC.insets = new Insets(0, 10, 10, 10);
+        gbL.setConstraints(m_saliencyMapButton, gbC);
+        optionsPanel.add(m_saliencyMapButton);
 
         return optionsPanel;
     }
@@ -430,6 +446,80 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         File f = m_FileChooser.getSelectedFile();
         m_currentlyDisplayedImage = f.getAbsolutePath();
         refreshImagePanel();
+    }
+
+    protected void openSaliencyMapWindow() {
+        JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
+
+        // Define the UI elements
+        ImageIcon image = new ImageIcon("C:\\Users\\comptonr\\Desktop\\rn101v2.png");
+        JLabel imageLabel = new JLabel(image);
+
+        JLabel targetClassLabel = new JLabel("Target Class ID:");
+        JTextField classIDTextField = new JTextField("235");
+        JLabel decodedClassName = new JLabel("  Class Name:");
+        JTextField classNameTextField = new JTextField("Doge");
+        classNameTextField.setEnabled(false);
+        JButton generateButton = new JButton("Generate");
+
+        // Panel to define the layout. We are using GridBagLayout
+        JPanel mainPanel = new JPanel();
+        GridBagLayout gbL = new GridBagLayout();
+        mainPanel.setLayout(gbL);
+        mainPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Saliency Map Viewer"),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+
+        JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        configPanel.add(targetClassLabel);
+        configPanel.add(classIDTextField);
+        configPanel.add(decodedClassName);
+        configPanel.add(classNameTextField);
+
+        GridBagConstraints gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridx = 0;
+        gbC.gridy = 0;
+        gbL.setConstraints(configPanel, gbC);
+        mainPanel.add(configPanel);
+//
+//        gbC = new GridBagConstraints();
+//        gbC.anchor = GridBagConstraints.CENTER;
+//        gbC.gridx = 1;
+//        gbC.gridy = 0;
+//        gbL.setConstraints(classIDTextField, gbC);
+//        mainPanel.add(classIDTextField);
+//
+//        gbC = new GridBagConstraints();
+//        gbC.anchor = GridBagConstraints.WEST;
+//        gbC.gridx = 2;
+//        gbC.gridy = 0;
+//        gbL.setConstraints(decodedClassName, gbC);
+//        mainPanel.add(decodedClassName);
+//
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridx = 0;
+        gbC.gridy = 1;
+        gbC.insets = new Insets(5, 0, 20, 0);
+        gbL.setConstraints(generateButton, gbC);
+        mainPanel.add(generateButton);
+
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.gridx = 0;
+        gbC.gridy = 2;
+//        gbC.gridwidth = 3;
+//        gbC.insets = new Insets(0, 0, 20, 0);
+        gbL.setConstraints(imageLabel, gbC);
+        mainPanel.add(imageLabel);
+
+        // Add panel to frame
+        saliencyMapWindow.add(mainPanel);
+
+        saliencyMapWindow.pack();
+        saliencyMapWindow.setLocationRelativeTo(null);
+        saliencyMapWindow.setVisible(true);
     }
 
     /**
