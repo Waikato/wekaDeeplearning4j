@@ -327,7 +327,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private INDArray predictTargetClassWeights(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
-        log.info(String.format("Running prediction on %d masked images...", numActivationMaps));
+        log.info(String.format("Running prediction on %d masked images with a batch size of %d", numActivationMaps, batchSize));
         double[] targetClassWeights = new double[numActivationMaps];
 
         int totalIterations = getNumIterations(numActivationMaps);
