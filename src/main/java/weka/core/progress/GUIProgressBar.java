@@ -23,7 +23,7 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
     private void initGUIElements() {
         // Create frame with title Registration Demo
         currentFrame = new JFrame();
-        currentFrame.setTitle("WekaDeeplearning4j Notification");
+        currentFrame.setTitle("Weka Progress Meter");
 
         progressMessageLabel = new JLabel(getProgressMessage());
 

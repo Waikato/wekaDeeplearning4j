@@ -35,6 +35,14 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     protected int insidePadding = 20;
 
+    public void processMaskedImages(File imageFile) {
+
+    }
+
+    public void createHeatmaps() {
+
+    }
+
     @Override
     public void generateForImage(File imageFile) {
         INDArray originalImage = loadImage(imageFile);
@@ -71,13 +79,13 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         ImagePreProcessingScaler scaler = getImagePreProcessingScaler();
 
         if (scaler == null) {
-            log.info("No image preprocessing required");
+            log.debug("No image preprocessing required");
             return imageArr;
         }
 
         INDArray preprocessed = imageArr.dup();
 
-        log.info("Applying image preprocessing...");
+        log.debug("Applying image preprocessing...");
         scaler.transform(preprocessed);
         return preprocessed;
     }

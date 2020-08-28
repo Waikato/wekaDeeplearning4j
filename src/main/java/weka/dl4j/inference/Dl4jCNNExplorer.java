@@ -249,7 +249,6 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         explorer.makePrediction(new File(inputImagePath));
         // Output the results to the command line
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
-        generateSaliencyMap(new File(inputImagePath));
     }
 
 
