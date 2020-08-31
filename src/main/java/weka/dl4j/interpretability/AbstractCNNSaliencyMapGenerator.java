@@ -35,6 +35,13 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected BufferedImage compositeImage;
 
+    public abstract void processImage(File imageFile);
+
+    public abstract void generateOutputMap();
+
+    /**
+     * Event listeners
+     */
     protected List<IterationsStartedListener> iterationsStartedListeners = new ArrayList<>();
 
     protected List<IterationIncrementListener> iterationIncrementListeners = new ArrayList<>();
@@ -53,8 +60,9 @@ public abstract class AbstractCNNSaliencyMapGenerator {
         iterationsFinishedListeners.add(listener);
     }
 
-    public abstract void generateForImage(File imageFile);
-
+    /**
+     * Getters and setters
+     */
     public ComputationGraph getComputationGraph() {
         return computationGraph;
     }

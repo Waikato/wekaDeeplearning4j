@@ -4,8 +4,6 @@ import junit.framework.TestCase;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.dl4j.zoo.AbstractZooModel;
-import weka.dl4j.zoo.KerasResNet;
-import weka.dl4j.zoo.keras.ResNet;
 import weka.zoo.ZooModelTest;
 
 import javax.imageio.ImageIO;
@@ -28,7 +26,7 @@ public class ScoreCAMTest extends TestCase {
             scoreCAM.setModelInputShape(Utils.decodeCNNShape(pretrainedModel.getShape()[0]));
             scoreCAM.setImageChannelsLast(pretrainedModel.getChannelsLast());
             scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-            scoreCAM.generateForImage(new File("src/test/resources/images/dog.jpg"));
+            scoreCAM.processImage(new File("src/test/resources/images/dog.jpg"));
 
             String modelName = pretrainedModel.getPrettyName();
 

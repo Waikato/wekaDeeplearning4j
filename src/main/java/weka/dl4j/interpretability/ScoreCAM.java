@@ -57,7 +57,13 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         softmaxOnMaskedImages = predictOnMaskedImages(maskedImages);
     }
 
-    public void createHeatmaps() {
+    @Override
+    public void processImage(File imageFile) {
+        processMaskedImages(imageFile);
+    }
+
+    @Override
+    public void generateOutputMap() {
         calculateTargetClassID(preprocessedImageArr);
 
         INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages);
@@ -69,12 +75,6 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
         createFinalImages(originalImageArr, postprocessedActivations);
-    }
-
-    @Override
-    public void generateForImage(File imageFile) {
-        processMaskedImages(imageFile);
-        createHeatmaps();
     }
 
     private INDArray preprocessImage(INDArray imageArr) {

@@ -17,13 +17,12 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     protected ScoreCAM scoreCAM;
 
     @Override
-    public void process(File imageFile) {
+    public void processImage(File imageFile) {
         scoreCAM = new ScoreCAM();
         scoreCAM.setComputationGraph(getComputationGraph());
         scoreCAM.setBatchSize(batchSize);
-        scoreCAM.setTargetClassID(targetClassID);
 
-        scoreCAM.setImageChannelsLast(zooModel.getChannelsLast());
+        scoreCAM.setImageChannelsLast(zooModel.getChannelsLast()); // TODO check with non-zooModels
         scoreCAM.setModelInputShape(Utils.decodeCNNShape(zooModel.getShape()[0]));
         scoreCAM.setImagePreProcessingScaler(zooModel.getImagePreprocessingScaler());
 
@@ -34,14 +33,16 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.processMaskedImages(imageFile);
     }
 
-    public void generateMap() {
+    @Override
+    public void generateOutputMap() {
         scoreCAM.setTargetClassID(targetClassID);
-        scoreCAM.createHeatmaps();
+        scoreCAM.generateOutputMap();
         saveResult();
     }
 
     private void saveResult() {
         if (Utils.notDefaultFileLocation(getOutputFile())) {
+            System.out.println(String.format("Output file location = %s", getOutputFile()));
             try {
                 ImageIO.write(scoreCAM.getCompositeImage(), "png", getOutputFile());
             } catch (Exception ex) {

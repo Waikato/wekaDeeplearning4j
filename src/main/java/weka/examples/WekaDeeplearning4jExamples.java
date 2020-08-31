@@ -1,19 +1,15 @@
 package weka.examples;
 
-import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
-import weka.dl4j.interpretability.ScoreCAM;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.inference.*;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.EfficientNet;
-import weka.dl4j.zoo.keras.ResNet;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Dl4jMlpFilter;
 
@@ -53,20 +49,6 @@ public class WekaDeeplearning4jExamples {
 
         Instances filteredInstances = Filter.useFilter(inst, filter);
         System.out.println(filteredInstances);
-    }
-
-    private static void scoreCamTest() {
-        Dl4jResNet50 pretrainedModel = new Dl4jResNet50();
-//        pretrainedModel.setVariation(ResNet.VARIATION.RESNET101V2);
-        ComputationGraph computationGraph = pretrainedModel.getDefaultGraph();
-
-        ScoreCAM scoreCAM = new ScoreCAM();
-        scoreCAM.setBatchSize(8);
-        scoreCAM.setComputationGraph(computationGraph);
-        scoreCAM.setImageChannelsLast(pretrainedModel.getChannelsLast());
-        scoreCAM.setModelInputShape(Utils.decodeCNNShape(pretrainedModel.getShape()[0]));
-        scoreCAM.setImagePreProcessingScaler(pretrainedModel.getImagePreprocessingScaler());
-        scoreCAM.generateForImage(new File("src/test/resources/images/dog.jpg"));
     }
 
     private static void filter() throws Exception {
@@ -163,11 +145,11 @@ public class WekaDeeplearning4jExamples {
         wrapper.setTargetClassID(281);
         wrapper.setOutputFile(new File("targetCat.png"));
         explorer.setSaliencyMapGenerator(wrapper);
-        explorer.generateSaliencyMap();
+        explorer.generateOutputMap();
 
         wrapper.setTargetClassID(222);
         wrapper.setOutputFile(new File("targetDog.png"));
         explorer.setSaliencyMapGenerator(wrapper);
-        explorer.generateSaliencyMap();
+        explorer.generateOutputMap();
     }
 }

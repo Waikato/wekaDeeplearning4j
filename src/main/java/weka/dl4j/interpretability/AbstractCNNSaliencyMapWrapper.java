@@ -6,6 +6,7 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.dl4j.zoo.AbstractZooModel;
+import weka.gui.ProgrammaticProperty;
 
 import java.io.File;
 import java.io.Serializable;
@@ -21,7 +22,13 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected File outputFile = new File(Utils.defaultFileLocation());
 
-    public abstract void process(File imageFile);
+    protected ComputationGraph computationGraph;
+
+    protected AbstractZooModel zooModel;
+
+    public abstract void processImage(File imageFile);
+
+    public abstract void generateOutputMap();
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;
@@ -31,8 +38,6 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         this.computationGraph = computationGraph;
     }
 
-    protected ComputationGraph computationGraph;
-
     public AbstractZooModel getZooModel() {
         return zooModel;
     }
@@ -40,8 +45,6 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
     public void setZooModel(AbstractZooModel zooModel) {
         this.zooModel = zooModel;
     }
-
-    protected AbstractZooModel zooModel;
 
     @OptionMetadata(
             displayName = "Batch size",
@@ -65,6 +68,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
             commandLineParamSynopsis = "-target-class <int>",
             displayOrder = 2
     )
+    @ProgrammaticProperty
     public int getTargetClassID() {
         return targetClassID;
     }
