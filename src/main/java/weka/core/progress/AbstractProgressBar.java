@@ -53,15 +53,15 @@ public abstract class AbstractProgressBar implements Serializable {
     private void calculate() {
         m_normalizedProgress = m_actualProgress / m_maxProgress;
 
-        if (!m_indeterminate) {
-            long eta = (long) ((m_maxProgress - m_actualProgress) * (System.currentTimeMillis() - startTime) / m_actualProgress);
-
-            etaHms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(eta),
-                    TimeUnit.MILLISECONDS.toMinutes(eta) % TimeUnit.HOURS.toMinutes(1),
-                    TimeUnit.MILLISECONDS.toSeconds(eta) % TimeUnit.MINUTES.toSeconds(1));
-        } else {
-            etaHms = "N/A";
+        if (m_indeterminate) {
+            return;
         }
+
+        long eta = (long) ((m_maxProgress - m_actualProgress) * (System.currentTimeMillis() - startTime) / m_actualProgress);
+
+        etaHms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(eta),
+                TimeUnit.MILLISECONDS.toMinutes(eta) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(eta) % TimeUnit.MINUTES.toSeconds(1));
     }
 
     public void setProgress(double progress) {
@@ -91,6 +91,6 @@ public abstract class AbstractProgressBar implements Serializable {
     }
 
     public String getETAString() {
-        return String.format("ETA: %s", etaHms);
+        return m_indeterminate ? "" : String.format("ETA: %s", etaHms);
     }
 }
