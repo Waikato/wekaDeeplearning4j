@@ -21,7 +21,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected File outputFile = new File(Utils.defaultFileLocation());
 
-    public abstract void run(File imageFile);
+    public abstract void process(File imageFile);
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;

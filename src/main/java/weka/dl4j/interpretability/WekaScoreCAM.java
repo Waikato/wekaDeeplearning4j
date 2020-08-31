@@ -14,9 +14,11 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
      */
     protected ProgressManager progressManager;
 
+    protected ScoreCAM scoreCAM;
+
     @Override
-    public void run(File imageFile) {
-        ScoreCAM scoreCAM = new ScoreCAM();
+    public void process(File imageFile) {
+        scoreCAM = new ScoreCAM();
         scoreCAM.setComputationGraph(getComputationGraph());
         scoreCAM.setBatchSize(batchSize);
         scoreCAM.setTargetClassID(targetClassID);
@@ -29,12 +31,16 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.addIterationIncrementListener(this::onIterationIncremented);
         scoreCAM.addIterationsFinishedListeners(this::onIterationsFinished);
 
-        scoreCAM.generateForImage(imageFile);
-
-        saveResult(scoreCAM);
+        scoreCAM.processMaskedImages(imageFile);
     }
 
-    private void saveResult(ScoreCAM scoreCAM) {
+    public void generateMap() {
+        scoreCAM.setTargetClassID(targetClassID);
+        scoreCAM.createHeatmaps();
+        saveResult();
+    }
+
+    private void saveResult() {
         if (Utils.notDefaultFileLocation(getOutputFile())) {
             try {
                 ImageIO.write(scoreCAM.getCompositeImage(), "png", getOutputFile());
