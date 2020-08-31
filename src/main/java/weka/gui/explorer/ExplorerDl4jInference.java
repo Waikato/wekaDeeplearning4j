@@ -3,6 +3,7 @@ package weka.gui.explorer;
 import lombok.SneakyThrows;
 import weka.core.*;
 
+import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
@@ -540,7 +541,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         SwingWorker worker = new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() throws Exception {
-
+                ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
+                manager.start();
                 int targetClassID = Integer.parseInt(classIDTextField.getText());
                 System.err.println("Generating for class = " + targetClassID);
 
@@ -562,7 +564,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
                 wrapper.setOutputFile(tmpFile);
                 processedExplorer.setSaliencyMapGenerator(wrapper);
-                processedExplorer.generateSaliencyMap();
+                processedExplorer.generateOutputMap();
+
+                manager.finish();
 
                 return filename;
             }
