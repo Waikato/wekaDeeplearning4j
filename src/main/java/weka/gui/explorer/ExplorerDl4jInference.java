@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import weka.core.*;
 
 import weka.dl4j.inference.Dl4jCNNExplorer;
+import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
@@ -17,6 +18,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Explorer panel for the Dl4j Model Inference Window
@@ -106,6 +108,19 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     static {
         GenericObjectEditor.registerEditors();
     }
+
+    protected Dl4jCNNExplorer processedExplorer;
+
+    /**
+     * Saliency map UI
+     */
+    JLabel targetClassLabel = new JLabel("Target Class ID:");
+    JTextField classIDTextField = new JTextField("235");
+    JLabel decodedClassName = new JLabel("  Class Name:");
+    JTextField classNameTextField = new JTextField("Doge");
+    JButton generateButton = new JButton("Generate");
+    JLabel saliencyImageLabel = new JLabel();
+
 
     /**
      * Sets the Explorer to use as parent frame (used for sending notifications
@@ -452,15 +467,14 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
         // Define the UI elements
-        ImageIcon image = new ImageIcon("C:\\Users\\comptonr\\Desktop\\rn101v2.png");
-        JLabel imageLabel = new JLabel(image);
+        ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
+        saliencyImageLabel.setIcon(defaultImage);
 
-        JLabel targetClassLabel = new JLabel("Target Class ID:");
-        JTextField classIDTextField = new JTextField("235");
-        JLabel decodedClassName = new JLabel("  Class Name:");
-        JTextField classNameTextField = new JTextField("Doge");
-        classNameTextField.setEnabled(false);
-        JButton generateButton = new JButton("Generate");
+        classNameTextField.setEditable(false);
+        generateButton.addActionListener(e -> generateSaliencyMap());
+
+        classIDTextField.setColumns(5);
+        classNameTextField.setColumns(40);
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
@@ -511,8 +525,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.gridy = 2;
 //        gbC.gridwidth = 3;
 //        gbC.insets = new Insets(0, 0, 20, 0);
-        gbL.setConstraints(imageLabel, gbC);
-        mainPanel.add(imageLabel);
+        gbL.setConstraints(saliencyImageLabel, gbC);
+        mainPanel.add(saliencyImageLabel);
 
         // Add panel to frame
         saliencyMapWindow.add(mainPanel);
@@ -520,6 +534,55 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         saliencyMapWindow.pack();
         saliencyMapWindow.setLocationRelativeTo(null);
         saliencyMapWindow.setVisible(true);
+    }
+
+    private void generateSaliencyMap() {
+        SwingWorker worker = new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+
+                int targetClassID = Integer.parseInt(classIDTextField.getText());
+                System.err.println("Generating for class = " + targetClassID);
+
+                AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
+                wrapper.setTargetClassID(targetClassID);
+
+                int leftLimit = 97; // letter 'a'
+                int rightLimit = 122; // letter 'z'
+                int targetStringLength = 10;
+                Random random = new Random();
+
+        String filename = random.ints(leftLimit, rightLimit + 1)
+                .limit(targetStringLength)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString() + ".png";
+
+//                String filename = "tmp.png";
+                File tmpFile = new File(filename);
+
+                wrapper.setOutputFile(tmpFile);
+                processedExplorer.setSaliencyMapGenerator(wrapper);
+                processedExplorer.generateSaliencyMap();
+
+                return filename;
+            }
+
+            @SneakyThrows
+            @Override
+            protected void done() {
+                super.done();
+                String filename = get();
+                ImageIcon newImage = new ImageIcon(filename);
+                saliencyImageLabel.setIcon(newImage);
+                saliencyImageLabel.invalidate();
+
+                new File(filename).delete();
+            }
+        };
+        worker.execute();
+
+
+//        tmpFile.delete();
     }
 
     /**
@@ -614,6 +677,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             saveResults(name, buffer);
             // Show these results
             m_History.setSingle(name);
+
+            processedExplorer = explorer;
 
             synchronized (this) {
                 m_Logger.statusMessage("OK");
