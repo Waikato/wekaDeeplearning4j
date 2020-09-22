@@ -109,6 +109,13 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         saliencyMapGenerator.setComputationGraph(model.getModel());
         saliencyMapGenerator.setZooModel(zooModelType);
         saliencyMapGenerator.processImage(imageFile);
+        if (shouldGenerateOutputMap()) {
+            generateOutputMap();
+        }
+    }
+
+    private boolean shouldGenerateOutputMap() {
+        return getGenerateSaliencyMap() && Utils.notDefaultFileLocation(saliencyMapGenerator.getOutputFile());
     }
 
     public void generateOutputMap() {
@@ -243,7 +250,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             // User wants to generate saliency map but hasn't supplied a location to save it to - throw an error
             if (explorer.getGenerateSaliencyMap() && !Utils.notDefaultFileLocation(explorer.saliencyMapGenerator.getOutputFile())) {
                 throw new WekaException("Please supply output file location in the saliency map generator options e.g.:\n" +
-                        "\t-saliency-map \".WekaScoreCAM -bs 8 -output output.jpg\"");
+                        "\t-saliency-map \".WekaScoreCAM -bs 8 -output output.png\"");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -254,7 +261,6 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         // Run the explorer
         explorer.init();
         explorer.makePrediction(new File(inputImagePath));
-        explorer.generateOutputMap();
         // Output the results to the command line
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }

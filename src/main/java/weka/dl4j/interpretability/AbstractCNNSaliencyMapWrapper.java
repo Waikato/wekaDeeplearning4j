@@ -84,6 +84,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
             commandLineParamSynopsis = "-output <file location>",
             displayOrder = 3
     )
+    @ProgrammaticProperty
     public File getOutputFile() {
         return outputFile;
     }
