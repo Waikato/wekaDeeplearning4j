@@ -4,7 +4,6 @@ import lombok.extern.log4j.Log4j2;
 
 // TODO document
 // TODO implement indeterminate bar
-
 @Log4j2
 public class TextProgressBar extends AbstractProgressBar {
 

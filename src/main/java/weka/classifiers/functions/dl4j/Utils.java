@@ -150,7 +150,6 @@ public class Utils {
           || iter instanceof CachingDataSetIterator) {
         next = getNext(iter);
       } else {
-        // TODO: figure out which batch size is feasible for inference
         final int batch = iter.batch() * 8;
         next = Utils.getNext(iter, batch);
       }

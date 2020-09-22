@@ -1713,7 +1713,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   public void setZooModel(AbstractZooModel zooModel) {
     this.zooModel = zooModel;
 
-    if (getLoadLayerSpecification()) { // TODO fix bug with layers not properly updating
+    if (getLoadLayerSpecification()) {
 
       progressManager = new ProgressManager("Initializing pretrained model and parsing layers (may require downloading weights)");
       progressManager.start();

@@ -367,11 +367,9 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
             // Parse each prediction
             for (int miniBatchI = 0; miniBatchI < actualBatchSize; miniBatchI++) {
+                // Save the probability for the target class
                 INDArray row = output.getRow(miniBatchI);
                 softmaxOnMaskedImages.putRow(fromIndex + miniBatchI, row);
-                // Save the probability for the target class
-//                double classProbVal = output.getDouble(miniBatchI, targetClassID);
-//                targetClassWeights[fromIndex + miniBatchI] = classProbVal;
             }
             // Fire the iteration increment listeners
             broadcastIterationIncremented();
@@ -379,7 +377,6 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         // Finish the iterations
         broadcastIterationsFinished();
         return softmaxOnMaskedImages;
-//        return Nd4j.create(targetClassWeights);
     }
 
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
@@ -413,7 +410,8 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
         // Upsample the activations to match original image size
         NDImage ndImage = new NDImage();
-        INDArray upsampledActivations = ndImage.imageResize(rawActivations, newSize, ImageResizeMethod.ResizeBicubic); // TODO try BiLinear
+        // Should use Bilinear interpolation but that seems to smooth over activations, removing them entirely
+        INDArray upsampledActivations = ndImage.imageResize(rawActivations, newSize, ImageResizeMethod.ResizeBicubic);
 
         // Drop the mini-batch size (1) from [1, 224, 224, 512]
         upsampledActivations = Nd4j.squeeze(upsampledActivations, 0);

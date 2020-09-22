@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 // TODO document
-// TODO calculate ETA
 public abstract class AbstractProgressBar implements Serializable {
 
-    protected boolean m_indeterminate = false; // TODO implement
+    protected boolean m_indeterminate = false;
 
     protected String m_progressMessage;
 

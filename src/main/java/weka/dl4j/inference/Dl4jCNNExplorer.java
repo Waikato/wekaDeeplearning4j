@@ -45,7 +45,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     protected boolean generateSaliencyMap = false;
 
     /**
-     * TODO change back to abstractSaliencyMap
+     * Class to generate a saliency map
      */
     protected AbstractCNNSaliencyMapWrapper saliencyMapGenerator = new WekaScoreCAM();
     /**

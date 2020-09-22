@@ -8,7 +8,6 @@ import weka.dl4j.zoo.keras.MobileNet;
 
 public class KerasMobileNet {
     // Uses RELU layer instead of RELU activation layer, which isn't currently supported in DL4J
-    // TODO investigate if it would be easy to implement
 
 //public class KerasMobileNet extends AbstractZooModel {
 //    private static final long serialVersionUID = 8206193669750977225L;

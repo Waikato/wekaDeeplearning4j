@@ -103,7 +103,6 @@ public class EpochListener extends TrainingListener {
               || iterator instanceof CachingDataSetIterator) {
             next = Utils.getNext(iterator);
           } else {
-            // TODO: figure out which batch size is feasible for inference
             final int batch = iterator.batch() * 8;
             next = Utils.getNext(iterator, batch);
           }
