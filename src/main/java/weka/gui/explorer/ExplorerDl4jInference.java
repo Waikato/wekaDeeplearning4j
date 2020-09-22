@@ -1,6 +1,7 @@
 package weka.gui.explorer;
 
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import weka.core.*;
 
 import weka.core.progress.ProgressManager;
@@ -25,6 +26,7 @@ import java.util.Random;
  * Explorer panel for the Dl4j Model Inference Window
  * @author - Rhys Compton
  */
+@Log4j2
 public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogHandler {
 
     /** the parent frame */
@@ -115,10 +117,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /**
      * Saliency map UI
      */
-    JLabel targetClassLabel = new JLabel("Target Class ID:");
-    JTextField classIDTextField = new JTextField("235");
-    JLabel decodedClassName = new JLabel("  Class Name:");
-    JTextField classNameTextField = new JTextField("Doge");
+    JLabel targetClassIDLabel = new JLabel("Target Class ID:");
+    JTextField targetClassIDInput = new JTextField("235");
+    JLabel classNameLabel = new JLabel("  Class Name:");
+    JTextField classNameInput = new JTextField("Doge");
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
 
@@ -455,7 +457,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         int returnCode = m_FileChooser.showOpenDialog(this);
 
         if (returnCode == 1) {
-            System.err.println("User did not select a new image");
+            log.error("User did not select a new image");
             return;
         }
 
@@ -464,18 +466,25 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         refreshImagePanel();
     }
 
+    private String getDefaultClassID() {
+        return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
+    }
+
     protected void openSaliencyMapWindow() {
         JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
+
+        // Setup the button listeners
+        generateButton.addActionListener(e -> generateSaliencyMap());
+        // Set the default class ID in the window
+        targetClassIDInput.setText(getDefaultClassID());
 
         // Define the UI elements
         ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
         saliencyImageLabel.setIcon(defaultImage);
 
-        classNameTextField.setEditable(false);
-        generateButton.addActionListener(e -> generateSaliencyMap());
-
-        classIDTextField.setColumns(5);
-        classNameTextField.setColumns(40);
+        targetClassIDInput.setColumns(5);
+        classNameInput.setColumns(40);
+        classNameInput.setEditable(false);
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
@@ -486,10 +495,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        configPanel.add(targetClassLabel);
-        configPanel.add(classIDTextField);
-        configPanel.add(decodedClassName);
-        configPanel.add(classNameTextField);
+        configPanel.add(targetClassIDLabel);
+        configPanel.add(targetClassIDInput);
+        configPanel.add(classNameLabel);
+        configPanel.add(classNameInput);
 
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
@@ -497,21 +506,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.gridy = 0;
         gbL.setConstraints(configPanel, gbC);
         mainPanel.add(configPanel);
-//
-//        gbC = new GridBagConstraints();
-//        gbC.anchor = GridBagConstraints.CENTER;
-//        gbC.gridx = 1;
-//        gbC.gridy = 0;
-//        gbL.setConstraints(classIDTextField, gbC);
-//        mainPanel.add(classIDTextField);
-//
-//        gbC = new GridBagConstraints();
-//        gbC.anchor = GridBagConstraints.WEST;
-//        gbC.gridx = 2;
-//        gbC.gridy = 0;
-//        gbL.setConstraints(decodedClassName, gbC);
-//        mainPanel.add(decodedClassName);
-//
+
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
@@ -543,8 +538,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             protected String doInBackground() throws Exception {
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
-                int targetClassID = Integer.parseInt(classIDTextField.getText());
-                System.err.println("Generating for class = " + targetClassID);
+                int targetClassID = Integer.parseInt(targetClassIDInput.getText());
+                log.info("Generating for class = " + targetClassID);
 
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
                 wrapper.setTargetClassID(targetClassID);
@@ -665,7 +660,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             try {
                 explorer.init();
             } catch (Exception ex) {
-                System.err.println("Couldn't initialise model");
+                log.error("Couldn't initialise model");
                 ex.printStackTrace();
                 return;
             }
