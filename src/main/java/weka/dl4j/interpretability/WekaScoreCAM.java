@@ -1,5 +1,6 @@
 package weka.dl4j.interpretability;
 
+import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.progress.ProgressManager;
 
@@ -7,6 +8,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 // TODO Document
+@Log4j2
 public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
     /**
@@ -42,19 +44,19 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
     private void saveResult() {
         if (Utils.notDefaultFileLocation(getOutputFile())) {
-            System.out.println(String.format("Output file location = %s", getOutputFile()));
+            log.info(String.format("Output file location = %s", getOutputFile()));
             try {
                 ImageIO.write(scoreCAM.getCompositeImage(), "png", getOutputFile());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
-            System.err.println("No output file location given - not saving saliency map");
+            log.error("No output file location given - not saving saliency map");
         }
     }
 
     private void onIterationsStarted(int maxIterations) {
-        progressManager = new ProgressManager(maxIterations, "Calculating Saliency Map...");
+        progressManager = new ProgressManager(maxIterations, String.format("Calculating Saliency Map with a batch size of %d...", scoreCAM.getBatchSize()));
         progressManager.start();
     }
 
