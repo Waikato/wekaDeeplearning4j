@@ -116,7 +116,7 @@ public abstract class KerasZooModel extends ZooModel implements Serializable {
         try {
             return ModelSerializer.restoreComputationGraph(cachedFile);
         } catch (Exception ex) {
-            System.err.println("Failed to load model");
+            log.error("Failed to load model");
             ex.printStackTrace();
             return null;
         }

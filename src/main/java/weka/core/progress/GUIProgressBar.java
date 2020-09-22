@@ -82,7 +82,6 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
     @Override
     public void finish() {
-        System.err.println("Closing...");
         if (currentFrame != null) {
             currentFrame.dispose();
         }

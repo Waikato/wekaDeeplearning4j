@@ -1,5 +1,6 @@
 package weka.dl4j.scripts.keras_downloading;
 
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.conf.CNN2DFormat;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
  * importing from Keras files every time, and is fine to do in this case because
  * WDL4J defines a fixed set of models - this process only needs to be done once.
  */
+@Log4j2
 public class KerasModelConverter {
 
     private static String modelSummariesPath = "";
@@ -37,7 +39,7 @@ public class KerasModelConverter {
                 method = InputType.class.getMethod("setDefaultCNN2DFormat", CNN2DFormat.class);
                 method.invoke(null, CNN2DFormat.NCHW);
             } catch (NoSuchMethodException ex) {
-                System.err.println("setDefaultCNN2DFormat() not found on InputType class... " +
+                log.error("setDefaultCNN2DFormat() not found on InputType class... " +
                         "Are you using the custom built deeplearning4j-nn.jar?");
                 System.exit(1);
             }
@@ -57,7 +59,7 @@ public class KerasModelConverter {
             kerasModel.save(new File(newZip));
             System.out.println("Saved file " + newZip);
         } catch (Exception e) {
-            System.err.println("\n\nCouldn't save " + modelFile.getName());
+            log.error("\n\nCouldn't save " + modelFile.getName());
             e.printStackTrace();
         }
     }

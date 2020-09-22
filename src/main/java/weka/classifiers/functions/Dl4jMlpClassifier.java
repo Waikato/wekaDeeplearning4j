@@ -1121,7 +1121,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
           }
           if (!cacheDir.delete()) {
             // remove old existing cache
-            System.err.println("Unable to delete cache dir "
+            log.error("Unable to delete cache dir "
                 + cacheDir.toString());
           }
         }
@@ -1729,11 +1729,11 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         protected void done() {
           super.done();
           try {
-            System.out.println("Done reached");
+            log.debug("Done reached");
             layers = get();
-            System.out.println("Layers updated");
+            log.debug("Layers updated");
           } catch (ExecutionException ex) {
-            System.err.println("Error while getting layer results!");
+            log.error("Error while getting layer results!");
             ex.printStackTrace();
           }
           progressManager.finish();
@@ -1744,7 +1744,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   private Layer[] parseLayers() {
-    System.out.println("Starting parse layers");
+    log.debug("Starting parse layers");
     ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
     Layer[] tmpLayers = new Layer[0];
     try {
@@ -1769,7 +1769,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     } finally {
       Thread.currentThread().setContextClassLoader(origLoader);
     }
-    System.out.println("Finishing parse layers");
+    log.debug("Finishing parse layers");
     return tmpLayers;
   }
 
