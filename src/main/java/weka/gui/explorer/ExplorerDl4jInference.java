@@ -254,8 +254,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         // Show the associated image when a results item is clicked on the results panel
         // Showing the appropriate results output is already handled by the ResultHistoryPanel
         m_History.getList().addListSelectionListener(e -> {
-            m_currentlyDisplayedImage = (String) m_History.getSelectedObject();
-            refreshImagePanel();
+            PredictionResult selectedResult = (PredictionResult) m_History.getSelectedObject();
+            loadPredictionsFromHistory(selectedResult);
+            refreshState();
         });
         return historyHolder;
     }
@@ -639,7 +640,16 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void saveResults(String name, StringBuffer buffer) {
         m_History.addResult(name, buffer);
-        m_History.addObject(name, m_currentlyDisplayedImage);
+        m_History.addObject(name, savePredictionsForHistory());
+    }
+
+    private PredictionResult savePredictionsForHistory() {
+        return new PredictionResult(m_currentlyDisplayedImage, processedExplorer);
+    }
+
+    private void loadPredictionsFromHistory(PredictionResult result) {
+        m_currentlyDisplayedImage = result.imagePath;
+        processedExplorer = result.processedExplorer;
     }
 
     /**
@@ -672,12 +682,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
             String name = new SimpleDateFormat("HH:mm:ss - ").format(new Date());
             name += explorer.getModelName();
-
+            processedExplorer = explorer;
             saveResults(name, buffer);
+
             // Show these results
             m_History.setSingle(name);
-
-            processedExplorer = explorer;
 
             synchronized (this) {
                 m_Logger.statusMessage("OK");
@@ -710,6 +719,16 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             m_RunThread = new Thread(this::runInference);
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();
+        }
+    }
+
+    private class PredictionResult {
+        private String imagePath;
+        private Dl4jCNNExplorer processedExplorer;
+
+        public PredictionResult(String imagePath, Dl4jCNNExplorer processedExplorer) {
+            this.imagePath = imagePath;
+            this.processedExplorer = processedExplorer;
         }
     }
 }
