@@ -286,7 +286,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_predictButton.setEnabled(false);
         m_predictButton.addActionListener(e -> predict());
 
-//        m_saliencyMapButton.setEnabled(false);
+        m_saliencyMapButton.setEnabled(false);
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
     }
 
@@ -465,6 +465,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         File f = m_FileChooser.getSelectedFile();
         m_currentlyDisplayedImage = f.getAbsolutePath();
         refreshImagePanel();
+        refreshState();
     }
 
     private String getDefaultClassID() {
@@ -588,7 +589,12 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /**
      * Refresh the image panel to show the currently selected image
      */
-    protected void refreshImagePanel() {
+    protected void refreshState() {
+        _refreshImagePanel();
+        _refreshButtonsEnabled();
+    }
+
+    private void _refreshImagePanel() {
         if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage == "") {
             return;
         }
@@ -602,8 +608,13 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         ImageIcon scaledIcon = scaleImage(imageIcon, desiredWidth, desiredHeight);
 
         imageLabel.setIcon(scaledIcon);
+    }
 
+    private void _refreshButtonsEnabled() {
         m_predictButton.setEnabled(true);
+
+        boolean saliencyMapEnabled = processedExplorer != null && processedExplorer.getGenerateSaliencyMap();
+        m_saliencyMapButton.setEnabled(saliencyMapEnabled);
     }
 
     /**
