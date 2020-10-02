@@ -280,7 +280,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         try {
-            log.info(String.format("Downloading %s weights", m_pretrainedType));
             Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
             if (pretrained == null) {
                 throw new Exception("Error while initialising model");
