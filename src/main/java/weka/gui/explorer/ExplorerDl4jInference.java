@@ -117,6 +117,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /**
      * Saliency map UI
      */
+    JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
     JLabel targetClassIDLabel = new JLabel("Target Class ID:");
     JTextField targetClassIDInput = new JTextField("235");
     JLabel classNameLabel = new JLabel("  Class Name:");
@@ -212,6 +213,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         JPanel imagePanel = setupImagePanel();
 
         setupMainLayout(optionsPanel, historyPanel, modelOutput, imagePanel);
+
+        createSaliencyMapWindow();
     }
 
     /**
@@ -464,7 +467,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         File f = m_FileChooser.getSelectedFile();
         m_currentlyDisplayedImage = f.getAbsolutePath();
-        refreshImagePanel();
         refreshState();
     }
 
@@ -472,13 +474,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
     }
 
-    protected void openSaliencyMapWindow() {
-        JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
-
+    private void createSaliencyMapWindow() {
         // Setup the button listeners
         generateButton.addActionListener(e -> generateSaliencyMap());
-        // Set the default class ID in the window
-        targetClassIDInput.setText(getDefaultClassID());
 
         // Define the UI elements
         ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
@@ -528,6 +526,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         // Add panel to frame
         saliencyMapWindow.add(mainPanel);
+    }
+
+    protected void openSaliencyMapWindow() {
+        // Set the default class ID in the window
+        targetClassIDInput.setText(getDefaultClassID());
 
         saliencyMapWindow.pack();
         saliencyMapWindow.setLocationRelativeTo(null);
