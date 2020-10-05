@@ -11,6 +11,7 @@ import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.zoo.*;
 
+import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -120,6 +121,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     public void generateOutputMap() {
         saliencyMapGenerator.generateOutputMap();
+    }
+
+    public Image generateOutmapToImage() {
+        return saliencyMapGenerator.generateOutputMapToImage();
     }
 
     /**

@@ -5,6 +5,7 @@ import weka.classifiers.functions.dl4j.Utils;
 import weka.core.progress.ProgressManager;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
 
 // TODO Document
@@ -35,11 +36,21 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.processMaskedImages(imageFile);
     }
 
-    @Override
-    public void generateOutputMap() {
+    private void generate() {
         scoreCAM.setTargetClassID(targetClassID);
         scoreCAM.generateOutputMap();
+    }
+
+    @Override
+    public void generateOutputMap() {
+        generate();
         saveResult();
+    }
+
+    @Override
+    public Image generateOutputMapToImage() {
+        generate();
+        return scoreCAM.getCompositeImage();
     }
 
     private void saveResult() {

@@ -8,6 +8,7 @@ import weka.core.OptionMetadata;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
 
+import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -29,6 +30,8 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
     public abstract void processImage(File imageFile);
 
     public abstract void generateOutputMap();
+
+    public abstract Image generateOutputMapToImage();
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;
