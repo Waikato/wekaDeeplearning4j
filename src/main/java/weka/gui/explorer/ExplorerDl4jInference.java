@@ -475,7 +475,42 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private String getDefaultClassID() {
-        return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
+        if (processedExplorer != null)
+            return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
+        else
+            return "" + -1;
+    }
+
+    private String getClassName(int classID) {
+        String[] classMap;
+        try {
+            classMap = processedExplorer.getModelOutputDecoder().getClasses();
+        } catch (Exception ex) {
+            classMap = new String[]{};
+        }
+        try {
+            return classMap[classID];
+        } catch (IndexOutOfBoundsException ex) {
+            return null;
+        }
+    }
+
+    private void updateClassNameInput() {
+        String targetClassIDText = targetClassIDInput.getText();
+        if (targetClassIDText.isEmpty()) {
+            return;
+        }
+        int classID;
+        try {
+            classID = Integer.parseInt(targetClassIDText);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null,
+                    "Error: Please enter a valid integer value", "Error Message",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String newClassName = getClassName(classID);
+        classNameInput.setText(newClassName);
     }
 
     private void setupSaliencyMapWindow() {
@@ -489,6 +524,22 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         targetClassIDInput.setColumns(5);
         classNameInput.setColumns(40);
         classNameInput.setEditable(false);
+        targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+        });
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
