@@ -516,14 +516,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     private void setupSaliencyMapWindow() {
         // Setup the button listeners
         generateButton.addActionListener(e -> generateSaliencyMap());
-
-        // Define the UI elements
-        ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
-        saliencyImageLabel.setIcon(defaultImage);
-
-        targetClassIDInput.setColumns(5);
-        classNameInput.setColumns(40);
-        classNameInput.setEditable(false);
         targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -540,6 +532,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 updateClassNameInput();
             }
         });
+
+        // Define the UI elements
+        targetClassIDInput.setColumns(5);
+        classNameInput.setColumns(40);
+        classNameInput.setEditable(false);
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
@@ -582,6 +579,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     protected void openSaliencyMapWindow() {
+        // Reset the image
+        ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
+        saliencyImageLabel.setIcon(defaultImage);
+
         // Set the default class ID in the window
         targetClassIDInput.setText(getDefaultClassID());
 
@@ -614,18 +615,13 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             @Override
             protected void done() {
                 super.done();
-                Image imageFile = (Image) get();
+                Image imageFile = get();
                 ImageIcon newImage = new ImageIcon(imageFile);
                 saliencyImageLabel.setIcon(newImage);
                 saliencyImageLabel.invalidate();
-
-//                new File(imageFile).delete();
             }
         };
         worker.execute();
-
-
-//        tmpFile.delete();
     }
 
     /**
