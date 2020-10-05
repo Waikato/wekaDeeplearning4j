@@ -35,6 +35,10 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected BufferedImage compositeImage;
 
+    protected String modelName;
+
+    protected String inputFilename;
+
     public abstract void processImage(File imageFile);
 
     public abstract void generateOutputMap();
@@ -125,5 +129,21 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public void setModelInputShape(InputType.InputTypeConvolutional modelInputShape) {
         this.modelInputShape = modelInputShape;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
+    public String getInputFilename() {
+        return inputFilename;
+    }
+
+    public void setInputFilename(String inputFilename) {
+        this.inputFilename = inputFilename;
     }
 }

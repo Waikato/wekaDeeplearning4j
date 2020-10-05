@@ -34,6 +34,8 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     protected int insidePadding = 20;
 
+    protected int fontSpacing = 12;
+
     protected INDArray originalImageArr, preprocessedImageArr, softmaxOnMaskedImages, normalisedActivations;
 
     public void processMaskedImages(File imageFile) {
@@ -199,11 +201,13 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     private int calculateCompositeWidth() {
+        // Outside margins plus images plus padding
         return outsideBorder * 2 + (insidePadding * 2) + ((int) modelInputShape.getWidth() * 3);
     }
 
     private int calculateCompositeHeight() {
-        return outsideBorder * 2 + (int) modelInputShape.getHeight();
+        // OUtside margins plus image height plus space for text
+        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing * 3);
     }
 
     private void createCompositeImage() {
@@ -231,6 +235,14 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         int rightX = (int) (outsideBorder + (modelInputShape.getWidth() * 2) + (insidePadding * 2));
         int rightY = outsideBorder;
         g.drawImage(getHeatmapOnImage(), rightX, rightY, null);
+
+        // Draw the map info
+        int textX = leftX;
+        int textY = leftY + (int) modelInputShape.getHeight() + (fontSpacing * 2);
+        g.setColor(Color.BLACK);
+//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
+        g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
+                getModelName(), getInputFilename()), textX, textY);
 
         g.dispose();
     }
@@ -441,6 +453,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     private INDArray loadImage(File imageFile) {
+        setInputFilename(imageFile.getName());
         // Load the image
         NativeImageLoader loader = new NativeImageLoader(modelInputShape.getHeight(), modelInputShape.getWidth(), modelInputShape.getChannels());
         try {

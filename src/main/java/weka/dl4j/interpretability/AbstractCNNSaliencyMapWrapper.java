@@ -66,7 +66,9 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     @OptionMetadata(
             displayName = "Target Class",
-            description = "Output class to generate saliency maps for; default is -1 (use the highest probability class)",
+            description = "Output class to generate saliency maps for; default is -1 (use the highest probability class). " +
+                    "This only needs to be set if wanting to use a non-default class from the *command line*; if using the *GUI*, " +
+                    "the 'View Saliency Map' window contains the interface for setting ",
             commandLineParamName = "target-class",
             commandLineParamSynopsis = "-target-class <int>",
             displayOrder = 2

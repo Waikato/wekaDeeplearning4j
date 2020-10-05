@@ -535,6 +535,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         // Define the UI elements
         targetClassIDInput.setColumns(5);
+        targetClassIDInput.setToolTipText("-1 to use max probability class");
         classNameInput.setColumns(40);
         classNameInput.setEditable(false);
 
