@@ -6,6 +6,7 @@ import weka.core.*;
 
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
+import weka.dl4j.inference.ModelOutputDecoder;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
@@ -14,6 +15,8 @@ import weka.gui.explorer.Explorer.LogHandler;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
@@ -206,6 +209,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         setupButtonListeners();
 
+        setupSaliencyMapWindow();
+
         JPanel optionsPanel = setupMainButtons();
 
         JPanel modelOutput = setupOutputPanel();
@@ -214,7 +219,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         setupMainLayout(optionsPanel, historyPanel, modelOutput, imagePanel);
 
-        createSaliencyMapWindow();
     }
 
     /**
@@ -474,7 +478,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
     }
 
-    private void createSaliencyMapWindow() {
+    private void setupSaliencyMapWindow() {
         // Setup the button listeners
         generateButton.addActionListener(e -> generateSaliencyMap());
 
@@ -519,8 +523,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 2;
-//        gbC.gridwidth = 3;
-//        gbC.insets = new Insets(0, 0, 20, 0);
         gbL.setConstraints(saliencyImageLabel, gbC);
         mainPanel.add(saliencyImageLabel);
 
@@ -538,9 +540,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void generateSaliencyMap() {
-        SwingWorker worker = new SwingWorker<String, Void>() {
+        SwingWorker<Image, Void> worker = new SwingWorker<Image, Void>() {
             @Override
-            protected String doInBackground() throws Exception {
+            protected Image doInBackground() {
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
                 int targetClassID = Integer.parseInt(targetClassIDInput.getText());
