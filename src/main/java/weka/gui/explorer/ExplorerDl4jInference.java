@@ -602,38 +602,24 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
                 wrapper.setTargetClassID(targetClassID);
 
-                int leftLimit = 97; // letter 'a'
-                int rightLimit = 122; // letter 'z'
-                int targetStringLength = 10;
-                Random random = new Random();
-
-        String filename = random.ints(leftLimit, rightLimit + 1)
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString() + ".png";
-
-//                String filename = "tmp.png";
-                File tmpFile = new File(filename);
-
-                wrapper.setOutputFile(tmpFile);
                 processedExplorer.setSaliencyMapGenerator(wrapper);
-                processedExplorer.generateOutputMap();
+                Image outputMap = processedExplorer.generateOutmapToImage();
 
                 manager.finish();
 
-                return filename;
+                return outputMap;
             }
 
             @SneakyThrows
             @Override
             protected void done() {
                 super.done();
-                String filename = get();
-                ImageIcon newImage = new ImageIcon(filename);
+                Image imageFile = (Image) get();
+                ImageIcon newImage = new ImageIcon(imageFile);
                 saliencyImageLabel.setIcon(newImage);
                 saliencyImageLabel.invalidate();
 
-                new File(filename).delete();
+//                new File(imageFile).delete();
             }
         };
         worker.execute();
@@ -757,6 +743,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
             synchronized (this) {
                 m_Logger.statusMessage("OK");
+                openSaliencyMapWindow();
             }
         } catch (Exception ex) {
             m_Logger.statusMessage("Error occured");
