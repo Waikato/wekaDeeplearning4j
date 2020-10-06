@@ -574,7 +574,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.gridy = 2;
         gbL.setConstraints(saliencyImageLabel, gbC);
         mainPanel.add(saliencyImageLabel);
-
+        
         // Add panel to frame
         saliencyMapWindow.add(mainPanel);
     }
@@ -620,6 +620,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 ImageIcon newImage = new ImageIcon(imageFile);
                 saliencyImageLabel.setIcon(newImage);
                 saliencyImageLabel.invalidate();
+
+                // Pack
+                saliencyMapWindow.pack();
             }
         };
         worker.execute();
