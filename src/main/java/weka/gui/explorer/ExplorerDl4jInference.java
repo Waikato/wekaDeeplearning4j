@@ -493,26 +493,31 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 BorderFactory.createTitledBorder("Saliency Map Viewer"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        configPanel.add(targetClassIDLabel);
-        configPanel.add(targetClassIDInput);
-        configPanel.add(classNameLabel);
-        configPanel.add(classNameInput);
-
+        // Setup top row in saliency window - labels and text fields
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topRow.add(targetClassIDLabel);
+        topRow.add(targetClassIDInput);
+        topRow.add(classNameLabel);
+        topRow.add(classNameInput);
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 0;
-        gbL.setConstraints(configPanel, gbC);
-        mainPanel.add(configPanel);
+        gbL.setConstraints(topRow, gbC);
+        mainPanel.add(topRow);
 
+        // Setup second row - Normalize checkbox and Generate button
+        JPanel secondRow = new JPanel(new GridLayout(1, 3, 30, 5));
+        secondRow.add(normalizeHeatmapCheckbox);
+        secondRow.add(generateButton);
+        secondRow.add(saveHeatmapButton);
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 1;
         gbC.insets = new Insets(5, 0, 20, 0);
-        gbL.setConstraints(generateButton, gbC);
-        mainPanel.add(generateButton);
+        gbL.setConstraints(secondRow, gbC);
+        mainPanel.add(secondRow);
 
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
