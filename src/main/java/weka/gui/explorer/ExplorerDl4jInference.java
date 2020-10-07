@@ -127,6 +127,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     JTextField classNameInput = new JTextField("Doge");
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
+    JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
 
 
     /**
@@ -599,10 +600,12 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
                 int targetClassID = Integer.parseInt(targetClassIDInput.getText());
+                boolean normalize = normalizeHeatmapCheckbox.isSelected();
                 log.info("Generating for class = " + targetClassID);
 
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
                 wrapper.setTargetClassID(targetClassID);
+                wrapper.setNormalizeHeatmap(normalize);
 
                 processedExplorer.setSaliencyMapGenerator(wrapper);
                 Image outputMap = processedExplorer.generateOutmapToImage();
@@ -712,6 +715,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     private void runInference() {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
         try {
+            synchronized (this) {
+                m_startButton.setEnabled(false);
+            }
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
             m_Logger.statusMessage("Initializing...");
@@ -743,7 +749,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
             synchronized (this) {
                 m_Logger.statusMessage("OK");
-                openSaliencyMapWindow();
+                if (processedExplorer.getGenerateSaliencyMap())
+                    openSaliencyMapWindow();
             }
         } catch (Exception ex) {
             m_Logger.statusMessage("Error occured");
@@ -752,7 +759,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             Thread.currentThread().setContextClassLoader(origLoader);
 
             synchronized (this) {
-                m_predictButton.setEnabled(true);
+                m_startButton.setEnabled(true);
                 m_RunThread = null;
 
                 if (m_Logger instanceof TaskLogger) {
@@ -767,9 +774,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void predict() {
         if (m_RunThread == null) {
-            synchronized (this) {
-                m_predictButton.setEnabled(false);
-            }
             m_RunThread = new Thread(this::runInference);
             m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();

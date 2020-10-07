@@ -39,6 +39,8 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected String inputFilename;
 
+    protected boolean normalizeHeatmap = true;
+
     public abstract void processImage(File imageFile);
 
     public abstract void generateOutputMap();
@@ -145,5 +147,13 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public void setInputFilename(String inputFilename) {
         this.inputFilename = inputFilename;
+    }
+
+    public boolean getNormalizeHeatmap() {
+        return normalizeHeatmap;
+    }
+
+    public void setNormalizeHeatmap(boolean normalizeHeatmap) {
+        this.normalizeHeatmap = normalizeHeatmap;
     }
 }

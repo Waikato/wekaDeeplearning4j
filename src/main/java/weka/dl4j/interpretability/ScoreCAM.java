@@ -181,6 +181,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
                 double normVal = postprocessedActivations.getDouble(row, col);
                 int colorIndex = (int) Math.floor(normVal * (gradientColors.length - 1));
 
+                // Limit it on the highest color
+                // - if we're not normalizing the heatmap then this can cause IndexOutOfBoundsException otherwise
+                // E.g., colorIndex = 610 with 500 gradientColors - colorIndex is now 499.
+                colorIndex = Math.min(colorIndex, gradientColors.length - 1);
+
                 Color color = gradientColors[colorIndex];
                 g.setColor(color);
                 g.fillRect(col, row, 1, 1);
@@ -242,7 +247,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         g.setColor(Color.BLACK);
 //        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
         g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
-                getModelName(), getInputFilename()), textX, textY);
+                getInputFilename(), getModelName()), textX, textY);
 
         g.dispose();
     }
@@ -274,7 +279,8 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         // Perform pixel-wise RELU
         INDArray reluActivations = Transforms.relu(summed);
 
-        normalize2x2ArrayI(reluActivations);
+        if (getNormalizeHeatmap())
+            normalize2x2ArrayI(reluActivations);
 
         return reluActivations;
     }

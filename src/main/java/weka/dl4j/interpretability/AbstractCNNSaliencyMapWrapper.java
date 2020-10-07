@@ -23,6 +23,8 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected File outputFile = new File(Utils.defaultFileLocation());
 
+    protected boolean normalizeHeatmap = true;
+
     protected ComputationGraph computationGraph;
 
     protected AbstractZooModel zooModel;
@@ -68,7 +70,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
             displayName = "Target Class",
             description = "Output class to generate saliency maps for; default is -1 (use the highest probability class). " +
                     "This only needs to be set if wanting to use a non-default class from the *command line*; if using the *GUI*, " +
-                    "the 'View Saliency Map' window contains the interface for setting ",
+                    "the 'View Saliency Map' window contains the interface for setting this.",
             commandLineParamName = "target-class",
             commandLineParamSynopsis = "-target-class <int>",
             displayOrder = 2
@@ -96,6 +98,22 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     public void setOutputFile(File outputFileLocation) {
         this.outputFile = outputFileLocation;
+    }
+
+    @OptionMetadata(
+            displayName = "Normalize heatmap",
+            description = "When generating the heatmap, should the values be normalized to be in [0, 1]",
+            commandLineParamName = "normalize",
+            commandLineParamSynopsis = "-normalize",
+            commandLineParamIsFlag = true
+    )
+    @ProgrammaticProperty
+    public boolean getNormalizeHeatmap() {
+        return normalizeHeatmap;
+    }
+
+    public void setNormalizeHeatmap(boolean normalizeHeatmap) {
+        this.normalizeHeatmap = normalizeHeatmap;
     }
 
     /**
