@@ -6,7 +6,6 @@ import weka.core.*;
 
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
-import weka.dl4j.inference.ModelOutputDecoder;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
@@ -23,7 +22,6 @@ import java.awt.event.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Random;
 
 /**
  * Explorer panel for the Dl4j Model Inference Window
@@ -78,7 +76,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     protected JButton m_OpenImageButton = new JButton("Open Image...");
 
     /** Click to start running the classifier. */
-    protected JButton m_predictButton = new JButton("Predict");
+    protected JButton m_startButton = new JButton("Start");
+
+    /** Click to stop running the classifier. */
+    protected JButton m_stopButton = new JButton("Stop");
 
     /** Click to view Saliency Map */
     protected JButton m_saliencyMapButton = new JButton("View Saliency Map...");
@@ -274,7 +275,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void setupToolTipText() {
         m_OpenImageButton.setToolTipText("Open an image for prediction");
-        m_predictButton.setToolTipText("Run prediction on the image");
+        m_startButton.setToolTipText("Run prediction on the image");
         m_saliencyMapButton.setToolTipText("View the saliency map for this image and model");
     }
 
@@ -318,6 +319,12 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbL.setConstraints(m_OpenImageButton, gbC);
         optionsPanel.add(m_OpenImageButton);
 
+        JPanel ssButs = new JPanel();
+        ssButs.setBorder(BorderFactory.createEmptyBorder(5,0,5,0));
+        ssButs.setLayout(new GridLayout(1, 2, 5, 5));
+        ssButs.add(m_startButton);
+        ssButs.add(m_stopButton);
+
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.fill = GridBagConstraints.HORIZONTAL;
@@ -325,8 +332,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.gridx = 0;
         gbC.weightx = 100;
         gbC.insets = new Insets(0, 10, 10, 10);
-        gbL.setConstraints(m_predictButton, gbC);
-        optionsPanel.add(m_predictButton);
+        gbL.setConstraints(ssButs, gbC);
+        optionsPanel.add(ssButs);
 
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
@@ -587,6 +594,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         // Set the default class ID in the window
         targetClassIDInput.setText(getDefaultClassID());
+        normalizeHeatmapCheckbox.setSelected(true);
 
         saliencyMapWindow.pack();
         saliencyMapWindow.setLocationRelativeTo(null);
@@ -656,7 +664,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void _refreshButtonsEnabled() {
-        m_predictButton.setEnabled(true);
+        boolean predictButtonEnabled = !m_currentlyDisplayedImage.equals("");
+        m_startButton.setEnabled(predictButtonEnabled);
 
         boolean saliencyMapEnabled = processedExplorer != null && processedExplorer.getGenerateSaliencyMap();
         m_saliencyMapButton.setEnabled(saliencyMapEnabled);
