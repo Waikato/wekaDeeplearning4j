@@ -12,11 +12,6 @@ import java.io.File;
 @Log4j2
 public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
-    /**
-     * Displays progress of the current process (feature extraction, training, etc.)
-     */
-    protected ProgressManager progressManager;
-
     protected ScoreCAM scoreCAM;
 
     @Override

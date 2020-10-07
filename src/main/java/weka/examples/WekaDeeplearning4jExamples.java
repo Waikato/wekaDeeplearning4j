@@ -4,6 +4,7 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instances;
 import weka.core.converters.ImageDirectoryLoader;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.dl4j.interpretability.WekaScoreCAM;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -20,7 +21,16 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        inference();
+        textProgressBarTest();
+    }
+
+    public static void textProgressBarTest() throws InterruptedException {
+        ProgressManager progressManager = new ProgressManager("Test indeterminate message");
+        progressManager.start();
+
+        Thread.sleep(100000);
+
+        progressManager.finish();
     }
 
     public static void commandLineProgressTest() throws Exception {
@@ -88,7 +98,8 @@ public class WekaDeeplearning4jExamples {
         inst.setClassIndex(1);
 
         Dl4jMlpClassifier classifier = new Dl4jMlpClassifier();
-        classifier.setNumEpochs(3);
+        classifier.setNumEpochs(0);
+        classifier.setLoadLayerSpecification(true);
 
         KerasDenseNet kerasEfficientNet = new KerasDenseNet();
 //        kerasEfficientNet.setVariation(ResNet.VARIATION.RESNET50V2);

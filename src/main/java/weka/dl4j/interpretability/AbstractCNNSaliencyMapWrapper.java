@@ -5,6 +5,7 @@ import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
 
@@ -16,6 +17,11 @@ import java.util.Enumeration;
 // TODO Document
 
 public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, OptionHandler {
+
+    /**
+     * Displays progress of the current process (feature extraction, training, etc.)
+     */
+    protected ProgressManager progressManager;
 
     protected int batchSize = 1;
 
@@ -114,6 +120,10 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     public void setNormalizeHeatmap(boolean normalizeHeatmap) {
         this.normalizeHeatmap = normalizeHeatmap;
+    }
+
+    public ProgressManager getProgressManager() {
+        return progressManager;
     }
 
     /**

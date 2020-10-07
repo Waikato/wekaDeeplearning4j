@@ -51,6 +51,10 @@ public class ProgressManager implements Serializable {
             // Create the text progress bar as we're running it from code/command line
             progressBar = new TextProgressBar(maxProgress, progressMessage);
         }
+
+        if (maxProgress == -1) {
+            progressBar.setIndeterminate(true);
+        }
     }
 
     /**

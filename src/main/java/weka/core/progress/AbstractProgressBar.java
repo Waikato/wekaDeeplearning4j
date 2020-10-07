@@ -65,7 +65,9 @@ public abstract class AbstractProgressBar implements Serializable {
 
     public void setProgress(double progress) {
         // Limit the progress to the max previously set
-        m_actualProgress = Math.min(progress, m_maxProgress);
+        m_actualProgress = progress;
+        if (!m_indeterminate)
+            m_actualProgress = Math.min(m_actualProgress, m_maxProgress);
 
         calculate();
         onSetProgress();
@@ -91,5 +93,13 @@ public abstract class AbstractProgressBar implements Serializable {
 
     public String getETAString() {
         return m_indeterminate ? "" : String.format("ETA: %s", etaHms);
+    }
+
+    public boolean isIndeterminate() {
+        return m_indeterminate;
+    }
+
+    public void setIndeterminate(boolean m_indeterminate) {
+        this.m_indeterminate = m_indeterminate;
     }
 }
