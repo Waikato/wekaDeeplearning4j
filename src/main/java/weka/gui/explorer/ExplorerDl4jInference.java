@@ -48,9 +48,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     protected String m_currentlyDisplayedImage = "";
 
-    /*
-     * UI Components
-     */
+    //region UI Components
 
     /** Lets the user configure the classifier. */
     protected GenericObjectEditor m_CNNExplorerEditor = new GenericObjectEditor();
@@ -123,74 +121,15 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
     JLabel targetClassIDLabel = new JLabel("Target Class ID:");
-    JTextField targetClassIDInput = new JTextField("235");
+    JTextField targetClassIDInput = new JTextField();
     JLabel classNameLabel = new JLabel("  Class Name:");
-    JTextField classNameInput = new JTextField("Doge");
+    JTextField classNameInput = new JTextField();
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
+    JButton saveHeatmapButton = new JButton("Save...");
+    //endregion
 
-
-    /**
-     * Sets the Explorer to use as parent frame (used for sending notifications
-     * about changes in the data)
-     *
-     * @param parent the parent frame
-     */
-    @Override
-    public void setExplorer(Explorer parent) {
-        m_Explorer = parent;
-    }
-
-    /**
-     * returns the parent Explorer frame
-     *
-     * @return the parent
-     */
-    @Override
-    public Explorer getExplorer() {
-        return m_Explorer;
-    }
-
-    /**
-     * Tells the panel to use a new set of instances.
-     *
-     * @param inst a set of Instances
-     */
-    @Override
-    public void setInstances(Instances inst) {
-        m_Instances = inst;
-    }
-
-    /**
-     * Returns the title for the tab in the Explorer
-     *
-     * @return the title of this tab
-     */
-    @Override
-    public String getTabTitle() {
-        return "Dl4j Inference";
-    }
-
-    /**
-     * Returns the tooltip for the tab in the Explorer
-     *
-     * @return the tooltip of this tab
-     */
-    @Override
-    public String getTabTitleToolTip() {
-        return "An explorer for trying different trained classification models on individual images.";
-    }
-
-    /**
-     * Sets the Logger to receive informational messages
-     *
-     * @param newLog the Logger that will now get info messages
-     */
-    @Override
-    public void setLog(Logger newLog) {
-        m_Logger = newLog;
-    }
 
     public ExplorerDl4jInference() {
         super();
@@ -291,12 +230,12 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void setupButtonListeners() {
         m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
-
-        m_predictButton.setEnabled(false);
-        m_predictButton.addActionListener(e -> predict());
-
-        m_saliencyMapButton.setEnabled(false);
+        m_startButton.addActionListener(e -> predict());
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
+
+        // Saliency Map Window
+        generateButton.addActionListener(e -> generateSaliencyMap());
+        _refreshButtonsEnabled();
     }
 
     /**
@@ -523,7 +462,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
     private void setupSaliencyMapWindow() {
         // Setup the button listeners
-        generateButton.addActionListener(e -> generateSaliencyMap());
         targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -798,4 +736,67 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             this.processedExplorer = processedExplorer;
         }
     }
+
+    //region Implenting Interface
+    /**
+     * Sets the Explorer to use as parent frame (used for sending notifications
+     * about changes in the data)
+     *
+     * @param parent the parent frame
+     */
+    @Override
+    public void setExplorer(Explorer parent) {
+        m_Explorer = parent;
+    }
+
+    /**
+     * returns the parent Explorer frame
+     *
+     * @return the parent
+     */
+    @Override
+    public Explorer getExplorer() {
+        return m_Explorer;
+    }
+
+    /**
+     * Tells the panel to use a new set of instances.
+     *
+     * @param inst a set of Instances
+     */
+    @Override
+    public void setInstances(Instances inst) {
+        m_Instances = inst;
+    }
+
+    /**
+     * Returns the title for the tab in the Explorer
+     *
+     * @return the title of this tab
+     */
+    @Override
+    public String getTabTitle() {
+        return "Dl4j Inference";
+    }
+
+    /**
+     * Returns the tooltip for the tab in the Explorer
+     *
+     * @return the tooltip of this tab
+     */
+    @Override
+    public String getTabTitleToolTip() {
+        return "An explorer for trying different trained classification models on individual images.";
+    }
+
+    /**
+     * Sets the Logger to receive informational messages
+     *
+     * @param newLog the Logger that will now get info messages
+     */
+    @Override
+    public void setLog(Logger newLog) {
+        m_Logger = newLog;
+    }
+    //endregion
 }
