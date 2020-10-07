@@ -230,7 +230,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void setupButtonListeners() {
         m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
-        m_startButton.addActionListener(e -> predict());
+        m_startButton.addActionListener(e -> startPrediction());
+        m_stopButton.addActionListener(e -> stopPrediction());
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
 
         // Saliency Map Window
@@ -607,8 +608,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void _refreshButtonsEnabled() {
-        boolean predictButtonEnabled = !m_currentlyDisplayedImage.equals("");
-        m_startButton.setEnabled(predictButtonEnabled);
+        boolean startButtonEnabled = !m_currentlyDisplayedImage.equals("") &&m_RunThread == null;
+        m_startButton.setEnabled(startButtonEnabled);
+
+        boolean stopButtonEnabled = m_RunThread != null;
+        m_stopButton.setEnabled(stopButtonEnabled);
 
         boolean saliencyMapEnabled = processedExplorer != null && processedExplorer.getGenerateSaliencyMap();
         m_saliencyMapButton.setEnabled(saliencyMapEnabled);
@@ -666,9 +670,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     @SneakyThrows
     private void runInference() {
         ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
         try {
             synchronized (this) {
-                m_startButton.setEnabled(false);
+                _refreshButtonsEnabled();
             }
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
@@ -677,17 +682,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 ((TaskLogger) m_Logger).taskStarted();
             }
 
-            Dl4jCNNExplorer explorer = (Dl4jCNNExplorer) m_CNNExplorerEditor.getValue();
-            try {
-                explorer.init();
-            } catch (Exception ex) {
-                log.error("Couldn't initialise model");
-                ex.printStackTrace();
-                return;
-            }
+            explorer.init();
 
             m_Logger.statusMessage("Processing image");
             explorer.makePrediction(new File(m_currentlyDisplayedImage));
+
             // Get the predictions
             StringBuffer buffer = new StringBuffer(explorer.getCurrentPredictions().toSummaryString());
 
@@ -704,6 +703,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
                 if (processedExplorer.getGenerateSaliencyMap())
                     openSaliencyMapWindow();
             }
+        } catch (RuntimeException ex) {
+            m_Logger.statusMessage("Terminated");
+            // End the current progress
+            explorer.getSaliencyMapGenerator().getProgressManager().finish();
         } catch (Exception ex) {
             m_Logger.statusMessage("Error occured");
             ex.printStackTrace();
@@ -711,9 +714,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             Thread.currentThread().setContextClassLoader(origLoader);
 
             synchronized (this) {
-                m_startButton.setEnabled(true);
                 m_RunThread = null;
-
+                _refreshButtonsEnabled();
                 if (m_Logger instanceof TaskLogger) {
                     ((TaskLogger) m_Logger).taskFinished();
                 }
@@ -724,11 +726,23 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /**
      * Using a separate thread, runs the model prediction
      */
-    private void predict() {
+    private void startPrediction() {
         if (m_RunThread == null) {
             m_RunThread = new Thread(this::runInference);
-            m_RunThread.setPriority(Thread.MIN_PRIORITY);
             m_RunThread.start();
+        }
+    }
+
+    /**
+     * Stops the currently running prediction (if any).
+     */
+    @SuppressWarnings("deprecation")
+    protected void stopPrediction() {
+        if (m_RunThread != null) {
+            m_RunThread.interrupt();
+
+            // This is deprecated (and theoretically the interrupt should do).
+            m_RunThread.stop();
         }
     }
 
