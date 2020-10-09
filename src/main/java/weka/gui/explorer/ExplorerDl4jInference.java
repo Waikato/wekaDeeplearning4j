@@ -2,6 +2,7 @@ package weka.gui.explorer;
 
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FilenameUtils;
 import weka.core.*;
 
 import weka.core.progress.ProgressManager;
@@ -11,6 +12,7 @@ import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -19,7 +21,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.RenderedImage;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -126,8 +130,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     JTextField classNameInput = new JTextField();
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
+    Image saliencyImage;
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
     JButton saveHeatmapButton = new JButton("Save...");
+    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
     //endregion
 
 
@@ -236,6 +242,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
         // Saliency Map Window
         generateButton.addActionListener(e -> generateSaliencyMap());
+        saveHeatmapButton.addActionListener(e -> saveHeatmap());
+
         _refreshButtonsEnabled();
     }
 
@@ -531,10 +539,20 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         saliencyMapWindow.add(mainPanel);
     }
 
+    private void setSaliencyImage(Image image) {
+        saliencyImage = image;
+        ImageIcon icon = new ImageIcon(saliencyImage);
+        saliencyImageLabel.setIcon(icon);
+        saliencyImageLabel.invalidate();
+    }
+
     protected void openSaliencyMapWindow() {
         // Reset the image
-        ImageIcon defaultImage = new ImageIcon("src/main/resources/placeholderSaliencyMap.png");
-        saliencyImageLabel.setIcon(defaultImage);
+        try {
+            setSaliencyImage(ImageIO.read(new File(DEFAULT_SALIENCY_IMAGE_PATH)));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         // Set the default class ID in the window
         targetClassIDInput.setText(getDefaultClassID());
@@ -543,6 +561,28 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         saliencyMapWindow.pack();
         saliencyMapWindow.setLocationRelativeTo(null);
         saliencyMapWindow.setVisible(true);
+    }
+
+    private void saveHeatmap() {
+        // Prompt the user for a place to save the image to
+        m_FileChooser.setFileFilter(m_ImageFilter);
+
+        int returnCode = m_FileChooser.showSaveDialog(this);
+
+        if (returnCode == 1) {
+            log.error("User did not select a new image");
+            return;
+        }
+        // Get the image
+        File outputFile = m_FileChooser.getSelectedFile();
+
+        String extension = FilenameUtils.getExtension(outputFile.getName());
+
+        try {
+            ImageIO.write((RenderedImage) saliencyImage, extension, outputFile);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void generateSaliencyMap() {
@@ -571,10 +611,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             @Override
             protected void done() {
                 super.done();
-                Image imageFile = get();
-                ImageIcon newImage = new ImageIcon(imageFile);
-                saliencyImageLabel.setIcon(newImage);
-                saliencyImageLabel.invalidate();
+                setSaliencyImage(get());
 
                 // Pack
                 saliencyMapWindow.pack();
