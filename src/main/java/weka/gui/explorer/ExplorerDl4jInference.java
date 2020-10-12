@@ -7,6 +7,8 @@ import weka.core.*;
 
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
+import weka.dl4j.inference.Prediction;
+import weka.dl4j.inference.PredictionClass;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
@@ -24,8 +26,11 @@ import java.awt.event.*;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 /**
  * Explorer panel for the Dl4j Model Inference Window
@@ -128,6 +133,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     JTextField targetClassIDInput = new JTextField();
     JLabel classNameLabel = new JLabel("  Class Name:");
     JTextField classNameInput = new JTextField();
+    JButton patternButton = new JButton("Pattern");
+    /** The current regular expression. */
+    String m_PatternRegEx = "";
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
     Image saliencyImage;
@@ -241,8 +249,28 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
 
         // Saliency Map Window
+        patternButton.addActionListener(e -> openPatternDialog());
         generateButton.addActionListener(e -> generateSaliencyMap());
         saveHeatmapButton.addActionListener(e -> saveHeatmap());
+        normalizeHeatmapCheckbox.addActionListener(e -> generateSaliencyMap());
+
+        // Setup the button listeners
+        targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateClassNameInput();
+            }
+        });
 
         _refreshButtonsEnabled();
     }
@@ -430,11 +458,11 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         refreshState();
     }
 
-    private String getDefaultClassID() {
+    private int getDefaultClassID() {
         if (processedExplorer != null)
-            return "" + processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
+            return processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
         else
-            return "" + -1;
+            return -1;
     }
 
     private String getClassName(int classID) {
@@ -470,24 +498,6 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void setupSaliencyMapWindow() {
-        // Setup the button listeners
-        targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
-        });
-
         // Define the UI elements
         targetClassIDInput.setColumns(5);
         targetClassIDInput.setToolTipText("-1 to use max probability class");
@@ -508,6 +518,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         topRow.add(targetClassIDInput);
         topRow.add(classNameLabel);
         topRow.add(classNameInput);
+        topRow.add(patternButton);
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
@@ -555,12 +566,71 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         }
 
         // Set the default class ID in the window
-        targetClassIDInput.setText(getDefaultClassID());
+        setTargetClass(getDefaultClassID());
         normalizeHeatmapCheckbox.setSelected(true);
 
         saliencyMapWindow.pack();
         saliencyMapWindow.setLocationRelativeTo(null);
         saliencyMapWindow.setVisible(true);
+    }
+
+    private void openPatternDialog() {
+        String pattern = JOptionPane.showInputDialog(patternButton.getParent(),
+                "Enter a Perl regular expression", m_PatternRegEx);
+        if (pattern != null) {
+            try {
+                Pattern.compile(pattern);
+                m_PatternRegEx = pattern;
+                ArrayList<PredictionClass> matchingClasses = getMatchingClasses(pattern);
+
+                if (matchingClasses.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No classes matched that regex pattern");
+                    return;
+                } else if (matchingClasses.size() == 1) {
+                    setTargetClass(matchingClasses.get(0).getID());
+                } else {
+                    PredictionClass selectedClass = selectOneOfNClasses(matchingClasses);
+                    setTargetClass(selectedClass.getID());
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(patternButton.getParent(), "'" + pattern
+                                + "' is not a valid Perl regular expression!\n" + "Error: " + ex,
+                        "Error in Pattern...", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private PredictionClass selectOneOfNClasses(ArrayList<PredictionClass> matchingClasses) {
+        return (PredictionClass) JOptionPane.showInputDialog(
+                null,
+                "The pattern matched multiple classes, please select one",
+                "Select a class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                matchingClasses.toArray(), // Array of choices
+                matchingClasses.get(0));
+    }
+
+    private void setTargetClass(int id) {
+        targetClassIDInput.setText("" + id);
+    }
+
+    private ArrayList<PredictionClass> getMatchingClasses(String pattern) {
+        ArrayList<PredictionClass> result = new ArrayList<>();
+        String[] classMap;
+        try {
+            classMap = processedExplorer.getModelOutputDecoder().getClasses();
+        } catch (Exception ex) {
+            classMap = new String[]{};
+        } // Change to ClassificationClass
+        for (int i = 0; i < classMap.length; i++) {
+            String tmpClass = classMap[i];
+            if (Pattern.matches(pattern, tmpClass)) {
+                result.add(new PredictionClass(i, tmpClass));
+            }
+        }
+        return result;
     }
 
     private void saveHeatmap() {
@@ -652,7 +722,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_stopButton.setEnabled(stopButtonEnabled);
 
         boolean saliencyMapEnabled = processedExplorer != null && processedExplorer.getGenerateSaliencyMap();
-        m_saliencyMapButton.setEnabled(saliencyMapEnabled);
+        m_saliencyMapButton.setEnabled(true);
     }
 
     /**
