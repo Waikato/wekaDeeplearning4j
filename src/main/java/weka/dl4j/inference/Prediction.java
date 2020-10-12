@@ -1,38 +1,41 @@
 package weka.dl4j.inference;
 
 /**
- * Simple class to hold the necessary values for prediction
+ * Simple immutable class to hold the necessary values for prediction
  * @author - Rhys Compton
  */
 public class Prediction {
 
     /**
-     * ID of the class prediction
+     * Stores the ID and Class name of the predicted class
      */
-    protected int classID;
-
-    /**
-     * Human readable class name
-     */
-    protected String className;
+    protected PredictionClass predictionClass;
 
     /**
      * Probability of the predicted class
      */
     protected double classProbability;
 
-    public Prediction(int classID, String className, double classProbability) {
-        this.classID = classID;
-        this.className = className;
+    public Prediction(PredictionClass predictionClass, double classProbability) {
+        this.predictionClass = predictionClass;
         this.classProbability = classProbability;
     }
 
+    public Prediction(int classID, String className, double classProbability) {
+        this.predictionClass = new PredictionClass(classID,className);
+        this.classProbability = classProbability;
+    }
+
+    public PredictionClass getPredictionClass() {
+        return predictionClass;
+    }
+
     public int getClassID() {
-        return classID;
+        return this.predictionClass.getID();
     }
 
     public String getClassName() {
-        return className;
+        return this.predictionClass.getName();
     }
 
     public double getClassProbability() {
@@ -47,9 +50,8 @@ public class Prediction {
 
     @Override
     public String toString() {
-        return String.format("Class ID = %d, Class name = %s, Class prob = %.3f",
-                getClassID(),
-                getClassName(),
+        return String.format("%s, Class prob = %.3f",
+                this.predictionClass.toString(),
                 getClassProbability());
     }
 }
