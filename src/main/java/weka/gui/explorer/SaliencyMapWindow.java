@@ -1,5 +1,6 @@
 package weka.gui.explorer;
 
+import javassist.ClassMap;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
@@ -51,7 +52,7 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void addClassSelector() {
-        ClassSelector classSelector = new ClassSelector(getCurrentClassMap());
+        ClassSelector classSelector = new ClassSelector(getCurrentClassMap(), getDefaultClassID());
         classSelectors.add(classSelector);
         classSelectorPanel.add(classSelector);
         thisWindow.pack();
@@ -62,6 +63,11 @@ public class SaliencyMapWindow extends JPanel {
         classSelectorPanel.remove(lastClassSelector);
         classSelectors.remove(lastClassSelector);
         thisWindow.pack();
+    }
+
+    private void clearClassSelectors() {
+        classSelectors.clear();
+        classSelectorPanel.removeAll();
     }
 
     private void setup() {
@@ -84,8 +90,6 @@ public class SaliencyMapWindow extends JPanel {
         classSelectorPanel = new JPanel();
         BoxLayout classSelectorLayout = new BoxLayout(classSelectorPanel, BoxLayout.Y_AXIS);
         classSelectorPanel.setLayout(classSelectorLayout);
-
-        addClassSelector();
 
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
@@ -138,13 +142,23 @@ public class SaliencyMapWindow extends JPanel {
             ex.printStackTrace();
         }
 
+        // Start with a fresh class selector
+        clearClassSelectors();
+        addClassSelector();
+
         // Set the default class ID in the window
-//        setTargetClass(getDefaultClassID());
         normalizeHeatmapCheckbox.setSelected(true);
 
         thisWindow.pack();
         thisWindow.setLocationRelativeTo(null);
         thisWindow.setVisible(true);
+    }
+
+    private int getDefaultClassID() {
+        if (processedExplorer != null)
+            return processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
+        else
+            return -1;
     }
 
     private void generateSaliencyMap() {
@@ -183,23 +197,12 @@ public class SaliencyMapWindow extends JPanel {
         worker.execute();
     }
 
-
-
-    private int getDefaultClassID() {
-        if (processedExplorer != null)
-            return processedExplorer.getCurrentPredictions().getTopPrediction().getClassID();
-        else
-            return -1;
-    }
-
     private void setSaliencyImage(Image image) {
         saliencyImage = image;
         ImageIcon icon = new ImageIcon(saliencyImage);
         saliencyImageLabel.setIcon(icon);
         saliencyImageLabel.invalidate();
     }
-
-
 
     private void saveHeatmap() {
         // Prompt the user for a place to save the image to
@@ -222,8 +225,4 @@ public class SaliencyMapWindow extends JPanel {
             ex.printStackTrace();
         }
     }
-
-
-
-
 }

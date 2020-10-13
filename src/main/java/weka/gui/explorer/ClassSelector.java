@@ -20,13 +20,13 @@ public class ClassSelector extends JPanel {
 
     String[] classMap;
 
-
-    public ClassSelector(String[] classMap) {
+    public ClassSelector(String[] classMap, int defaultClassID) {
         this.classMap = classMap;
-        setup();
+        setTargetClass(defaultClassID);
+        setupLayout();
     }
 
-    private void setup() {
+    private void setupLayout() {
         patternButton.addActionListener(e -> openPatternDialog());
 
         // Setup the button listeners
@@ -69,7 +69,7 @@ public class ClassSelector extends JPanel {
 //        return row;
 //    }
 
-    private void setTargetClass(int id) {
+    public void setTargetClass(int id) {
         targetClassIDInput.setText("" + id);
     }
 
