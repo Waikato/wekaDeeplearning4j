@@ -5,22 +5,18 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
-import weka.dl4j.inference.PredictionClass;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.ExtensionFileFilter;
 import weka.gui.WekaFileChooser;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 @Log4j2
 public class SaliencyMapWindow extends JPanel {
@@ -31,12 +27,14 @@ public class SaliencyMapWindow extends JPanel {
     /**
      * UI Elements
      */
-    JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
+    JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
-    JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
     Image saliencyImage;
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
+    JButton addClassButton = new JButton("Add Class");
+    JButton removeClassButton = new JButton("Remove Class");
+    JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
     private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
 
@@ -45,8 +43,25 @@ public class SaliencyMapWindow extends JPanel {
     /** The file chooser for selecting model files. */
     protected WekaFileChooser m_FileChooser = new WekaFileChooser(new File(System.getProperty("user.dir")));
 
+    JPanel classSelectorPanel;
+    ArrayList<ClassSelector> classSelectors = new ArrayList<>();
+
     public SaliencyMapWindow() {
         setup();
+    }
+
+    private void addClassSelector() {
+        ClassSelector classSelector = new ClassSelector(getCurrentClassMap());
+        classSelectors.add(classSelector);
+        classSelectorPanel.add(classSelector);
+        thisWindow.pack();
+    }
+
+    private void removeClassSelector() {
+        ClassSelector lastClassSelector = classSelectors.get(classSelectors.size() - 1);
+        classSelectorPanel.remove(lastClassSelector);
+        classSelectors.remove(lastClassSelector);
+        thisWindow.pack();
     }
 
     private void setup() {
@@ -54,28 +69,35 @@ public class SaliencyMapWindow extends JPanel {
         generateButton.addActionListener(e -> generateSaliencyMap());
         saveHeatmapButton.addActionListener(e -> saveHeatmap());
         normalizeHeatmapCheckbox.addActionListener(e -> generateSaliencyMap());
-
-
+        addClassButton.addActionListener(e -> addClassSelector());
+        removeClassButton.addActionListener(e -> removeClassSelector());
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
-        GridBagLayout gbL = new GridBagLayout();
-        mainPanel.setLayout(gbL);
+        GridBagLayout mainLayout = new GridBagLayout();
+        mainPanel.setLayout(mainLayout);
         mainPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Saliency Map Viewer"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        // Setup top row in saliency window - labels and text fields
-        ClassSelector selector = new ClassSelector(getCurrentClassMap());
+        // Setup top row in saliency window - class selector UI
+        classSelectorPanel = new JPanel();
+        BoxLayout classSelectorLayout = new BoxLayout(classSelectorPanel, BoxLayout.Y_AXIS);
+        classSelectorPanel.setLayout(classSelectorLayout);
+
+        addClassSelector();
+
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 0;
-        gbL.setConstraints(selector, gbC);
-        mainPanel.add(selector);
+        mainLayout.setConstraints(classSelectorPanel, gbC);
+        mainPanel.add(classSelectorPanel);
 
         // Setup second row - Normalize checkbox and Generate button
-        JPanel secondRow = new JPanel(new GridLayout(1, 3, 30, 5));
+        JPanel secondRow = new JPanel(new GridLayout(1, 5, 30, 5));
+        secondRow.add(addClassButton);
+        secondRow.add(removeClassButton);
         secondRow.add(normalizeHeatmapCheckbox);
         secondRow.add(generateButton);
         secondRow.add(saveHeatmapButton);
@@ -84,18 +106,18 @@ public class SaliencyMapWindow extends JPanel {
         gbC.gridx = 0;
         gbC.gridy = 1;
         gbC.insets = new Insets(5, 0, 20, 0);
-        gbL.setConstraints(secondRow, gbC);
+        mainLayout.setConstraints(secondRow, gbC);
         mainPanel.add(secondRow);
 
         gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 2;
-        gbL.setConstraints(saliencyImageLabel, gbC);
+        mainLayout.setConstraints(saliencyImageLabel, gbC);
         mainPanel.add(saliencyImageLabel);
 
         // Add panel to frame
-        saliencyMapWindow.add(mainPanel);
+        thisWindow.add(mainPanel);
     }
 
     private String[] getCurrentClassMap() {
@@ -120,9 +142,9 @@ public class SaliencyMapWindow extends JPanel {
 //        setTargetClass(getDefaultClassID());
         normalizeHeatmapCheckbox.setSelected(true);
 
-        saliencyMapWindow.pack();
-        saliencyMapWindow.setLocationRelativeTo(null);
-        saliencyMapWindow.setVisible(true);
+        thisWindow.pack();
+        thisWindow.setLocationRelativeTo(null);
+        thisWindow.setVisible(true);
     }
 
     private void generateSaliencyMap() {
@@ -155,7 +177,7 @@ public class SaliencyMapWindow extends JPanel {
                 setSaliencyImage(get());
 
                 // Pack
-                saliencyMapWindow.pack();
+                thisWindow.pack();
             }
         };
         worker.execute();
