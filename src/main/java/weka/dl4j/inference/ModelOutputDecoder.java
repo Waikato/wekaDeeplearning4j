@@ -150,21 +150,25 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
      * @return String[], one item for each class
      * @throws Exception
      */
-    public String[] getClasses() throws Exception {
+    public String[] getClasses() {
         // TODO add support for arff files
         List<String> classes = new ArrayList<>();
-        try (FileReader fr = new FileReader(getClassMapPath())) {
-            try (BufferedReader br = new BufferedReader(fr)) {
-                // Create a class for each line in the file
-                for (String line = br.readLine(); line != null; line = br.readLine()) {
-                    line = line.trim();
-                    // Ignore empty lines
-                    if (line.length() == 0)
-                        continue;
+        try {
+            try (FileReader fr = new FileReader(getClassMapPath())) {
+                try (BufferedReader br = new BufferedReader(fr)) {
+                    // Create a class for each line in the file
+                    for (String line = br.readLine(); line != null; line = br.readLine()) {
+                        line = line.trim();
+                        // Ignore empty lines
+                        if (line.length() == 0)
+                            continue;
 
-                    classes.add(line);
+                        classes.add(line);
+                    }
                 }
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return classes.toArray(String[]::new);
     }

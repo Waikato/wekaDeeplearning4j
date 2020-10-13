@@ -32,13 +32,7 @@ public class SaliencyMapWindow extends JPanel {
      * UI Elements
      */
     JFrame saliencyMapWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
-    JLabel targetClassIDLabel = new JLabel("Target Class ID:");
-    JTextField targetClassIDInput = new JTextField();
-    JLabel classNameLabel = new JLabel("  Class Name:");
-    JTextField classNameInput = new JTextField();
-    JButton patternButton = new JButton("Pattern");
-    /** The current regular expression. */
-    String m_PatternRegEx = "";
+
     JButton generateButton = new JButton("Generate");
     JLabel saliencyImageLabel = new JLabel();
     Image saliencyImage;
@@ -57,34 +51,11 @@ public class SaliencyMapWindow extends JPanel {
 
     private void setup() {
         // Saliency Map Window
-        patternButton.addActionListener(e -> openPatternDialog());
         generateButton.addActionListener(e -> generateSaliencyMap());
         saveHeatmapButton.addActionListener(e -> saveHeatmap());
         normalizeHeatmapCheckbox.addActionListener(e -> generateSaliencyMap());
 
-        // Setup the button listeners
-        targetClassIDInput.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateClassNameInput();
-            }
-        });
-
-        // Define the UI elements
-        targetClassIDInput.setColumns(5);
-        targetClassIDInput.setToolTipText("-1 to use max probability class");
-        classNameInput.setColumns(40);
-        classNameInput.setEditable(false);
 
         // Panel to define the layout. We are using GridBagLayout
         JPanel mainPanel = new JPanel();
@@ -95,18 +66,13 @@ public class SaliencyMapWindow extends JPanel {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         // Setup top row in saliency window - labels and text fields
-        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topRow.add(targetClassIDLabel);
-        topRow.add(targetClassIDInput);
-        topRow.add(classNameLabel);
-        topRow.add(classNameInput);
-        topRow.add(patternButton);
+        ClassSelector selector = new ClassSelector(getCurrentClassMap());
         GridBagConstraints gbC = new GridBagConstraints();
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 0;
-        gbL.setConstraints(topRow, gbC);
-        mainPanel.add(topRow);
+        gbL.setConstraints(selector, gbC);
+        mainPanel.add(selector);
 
         // Setup second row - Normalize checkbox and Generate button
         JPanel secondRow = new JPanel(new GridLayout(1, 3, 30, 5));
@@ -132,6 +98,14 @@ public class SaliencyMapWindow extends JPanel {
         saliencyMapWindow.add(mainPanel);
     }
 
+    private String[] getCurrentClassMap() {
+        if (processedExplorer == null) {
+            return new String[0];
+        } else {
+            return processedExplorer.getModelOutputDecoder().getClasses();
+        }
+    }
+
     public void open(Dl4jCNNExplorer explorer) {
         this.processedExplorer = explorer;
 
@@ -143,7 +117,7 @@ public class SaliencyMapWindow extends JPanel {
         }
 
         // Set the default class ID in the window
-        setTargetClass(getDefaultClassID());
+//        setTargetClass(getDefaultClassID());
         normalizeHeatmapCheckbox.setSelected(true);
 
         saliencyMapWindow.pack();
@@ -157,7 +131,8 @@ public class SaliencyMapWindow extends JPanel {
             protected Image doInBackground() {
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
-                int targetClassID = Integer.parseInt(targetClassIDInput.getText());
+//                int targetClassID = Integer.parseInt(targetClassIDInput.getText());
+                int targetClassID = -1;
                 boolean normalize = normalizeHeatmapCheckbox.isSelected();
                 log.info("Generating for class = " + targetClassID);
 
@@ -186,9 +161,7 @@ public class SaliencyMapWindow extends JPanel {
         worker.execute();
     }
 
-    private void setTargetClass(int id) {
-        targetClassIDInput.setText("" + id);
-    }
+
 
     private int getDefaultClassID() {
         if (processedExplorer != null)
@@ -204,60 +177,7 @@ public class SaliencyMapWindow extends JPanel {
         saliencyImageLabel.invalidate();
     }
 
-    private void openPatternDialog() {
-        String pattern = JOptionPane.showInputDialog(patternButton.getParent(),
-                "Enter a Perl regular expression", m_PatternRegEx);
-        if (pattern != null) {
-            try {
-                Pattern.compile(pattern);
-                m_PatternRegEx = pattern;
-                ArrayList<PredictionClass> matchingClasses = getMatchingClasses(pattern);
 
-                if (matchingClasses.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No classes matched that regex pattern");
-                    return;
-                } else if (matchingClasses.size() == 1) {
-                    setTargetClass(matchingClasses.get(0).getID());
-                } else {
-                    PredictionClass selectedClass = selectOneOfNClasses(matchingClasses);
-                    setTargetClass(selectedClass.getID());
-                }
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(patternButton.getParent(), "'" + pattern
-                                + "' is not a valid Perl regular expression!\n" + "Error: " + ex,
-                        "Error in Pattern...", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private PredictionClass selectOneOfNClasses(ArrayList<PredictionClass> matchingClasses) {
-        return (PredictionClass) JOptionPane.showInputDialog(
-                null,
-                "The pattern matched multiple classes, please select one",
-                "Select a class",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                matchingClasses.toArray(), // Array of choices
-                matchingClasses.get(0));
-    }
-
-    private ArrayList<PredictionClass> getMatchingClasses(String pattern) {
-        ArrayList<PredictionClass> result = new ArrayList<>();
-        String[] classMap;
-        try {
-            classMap = processedExplorer.getModelOutputDecoder().getClasses();
-        } catch (Exception ex) {
-            classMap = new String[]{};
-        } // Change to ClassificationClass
-        for (int i = 0; i < classMap.length; i++) {
-            String tmpClass = classMap[i];
-            if (Pattern.matches(pattern, tmpClass)) {
-                result.add(new PredictionClass(i, tmpClass));
-            }
-        }
-        return result;
-    }
 
     private void saveHeatmap() {
         // Prompt the user for a place to save the image to
@@ -281,35 +201,7 @@ public class SaliencyMapWindow extends JPanel {
         }
     }
 
-    private String getClassName(int classID) {
-        String[] classMap;
-        try {
-            classMap = processedExplorer.getModelOutputDecoder().getClasses();
-        } catch (Exception ex) {
-            classMap = new String[]{};
-        }
-        try {
-            return classMap[classID];
-        } catch (IndexOutOfBoundsException ex) {
-            return null;
-        }
-    }
 
-    private void updateClassNameInput() {
-        String targetClassIDText = targetClassIDInput.getText();
-        if (targetClassIDText.isEmpty()) {
-            return;
-        }
-        int classID;
-        try {
-            classID = Integer.parseInt(targetClassIDText);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null,
-                    "Error: Please enter a valid integer value", "Error Message",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String newClassName = getClassName(classID);
-        classNameInput.setText(newClassName);
-    }
+
+
 }
