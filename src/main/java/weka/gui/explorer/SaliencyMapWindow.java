@@ -52,6 +52,10 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void addClassSelector() {
+        if (classSelectors.size() == 10) {
+            // Limit the size to 10
+            return;
+        }
         ClassSelector classSelector = new ClassSelector(getCurrentClassMap(), getDefaultClassID());
         classSelectors.add(classSelector);
         classSelectorPanel.add(classSelector);
@@ -59,6 +63,10 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void removeClassSelector() {
+        if (classSelectors.size() == 1) {
+            // Don't go below one class selector
+            return;
+        }
         ClassSelector lastClassSelector = classSelectors.get(classSelectors.size() - 1);
         classSelectorPanel.remove(lastClassSelector);
         classSelectors.remove(lastClassSelector);
@@ -161,19 +169,22 @@ public class SaliencyMapWindow extends JPanel {
             return -1;
     }
 
+    private int[] getTargetClassIDs() {
+        return classSelectors.stream().mapToInt(ClassSelector::getTargetClass).toArray();
+    }
+
     private void generateSaliencyMap() {
         SwingWorker<Image, Void> worker = new SwingWorker<Image, Void>() {
             @Override
             protected Image doInBackground() {
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
-//                int targetClassID = Integer.parseInt(targetClassIDInput.getText());
-                int targetClassID = -1;
+                int targetClassID = classSelectors.get(0).getTargetClass();
                 boolean normalize = normalizeHeatmapCheckbox.isSelected();
                 log.info("Generating for class = " + targetClassID);
 
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
-                wrapper.setTargetClassID(targetClassID);
+                wrapper.setTargetClassIDs(getTargetClassIDs());
                 wrapper.setNormalizeHeatmap(normalize);
 
                 processedExplorer.setSaliencyMapGenerator(wrapper);

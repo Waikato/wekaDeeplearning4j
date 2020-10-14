@@ -22,8 +22,8 @@ public class ClassSelector extends JPanel {
 
     public ClassSelector(String[] classMap, int defaultClassID) {
         this.classMap = classMap;
-        setTargetClass(defaultClassID);
         setupLayout();
+        setTargetClass(defaultClassID);
     }
 
     private void setupLayout() {
@@ -71,6 +71,10 @@ public class ClassSelector extends JPanel {
 
     public void setTargetClass(int id) {
         targetClassIDInput.setText("" + id);
+    }
+
+    public int getTargetClass() {
+        return Integer.parseInt(targetClassIDInput.getText());
     }
 
     private void openPatternDialog() {

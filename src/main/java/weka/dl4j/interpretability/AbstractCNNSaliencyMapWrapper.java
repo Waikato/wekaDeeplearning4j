@@ -25,7 +25,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected int batchSize = 1;
 
-    protected int targetClassID = -1;
+    protected int[] targetClassIDs = new int[] { -1 };
 
     protected File outputFile = new File(Utils.defaultFileLocation());
 
@@ -82,12 +82,12 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
             displayOrder = 2
     )
     @ProgrammaticProperty
-    public int getTargetClassID() {
-        return targetClassID;
+    public int[] getTargetClassIDs() {
+        return targetClassIDs;
     }
 
-    public void setTargetClassID(int targetClassID) {
-        this.targetClassID = targetClassID;
+    public void setTargetClassIDs(int[] targetClassIDs) {
+        this.targetClassIDs = targetClassIDs;
     }
 
     @OptionMetadata(
