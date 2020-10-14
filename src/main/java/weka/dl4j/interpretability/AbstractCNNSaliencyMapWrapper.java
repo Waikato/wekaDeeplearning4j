@@ -1,10 +1,13 @@
 package weka.dl4j.interpretability;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
+import weka.core.Range;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
@@ -12,6 +15,7 @@ import weka.gui.ProgrammaticProperty;
 import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 // TODO Document
@@ -25,7 +29,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected int batchSize = 1;
 
-    protected int[] targetClassIDs = new int[] { -1 };
+    protected int[] targetClassIDs = new int[] {-1};
 
     protected File outputFile = new File(Utils.defaultFileLocation());
 
@@ -73,22 +77,31 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
     }
 
     @OptionMetadata(
-            displayName = "Target Class",
+            displayName = "Target Classes",
             description = "Output class to generate saliency maps for; default is -1 (use the highest probability class). " +
                     "This only needs to be set if wanting to use a non-default class from the *command line*; if using the *GUI*, " +
                     "the 'View Saliency Map' window contains the interface for setting this.",
-            commandLineParamName = "target-class",
-            commandLineParamSynopsis = "-target-class <int>",
+            commandLineParamName = "target-classes",
+            commandLineParamSynopsis = "-target-classes <int,int,...>",
             displayOrder = 2
     )
     @ProgrammaticProperty
-    public int[] getTargetClassIDs() {
+    public String getTargetClassIDs() {
+        return StringUtils.join(ArrayUtils.toObject(targetClassIDs), ",");
+    }
+
+    public void setTargetClassIDs(String targetClassIDs) {
+        this.targetClassIDs = Arrays.stream(targetClassIDs.split(",")).mapToInt(Integer::parseInt).toArray();
+    }
+
+    public int[] getTargetClassIDsAsInt() {
         return targetClassIDs;
     }
 
-    public void setTargetClassIDs(int[] targetClassIDs) {
+    public void setTargetClassIDsAsInt(int[] targetClassIDs) {
         this.targetClassIDs = targetClassIDs;
     }
+
 
     @OptionMetadata(
             displayName = "Output file location",

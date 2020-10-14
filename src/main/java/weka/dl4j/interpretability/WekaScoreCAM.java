@@ -33,7 +33,7 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     }
 
     private void generate() {
-        int[] targetClassIDs = getTargetClassIDs();
+        int[] targetClassIDs = getTargetClassIDsAsInt();
         scoreCAM.setTargetClassID(targetClassIDs[0]);
         scoreCAM.setNormalizeHeatmap(getNormalizeHeatmap());
         scoreCAM.generateOutputMap();

@@ -21,7 +21,7 @@ import java.util.Random;
 public class WekaDeeplearning4jExamples {
 
     public static void main(String[] args) throws Exception {
-        textProgressBarTest();
+        inference();
     }
 
     public static void textProgressBarTest() throws InterruptedException {
@@ -150,16 +150,12 @@ public class WekaDeeplearning4jExamples {
 
         // Predict for dog
         explorer.init();
-        explorer.makePrediction(new File("C:\\Users\\comptonr\\Desktop\\catAndDog.jpg"));
+//        explorer.makePrediction(new File("C:\\Users\\comptonr\\Desktop\\catAndDog.jpg"));
+        explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
 
-        wrapper.setTargetClassID(281);
+        wrapper.setTargetClassIDs("-1,520");
         wrapper.setOutputFile(new File("targetCat.png"));
-        explorer.setSaliencyMapGenerator(wrapper);
-        explorer.generateOutputMap();
-
-        wrapper.setTargetClassID(222);
-        wrapper.setOutputFile(new File("targetDog.png"));
         explorer.setSaliencyMapGenerator(wrapper);
         explorer.generateOutputMap();
     }

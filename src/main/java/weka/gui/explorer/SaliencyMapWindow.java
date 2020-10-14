@@ -184,7 +184,7 @@ public class SaliencyMapWindow extends JPanel {
                 log.info("Generating for class = " + targetClassID);
 
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
-                wrapper.setTargetClassIDs(getTargetClassIDs());
+                wrapper.setTargetClassIDsAsInt(getTargetClassIDs());
                 wrapper.setNormalizeHeatmap(normalize);
 
                 processedExplorer.setSaliencyMapGenerator(wrapper);
