@@ -34,7 +34,7 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
     private void generate() {
         int[] targetClassIDs = getTargetClassIDsAsInt();
-        scoreCAM.setTargetClassID(targetClassIDs[0]);
+        scoreCAM.setTargetClassIDs(targetClassIDs);
         scoreCAM.setNormalizeHeatmap(getNormalizeHeatmap());
         scoreCAM.generateOutputMap();
     }
@@ -48,14 +48,14 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     @Override
     public Image generateOutputMapToImage() {
         generate();
-        return scoreCAM.getCompositeImage();
+        return scoreCAM.getCompleteCompositeImage();
     }
 
     private void saveResult() {
         if (Utils.notDefaultFileLocation(getOutputFile())) {
             log.info(String.format("Output file location = %s", getOutputFile()));
             try {
-                ImageIO.write(scoreCAM.getCompositeImage(), "png", getOutputFile());
+                ImageIO.write(scoreCAM.getCompleteCompositeImage(), "png", getOutputFile());
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

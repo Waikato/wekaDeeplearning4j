@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 // TODO document
@@ -66,17 +67,20 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     @Override
     public void generateOutputMap() {
-        calculateTargetClassID(preprocessedImageArr);
+        allImages.clear();
+        for (int targetClassID : getTargetClassIDs()) {
+            int actualClassID = calculateTargetClassID(preprocessedImageArr, targetClassID);
 
-        INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages);
+            INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, actualClassID);
 
-        // Weight each activation map using the previously acquired softmax scores
-        INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
+            // Weight each activation map using the previously acquired softmax scores
+            INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
 
-        // Sum the activation maps into one map and normalise the saliency map values to between [0, 1]
-        INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
+            // Sum the activation maps into one map and normalise the saliency map values to between [0, 1]
+            INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
 
-        createFinalImages(originalImageArr, postprocessedActivations);
+            createFinalImages(originalImageArr, postprocessedActivations);
+        }
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
@@ -94,18 +98,18 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return preprocessed;
     }
 
-    private void calculateTargetClassID(INDArray imageArr) {
-        if (getTargetClassID() != -1) {
+    private int calculateTargetClassID(INDArray imageArr, int targetClassID) {
+        if (targetClassID != -1) {
             // Target class has already been set, don't calculate it
-            return;
+            return targetClassID;
         }
         // Otherwise run the model on the image, and choose argmax as the target class
         INDArray output = modelOutputSingle(imageArr);
         int argMax = output.argMax(1).getNumber(0).intValue();
-        setTargetClassID(argMax);
+        return argMax;
     }
 
-    private INDArray calculateTargetClassWeights(INDArray softmaxOutput) {
+    private INDArray calculateTargetClassWeights(INDArray softmaxOutput, int targetClassID) {
         return softmaxOutput.getColumn(targetClassID).dup();
     }
 
@@ -203,6 +207,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         createOriginalImage(imageArr);
         createOverlaidHeatmap();
         createCompositeImage();
+        allImages.add(getCompositeImage());
     }
 
     private int calculateCompositeWidth() {
@@ -211,8 +216,8 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     private int calculateCompositeHeight() {
-        // OUtside margins plus image height plus space for text
-        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing * 3);
+        // Outside margins plus image height plus space for text
+        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing * 2);
     }
 
     private void createCompositeImage() {
@@ -360,7 +365,6 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     private INDArray predictOnMaskedImages(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images with a batch size of %d", numActivationMaps, batchSize));
-        double[] targetClassWeights = new double[numActivationMaps];
         INDArray softmaxOnMaskedImages = null;
 
         int totalIterations = getNumIterations(numActivationMaps);

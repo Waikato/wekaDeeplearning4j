@@ -7,6 +7,7 @@ import weka.dl4j.interpretability.listeners.IterationIncrementListener;
 import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
 import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected ComputationGraph computationGraph = null;
 
-    protected int targetClassID = -1;
+    protected int[] targetClassIDs = new int[] {-1};
 
     protected int batchSize = 1;
 
@@ -34,6 +35,8 @@ public abstract class AbstractCNNSaliencyMapGenerator {
     protected BufferedImage heatmapOnImage;
 
     protected BufferedImage compositeImage;
+
+    protected ArrayList<BufferedImage> allImages = new ArrayList<>();
 
     protected String modelName;
 
@@ -77,12 +80,12 @@ public abstract class AbstractCNNSaliencyMapGenerator {
         this.computationGraph = computationGraph;
     }
 
-    public int getTargetClassID() {
-        return targetClassID;
+    public int[] getTargetClassIDs() {
+        return targetClassIDs;
     }
 
-    public void setTargetClassID(int targetClassID) {
-        this.targetClassID = targetClassID;
+    public void setTargetClassIDs(int[] targetClassIDs) {
+        this.targetClassIDs = targetClassIDs;
     }
 
     public int getBatchSize() {
@@ -101,20 +104,45 @@ public abstract class AbstractCNNSaliencyMapGenerator {
         this.imagePreProcessingScaler = imagePreProcessingScaler;
     }
 
-    public BufferedImage getOriginalImage() {
+    protected BufferedImage getOriginalImage() {
         return originalImage;
     }
 
-    public BufferedImage getHeatmap() {
+    protected BufferedImage getHeatmap() {
         return heatmap;
     }
 
-    public BufferedImage getHeatmapOnImage() {
+    protected BufferedImage getHeatmapOnImage() {
         return heatmapOnImage;
     }
 
-    public BufferedImage getCompositeImage() {
+    protected BufferedImage getCompositeImage() {
         return compositeImage;
+    }
+
+    public BufferedImage getCompleteCompositeImage() {
+        // Stitch each buffered image together in allImages
+        if (allImages.size() == 0) {
+            return null;
+        }
+
+        BufferedImage firstImage = allImages.get(0);
+        int width = firstImage.getWidth();
+        int singleImageHeight = firstImage.getHeight();
+        int numImages = allImages.size();
+        int height = singleImageHeight * numImages;
+
+        BufferedImage completeCompositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = completeCompositeImage.createGraphics();
+
+        for (int i = 0; i < numImages; i++) {
+            BufferedImage tmpCompositeImage = allImages.get(i);
+            g.drawImage(tmpCompositeImage, 0, i * singleImageHeight, null);
+        }
+
+        g.dispose();
+
+        return completeCompositeImage;
     }
 
     public boolean isImageChannelsLast() {

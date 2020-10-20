@@ -31,7 +31,7 @@ public class ScoreCAMTest extends TestCase {
             String modelName = pretrainedModel.getPrettyName();
 
             try {
-                ImageIO.write(scoreCAM.getCompositeImage(), "png", new File(String.format("tmp/%s_composite.png", modelName)));
+                ImageIO.write(scoreCAM.getCompleteCompositeImage(), "png", new File(String.format("tmp/%s_composite.png", modelName)));
             } catch (OutOfMemoryError error) {
                 error.printStackTrace();
             } catch (Exception ex) {

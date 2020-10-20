@@ -435,7 +435,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void _refreshImagePanel() {
-        if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage == "") {
+        if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage.equals("")) {
             return;
         }
 
