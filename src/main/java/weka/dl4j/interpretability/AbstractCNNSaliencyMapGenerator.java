@@ -44,6 +44,12 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected boolean normalizeHeatmap = true;
 
+    protected int outsideBorder = 25;
+
+    protected int insidePadding = 20;
+
+    protected int fontSpacing = 12;
+
     public abstract void processImage(File imageFile);
 
     public abstract void generateOutputMap();
@@ -132,6 +138,10 @@ public abstract class AbstractCNNSaliencyMapGenerator {
         int numImages = allImages.size();
         int height = singleImageHeight * numImages;
 
+        // Draw the map info
+        int textX = 15;
+        int textY = 15;
+
         BufferedImage completeCompositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = completeCompositeImage.createGraphics();
 
@@ -139,6 +149,11 @@ public abstract class AbstractCNNSaliencyMapGenerator {
             BufferedImage tmpCompositeImage = allImages.get(i);
             g.drawImage(tmpCompositeImage, 0, i * singleImageHeight, null);
         }
+
+        g.setColor(Color.BLACK);
+//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
+        g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
+                getInputFilename(), getModelName()), textX, textY);
 
         g.dispose();
 

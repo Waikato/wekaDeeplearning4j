@@ -39,6 +39,7 @@ public class SaliencyMapWindow extends JPanel {
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
     private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
+//    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "output.png";
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
 
@@ -128,13 +129,9 @@ public class SaliencyMapWindow extends JPanel {
         gbC.gridy = 2;
         scrollPane = new JScrollPane(saliencyImageLabel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        scrollPane.setBackground(Color.WHITE);
         scrollPane.setPreferredSize(new Dimension(800, 400));
         mainLayout.setConstraints(scrollPane, gbC);
         mainPanel.add(scrollPane);
-
-//        mainLayout.setConstraints(saliencyImageLabel, gbC);
-//        mainPanel.add(saliencyImageLabel);
 
         // Add panel to frame
         thisWindow.add(mainPanel);

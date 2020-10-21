@@ -31,12 +31,6 @@ import java.util.Arrays;
 @Log4j2
 public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
-    protected int outsideBorder = 25;
-
-    protected int insidePadding = 20;
-
-    protected int fontSpacing = 12;
-
     protected INDArray originalImageArr, preprocessedImageArr, softmaxOnMaskedImages, normalisedActivations;
 
     public void processMaskedImages(File imageFile) {
@@ -217,7 +211,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private int calculateCompositeHeight() {
         // Outside margins plus image height plus space for text
-        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing * 2);
+        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing);
     }
 
     private void createCompositeImage() {
@@ -251,8 +245,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         int textY = leftY + (int) modelInputShape.getHeight() + (fontSpacing * 2);
         g.setColor(Color.BLACK);
 //        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
-        g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
-                getInputFilename(), getModelName()), textX, textY);
+        g.drawString("Target class: Dog", textX, textY);
 
         g.dispose();
     }
