@@ -31,6 +31,7 @@ public class SaliencyMapWindow extends JPanel {
     JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
     JLabel saliencyImageLabel = new JLabel();
+    JScrollPane scrollPane;
     Image saliencyImage;
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
     JButton addClassButton = new JButton("Add Class");
@@ -125,8 +126,15 @@ public class SaliencyMapWindow extends JPanel {
         gbC.anchor = GridBagConstraints.CENTER;
         gbC.gridx = 0;
         gbC.gridy = 2;
-        mainLayout.setConstraints(saliencyImageLabel, gbC);
-        mainPanel.add(saliencyImageLabel);
+        scrollPane = new JScrollPane(saliencyImageLabel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.setPreferredSize(new Dimension(800, 400));
+        mainLayout.setConstraints(scrollPane, gbC);
+        mainPanel.add(scrollPane);
+
+//        mainLayout.setConstraints(saliencyImageLabel, gbC);
+//        mainPanel.add(saliencyImageLabel);
 
         // Add panel to frame
         thisWindow.add(mainPanel);

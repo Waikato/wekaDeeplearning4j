@@ -131,6 +131,9 @@ public class ClassSelector extends JPanel {
         if (targetClassIDText.isEmpty()) {
             return;
         }
+        if (this.classMap.length == 0) {
+            return;
+        }
         int classID;
         try {
             classID = Integer.parseInt(targetClassIDText);
