@@ -31,7 +31,7 @@ public class ScoreCAMTest extends TestCase {
 
             String modelName = pretrainedModel.getPrettyName();
 
-            var predictionClasses = new PredictionClass[] { new PredictionClass(-1, "Test Class") };
+            var predictionClasses = new int[] { -1 };
 
             try {
                 ImageIO.write(scoreCAM.generateHeatmapToImage(predictionClasses, true), "png", new File(String.format("tmp/%s_composite.png", modelName)));

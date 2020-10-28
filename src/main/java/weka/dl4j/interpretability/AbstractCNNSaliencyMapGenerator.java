@@ -53,7 +53,7 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public abstract void processImage(File imageFile);
 
-    public abstract BufferedImage generateHeatmapToImage(PredictionClass[] targetClasses, boolean normalize);
+    public abstract BufferedImage generateHeatmapToImage(int[] targetClasses, boolean normalize);
 
     /**
      * Event listeners

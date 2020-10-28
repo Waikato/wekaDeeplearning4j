@@ -78,13 +78,13 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     @Override
-    public BufferedImage generateHeatmapToImage(PredictionClass[] targetClasses, boolean normalize) {
+    public BufferedImage generateHeatmapToImage(int[] targetClasses, boolean normalize) {
         var allImages = new ArrayList<BufferedImage>();
         var classPredictions = new ArrayList<Prediction>();
         for (var targetClass : targetClasses) {
-            int actualClassID = calculateTargetClassID(preprocessedImageArr, targetClass);
+            var predictionForClass = predictForClass(preprocessedImageArr, targetClass);
 
-            INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, actualClassID);
+            INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, predictionForClass.getClassID());
 
             // Weight each activation map using the previously acquired softmax scores
             INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
@@ -93,6 +93,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
             INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps, normalize);
 
             allImages.add(createFinalImages(originalImageArr, postprocessedActivations));
+            classPredictions.add(predictionForClass);
         }
         return createCompleteCompositeImage(allImages, classPredictions);
     }
@@ -112,14 +113,21 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return preprocessed;
     }
 
-    private int calculateTargetClassID(INDArray imageArr, PredictionClass targetClass) { // TODO return Prediction
-        if (targetClass.getClassID() != -1) {
-            // Target class has already been set, don't calculate it
-            return targetClass.getClassID();
-        }
-        // Otherwise run the model on the image, and choose argmax as the target class
+    /**
+     * Run prediction on the class, returning the class probability for the given class ID
+     * @param imageArr Preprocessed image
+     * @param targetClass Class to predict for
+     * @return
+     */
+    private Prediction predictForClass(INDArray imageArr, int targetClass) { // TODO return Prediction
+        // Run the model on the image, then return the prediction for the target class
         INDArray output = modelOutputSingle(imageArr);
-        return output.argMax(1).getNumber(0).intValue();
+        if (targetClass == -1) {
+            targetClass = output.argMax(1).getNumber(0).intValue();
+        }
+        var classProbability = output.getDouble(0, targetClass);
+
+        return new Prediction(targetClass, "Test Class Name", classProbability);
     }
 
     private INDArray calculateTargetClassWeights(INDArray softmaxOutput, int targetClassID) {
@@ -216,7 +224,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return imageFromINDArray(imageArr);
     }
 
-    private BufferedImage createCompleteCompositeImage(ArrayList<BufferedImage> allImages, ArrayList<Prediction> targetClasses) {
+    private BufferedImage createCompleteCompositeImage(ArrayList<BufferedImage> allImages, ArrayList<Prediction> predictions) {
         // Stitch each buffered image together in allImages
         if (allImages.size() == 0) {
             return null;
@@ -228,10 +236,6 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         int numImages = allImages.size();
         int height = singleImageHeight * numImages;
 
-        // Draw the map info
-        int textX = outsideMargin;
-        int textY = 15;
-
         BufferedImage completeCompositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = completeCompositeImage.createGraphics();
 
@@ -240,10 +244,20 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
             g.drawImage(tmpCompositeImage, 0, i * singleImageHeight, null);
         }
 
+        // Write info text up top
+        int textX = outsideMargin;
+        int textY = 15;
+
         g.setColor(Color.BLACK);
-//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
         g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
                 getInputFilename(), getModelName()), textX, textY);
+
+        for (int i = 0; i < numImages; i++) {
+            var prediction = predictions.get(i);
+            g.drawString(String.format("Class ID: %d       Probability: %.2f       Name: %s",
+                    prediction.getClassID(), prediction.getClassProbability(),prediction.getClassName()),
+                    textX, ((i + 1) * calculateCompositeHeight()) - fontSpacing);
+        }
 
         g.dispose();
 

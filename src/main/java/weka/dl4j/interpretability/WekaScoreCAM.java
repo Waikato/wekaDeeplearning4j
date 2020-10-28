@@ -38,9 +38,8 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     @Override
     public BufferedImage generateHeatmapToImage() {
         int[] targetClassIDs = getTargetClassIDsAsInt();
-        var predictionClasses = getTestPredictionClasses(targetClassIDs);
         var normalize = getNormalizeHeatmap();
-        return scoreCAM.generateHeatmapToImage(predictionClasses, normalize);
+        return scoreCAM.generateHeatmapToImage(targetClassIDs, normalize);
     }
 
     private PredictionClass[] getTestPredictionClasses(int[] targetClassIDs) {
