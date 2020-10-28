@@ -40,6 +40,8 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected boolean normalizeHeatmap = true;
 
+    protected String[] classMap;
+
     protected ComputationGraph computationGraph;
 
     protected AbstractZooModel zooModel;
@@ -59,6 +61,14 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         } else {
             log.error("No output file location given - not saving saliency map");
         }
+    }
+
+    public String[] getClassMap() {
+        return classMap;
+    }
+
+    public void setClassMap(String[] classMap) {
+        this.classMap = classMap;
     }
 
     public ComputationGraph getComputationGraph() {

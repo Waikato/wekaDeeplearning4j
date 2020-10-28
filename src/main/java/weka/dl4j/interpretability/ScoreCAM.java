@@ -78,11 +78,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     @Override
-    public BufferedImage generateHeatmapToImage(int[] targetClasses, boolean normalize) {
+    public BufferedImage generateHeatmapToImage(int[] targetClasses, String[] classMap, boolean normalize) {
         var allImages = new ArrayList<BufferedImage>();
         var classPredictions = new ArrayList<Prediction>();
         for (var targetClass : targetClasses) {
-            var predictionForClass = predictForClass(preprocessedImageArr, targetClass);
+            var predictionForClass = predictForClass(preprocessedImageArr, targetClass, classMap);
 
             INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, predictionForClass.getClassID());
 
@@ -119,15 +119,15 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
      * @param targetClass Class to predict for
      * @return
      */
-    private Prediction predictForClass(INDArray imageArr, int targetClass) { // TODO return Prediction
+    private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) { // TODO return Prediction
         // Run the model on the image, then return the prediction for the target class
         INDArray output = modelOutputSingle(imageArr);
         if (targetClass == -1) {
             targetClass = output.argMax(1).getNumber(0).intValue();
         }
         var classProbability = output.getDouble(0, targetClass);
-
-        return new Prediction(targetClass, "Test Class Name", classProbability);
+        var className = classMap[targetClass];
+        return new Prediction(targetClass, className, classProbability);
     }
 
     private INDArray calculateTargetClassWeights(INDArray softmaxOutput, int targetClassID) {

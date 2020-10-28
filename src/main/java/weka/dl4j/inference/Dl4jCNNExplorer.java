@@ -98,6 +98,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         log.info("Generating saliency map...");
         saliencyMapWrapper.setComputationGraph(model.getModel());
         saliencyMapWrapper.setZooModel(zooModelType);
+        saliencyMapWrapper.setClassMap(modelOutputDecoder.getClasses());
         saliencyMapWrapper.processImage(imageFile);
     }
 

@@ -32,9 +32,10 @@ public class ScoreCAMTest extends TestCase {
             String modelName = pretrainedModel.getPrettyName();
 
             var predictionClasses = new int[] { -1 };
+            var classMap = new String[] {"Test Class"};
 
             try {
-                ImageIO.write(scoreCAM.generateHeatmapToImage(predictionClasses, true), "png", new File(String.format("tmp/%s_composite.png", modelName)));
+                ImageIO.write(scoreCAM.generateHeatmapToImage(predictionClasses, classMap, true), "png", new File(String.format("tmp/%s_composite.png", modelName)));
             } catch (OutOfMemoryError error) {
                 error.printStackTrace();
             } catch (Exception ex) {
