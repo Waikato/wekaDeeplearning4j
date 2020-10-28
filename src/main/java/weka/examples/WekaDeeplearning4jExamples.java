@@ -145,18 +145,18 @@ public class WekaDeeplearning4jExamples {
         // Cat ID = 281
         AbstractCNNSaliencyMapWrapper wrapper = new WekaScoreCAM();
         wrapper.setBatchSize(6);
-        explorer.setSaliencyMapGenerator(wrapper);
+        explorer.setSaliencyMapWrapper(wrapper);
         explorer.setGenerateSaliencyMap(true);
 
         // Predict for dog
         explorer.init();
 //        explorer.makePrediction(new File("C:\\Users\\comptonr\\Desktop\\catAndDog.jpg"));
-        explorer.makePrediction(new File("src/test/resources/images/dog.jpg"));
+        explorer.processImage(new File("src/test/resources/images/dog.jpg"));
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
 
         wrapper.setTargetClassIDs("-1,520");
-        wrapper.setOutputFile(new File("targetCat.png"));
-        explorer.setSaliencyMapGenerator(wrapper);
-        explorer.generateOutputMap();
+        wrapper.setOutputFile(new File("output.png"));
+        explorer.setSaliencyMapWrapper(wrapper);
+        explorer.generateAndSaveOutputMap();
     }
 }

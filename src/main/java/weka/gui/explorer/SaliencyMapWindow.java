@@ -1,6 +1,5 @@
 package weka.gui.explorer;
 
-import javassist.ClassMap;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
@@ -188,12 +187,12 @@ public class SaliencyMapWindow extends JPanel {
                 boolean normalize = normalizeHeatmapCheckbox.isSelected();
                 log.info("Generating for class = " + targetClassID);
 
-                AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapGenerator();
+                AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapWrapper();
                 wrapper.setTargetClassIDsAsInt(getTargetClassIDs());
                 wrapper.setNormalizeHeatmap(normalize);
 
-                processedExplorer.setSaliencyMapGenerator(wrapper);
-                Image outputMap = processedExplorer.generateOutmapToImage();
+                processedExplorer.setSaliencyMapWrapper(wrapper);
+                Image outputMap = processedExplorer.generateOutputMap();
 
                 manager.finish();
 

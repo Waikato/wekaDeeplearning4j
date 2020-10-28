@@ -3,6 +3,7 @@ package weka.dl4j.interpretability;
 import junit.framework.TestCase;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.inference.PredictionClass;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.zoo.ZooModelTest;
 
@@ -30,8 +31,10 @@ public class ScoreCAMTest extends TestCase {
 
             String modelName = pretrainedModel.getPrettyName();
 
+            var predictionClasses = new PredictionClass[] { new PredictionClass(-1, "Test Class") };
+
             try {
-                ImageIO.write(scoreCAM.getCompleteCompositeImage(), "png", new File(String.format("tmp/%s_composite.png", modelName)));
+                ImageIO.write(scoreCAM.generateHeatmapToImage(predictionClasses, true), "png", new File(String.format("tmp/%s_composite.png", modelName)));
             } catch (OutOfMemoryError error) {
                 error.printStackTrace();
             } catch (Exception ex) {

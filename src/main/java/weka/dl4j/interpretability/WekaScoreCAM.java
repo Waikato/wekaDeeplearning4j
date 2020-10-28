@@ -3,10 +3,13 @@ package weka.dl4j.interpretability;
 import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.dl4j.Utils;
 import weka.core.progress.ProgressManager;
+import weka.dl4j.inference.PredictionClass;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.Buffer;
 
 // TODO Document
 @Log4j2
@@ -29,39 +32,28 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.addIterationIncrementListener(this::onIterationIncremented);
         scoreCAM.addIterationsFinishedListeners(this::onIterationsFinished);
 
-        scoreCAM.processMaskedImages(imageFile);
+        scoreCAM.processImage(imageFile);
     }
 
-    private void generate() {
+    @Override
+    public BufferedImage generateHeatmapToImage() {
         int[] targetClassIDs = getTargetClassIDsAsInt();
-        scoreCAM.setTargetClassIDs(targetClassIDs);
-        scoreCAM.setNormalizeHeatmap(getNormalizeHeatmap());
-        scoreCAM.generateOutputMap();
+        var predictionClasses = getTestPredictionClasses(targetClassIDs);
+        var normalize = getNormalizeHeatmap();
+        return scoreCAM.generateHeatmapToImage(predictionClasses, normalize);
     }
 
-    @Override
-    public void generateOutputMap() {
-        generate();
-        saveResult();
-    }
+    private PredictionClass[] getTestPredictionClasses(int[] targetClassIDs) {
+        var result = new PredictionClass[targetClassIDs.length];
 
-    @Override
-    public Image generateOutputMapToImage() {
-        generate();
-        return scoreCAM.getCompleteCompositeImage();
-    }
-
-    private void saveResult() {
-        if (Utils.notDefaultFileLocation(getOutputFile())) {
-            log.info(String.format("Output file location = %s", getOutputFile()));
-            try {
-                ImageIO.write(scoreCAM.getCompleteCompositeImage(), "png", getOutputFile());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            log.error("No output file location given - not saving saliency map");
+        for (int i = 0; i < targetClassIDs.length; i++)
+        {
+            result[i] = new PredictionClass(
+                    targetClassIDs[i],
+                    String.format("Test class %d", i)
+            );
         }
+        return result;
     }
 
     private void onIterationsStarted(int maxIterations) {

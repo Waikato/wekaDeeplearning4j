@@ -3,11 +3,12 @@ package weka.dl4j.interpretability;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import weka.dl4j.inference.Prediction;
+import weka.dl4j.inference.PredictionClass;
 import weka.dl4j.interpretability.listeners.IterationIncrementListener;
 import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
 import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected ComputationGraph computationGraph = null;
 
-    protected int[] targetClassIDs = new int[] {-1};
+//    protected int[] targetClassIDs = new int[] {-1};
 
     protected int batchSize = 1;
 
@@ -28,23 +29,23 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected InputType.InputTypeConvolutional modelInputShape;
 
-    protected BufferedImage originalImage;
-
-    protected BufferedImage heatmap;
-
-    protected BufferedImage heatmapOnImage;
-
-    protected BufferedImage compositeImage;
-
-    protected ArrayList<BufferedImage> allImages = new ArrayList<>();
+//    protected BufferedImage originalImage;
+//
+//    protected BufferedImage heatmap;
+//
+//    protected BufferedImage heatmapOnImage;
+//
+//    protected BufferedImage compositeImage;
+//
+//    protected ArrayList<BufferedImage> allImages = new ArrayList<>();
 
     protected String modelName;
 
     protected String inputFilename;
 
-    protected boolean normalizeHeatmap = true;
+//    protected boolean normalizeHeatmap = true;
 
-    protected int outsideBorder = 25;
+    protected int outsideMargin = 25;
 
     protected int insidePadding = 20;
 
@@ -52,7 +53,7 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public abstract void processImage(File imageFile);
 
-    public abstract void generateOutputMap();
+    public abstract BufferedImage generateHeatmapToImage(PredictionClass[] targetClasses, boolean normalize);
 
     /**
      * Event listeners
@@ -86,14 +87,6 @@ public abstract class AbstractCNNSaliencyMapGenerator {
         this.computationGraph = computationGraph;
     }
 
-    public int[] getTargetClassIDs() {
-        return targetClassIDs;
-    }
-
-    public void setTargetClassIDs(int[] targetClassIDs) {
-        this.targetClassIDs = targetClassIDs;
-    }
-
     public int getBatchSize() {
         return batchSize;
     }
@@ -108,56 +101,6 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public void setImagePreProcessingScaler(ImagePreProcessingScaler imagePreProcessingScaler) {
         this.imagePreProcessingScaler = imagePreProcessingScaler;
-    }
-
-    protected BufferedImage getOriginalImage() {
-        return originalImage;
-    }
-
-    protected BufferedImage getHeatmap() {
-        return heatmap;
-    }
-
-    protected BufferedImage getHeatmapOnImage() {
-        return heatmapOnImage;
-    }
-
-    protected BufferedImage getCompositeImage() {
-        return compositeImage;
-    }
-
-    public BufferedImage getCompleteCompositeImage() {
-        // Stitch each buffered image together in allImages
-        if (allImages.size() == 0) {
-            return null;
-        }
-
-        BufferedImage firstImage = allImages.get(0);
-        int width = firstImage.getWidth();
-        int singleImageHeight = firstImage.getHeight();
-        int numImages = allImages.size();
-        int height = singleImageHeight * numImages;
-
-        // Draw the map info
-        int textX = 15;
-        int textY = 15;
-
-        BufferedImage completeCompositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = completeCompositeImage.createGraphics();
-
-        for (int i = 0; i < numImages; i++) {
-            BufferedImage tmpCompositeImage = allImages.get(i);
-            g.drawImage(tmpCompositeImage, 0, i * singleImageHeight, null);
-        }
-
-        g.setColor(Color.BLACK);
-//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
-        g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
-                getInputFilename(), getModelName()), textX, textY);
-
-        g.dispose();
-
-        return completeCompositeImage;
     }
 
     public boolean isImageChannelsLast() {
@@ -190,13 +133,5 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     public void setInputFilename(String inputFilename) {
         this.inputFilename = inputFilename;
-    }
-
-    public boolean getNormalizeHeatmap() {
-        return normalizeHeatmap;
-    }
-
-    public void setNormalizeHeatmap(boolean normalizeHeatmap) {
-        this.normalizeHeatmap = normalizeHeatmap;
     }
 }

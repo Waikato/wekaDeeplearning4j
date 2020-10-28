@@ -16,6 +16,8 @@ import org.nd4j.linalg.factory.ops.NDImage;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.ops.transforms.Transforms;
+import weka.dl4j.inference.Prediction;
+import weka.dl4j.inference.PredictionClass;
 import weka.dl4j.interpretability.listeners.IterationIncrementListener;
 import weka.dl4j.interpretability.listeners.IterationsStartedListener;
 import weka.dl4j.interpretability.listeners.IterationsFinishedListener;
@@ -31,9 +33,30 @@ import java.util.Arrays;
 @Log4j2
 public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
-    protected INDArray originalImageArr, preprocessedImageArr, softmaxOnMaskedImages, normalisedActivations;
+    /**
+     * Used for displaying the original image
+     */
+    private INDArray originalImageArr;
 
-    public void processMaskedImages(File imageFile) {
+    /**
+     * The image after having preprocessing applied
+     * (passed into the model)
+     */
+    private INDArray preprocessedImageArr;
+
+    /**
+     *
+     */
+    private INDArray normalisedActivations;
+
+    /**
+     * The final result after running the model on all masked images
+     * Shape = [numActivationMaps, numClasses]
+     */
+    private INDArray softmaxOnMaskedImages;
+
+    @Override
+    public void processImage(File imageFile) {
         originalImageArr = loadImage(imageFile);
         // Preprocess the image if the model requires it
         preprocessedImageArr = preprocessImage(originalImageArr);
@@ -55,15 +78,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     @Override
-    public void processImage(File imageFile) {
-        processMaskedImages(imageFile);
-    }
-
-    @Override
-    public void generateOutputMap() {
-        allImages.clear();
-        for (int targetClassID : getTargetClassIDs()) {
-            int actualClassID = calculateTargetClassID(preprocessedImageArr, targetClassID);
+    public BufferedImage generateHeatmapToImage(PredictionClass[] targetClasses, boolean normalize) {
+        var allImages = new ArrayList<BufferedImage>();
+        var classPredictions = new ArrayList<Prediction>();
+        for (var targetClass : targetClasses) {
+            int actualClassID = calculateTargetClassID(preprocessedImageArr, targetClass);
 
             INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, actualClassID);
 
@@ -71,10 +90,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
             INDArray weightedActivationMaps = applyActivationMapWeights(normalisedActivations, targetClassWeights);
 
             // Sum the activation maps into one map and normalise the saliency map values to between [0, 1]
-            INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps);
+            INDArray postprocessedActivations = postprocessActivations(weightedActivationMaps, normalize);
 
-            createFinalImages(originalImageArr, postprocessedActivations);
+            allImages.add(createFinalImages(originalImageArr, postprocessedActivations));
         }
+        return createCompleteCompositeImage(allImages, classPredictions);
     }
 
     private INDArray preprocessImage(INDArray imageArr) {
@@ -92,15 +112,14 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return preprocessed;
     }
 
-    private int calculateTargetClassID(INDArray imageArr, int targetClassID) {
-        if (targetClassID != -1) {
+    private int calculateTargetClassID(INDArray imageArr, PredictionClass targetClass) { // TODO return Prediction
+        if (targetClass.getClassID() != -1) {
             // Target class has already been set, don't calculate it
-            return targetClassID;
+            return targetClass.getClassID();
         }
         // Otherwise run the model on the image, and choose argmax as the target class
         INDArray output = modelOutputSingle(imageArr);
-        int argMax = output.argMax(1).getNumber(0).intValue();
-        return argMax;
+        return output.argMax(1).getNumber(0).intValue();
     }
 
     private INDArray calculateTargetClassWeights(INDArray softmaxOutput, int targetClassID) {
@@ -165,9 +184,9 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return layerName;
     }
 
-    private void createHeatmap(INDArray postprocessedActivations) {
+    private BufferedImage createHeatmap(INDArray postprocessedActivations) {
         Color[] gradientColors = Gradient.GRADIENT_PLASMA;
-        heatmap = new BufferedImage(
+        var heatmap = new BufferedImage(
                 (int) modelInputShape.getWidth(),
                 (int) modelInputShape.getHeight(),
                 BufferedImage.TYPE_INT_ARGB);
@@ -190,69 +209,104 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
             }
         }
         g.dispose();
+        return heatmap;
     }
 
-    private void createOriginalImage(INDArray imageArr) {
-        originalImage = imageFromINDArray(imageArr);
+    private BufferedImage createOriginalImage(INDArray imageArr) {
+        return imageFromINDArray(imageArr);
     }
 
-    private void createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
-        createHeatmap(postprocessedActivations);
-        createOriginalImage(imageArr);
-        createOverlaidHeatmap();
-        createCompositeImage();
-        allImages.add(getCompositeImage());
+    private BufferedImage createCompleteCompositeImage(ArrayList<BufferedImage> allImages, ArrayList<Prediction> targetClasses) {
+        // Stitch each buffered image together in allImages
+        if (allImages.size() == 0) {
+            return null;
+        }
+
+        BufferedImage firstImage = allImages.get(0);
+        int width = firstImage.getWidth();
+        int singleImageHeight = firstImage.getHeight();
+        int numImages = allImages.size();
+        int height = singleImageHeight * numImages;
+
+        // Draw the map info
+        int textX = outsideMargin;
+        int textY = 15;
+
+        BufferedImage completeCompositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = completeCompositeImage.createGraphics();
+
+        for (int i = 0; i < numImages; i++) {
+            BufferedImage tmpCompositeImage = allImages.get(i);
+            g.drawImage(tmpCompositeImage, 0, i * singleImageHeight, null);
+        }
+
+        g.setColor(Color.BLACK);
+//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
+        g.drawString(String.format("Image file: %s       Saliency Map Method: ScoreCAM       Base model: %s",
+                getInputFilename(), getModelName()), textX, textY);
+
+        g.dispose();
+
+        return completeCompositeImage;
+    }
+
+    private BufferedImage createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
+        var originalImage = createOriginalImage(imageArr);
+        var heatmap = createHeatmap(postprocessedActivations);
+        var heatmapOnImage = createHeatmapOnImage(originalImage, heatmap);
+        return createCompositeImage(originalImage, heatmap, heatmapOnImage);
     }
 
     private int calculateCompositeWidth() {
         // Outside margins plus images plus padding
-        return outsideBorder * 2 + (insidePadding * 2) + ((int) modelInputShape.getWidth() * 3);
+        return outsideMargin * 2 + (insidePadding * 2) + ((int) modelInputShape.getWidth() * 3);
     }
 
     private int calculateCompositeHeight() {
         // Outside margins plus image height plus space for text
-        return outsideBorder * 2 + (int) modelInputShape.getHeight() + (fontSpacing);
+        return outsideMargin * 2 + (int) modelInputShape.getHeight() + (fontSpacing);
     }
 
-    private void createCompositeImage() {
+    private BufferedImage createCompositeImage(BufferedImage originalImage, BufferedImage heatmap, BufferedImage heatmapOnImage) {
         int width = calculateCompositeWidth();
         int height = calculateCompositeHeight();
 
-        compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        var compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = compositeImage.createGraphics();
 
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
         g.setComposite(AlphaComposite.SrcOver);
 
-        int leftX = outsideBorder;
-        int leftY = outsideBorder;
+        int leftX = outsideMargin;
+        int leftY = outsideMargin;
         // Draw the left image
-        g.drawImage(getOriginalImage(), leftX, leftY, null);
+        g.drawImage(originalImage, leftX, leftY, null);
 
         // Draw the center image
-        int midX = (int) (outsideBorder + modelInputShape.getWidth() + insidePadding);
-        int midY = outsideBorder;
-        g.drawImage(getHeatmap(), midX, midY, null);
+        int midX = (int) (outsideMargin + modelInputShape.getWidth() + insidePadding);
+        int midY = outsideMargin;
+        g.drawImage(heatmap, midX, midY, null);
 
         // Draw the right image
-        int rightX = (int) (outsideBorder + (modelInputShape.getWidth() * 2) + (insidePadding * 2));
-        int rightY = outsideBorder;
-        g.drawImage(getHeatmapOnImage(), rightX, rightY, null);
+        int rightX = (int) (outsideMargin + (modelInputShape.getWidth() * 2) + (insidePadding * 2));
+        int rightY = outsideMargin;
+        g.drawImage(heatmapOnImage, rightX, rightY, null);
 
         // Draw the map info
         int textX = leftX;
         int textY = leftY + (int) modelInputShape.getHeight() + (fontSpacing * 2);
         g.setColor(Color.BLACK);
-//        g.setFont(new Font("Serif", Font.PLAIN, fontSpacing));
-        g.drawString("Target class: Dog", textX, textY);
+//        g.drawString("Target class: Dog", textX, textY);
 
         g.dispose();
+
+        return compositeImage;
     }
 
-    private void createOverlaidHeatmap() {
+    private BufferedImage createHeatmapOnImage(BufferedImage originalImage, BufferedImage heatmap) {
         // From https://www.reddit.com/r/javahelp/comments/2ufc0m/how_do_i_overlay_2_bufferedimages_and_set_the/co7yrv9?utm_source=share&utm_medium=web2x&context=3
-        heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
+        var heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = heatmapOnImage.createGraphics();
 
         // Clear the image (optional)
@@ -269,15 +323,16 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         g.drawImage(heatmap, 0, 0, null);
 
         g.dispose();
+        return heatmapOnImage;
     }
 
-    private INDArray postprocessActivations(INDArray weightedActivationMaps) {
+    private INDArray postprocessActivations(INDArray weightedActivationMaps, boolean normalize) {
         // Sum all maps to get one 224x224 map - [numActivationMaps, 224, 224] -> [224, 224]
         INDArray summed = weightedActivationMaps.sum(0);
         // Perform pixel-wise RELU
         INDArray reluActivations = Transforms.relu(summed);
 
-        if (getNormalizeHeatmap())
+        if (normalize)
             normalize2x2ArrayI(reluActivations);
 
         return reluActivations;

@@ -4,30 +4,30 @@ public class PredictionClass {
     /**
      * ID of the class prediction
      */
-    protected int classID;
+    private final int classID;
 
     /**
      * Human readable class name
      */
-    protected String className;
+    private final String className;
 
     public PredictionClass(int classID, String className) {
         this.classID = classID;
         this.className = className;
     }
 
-    public int getID() {
+    public int getClassID() {
         return classID;
     }
 
-    public String getName() {
+    public String getClassName() {
         return className;
     }
 
     @Override
     public String toString() {
         return String.format("Class ID = %d, Class name = %s",
-                getID(),
-                getName());
+                getClassID(),
+                getClassName());
     }
 }

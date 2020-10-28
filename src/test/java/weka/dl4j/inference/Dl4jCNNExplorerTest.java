@@ -153,7 +153,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
     private void checkPredictionInTopN(Dl4jCNNExplorer explorer, String imagePath, int expectedClassID) throws Exception {
         try {
             explorer.init();
-            explorer.makePrediction(new File(imagePath));
+            explorer.processImage(new File(imagePath));
 
             TopNPredictions topNPredictions = explorer.getCurrentPredictions();
 

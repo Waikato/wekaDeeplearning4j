@@ -31,11 +31,11 @@ public class Prediction {
     }
 
     public int getClassID() {
-        return this.predictionClass.getID();
+        return this.predictionClass.getClassID();
     }
 
     public String getClassName() {
-        return this.predictionClass.getName();
+        return this.predictionClass.getClassName();
     }
 
     public double getClassProbability() {
@@ -55,3 +55,4 @@ public class Prediction {
                 getClassProbability());
     }
 }
+

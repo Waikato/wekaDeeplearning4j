@@ -1,5 +1,6 @@
 package weka.dl4j.interpretability;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.deeplearning4j.nn.graph.ComputationGraph;
@@ -12,14 +13,18 @@ import weka.core.progress.ProgressManager;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
+import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.Enumeration;
 
 // TODO Document
 
+@Log4j2
 public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, OptionHandler {
 
     /**
@@ -41,9 +46,20 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     public abstract void processImage(File imageFile);
 
-    public abstract void generateOutputMap();
+    public abstract BufferedImage generateHeatmapToImage();
 
-    public abstract Image generateOutputMapToImage();
+    public void saveResult(BufferedImage completeCompositeImage) {
+        if (Utils.notDefaultFileLocation(getOutputFile())) {
+            log.info(String.format("Output file location = %s", getOutputFile()));
+            try {
+                ImageIO.write(completeCompositeImage, "png", getOutputFile());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            log.error("No output file location given - not saving saliency map");
+        }
+    }
 
     public ComputationGraph getComputationGraph() {
         return computationGraph;

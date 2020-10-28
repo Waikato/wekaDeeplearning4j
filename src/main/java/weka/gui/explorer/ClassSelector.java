@@ -90,10 +90,10 @@ public class ClassSelector extends JPanel {
                     JOptionPane.showMessageDialog(null, "No classes matched that regex pattern");
                     return;
                 } else if (matchingClasses.size() == 1) {
-                    setTargetClass(matchingClasses.get(0).getID());
+                    setTargetClass(matchingClasses.get(0).getClassID());
                 } else {
                     PredictionClass selectedClass = selectOneOfNClasses(matchingClasses);
-                    setTargetClass(selectedClass.getID());
+                    setTargetClass(selectedClass.getClassID());
                 }
 
             } catch (Exception ex) {

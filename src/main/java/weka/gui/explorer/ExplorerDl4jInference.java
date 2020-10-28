@@ -2,35 +2,22 @@ package weka.gui.explorer;
 
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.FilenameUtils;
 import weka.core.*;
 
-import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.Dl4jCNNExplorer;
-import weka.dl4j.inference.Prediction;
-import weka.dl4j.inference.PredictionClass;
-import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
 import weka.gui.explorer.Explorer.LogHandler;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 /**
  * Explorer panel for the Dl4j Model Inference Window
@@ -528,7 +515,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             explorer.init();
 
             m_Logger.statusMessage("Processing image");
-            explorer.makePrediction(new File(m_currentlyDisplayedImage));
+            explorer.processImage(new File(m_currentlyDisplayedImage));
 
             // Get the predictions
             StringBuffer buffer = new StringBuffer(explorer.getCurrentPredictions().toSummaryString());
@@ -549,7 +536,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         } catch (RuntimeException ex) {
             m_Logger.statusMessage("Terminated");
             // End the current progress
-            explorer.getSaliencyMapGenerator().getProgressManager().finish();
+            explorer.getSaliencyMapWrapper().getProgressManager().finish();
         } catch (Exception ex) {
             m_Logger.statusMessage("Error occured");
             ex.printStackTrace();
