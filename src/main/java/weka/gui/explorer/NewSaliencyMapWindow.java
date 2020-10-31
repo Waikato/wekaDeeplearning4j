@@ -123,6 +123,17 @@ public class NewSaliencyMapWindow extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 5;
+        var buttonPanel = new JPanel(new GridLayout(1, 5, 30, 5));
+        buttonPanel.add(addClassButton);
+        buttonPanel.add(removeClassButton);
+        buttonPanel.add(normalizeHeatmapCheckbox);
+        buttonPanel.add(generateButton);
+        buttonPanel.add(saveHeatmapButton);
+        add(buttonPanel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 5;
