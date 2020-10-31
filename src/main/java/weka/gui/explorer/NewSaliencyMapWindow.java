@@ -45,7 +45,8 @@ public class NewSaliencyMapWindow extends JPanel {
     JButton removeClassButton = new JButton("Remove Class");
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
-    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
+    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "saliency2.png";
+//    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
 //    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "output.png";
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
@@ -101,6 +102,7 @@ public class NewSaliencyMapWindow extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 0;
+        targetClassIDInput.setMinimumSize(new Dimension(50, 28));
         add(targetClassIDInput, gbc);
 
         gbc.gridx = 2;
@@ -119,27 +121,39 @@ public class NewSaliencyMapWindow extends JPanel {
         gbc.gridy = 0;
         add(patternButton, gbc);
 
-        gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        add(addClassButton, gbc);
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridwidth = 5;
+        gbc.gridheight = 1;
+        var imageLabel = new JLabel(new ImageIcon(DEFAULT_SALIENCY_IMAGE_PATH));
+        var scrollPane = new JScrollPane(imageLabel);
+//        var panel = new JPanel();
+//        panel.setBackground(Color.green);
+        add(scrollPane, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        add(removeClassButton, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        add(normalizeHeatmapCheckbox, gbc);
-
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        add(generateButton, gbc);
-
-        gbc.gridx = 4;
-        gbc.gridy = 1;
-        add(saveHeatmapButton, gbc);
+//        gbc.weightx = 1;
+//        gbc.fill = GridBagConstraints.HORIZONTAL;
+//        gbc.gridx = 0;
+//        gbc.gridy = 1;
+//        add(addClassButton, gbc);
+//
+//        gbc.gridx = 1;
+//        gbc.gridy = 1;
+//        add(removeClassButton, gbc);
+//
+//        gbc.gridx = 2;
+//        gbc.gridy = 1;
+//        add(normalizeHeatmapCheckbox, gbc);
+//
+//        gbc.gridx = 3;
+//        gbc.gridy = 1;
+//        add(generateButton, gbc);
+//
+//        gbc.gridx = 4;
+//        gbc.gridy = 1;
+//        add(saveHeatmapButton, gbc);
 //        // Saliency Map Window
 //        generateButton.addActionListener(e -> generateSaliencyMap());
 //        saveHeatmapButton.addActionListener(e -> saveHeatmap());
@@ -209,9 +223,12 @@ public class NewSaliencyMapWindow extends JPanel {
         var jf = new JFrame();
 
         jf.setTitle("WekaDeeplearning4j - Saliency Map Viewer");
-        jf.setSize(500, 500);
+        jf.setSize(1000, 700);
+        jf.setLocationRelativeTo(null);
         jf.setVisible(true);
         jf.add(window);
+
+        System.err.println(classNameInput.getHeight());
 //        this.processedExplorer = explorer;
 //
 //        // Reset the image
