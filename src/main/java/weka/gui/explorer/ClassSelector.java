@@ -9,24 +9,28 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-public class ClassSelector extends JPanel {
+public class ClassSelector {
+
+    private String[] classMap;
+
+    String m_PatternRegEx = "";
+
+    private SaliencyMapWindow parentPanel;
+
     JLabel targetClassIDLabel = new JLabel("Target Class ID:");
     JTextField targetClassIDInput = new JTextField();
     JLabel classNameLabel = new JLabel("  Class Name:");
     JTextField classNameInput = new JTextField();
     JButton patternButton = new JButton("Pattern");
-    /** The current regular expression. */
-    String m_PatternRegEx = "";
 
-    String[] classMap;
-
-    public ClassSelector(String[] classMap, int defaultClassID) {
-        this.classMap = classMap;
-        setupLayout();
-        setTargetClass(defaultClassID);
+    public ClassSelector(SaliencyMapWindow parentPanel, int rowNum) {
+        this.parentPanel = parentPanel;
+        this.classMap = parentPanel.getCurrentClassMap();
+        setTargetClass(parentPanel.getDefaultClassID());
+        setup(rowNum);
     }
 
-    private void setupLayout() {
+    private void setup(int rowNum) {
         patternButton.addActionListener(e -> openPatternDialog());
 
         // Setup the button listeners
@@ -50,24 +54,40 @@ public class ClassSelector extends JPanel {
         // Define the UI elements
         targetClassIDInput.setColumns(5);
         targetClassIDInput.setToolTipText("-1 to use max probability class");
-        classNameInput.setColumns(40);
         classNameInput.setEditable(false);
 
-        this.setLayout(new FlowLayout(FlowLayout.LEFT));
-        this.add(targetClassIDLabel);
-        this.add(targetClassIDInput);
-        this.add(classNameLabel);
-        this.add(classNameInput);
-        this.add(patternButton);
+        var gbc = new SaliencyMapWindow.SaliencyMapGBC();
+
+        gbc.gridy = rowNum;
+
+        gbc.gridx = 0;
+        parentPanel.add(targetClassIDLabel, gbc);
+
+        gbc.gridx = 1;
+        targetClassIDInput.setMinimumSize(new Dimension(50, 28));
+        parentPanel.add(targetClassIDInput, gbc);
+
+        gbc.gridx = 2;
+        parentPanel.add(classNameLabel, gbc);
+
+        gbc.gridx = 3;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        parentPanel.add(classNameInput, gbc);
+
+        gbc.gridx = 4;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        parentPanel.add(patternButton, gbc);
     }
 
-//    public void setClassMap(String[] classMap) {
-//        processedExplorer.getModelOutputDecoder().getClasses()
-//    }
-
-//    public JPanel getPanel() {
-//        return row;
-//    }
+    public void removeFromParent() {
+        parentPanel.remove(targetClassIDLabel);
+        parentPanel.remove(targetClassIDInput);
+        parentPanel.remove(classNameLabel);
+        parentPanel.remove(classNameInput);
+        parentPanel.remove(patternButton);
+    }
 
     public void setTargetClass(int id) {
         targetClassIDInput.setText("" + id);

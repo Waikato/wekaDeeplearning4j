@@ -112,7 +112,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
     protected Dl4jCNNExplorer processedExplorer;
 
-    protected NewSaliencyMapWindow saliencyMapWindow;
+    protected SaliencyMapWindow saliencyMapWindow;
     //endregion
 
 
@@ -410,7 +410,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     private void setupSaliencyMapWindow() {
-        saliencyMapWindow = new NewSaliencyMapWindow();
+        saliencyMapWindow = new SaliencyMapWindow();
     }
 
     /**
