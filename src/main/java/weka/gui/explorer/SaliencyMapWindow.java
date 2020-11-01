@@ -37,7 +37,7 @@ public class SaliencyMapWindow extends JPanel {
      */
     JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
-    JLabel saliencyImageLabel = new JLabel();
+    JLabel saliencyImageLabel;
     ImageIcon icon;
     Image saliencyImage;
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
@@ -45,6 +45,7 @@ public class SaliencyMapWindow extends JPanel {
     JButton removeClassButton = new JButton("Remove Class");
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
+    JScrollPane scrollPane;
     private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
@@ -129,8 +130,10 @@ public class SaliencyMapWindow extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 5;
         gbc.gridheight = 1;
-        var imageLabel = new JLabel(new ImageIcon(DEFAULT_SALIENCY_IMAGE_PATH));
-        var scrollPane = new JScrollPane(imageLabel);
+        saliencyImageLabel = new JLabel(new ImageIcon(DEFAULT_SALIENCY_IMAGE_PATH));
+        scrollPane = new JScrollPane(saliencyImageLabel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(20);
         add(scrollPane, gbc);
     }
 
@@ -157,13 +160,6 @@ public class SaliencyMapWindow extends JPanel {
 
     public void open(Dl4jCNNExplorer explorer) {
         this.processedExplorer = explorer;
-
-        // Reset the image
-        try {
-            setSaliencyImage(ImageIO.read(new File(DEFAULT_SALIENCY_IMAGE_PATH)));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
 
         // Start with a fresh class selector
         clearClassSelectors();
@@ -222,6 +218,13 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void setSaliencyImage(Image image) {
+        if (image == null) {
+            try {
+                image = ImageIO.read(new File(DEFAULT_SALIENCY_IMAGE_PATH));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
         saliencyImage = image;
         icon = new ImageIcon(saliencyImage);
         saliencyImageLabel.setIcon(icon);
