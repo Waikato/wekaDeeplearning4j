@@ -21,15 +21,21 @@ import java.util.ArrayList;
 @Log4j2
 public class NewSaliencyMapWindow extends JPanel {
 
+    public static class SaliencyMapGBC extends GridBagConstraints {
+        public SaliencyMapGBC() {
+            this(5);
+        }
 
+        public SaliencyMapGBC(int insetSize) {
+            this.insets = new Insets(insetSize, insetSize, insetSize, insetSize);
+        }
+    }
 
     Dl4jCNNExplorer processedExplorer;
     /**
      * UI Elements
      */
     JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
-
-    GridBagConstraints gbc = new GridBagConstraints();
 
     JLabel saliencyImageLabel = new JLabel();
     Image saliencyImage;
@@ -38,9 +44,7 @@ public class NewSaliencyMapWindow extends JPanel {
     JButton removeClassButton = new JButton("Remove Class");
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
-    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "saliency2.png";
-//    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
-//    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "output.png";
+    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
 
@@ -91,9 +95,13 @@ public class NewSaliencyMapWindow extends JPanel {
         normalizeHeatmapCheckbox.addActionListener(e -> generateSaliencyMap());
         addClassButton.addActionListener(e -> addClassSelector());
         removeClassButton.addActionListener(e -> removeClassSelector());
+
+        // Set the default class ID in the window
+        normalizeHeatmapCheckbox.setSelected(true);
     }
 
     private void addControlButtons() {
+        var gbc = new SaliencyMapGBC();
         gbc.gridy = buttonsRow;
 
         gbc.gridx = 0;
@@ -108,6 +116,7 @@ public class NewSaliencyMapWindow extends JPanel {
     }
 
     private void addScrollableImage() {
+        var gbc = new SaliencyMapGBC();
         gbc.gridx = 0;
         gbc.gridy = imageRow;
         gbc.weighty = 1;
@@ -127,10 +136,10 @@ public class NewSaliencyMapWindow extends JPanel {
                 BorderFactory.createTitledBorder("Saliency Map Viewer"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-
-        gbc.insets = new Insets(5, 5, 5, 5);
-
         addControlButtons();
+
+        // Start with a fresh class selector
+        addClassSelector();
 
         addScrollableImage();
     }
@@ -152,12 +161,6 @@ public class NewSaliencyMapWindow extends JPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        // Start with a fresh class selector
-        addClassSelector();
-
-        // Set the default class ID in the window
-        normalizeHeatmapCheckbox.setSelected(true);
 
         thisWindow.add(this);
         packWindow();

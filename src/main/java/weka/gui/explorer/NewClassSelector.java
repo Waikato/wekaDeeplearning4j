@@ -11,12 +11,6 @@ import java.util.regex.Pattern;
 
 public class NewClassSelector {
 
-    private GridBagConstraints gbc;
-
-//    private JPanel parentPanel;
-
-    private int rowNum;
-
     private String[] classMap;
 
     String m_PatternRegEx = "";
@@ -24,22 +18,19 @@ public class NewClassSelector {
     private NewSaliencyMapWindow parentPanel;
 
     JLabel targetClassIDLabel = new JLabel("Target Class ID:");
-    JTextField targetClassIDInput = new JTextField(3);
+    JTextField targetClassIDInput = new JTextField();
     JLabel classNameLabel = new JLabel("  Class Name:");
     JTextField classNameInput = new JTextField();
     JButton patternButton = new JButton("Pattern");
 
-//    public NewClassSelector(JPanel parentPanel, GridBagConstraints gbc, String[] classMap, int rowNum, int targetClassID) {
     public NewClassSelector(NewSaliencyMapWindow parentPanel, int rowNum) {
         this.parentPanel = parentPanel;
-        this.gbc = parentPanel.gbc;
         this.classMap = parentPanel.getCurrentClassMap();
-        this.rowNum = rowNum;
         setTargetClass(parentPanel.getDefaultClassID());
-        setup();
+        setup(rowNum);
     }
 
-    private void setup() {
+    private void setup(int rowNum) {
         patternButton.addActionListener(e -> openPatternDialog());
 
         // Setup the button listeners
@@ -63,14 +54,11 @@ public class NewClassSelector {
         // Define the UI elements
         targetClassIDInput.setColumns(5);
         targetClassIDInput.setToolTipText("-1 to use max probability class");
-        classNameInput.setColumns(40);
         classNameInput.setEditable(false);
 
+        var gbc = new NewSaliencyMapWindow.SaliencyMapGBC();
+
         gbc.gridy = rowNum;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
 
         gbc.gridx = 0;
         parentPanel.add(targetClassIDLabel, gbc);
