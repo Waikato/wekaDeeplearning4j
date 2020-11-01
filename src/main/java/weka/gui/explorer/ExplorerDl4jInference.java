@@ -445,7 +445,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_stopButton.setEnabled(stopButtonEnabled);
 
         boolean saliencyMapEnabled = processedExplorer != null && processedExplorer.getGenerateSaliencyMap();
-        m_saliencyMapButton.setEnabled(true);
+        m_saliencyMapButton.setEnabled(saliencyMapEnabled);
     }
 
     /**

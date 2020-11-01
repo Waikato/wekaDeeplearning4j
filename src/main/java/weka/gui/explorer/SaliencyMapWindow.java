@@ -38,6 +38,7 @@ public class SaliencyMapWindow extends JPanel {
     JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
     JLabel saliencyImageLabel = new JLabel();
+    ImageIcon icon;
     Image saliencyImage;
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
     JButton addClassButton = new JButton("Add Class");
@@ -55,7 +56,6 @@ public class SaliencyMapWindow extends JPanel {
 
     int buttonsRow = 0;
     int targetClassRow = 1;
-    int numTargetClasses = 0;
     int imageRow = 20;
 
     public SaliencyMapWindow() {
@@ -67,13 +67,19 @@ public class SaliencyMapWindow extends JPanel {
             // Limit the size to 10
             return;
         }
-        var classSelector = new ClassSelector(this, targetClassRow + numTargetClasses++);
+        var classSelector = new ClassSelector(this, targetClassRow + classSelectors.size());
         classSelectors.add(classSelector);
         packWindow();
     }
 
+    private void clearClassSelectors() {
+        while (classSelectors.size() > 0) {
+            removeClassSelector();
+        }
+    }
+
     private void removeClassSelector() {
-        if (classSelectors.size() == 1) {
+        if (classSelectors.size() == 0) {
             // Don't go below one class selector
             return;
         }
@@ -138,9 +144,6 @@ public class SaliencyMapWindow extends JPanel {
 
         addControlButtons();
 
-        // Start with a fresh class selector
-        addClassSelector();
-
         addScrollableImage();
     }
 
@@ -161,6 +164,10 @@ public class SaliencyMapWindow extends JPanel {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        // Start with a fresh class selector
+        clearClassSelectors();
+        addClassSelector();
 
         thisWindow.add(this);
         packWindow();
@@ -216,7 +223,7 @@ public class SaliencyMapWindow extends JPanel {
 
     private void setSaliencyImage(Image image) {
         saliencyImage = image;
-        ImageIcon icon = new ImageIcon(saliencyImage);
+        icon = new ImageIcon(saliencyImage);
         saliencyImageLabel.setIcon(icon);
         saliencyImageLabel.invalidate();
     }

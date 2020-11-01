@@ -26,8 +26,8 @@ public class ClassSelector {
     public ClassSelector(SaliencyMapWindow parentPanel, int rowNum) {
         this.parentPanel = parentPanel;
         this.classMap = parentPanel.getCurrentClassMap();
-        setTargetClass(parentPanel.getDefaultClassID());
         setup(rowNum);
+        setTargetClass(parentPanel.getDefaultClassID());
     }
 
     private void setup(int rowNum) {
