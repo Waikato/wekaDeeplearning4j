@@ -144,7 +144,7 @@ public class WekaDeeplearning4jExamples {
         // Dog ID = 222
         // Cat ID = 281
         AbstractCNNSaliencyMapWrapper wrapper = new WekaScoreCAM();
-        wrapper.setBatchSize(6);
+        wrapper.setBatchSize(8);
         explorer.setSaliencyMapWrapper(wrapper);
         explorer.setGenerateSaliencyMap(true);
 

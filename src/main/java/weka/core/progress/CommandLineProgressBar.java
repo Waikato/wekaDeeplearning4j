@@ -5,12 +5,10 @@ import lombok.extern.log4j.Log4j2;
 import java.util.Timer;
 import java.util.TimerTask;
 
-// TODO document
-// TODO implement indeterminate bar
 @Log4j2
-public class TextProgressBar extends AbstractProgressBar {
+public class CommandLineProgressBar extends AbstractProgressBar {
 
-    public TextProgressBar(double maxProgress, String progressMessage) {
+    public CommandLineProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
     }
 

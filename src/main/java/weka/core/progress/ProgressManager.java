@@ -49,7 +49,7 @@ public class ProgressManager implements Serializable {
             progressBar = new GUIProgressBar(maxProgress, progressMessage);
         } else {
             // Create the text progress bar as we're running it from code/command line
-            progressBar = new TextProgressBar(maxProgress, progressMessage);
+            progressBar = new CommandLineProgressBar(maxProgress, progressMessage);
         }
 
         if (maxProgress == -1) {
