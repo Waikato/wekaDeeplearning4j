@@ -12,6 +12,7 @@ nav:
         - 'Loading Data': 'user-guide/data.md'
         - 'Model Zoo': 'user-guide/model-zoo.md'
         - 'Natural Language Processing': 'user-guide/nlp.md'
+        - 'Progress Manager': 'user-guide/progress-manager.md'
     - Examples:
         - 'Image Feature Extraction': 'examples/featurize-mnist.md'
         - 'Classifying a Custom Dataset': 'examples/classifying-your-own.md'
