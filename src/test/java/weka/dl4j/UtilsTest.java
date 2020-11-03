@@ -16,7 +16,7 @@
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.iterators.instance;
+package weka.dl4j;
 
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -26,7 +26,7 @@ import weka.core.Attribute;
 import weka.core.Instances;
 import weka.util.TestUtil;
 
-public class UtilTest {
+public class UtilsTest {
 
   @Test
   public void testInstancesToDataSet() throws Exception {
