@@ -241,6 +241,12 @@ public class TestUtil {
     double[] row2 = new double[] {2, 2, 4, 5};
     return Nd4j.create(new double[][] {row1, row2});
   }
+
+  public static INDArray get4dActivations() {
+    // bs, channels, w, h
+    int[] shape = new int[] {16, 512, 64, 64};
+    return Nd4j.zeros(shape).add(5);
+  }
   /**
    * Creates a test dataset
    */

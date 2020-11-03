@@ -248,4 +248,121 @@ public class UtilsTest {
     // Assert
     Assert.assertFalse(Utils.isChannelsLast(ndArray));
   }
+
+  @Test()
+  public void reshapeActivations_NoPooling_IsReshaped() {
+    // Arrange
+    var ndArray = TestUtil.get4dActivations();
+
+    // Act
+    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.NONE);
+
+    // Assert
+    // Flattened the extra dimensions together
+    Assert.assertEquals(512 * 64 * 64, reshapedActivations.shape()[1]);
+
+    // Doesn't pool anything, max should still be 5
+    Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
+  }
+
+  @Test()
+  public void reshapeActivations_Max_IsPooled() {
+    // Arrange
+    var ndArray = TestUtil.get4dActivations();
+
+    // Act
+    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MAX);
+
+    // Assert
+    // Pooled extra dimensions the extra dimensions together
+    Assert.assertEquals(512, reshapedActivations.shape()[1]);
+
+    // Using max pooling should retain 5 as max
+    Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
+  }
+
+  @Test()
+  public void reshapeActivations_Avg_IsPooled() {
+    // Arrange
+    var ndArray = TestUtil.get4dActivations();
+
+    // Act
+    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.AVG);
+
+    // Assert
+    // Pooled extra dimensions the extra dimensions together
+    Assert.assertEquals(512, reshapedActivations.shape()[1]);
+
+    Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
+  }
+
+  @Test()
+  public void reshapeActivations_Sum_IsPooled() {
+    // Arrange
+    var ndArray = TestUtil.get4dActivations();
+
+    // Act
+    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.SUM);
+
+    // Assert
+    // Pooled extra dimensions the extra dimensions together
+    Assert.assertEquals(512, reshapedActivations.shape()[1]);
+
+    Assert.assertEquals(20480, reshapedActivations.maxNumber().intValue());
+  }
+
+  @Test()
+  public void reshapeActivations_Min_IsPooled() {
+    // Arrange
+    var ndArray = TestUtil.get4dActivations();
+
+    // Act
+    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MIN);
+
+    // Assert
+    // Pooled extra dimensions the extra dimensions together
+    Assert.assertEquals(512, reshapedActivations.shape()[1]);
+
+    Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
+  }
+
+  @Test()
+  public void appendClasses_AttachesCorrectClasses() throws Exception {
+    // Arrange
+    var numInstances = 10;
+    var numAttributes = 100;
+
+    var dataset = TestUtil.makeTestDataset(
+            0,
+            numInstances,
+            0,
+            0,
+            1,
+            0,
+            0,
+            2,
+            Attribute.NOMINAL,
+            1,
+            false
+    );
+
+    var activations = Nd4j.ones(numInstances, numAttributes);
+
+    // Act
+    var classesAppended = Utils.appendClasses(activations, dataset);
+
+    var shape = classesAppended.shape();
+
+    // Assert
+    Assert.assertEquals(numInstances, shape[0]);
+    // +1 for the class attribute that's now been attached
+    Assert.assertEquals(numAttributes + 1, shape[1]);
+
+    for (int i = 0; i < numInstances; i++) {
+      var thisInstance = classesAppended.getRow(i);
+
+      // Assert the class value has been transferred to the activation correctly
+      Assert.assertEquals(dataset.instance(i).classValue(), thisInstance.getDouble(numAttributes), 0);
+    }
+  }
 }
