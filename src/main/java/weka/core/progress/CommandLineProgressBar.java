@@ -6,22 +6,33 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Log4j2
+/**
+ * Command line implementation of a progress bar
+ */
 public class CommandLineProgressBar extends AbstractProgressBar {
 
     public CommandLineProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
     }
 
+    /** Total number of characters across the progress bar */
     protected int totalProgressBarSize = 60;
 
+    /** Size of the indeterminate bar which scrolls across */
     private int indeterminateBarSize = 10;
 
+    /** Number of Progress chars to print */
     private int currNumDots = 0;
 
+    /** Space to the left and right of the progress bar */
     private int leftSpace = 0, rightSpace = 0;
 
+    /** Timer for refreshing the indeterminate progress bar */
     protected Timer timer;
 
+    /**
+     * Update the progress bar with the current value
+     */
     @Override
     protected void onSetProgress() {
         if (m_indeterminate) {
@@ -46,19 +57,25 @@ public class CommandLineProgressBar extends AbstractProgressBar {
         }
     }
 
+    /**
+     * Update the progress bar display
+     */
     @Override
     public void refreshDisplay() {
         String progressChar = "=";
         String progressRemainingChar = " ";
 
-        System.err.print(String.format("\r%s: [%s%s%s] %s",
+        System.err.printf("\r%s: [%s%s%s] %s",
                 getProgressMessage(),
                 progressRemainingChar.repeat(leftSpace),
                 progressChar.repeat(currNumDots),
                 progressRemainingChar.repeat(rightSpace),
-                getETAString()));
+                getETAString());
     }
 
+    /**
+     * Do any required setup on start (e.g., show a popup window)
+     */
     @Override
     protected void onStart() {
         System.err.println("\n\n");
@@ -68,6 +85,7 @@ public class CommandLineProgressBar extends AbstractProgressBar {
         }
     }
 
+    /** Start a new timer which repeatedly increments the indeterminate progress bar loader */
     private void startIndeterminateLoader() {
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -78,6 +96,9 @@ public class CommandLineProgressBar extends AbstractProgressBar {
         }, 0, 250);
     }
 
+    /**
+     * Perform any teardown (e.g., close popup window, display completion message)
+     */
     @Override
     public void finish() {
         if (timer != null) {

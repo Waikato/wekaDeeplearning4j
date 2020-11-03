@@ -117,30 +117,50 @@ public abstract class AbstractProgressBar implements Serializable {
     }
 
     /**
-     * 
-     * @param max
+     * Set the max progress value
+     * @param max Maximum value for progress (e.g., max number of iterations)
      */
     public void setMaxProgress(double max) {
         m_maxProgress = max;
         m_indeterminate = max < 0;
     }
 
+    /**
+     * Return the user supplied progress message
+     * @return User supplied progress message
+     */
     public String getProgressMessage() {
         return m_progressMessage;
     }
 
+    /**
+     * Set the progress message
+     * @param message Progress Message (e.g., Processing data...)
+     */
     public void setProgressMessage(String message) {
         m_progressMessage = message;
     }
 
+    /**
+     * Gets the estimated time remaining of the task, or "" if indeterminate
+     * @return Formatted ETA string
+     */
     public String getETAString() {
         return m_indeterminate ? "" : String.format("ETA: %s", etaHms);
     }
 
+    /**
+     * Gets the indeterminate status of the progress bar
+     * @return Indeterminate status
+     */
     public boolean isIndeterminate() {
         return m_indeterminate;
     }
 
+    /**
+     * Sets the indeterminate status of the progress bar
+     * @param m_indeterminate Indeterminate status
+     */
     public void setIndeterminate(boolean m_indeterminate) {
         this.m_indeterminate = m_indeterminate;
     }

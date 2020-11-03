@@ -7,12 +7,16 @@ import java.awt.*;
 
 public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
+    /** The main JFrame */
     protected JFrame currentFrame;
 
+    /** The main progres bar */
     protected JProgressBar progressBar;
 
+    /** Displays the user supplied progress message */
     protected JLabel progressMessageLabel;
 
+    /** Displays the calculated ETA */
     protected JLabel etaLabel;
 
     public GUIProgressBar(double maxProgress, String progressMessage) {
@@ -20,6 +24,9 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         initGUIElements();
     }
 
+    /**
+     * Initialize the GUI elements on the frame
+     */
     private void initGUIElements() {
         // Create frame with title Registration Demo
         currentFrame = new JFrame();
@@ -68,11 +75,17 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         currentFrame.add(mainPanel);
     }
 
+    /**
+     * Update the progress bar with the current value
+     */
     @Override
     protected void onSetProgress() {
         progressBar.setValue((int) m_actualProgress);
     }
 
+    /**
+     * Do any required setup on start (e.g., show a popup window)
+     */
     @Override
     protected void onStart() {
         currentFrame.pack();
@@ -80,6 +93,9 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         currentFrame.setVisible(true);
     }
 
+    /**
+     * Perform any teardown (e.g., close popup window, display completion message)
+     */
     @Override
     public void finish() {
         if (currentFrame != null) {
@@ -87,6 +103,9 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
         }
     }
 
+    /**
+     * Update the progress bar display
+     */
     @Override
     public void refreshDisplay() {
         SwingUtilities.invokeLater(() -> {
