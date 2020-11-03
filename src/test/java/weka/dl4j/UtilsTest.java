@@ -18,17 +18,20 @@
 
 package weka.dl4j;
 
+import org.deeplearning4j.nn.conf.CNN2DFormat;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
+import weka.core.WekaPackageManager;
 import weka.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.dl4j.enums.PoolingType;
 import weka.util.TestUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -364,5 +367,90 @@ public class UtilsTest {
       // Assert the class value has been transferred to the activation correctly
       Assert.assertEquals(dataset.instance(i).classValue(), thisInstance.getDouble(numAttributes), 0);
     }
+  }
+
+  @Test
+  public void notDefaultFileLocation_True_ForNewFile() {
+    // Arrange
+    var selectedFile = new File("tmp.png");
+
+    // Assert
+    Assert.assertTrue(Utils.notDefaultFileLocation(selectedFile));
+  }
+
+  @Test
+  public void notDefaultFileLocation_False_ForDefaultFile() {
+    // Arrange
+    var selectedFile = new File(WekaPackageManager.getPackageHome().getPath());
+
+    // Assert
+    Assert.assertFalse(Utils.notDefaultFileLocation(selectedFile));
+  }
+
+  @Test
+  public void decodeCNNShape_channelsFirst() {
+    // Arrange
+    int numChannels = 512;
+    int featureMapSize = 7;
+    var cnnShape = new int[] {numChannels, featureMapSize, featureMapSize};
+
+    // Act
+    var decodedShape = Utils.decodeCNNShape(cnnShape);
+
+    // Assert
+    Assert.assertEquals(numChannels, decodedShape.getChannels());
+    Assert.assertEquals(featureMapSize, decodedShape.getWidth());
+    Assert.assertEquals(featureMapSize, decodedShape.getHeight());
+    Assert.assertEquals(CNN2DFormat.NCHW, decodedShape.getFormat());
+  }
+
+  @Test
+  public void decodeCNNShape_channelsLast() {
+    // Arrange
+    int numChannels = 512;
+    int featureMapSize = 7;
+    var cnnShape = new int[] {featureMapSize, featureMapSize, numChannels};
+
+    // Act
+    var decodedShape = Utils.decodeCNNShape(cnnShape);
+
+    // Assert
+    Assert.assertEquals(numChannels, decodedShape.getChannels());
+    Assert.assertEquals(featureMapSize, decodedShape.getWidth());
+    Assert.assertEquals(featureMapSize, decodedShape.getHeight());
+    Assert.assertEquals(CNN2DFormat.NCHW, decodedShape.getFormat());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void decodeCNNShape_withBatchSize_ThrowsIllegalArgumentException() {
+    // Arrange
+    int batchSize = 16;
+    int numChannels = 512;
+    int featureMapSize = 7;
+    var cnnShape = new int[] {batchSize, numChannels, featureMapSize, featureMapSize};
+
+    // Act
+    Utils.decodeCNNShape(cnnShape);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void decodeCNNShape_withBadOrder_ThrowsIllegalArgumentException() {
+    // Arrange
+    int numChannels = 512;
+    int featureMapSize = 7;
+    var cnnShape = new int[] {featureMapSize, numChannels, featureMapSize};
+
+    // Act
+    Utils.decodeCNNShape(cnnShape);
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void decodeCNNShape_with2dshape_ThrowsIndexOutOfBoundsException() {
+    // Arrange
+    int featureMapSize = 7;
+    var cnnShape = new int[] {featureMapSize, featureMapSize};
+
+    // Act
+    Utils.decodeCNNShape(cnnShape);
   }
 }

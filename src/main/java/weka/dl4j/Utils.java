@@ -480,12 +480,12 @@ public class Utils {
   }
 
   /**
-   * @param serializedModelFile File to check
+   * @param file File to check
    * @return true if the user has selected a file to load the model from
    */
-  public static boolean notDefaultFileLocation(File serializedModelFile) {
+  public static boolean notDefaultFileLocation(File file) {
     // Has the model file location been set to something other than the default
-    return !serializedModelFile.getPath().equals(defaultFileLocation());
+    return !file.getPath().equals(defaultFileLocation());
   }
 
   /**
@@ -586,7 +586,9 @@ public class Utils {
       height = val1;
       channels = val2;
     } else {
-      throw new IllegalArgumentException(String.format("Input array '%s' is not of valid shape", Arrays.toString(shape)));
+      throw new IllegalArgumentException(String.format("Input array '%s' is not of valid shape," +
+              " must be either [numChannels, width, height] or [width, height, numChannels]",
+              Arrays.toString(shape)));
     }
 
     return (InputType.InputTypeConvolutional) InputType.convolutional(height, width, channels);
