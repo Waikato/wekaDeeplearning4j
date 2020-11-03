@@ -31,7 +31,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.Classifier;
@@ -232,6 +234,12 @@ public class TestUtil {
     attributesPerLayer.put("layer1", 256L);
     attributesPerLayer.put("layer2", 64L);
     return attributesPerLayer;
+  }
+
+  public static INDArray get2DArray() {
+    double[] row1 = new double[] {-1, -1, -2, 0 };
+    double[] row2 = new double[] {2, 2, 4, 5};
+    return Nd4j.create(new double[][] {row1, row2});
   }
   /**
    * Creates a test dataset

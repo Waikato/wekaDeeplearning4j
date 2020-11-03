@@ -26,6 +26,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import weka.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
+import weka.dl4j.enums.PoolingType;
 import weka.util.TestUtil;
 
 import java.util.ArrayList;
@@ -174,5 +175,77 @@ public class UtilsTest {
 
     // Assert
     Assert.assertTrue(Utils.needsReshaping(activations));
+  }
+
+  @Test
+  public void poolNDArray_Max_IsMax() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(5, (int) Utils.poolNDArray(ndArray, PoolingType.MAX));
+  }
+
+  @Test
+  public void poolNDArray_Avg_IsAvg() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(1.125, Utils.poolNDArray(ndArray, PoolingType.AVG), 0.01);
+  }
+
+  @Test
+  public void poolNDArray_Sum_IsSum() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(9, (int) Utils.poolNDArray(ndArray, PoolingType.SUM));
+  }
+
+  @Test
+  public void poolNDArray_Min_IsMin() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.MIN));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void poolNDArray_PNorm_throwsException() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.PNORM));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void poolNDArray_None_throwsException() {
+    // Arrange
+    var ndArray = TestUtil.get2DArray();
+
+    // Assert
+    Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.NONE));
+  }
+
+  @Test()
+  public void isChannelsLast_TrueForChannelsLast() {
+    // Arrange
+    var ndArray = Nd4j.zeros(1, 56, 56, 128);
+
+    // Assert
+    Assert.assertTrue(Utils.isChannelsLast(ndArray));
+  }
+
+  @Test()
+  public void isChannelsLast_FalseForChannelsFirst() {
+    // Arrange
+    var ndArray = Nd4j.zeros(1, 128, 56, 56);
+
+    // Assert
+    Assert.assertFalse(Utils.isChannelsLast(ndArray));
   }
 }
