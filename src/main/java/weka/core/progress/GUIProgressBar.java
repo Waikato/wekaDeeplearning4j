@@ -1,7 +1,5 @@
 package weka.core.progress;
 
-// TODO document
-
 import javax.swing.*;
 import java.awt.*;
 
