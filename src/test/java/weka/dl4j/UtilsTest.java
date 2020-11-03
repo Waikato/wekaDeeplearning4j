@@ -18,13 +18,18 @@
 
 package weka.dl4j;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.util.TestUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class UtilsTest {
 
@@ -51,5 +56,123 @@ public class UtilsTest {
     for (int i = 0; i < data.numInstances(); i++) {
 
     }
+  }
+
+  @Test
+  public void copyNominalAttribute_CopiesCorrectly() {
+    // Arrange
+    var attributeName = "Test Attribute";
+    var attributeValues = new ArrayList<String>();
+    attributeValues.add("Attribute val 1");
+    attributeValues.add("Attribute val 2");
+    attributeValues.add("Attribute val 3");
+    var originalAttribute = new Attribute(attributeName, attributeValues);
+
+    // Act
+    var duplicateAttribute = Utils.copyNominalAttribute(originalAttribute);
+
+    // Assert
+    Assert.assertEquals(originalAttribute.numValues(), duplicateAttribute.numValues());
+
+    var duplicateValues = Collections.list(duplicateAttribute.enumerateValues());
+    Assert.assertArrayEquals(attributeValues.toArray(), duplicateValues.toArray());
+  }
+
+  @Test
+  public void getAttributeName_Index0_IsLayer1() {
+    // Arrange
+    var attributesPerLayer = TestUtil.getAttributesPerLayer();
+    var i = 0;
+
+    // Act
+    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+
+    Assert.assertEquals("layer1-0", layerName);
+  }
+
+  @Test
+  public void getAttributeName_Index255_IsLayer1() {
+    // Arrange
+    var attributesPerLayer = TestUtil.getAttributesPerLayer();
+    var i = 255;
+
+    // Act
+    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+
+    Assert.assertEquals("layer1-255", layerName);
+  }
+
+  @Test
+  public void getAttributeName_Index256_IsLayer2() {
+    // Arrange
+    var attributesPerLayer = TestUtil.getAttributesPerLayer();
+    var i = 256;
+
+    // Act
+    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+
+    Assert.assertEquals("layer2-0", layerName);
+  }
+
+  @Test
+  public void getAttributeName_Index319_IsLayer2() {
+    // Arrange
+    var attributesPerLayer = TestUtil.getAttributesPerLayer();
+    var i = 319;
+
+    // Act
+    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+
+    Assert.assertEquals("layer2-63", layerName);
+  }
+
+  @Test
+  public void getAttributeName_OutofIndex_IsNull() {
+    // Arrange
+    var attributesPerLayer = TestUtil.getAttributesPerLayer();
+    var i = 320;
+
+    // Act
+    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+
+    Assert.assertNull(layerName);
+  }
+
+  @Test
+  public void getAttributeName_NoLayerMap_transformedAttribute() {
+    // Arrange
+    var i = 256;
+
+    // Act
+    var layerName = Utils.getAttributeName(null, i);
+
+    Assert.assertEquals("transformedAttribute256", layerName);
+  }
+
+  @Test
+  public void needsReshaping_2d_isFalse() {
+    // Arrange
+    var activations = Nd4j.rand(8, 64);
+
+    // Assert
+    Assert.assertFalse(Utils.needsReshaping(activations));
+  }
+
+  @Test
+  public void needsReshaping_3d_isTrue() {
+    // Arrange
+    var activations = Nd4j.rand(8, 64, 7);
+
+    // Assert
+    Assert.assertTrue(Utils.needsReshaping(activations));
+  }
+
+  @Test
+  public void needsReshaping_4d_isTrue() {
+    // Arrange
+    var activations = Nd4j.rand(8, 64, 7, 7);
+
+    // Assert
+    Assert.assertTrue(Utils.needsReshaping(activations));
   }
 }

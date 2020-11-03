@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -225,6 +227,12 @@ public class TestUtil {
 //    uiServer.attach(statsStorage);
 //  }
 
+  public static Map<String, Long> getAttributesPerLayer() {
+    Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
+    attributesPerLayer.put("layer1", 256L);
+    attributesPerLayer.put("layer2", 64L);
+    return attributesPerLayer;
+  }
   /**
    * Creates a test dataset
    */
