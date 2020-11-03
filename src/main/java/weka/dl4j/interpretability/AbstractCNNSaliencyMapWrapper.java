@@ -4,21 +4,18 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.core.Range;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
-import java.nio.Buffer;
 import java.util.Arrays;
 import java.util.Enumeration;
 

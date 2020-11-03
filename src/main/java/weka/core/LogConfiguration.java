@@ -35,7 +35,7 @@ import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.Configurator;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.gui.FilePropertyMetadata;
 import weka.gui.knowledgeflow.KFGUIConsts;
 

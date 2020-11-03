@@ -1,15 +1,12 @@
 package weka.dl4j.interpretability;
 
 import lombok.extern.log4j.Log4j2;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.PredictionClass;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.Buffer;
 
 // TODO Document
 @Log4j2

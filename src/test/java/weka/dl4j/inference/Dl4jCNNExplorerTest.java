@@ -2,7 +2,7 @@ package weka.dl4j.inference;
 
 import junit.framework.TestCase;
 import lombok.extern.log4j.Log4j2;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.*;
 import weka.dl4j.zoo.keras.VGG;
 import weka.zoo.ZooModelTest;

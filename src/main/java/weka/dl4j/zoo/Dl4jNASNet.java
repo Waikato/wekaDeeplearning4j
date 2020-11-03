@@ -18,11 +18,6 @@
 
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.conf.CacheMode;
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
-
 /**
  * A WEKA version of DeepLearning4j's NASNet ZooModel.
  *

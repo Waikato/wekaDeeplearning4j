@@ -3,7 +3,7 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.NASNet;
 
 public class KerasNASNet extends AbstractZooModel {

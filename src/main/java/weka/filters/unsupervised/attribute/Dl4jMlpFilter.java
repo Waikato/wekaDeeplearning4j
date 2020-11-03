@@ -19,16 +19,14 @@
 package weka.filters.unsupervised.attribute;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
 
 import lombok.extern.log4j.Log4j2;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.*;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.DefaultInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -287,7 +285,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
    * @throws Exception From errors occurring during loading the model file, or from intializing from the data
    */
   private void loadModel(Instances data) throws Exception {
-    model = Utils.loadModel(data, serializedModelFile, zooModelType, instanceIterator);
+    model = Dl4jMlpClassifier.loadModel(data, serializedModelFile, zooModelType, instanceIterator);
   }
 
   /**

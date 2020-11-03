@@ -54,13 +54,17 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
 import weka.classifiers.IterativeClassifier;
 import weka.classifiers.RandomizableClassifier;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.classifiers.rules.ZeroR;
 import weka.core.*;
 import weka.core.Capabilities.Capability;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.*;
 import weka.dl4j.earlystopping.EarlyStopping;
+import weka.dl4j.enums.CacheMode;
+import weka.dl4j.enums.ConvolutionMode;
+import weka.dl4j.enums.PoolingType;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.iterators.instance.*;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
@@ -1771,6 +1775,73 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     }
     log.debug("Finishing parse layers");
     return tmpLayers;
+  }
+
+  /**
+   * Tries to load from a saved model file (if it exists), otherwise loads the given zoo model
+   * @param serializedModelFile Saved model path
+   * @param zooModelType Type of Zoo Model
+   * @return Dl4jMlpClassifier with the loaded ComputationGraph
+   * @throws WekaException From errors occurring during loading the model file
+   */
+  public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
+    Dl4jMlpClassifier model;
+    if (Utils.notDefaultFileLocation(serializedModelFile)) {
+      // First try load from the WEKA binary model file
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
+        model = (Dl4jMlpClassifier) ois.readObject();
+      } catch (Exception e) {
+        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
+      }
+    } else {
+      if (zooModelType == null) {
+        throw new WekaException("No model file supplied nor zoo model specified");
+      }
+      // If that fails, try loading from selected zoo model (or keras file)
+      model = new Dl4jMlpClassifier();
+      model.setZooModel(zooModelType);
+    }
+    model.setFilterMode(true);
+    return model;
+  }
+
+  /**
+   * Load a Dl4jMlpClassifier for use with the given instances and iterator
+   * @param data Instances to prime the model with
+   * @param serializedModelFile Saved model file
+   * @param zooModelType Type of Zoo Model
+   * @param instanceIterator Instance iterator to prime the model with
+   * @return Dl4jMlpClassifier setup with the instances and iterator
+   * @throws Exception From errors occurring during loading the model file, or from intializing from the data
+   */
+  public static Dl4jMlpClassifier loadModel(Instances data, File serializedModelFile,
+                                            AbstractZooModel zooModelType, AbstractInstanceIterator instanceIterator) throws Exception {
+    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
+
+    model.setInstanceIterator(instanceIterator);
+
+    // If we're loading from a previously trained model, we don't need to intialize the classifier again,
+    // We do need to, however, if we're loading from a fresh zoo model
+    if (!Utils.notDefaultFileLocation(serializedModelFile))
+      model.initializeClassifier(data);
+
+    return model;
+  }
+
+  /**
+   * Load a Dl4jMlpClassifier for use in the Inference Panel - no need to supply Instances or InstanceIterators
+   * @param serializedModelFile Saved model file
+   * @param zooModelType Type of Zoo Model
+   * @return Dl4jMlpClassifier ready to be used in the Inference Panel
+   * @throws WekaException From errors occurring during loading the model file, or from intializing from the data
+   */
+  public static Dl4jMlpClassifier loadInferenceModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
+    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
+
+    if (!Utils.notDefaultFileLocation(serializedModelFile))
+      model.loadZooModelNoData(2, 1, zooModelType.getShape()[0]);
+
+    return model;
   }
 
   public TrainingListener getIterationListener() {

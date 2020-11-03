@@ -1,11 +1,5 @@
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.core.OptionMetadata;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.DenseNet;
-import weka.dl4j.zoo.keras.MobileNet;
-
 public class KerasMobileNet {
     // Uses RELU layer instead of RELU activation layer, which isn't currently supported in DL4J
 

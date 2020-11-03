@@ -22,7 +22,7 @@ import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's XCeption ZooModel.

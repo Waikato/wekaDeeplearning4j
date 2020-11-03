@@ -10,13 +10,12 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 import weka.gui.ProgrammaticProperty;
 
 import java.io.Serializable;
@@ -36,7 +35,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     /**
      * Dataset that the pretrained weights are trained on
      */
-    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
+    protected PretrainedType m_pretrainedType = PretrainedType.NONE;
     /**
      * Output layer of the model to be taken off (and replace by our custom output layer)
      */

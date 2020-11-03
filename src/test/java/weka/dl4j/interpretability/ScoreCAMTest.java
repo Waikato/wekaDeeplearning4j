@@ -2,8 +2,7 @@ package weka.dl4j.interpretability;
 
 import junit.framework.TestCase;
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.classifiers.functions.dl4j.Utils;
-import weka.dl4j.inference.PredictionClass;
+import weka.dl4j.Utils;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.zoo.ZooModelTest;
 

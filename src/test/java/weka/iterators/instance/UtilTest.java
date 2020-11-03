@@ -21,7 +21,7 @@ package weka.iterators.instance;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.util.TestUtil;

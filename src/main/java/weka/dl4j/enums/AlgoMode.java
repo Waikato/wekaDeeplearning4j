@@ -16,9 +16,10 @@
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.dl4j;
+package weka.dl4j.enums;
 
 import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import weka.dl4j.ApiWrapper;
 
 /**
  * Proxy Enum for {@link org.deeplearning4j.nn.conf.ConvolutionMode}. This is necessary as Weka's

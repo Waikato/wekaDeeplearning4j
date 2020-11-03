@@ -16,14 +16,12 @@
  * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.classifiers.functions.dl4j;
+package weka.dl4j;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,8 +31,6 @@ import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
-import org.deeplearning4j.nn.api.Layer;
-import org.deeplearning4j.nn.conf.CNN2DFormat;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -44,13 +40,8 @@ import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
-import weka.dl4j.PoolingType;
-import weka.dl4j.iterators.instance.AbstractInstanceIterator;
-import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.enums.PoolingType;
 
 import javax.imageio.ImageIO;
 
@@ -503,73 +494,6 @@ public class Utils {
    */
   public static String defaultFileLocation() {
     return WekaPackageManager.getPackageHome().getPath();
-  }
-
-  /**
-   * Tries to load from a saved model file (if it exists), otherwise loads the given zoo model
-   * @param serializedModelFile Saved model path
-   * @param zooModelType Type of Zoo Model
-   * @return Dl4jMlpClassifier with the loaded ComputationGraph
-   * @throws WekaException From errors occurring during loading the model file
-   */
-  public static Dl4jMlpClassifier tryLoadFromFile(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
-    Dl4jMlpClassifier model;
-    if (notDefaultFileLocation(serializedModelFile)) {
-      // First try load from the WEKA binary model file
-      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
-        model = (Dl4jMlpClassifier) ois.readObject();
-      } catch (Exception e) {
-        throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
-      }
-    } else {
-      if (zooModelType == null) {
-        throw new WekaException("No model file supplied nor zoo model specified");
-      }
-      // If that fails, try loading from selected zoo model (or keras file)
-      model = new Dl4jMlpClassifier();
-      model.setZooModel(zooModelType);
-    }
-    model.setFilterMode(true);
-    return model;
-  }
-
-  /**
-   * Load a Dl4jMlpClassifier for use with the given instances and iterator
-   * @param data Instances to prime the model with
-   * @param serializedModelFile Saved model file
-   * @param zooModelType Type of Zoo Model
-   * @param instanceIterator Instance iterator to prime the model with
-   * @return Dl4jMlpClassifier setup with the instances and iterator
-   * @throws Exception From errors occurring during loading the model file, or from intializing from the data
-   */
-  public static Dl4jMlpClassifier loadModel(Instances data, File serializedModelFile,
-                                            AbstractZooModel zooModelType, AbstractInstanceIterator instanceIterator) throws Exception {
-    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
-
-    model.setInstanceIterator(instanceIterator);
-
-    // If we're loading from a previously trained model, we don't need to intialize the classifier again,
-    // We do need to, however, if we're loading from a fresh zoo model
-    if (!notDefaultFileLocation(serializedModelFile))
-      model.initializeClassifier(data);
-
-    return model;
-  }
-
-  /**
-   * Load a Dl4jMlpClassifier for use in the Inference Panel - no need to supply Instances or InstanceIterators
-   * @param serializedModelFile Saved model file
-   * @param zooModelType Type of Zoo Model
-   * @return Dl4jMlpClassifier ready to be used in the Inference Panel
-   * @throws WekaException From errors occurring during loading the model file, or from intializing from the data
-   */
-  public static Dl4jMlpClassifier loadInferenceModel(File serializedModelFile, AbstractZooModel zooModelType) throws WekaException {
-    Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
-
-    if (!Utils.notDefaultFileLocation(serializedModelFile))
-      model.loadZooModelNoData(2, 1, zooModelType.getShape()[0]);
-
-    return model;
   }
 
   public static void saveNDArray(INDArray array, String filenamePrefix) {

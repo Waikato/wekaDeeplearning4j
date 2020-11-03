@@ -30,7 +30,7 @@ import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;

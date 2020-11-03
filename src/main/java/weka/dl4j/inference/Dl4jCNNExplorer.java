@@ -5,7 +5,7 @@ import org.datavec.image.loader.NativeImageLoader;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.*;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.dl4j.interpretability.WekaScoreCAM;
@@ -64,7 +64,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @throws Exception Exceptions from loading the ComputationGraph
      */
     public void init() throws Exception {
-        model = Utils.loadInferenceModel(serializedModelFile, zooModelType);
+        model = Dl4jMlpClassifier.loadInferenceModel(serializedModelFile, zooModelType);
     }
 
     public void processImage(File imageFile) throws Exception {

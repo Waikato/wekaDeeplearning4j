@@ -21,7 +21,7 @@ package weka.dl4j.layers;
 import java.io.Serializable;
 import java.util.Enumeration;
 import org.deeplearning4j.nn.conf.dropout.Dropout;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;

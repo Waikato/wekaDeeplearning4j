@@ -21,7 +21,7 @@ package weka.dl4j.iterators.instance;
 import java.util.Enumeration;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.core.Option;

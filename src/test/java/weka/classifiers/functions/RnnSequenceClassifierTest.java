@@ -45,7 +45,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.stemmers.SnowballStemmer;
-import weka.dl4j.GradientNormalization;
+import weka.dl4j.enums.GradientNormalization;
 import weka.dl4j.NeuralNetConfiguration;
 import weka.dl4j.activations.ActivationIdentity;
 import weka.dl4j.activations.ActivationTanH;

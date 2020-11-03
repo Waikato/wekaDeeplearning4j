@@ -21,7 +21,7 @@ package weka.dl4j.layers;
 import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionMetadata;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 
 /**
  * A version of DeepLearning4j's GlobalPooling that implements WEKA option handling.

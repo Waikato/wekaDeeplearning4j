@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.deeplearning4j.nn.conf.dropout.IDropout;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.dl4j.ApiWrapper;

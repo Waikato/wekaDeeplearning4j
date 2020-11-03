@@ -3,7 +3,7 @@ package weka.dl4j.inference;
 import lombok.extern.log4j.Log4j2;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.*;
 
 import java.io.BufferedReader;

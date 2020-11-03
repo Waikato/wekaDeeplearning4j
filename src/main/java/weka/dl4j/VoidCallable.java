@@ -12,24 +12,18 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * CacheMode.java
- * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
+ * VoidCallable.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 
 package weka.dl4j;
 
 /**
- * Cache modes for datasetiterators.
- * <ul>
- * <li>NONE: Do not use any cache</li>
- * <li>MEMORY: Cache data in memory</li>
- * <li>FILESYSTEM: Cache data in the filesystem in "java.io.tmpdir"</li>
- * </ul>
+ * Simple callable interafce with no parameters and no return value (void).
  *
  * @author Steven Lang
  */
-public enum CacheMode {
-  NONE,
-  MEMORY,
-  FILESYSTEM
+public interface VoidCallable {
+
+  void call();
 }
