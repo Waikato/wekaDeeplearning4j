@@ -1,10 +1,5 @@
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.core.OptionMetadata;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.InceptionResNetV2;
-
 
 public class KerasInceptionResNetV2 {
     // Requires writing custom lambda layers for block35, block17, block8:

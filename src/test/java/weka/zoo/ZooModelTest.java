@@ -25,13 +25,12 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.OperationNotSupportedException;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.listener.EpochListener;

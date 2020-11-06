@@ -12,48 +12,43 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * PoolingType.java
+ * AlgoMode.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.dl4j;
+package weka.dl4j.enums;
+
+import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import weka.dl4j.ApiWrapper;
 
 /**
- * Proxy Enum for {@link org.deeplearning4j.nn.conf.layers.PoolingType}. This is necessary as Weka's
+ * Proxy Enum for {@link org.deeplearning4j.nn.conf.ConvolutionMode}. This is necessary as Weka's
  * run script cannot find the enum classes during the option parsing as they reside in the Dl4j
  * backend and are at that time not visible to the class loader.
  *
  * @author Steven Lang
  */
-public enum PoolingType implements ApiWrapper<org.deeplearning4j.nn.conf.layers.PoolingType> {
-  MAX, AVG, SUM, PNORM, NONE, MIN;
+public enum AlgoMode implements ApiWrapper<ConvolutionLayer.AlgoMode> {
+  NO_WORKSPACE, PREFER_FASTEST, USER_SPECIFIED;
 
   /**
-   * NONE and MIN are not DL4J pooling types, only used for pooling activations
-   * @return true if the pooling type is custom (and not valid in DL4J)
-   */
-  public boolean isCustom() {
-    return this == NONE || this == MIN;
-  }
-
-  /**
-   * Parse backend pooling type and return weka enum implementation.
+   * Parse backend algo mode and return weka enum implementation.
    *
-   * @param poolingType Pooling type
-   * @return Weka pooling type enum implementation
+   * @param algoMode Convolution mode
+   * @return Weka convolution mode enum implementation
    */
-  public static PoolingType fromBackend(
-      org.deeplearning4j.nn.conf.layers.PoolingType poolingType) {
-    return valueOf(poolingType.name());
+  public static AlgoMode fromBackend(
+      ConvolutionLayer.AlgoMode algoMode) {
+    return valueOf(algoMode.name());
   }
 
   @Override
-  public org.deeplearning4j.nn.conf.layers.PoolingType getBackend() {
-    return org.deeplearning4j.nn.conf.layers.PoolingType.valueOf(this.name());
+  public ConvolutionLayer.AlgoMode getBackend() {
+    return ConvolutionLayer.AlgoMode.valueOf(this.name());
   }
 
   @Override
-  public void setBackend(org.deeplearning4j.nn.conf.layers.PoolingType newBackend) {
+  public void setBackend(ConvolutionLayer.AlgoMode newBackend) {
     // Do nothing as this enum does not have a state
 
   }

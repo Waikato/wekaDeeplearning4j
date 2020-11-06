@@ -1,9 +1,9 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.DenseNet;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.ResNet;
 
 public class KerasResNet extends AbstractZooModel {
@@ -28,6 +28,18 @@ public class KerasResNet extends AbstractZooModel {
     )
     public ResNet.VARIATION getVariation() {
         return variation;
+    }
+
+    @Override
+    public ImagePreProcessingScaler getImagePreprocessingScaler() {
+        ResNet.VARIATION variation = getVariation();
+
+        if (variation == ResNet.VARIATION.RESNET50V2 ||
+            variation == ResNet.VARIATION.RESNET101V2 ||
+            variation == ResNet.VARIATION.RESNET152V2)
+            return new ImagePreProcessingScaler(-1, 1);
+        else
+            return null;
     }
 
     public void setVariation(ResNet.VARIATION var) {

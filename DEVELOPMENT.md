@@ -2,6 +2,11 @@
 
 This document provides information that are specific to the development of Wekadeeplearning4j.
 
+## Misc Dev Tips
+
+- `Utils.getNext(DataSetIterator, int)` - If using a `DataSetIterator`, make sure you use this wrapper method in `Utils`
+instead of simply calling `DataSetIterator.next()`.
+- `Utils.defaultFileLocation()` - If making a class with a `File` parameter, use this as the default filepath value.
 ## Publish a new Release
 
 See the [RELEASE.md](./RELEASE.md) documentation.

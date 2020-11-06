@@ -17,7 +17,7 @@ Title=Weka wrappers for Deeplearning4j
 Category=Classification/Regression
 
 # Author (required)
-Author=Christopher Beckham, Eibe Frank, Mark Hall, Steven Lang and Felipe Bravo
+Author=Christopher Beckham, Eibe Frank, Mark Hall, Steven Lang, Felipe Bravo, and Rhys Compton
 
 # Maintainer (required)
 Maintainer=Weka team <wekalist@list.scms.waikato.ac.nz>

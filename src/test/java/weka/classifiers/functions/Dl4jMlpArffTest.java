@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.core.Instances;
 import weka.dl4j.NeuralNetConfiguration;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 import weka.dl4j.activations.ActivationReLU;
 import weka.dl4j.activations.ActivationSoftmax;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;

@@ -20,8 +20,9 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's InceptionResNetV1 ZooModel.
@@ -55,5 +56,20 @@ public class Dl4jInceptionResNetV1 extends AbstractZooModel {
   public int[][] getShape() {
     return org.deeplearning4j.zoo.model.InceptionResNetV1.builder().build().metaData()
         .getInputShape();
+  }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
+
+  @Override
+  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+    return null;
   }
 }

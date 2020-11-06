@@ -18,11 +18,6 @@
 
 package weka.dl4j.zoo;
 
-import org.deeplearning4j.nn.conf.CacheMode;
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
-
 /**
  * A WEKA version of DeepLearning4j's NASNet ZooModel.
  *
@@ -30,7 +25,7 @@ import weka.dl4j.PretrainedType;
  */
 public class Dl4jNASNet {
     // NASNet has a bug in the current version of DL4j (1.0.0-beta6)
-    // It should be fixed in the next release
+    // Not fixed in 1.0.0-beta7 TODO check this in 1.0.0-beta8
     // https://github.com/eclipse/deeplearning4j/issues/7319
 
 //public class Dl4jNASNet extends AbstractZooModel {

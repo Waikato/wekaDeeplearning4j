@@ -65,11 +65,15 @@ public class Word2VecLoader extends AbstractFileLoader implements BatchConverter
   }
 
   /* (non-Javadoc)
+   * @see
+   */
+
+  /**
    * @see weka.core.converters.FileSourcedConverter#getFileExtension()
+   * @return Word2Vec file extension
    */
   @Override
   public String getFileExtension() {
-    // TODO Auto-generated method stub
     return FILE_EXTENSION;
   }
 

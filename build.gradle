@@ -14,8 +14,8 @@ def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
 // Set JDK compatibility
 allprojects {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    sourceCompatibility = 1.11
+    targetCompatibility = 1.11
 }
 
 /*
@@ -120,13 +120,17 @@ task mainCopyMisc(dependsOn: mainInitDistDir, type: Copy) {
     from('./') {
         include 'GenericPropertiesCreator.props'
         include 'GUIEditors.props'
+        include 'Explorer-release.props'
         include 'datasets/**'
         include 'doc/**'
         include 'src/main/**'
+        include 'src/test/resources/images/**'
         exclude 'src/main/*.iml'
     }
-
     into "dist/${project.name}/"
+
+    // Needs to be called 'Explorer.props' to be found by the Weka GUI
+    rename "Explorer-release.props", "Explorer.props"
 }
 
 /*
@@ -158,7 +162,7 @@ task mainCopyJar(dependsOn: [mainInitDistDir, assemble], type: Copy) {
  */
 task makeMainZip(dependsOn: [mainCopyJar, mainCopyDescriptionProps, mainCopyMisc, mainCopyLibs], type: Zip) {
     from "dist/${project.name}"
-    destinationDir file("dist")
+    destinationDirectory = file("dist")
 }
 
 /*
@@ -230,7 +234,7 @@ def createCudaZipTask(cuda_version, platform) {
         def cuda_dist_dir = "dist/${project.name}-cuda-$cuda_version-$platform"
         from cuda_dist_dir
         archiveName "${project.name}-cuda-$cuda_version-$version-$platform-x86_64.zip"
-        destinationDir file("dist")
+        destinationDirectory = file("dist")
         dependsOn "makeCuda-$cuda_version-$platform"
     }
 }
@@ -292,6 +296,7 @@ dependencies {
     testImplementation group: "nz.ac.waikato.cms.weka", name: "weka-stable", version: "$versions.weka", classifier: "tests"
     testImplementation "com.github.fracpete:inetutils4j:$versions.inetutils4j"
     testImplementation "junit:junit:$versions.junit"
+    testImplementation "org.projectlombok:lombok:$versions.lombok"
 
     // Cuda dependencies
     if (cuda_version != null) {
@@ -302,15 +307,39 @@ dependencies {
             throw new GradleException("Invalid CUDA Version: $cuda_version - Must be one of $valid_cuda_versions")
         }
     }
+
+    // Annotation Processors
+    annotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    testAnnotationProcessor "org.projectlombok:lombok:$versions.lombok"
 }
 
 test {
+    maxHeapSize = "4g"
+
     testLogging {
         events "passed", "skipped", "failed"
     }
-    
-    if (project.hasProperty('excludeTests')) { 
-        exclude project.property('excludeTests')
+
+    if (project.hasProperty('excludeTests')) {
+        println "For consistency, please add your test exclusion to the travisTest task"
+        println "If this is an ad-hoc/short-term exclusion then ignore this message"
+        excludeTestsMatching project.property('excludeTests')
+    }
+}
+
+task travisTest(type: Test) {
+    maxHeapSize = "4g"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    filter {
+        // Excluded from travis due to taking too long / using too much memory
+        excludeTestsMatching 'ZooModelTest'
+        excludeTestsMatching 'Dl4jCNNExplorerTest'
+        excludeTestsMatching 'Dl4jMlpFilterTest'
+        excludeTestsMatching 'ScoreCAMTest'
     }
 }
 

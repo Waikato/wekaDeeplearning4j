@@ -1,0 +1,6 @@
+# Adds the Model Explorer tab to the GUI tabs
+
+# The release version doesn't need the built-in tabs specified, only the newly added tabs
+
+Tabs=weka.gui.explorer.ExplorerDl4jInference:standalone
+TabsPolicy=append

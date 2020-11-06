@@ -21,9 +21,10 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.zoo.ZooModel;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.VGG;
 
 /**
@@ -53,6 +54,11 @@ public class Dl4jVGG extends AbstractZooModel {
     )
     public VGG.VARIATION getVariation() {
         return m_variation;
+    }
+
+    @Override
+    public ImagePreProcessingScaler getImagePreprocessingScaler() {
+        return null;
     }
 
     public void setVariation(VGG.VARIATION var) {

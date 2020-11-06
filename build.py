@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import argparse
 import os
 import subprocess
@@ -103,7 +103,8 @@ def install_main_package():
     weka_home = os.environ.get('WEKA_HOME', f'{user_home}/wekafiles')
     weka_jar = f'{weka_home}/weka.jar'
     if not os.path.isfile(weka_jar):
-        printerr(f'{weka_home} did not cointain a weka jar')
+        printerr(f'{weka_home} did not contain a weka jar, couldnt install package')
+        return
 
     # Install via packagemanager
     exec_cmd(f'rm -r {weka_home}/packages/wekaDeeplearning4j',

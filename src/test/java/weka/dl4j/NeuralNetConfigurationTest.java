@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.layers.BaseLayer;
-import org.deeplearning4j.nn.weights.IWeightInit;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.nn.weights.WeightInitDistribution;
 import org.junit.After;
@@ -48,7 +47,6 @@ import org.nd4j.linalg.learning.regularization.L1Regularization;
 import org.nd4j.linalg.learning.regularization.L2Regularization;
 import org.nd4j.linalg.learning.regularization.Regularization;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.classifiers.functions.dl4j.Utils;
 import weka.core.Instances;
 import weka.dl4j.distribution.BinomialDistribution;
 import weka.dl4j.distribution.ConstantDistribution;
@@ -63,6 +61,7 @@ import weka.dl4j.dropout.AlphaDropout;
 import weka.dl4j.dropout.Dropout;
 import weka.dl4j.dropout.GaussianDropout;
 import weka.dl4j.dropout.GaussianNoise;
+import weka.dl4j.enums.GradientNormalization;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
 import weka.dl4j.layers.ConvolutionLayer;
 import weka.dl4j.layers.DenseLayer;
@@ -312,9 +311,6 @@ public class NeuralNetConfigurationTest {
     }
   }
 
-  // TODO: Should be fixed when
-  //       https://github.com/eclipse/deeplearning4j/pull/8243
-  //       gets merged.
   @Test
   public void testUpdater() throws Exception {
     for (Updater updater : getAvailableUpdaterWithNonDefaultParameters()) {
@@ -324,9 +320,6 @@ public class NeuralNetConfigurationTest {
     }
   }
 
-  // TODO: Should be fixed when
-  //       https://github.com/eclipse/deeplearning4j/pull/8243
-  //       gets merged.
   @Test
   public void testWeightInit() throws Exception {
     List<WeightInit> skipWeightInits = new ArrayList<>();

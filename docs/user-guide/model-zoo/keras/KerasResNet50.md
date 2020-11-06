@@ -1,6 +1,6 @@
 # KerasResNet50
 
-[Back to Model Zoo](../../model-zoo.md)
+[Back to Model Zoo](../../model-zoo.md#model-summaries)
 
 ```text
 Model: "resnet50"

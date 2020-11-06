@@ -20,10 +20,10 @@ package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.DenseNet;
+import weka.dl4j.enums.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's Darknet19 ZooModel.
@@ -57,16 +57,15 @@ public class Dl4jDarknet19 extends AbstractZooModel {
     return m_variation;
   }
 
+  @Override
+  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+    return new ImagePreProcessingScaler(0, 1);
+  }
+
+
   public void setVariation(VARIATION var) {
     m_variation = var;
   }
-
-//  @Override
-//  public void setPretrainedType(PretrainedType pretrainedType) {
-//    setPretrainedType(pretrainedType, 1000,
-//            "globalpooling", "softmax",
-//            new String[]{"loss"});
-//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {

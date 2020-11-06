@@ -16,8 +16,12 @@
  * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.classifiers.functions.dl4j;
+package weka.dl4j;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.cpu.nativecpu.NDArray;
@@ -34,26 +40,18 @@ import org.nd4j.linalg.dataset.api.iterator.CachingDataSetIterator;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.WekaException;
-import weka.dl4j.PoolingType;
+import weka.core.*;
+import weka.dl4j.enums.PoolingType;
+
+import javax.imageio.ImageIO;
 
 /**
  * Utility routines for the Dl4jMlpClassifier
  *
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
  */
+@Log4j2
 public class Utils {
-
-  /**
-   * Logger instance
-   */
-  private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
   /**
    * Converts a set of training instances to a DataSet. Assumes that the instances have been
@@ -143,7 +141,6 @@ public class Utils {
           || iter instanceof CachingDataSetIterator) {
         next = getNext(iter);
       } else {
-        // TODO: figure out which batch size is feasible for inference
         final int batch = iter.batch() * 8;
         next = Utils.getNext(iter, batch);
       }
@@ -471,5 +468,129 @@ public class Utils {
    */
   public static DataSet getNext(DataSetIterator iter, int num) {
     return iter.next(num).copy();
+  }
+
+  /**
+   * Checks whether the path exists - a little tidier than the code it wraps
+   * @param path Path to check
+   * @return True if the path exists, false otherwise
+   */
+  public static boolean pathExists(String path) {
+    return new File(path).exists();
+  }
+
+  /**
+   * @param file File to check
+   * @return true if the user has selected a file to load the model from
+   */
+  public static boolean notDefaultFileLocation(File file) {
+    // Has the model file location been set to something other than the default
+    return !file.getPath().equals(defaultFileLocation());
+  }
+
+  /**
+   * The default location for a file parameter
+   * @return Default file path
+   */
+  public static String defaultFileLocation() {
+    return WekaPackageManager.getPackageHome().getPath();
+  }
+
+  public static void saveNDArray(INDArray array, String filenamePrefix) {
+    BufferedImage img = Utils.imageFromINDArray(array);
+    try {
+      ImageIO.write(img, "png", new File(filenamePrefix + ".png"));
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  /**
+   * Takes an INDArray containing an image loaded using the native image loader
+   * libraries associated with DL4J, and converts it into a BufferedImage.
+   * The INDArray contains the color values split up across three channels (RGB)
+   * and in the integer range 0-255.
+   *
+   * @param array INDArray containing an image in order [N, C, H, W] or [C, H, W]
+   * @return BufferedImage
+   */
+  public static BufferedImage imageFromINDArray(INDArray array) {
+    long[] shape = array.shape();
+
+    boolean is4d = false;
+    String dimString = "3D";
+
+    if (shape.length == 4) {
+      is4d = true;
+      dimString = "4D";
+    }
+
+    log.debug(String.format("Converting %s INDArray to image...", dimString));
+
+    long height = shape[1];
+    long width = shape[2];
+
+    if (is4d) {
+      height = shape[2];
+      width = shape[3];
+    }
+
+    BufferedImage image = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        int red, green, blue;
+
+        if (is4d) {
+          red = array.getInt(0, 2, y, x);
+          green = array.getInt(0, 1, y, x);
+          blue = array.getInt(0, 0, y, x);
+        } else {
+          red = array.getInt(2, y, x);
+          green = array.getInt(1, y, x);
+          blue = array.getInt(0, y, x);
+        }
+
+        //handle out of bounds pixel values
+        red = Math.min(red, 255);
+        green = Math.min(green, 255);
+        blue = Math.min(blue, 255);
+
+        red = Math.max(red, 0);
+        green = Math.max(green, 0);
+        blue = Math.max(blue, 0);
+        image.setRGB(x, y, new Color(red, green, blue).getRGB());
+      }
+    }
+    return image;
+  }
+
+  public static InputType.InputTypeConvolutional decodeCNNShape (int[] shape) {
+    return decodeCNNShape(Arrays.stream(shape).asLongStream().toArray());
+  }
+
+  public static InputType.InputTypeConvolutional decodeCNNShape (long[] shape) {
+    long val0 = shape[0];
+    long val1 = shape[1];
+    long val2 = shape[2];
+    long channels, width, height;
+
+    // Check for channels first
+    if (val1 == val2) {
+      // shape = [channels, width, height]
+      channels = val0;
+      width = val1;
+      height = val2;
+    } else if (val0 == val1) { // check for channels last
+      // shape = [width, height, channels]
+      width = val0;
+      height = val1;
+      channels = val2;
+    } else {
+      throw new IllegalArgumentException(String.format("Input array '%s' is not of valid shape," +
+              " must be either [numChannels, width, height] or [width, height, numChannels]",
+              Arrays.toString(shape)));
+    }
+
+    return (InputType.InputTypeConvolutional) InputType.convolutional(height, width, channels);
   }
 }

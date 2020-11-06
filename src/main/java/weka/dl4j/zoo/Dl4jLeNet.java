@@ -21,9 +21,9 @@ package weka.dl4j.zoo;
 import org.deeplearning4j.nn.conf.CacheMode;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import weka.classifiers.functions.MultilayerPerceptron;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.dl4j.Preferences;
-import weka.dl4j.PretrainedType;
+import weka.dl4j.enums.PretrainedType;
 
 /**
  * A WEKA version of DeepLearning4j's LeNet ZooModel.
@@ -42,15 +42,6 @@ public class Dl4jLeNet extends AbstractZooModel {
     setOutputLayer("8");
     setExtraLayersToRemove(new String[] {"9"});
   }
-//
-//  @Override
-//  public void setPretrainedType(PretrainedType pretrainedType) {
-//    setPretrainedType(pretrainedType,
-//            500,
-//            "7",
-//            "8",
-//            new String[] {"9"});
-//  }
 
   @Override
   public ComputationGraph init(int numLabels, long seed, int[] shape, boolean filterMode) {
@@ -69,5 +60,20 @@ public class Dl4jLeNet extends AbstractZooModel {
   @Override
   public int[][] getShape() {
     return org.deeplearning4j.zoo.model.LeNet.builder().build().metaData().getInputShape();
+  }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
+
+  @Override
+  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+    return null;
   }
 }

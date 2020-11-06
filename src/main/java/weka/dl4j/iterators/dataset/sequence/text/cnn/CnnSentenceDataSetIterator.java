@@ -21,9 +21,9 @@ package weka.dl4j.iterators.dataset.sequence.text.cnn;
 import static org.nd4j.linalg.indexing.NDArrayIndex.all;
 import static org.nd4j.linalg.indexing.NDArrayIndex.interval;
 import static org.nd4j.linalg.indexing.NDArrayIndex.point;
-import static weka.classifiers.functions.dl4j.Utils.getFieldValue;
-import static weka.classifiers.functions.dl4j.Utils.invokeMethod;
-import static weka.classifiers.functions.dl4j.Utils.setFieldValue;
+import static weka.dl4j.Utils.getFieldValue;
+import static weka.dl4j.Utils.invokeMethod;
+import static weka.dl4j.Utils.setFieldValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,7 @@ import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.INDArrayIndex;
 import weka.core.stopwords.AbstractStopwords;
+import weka.dl4j.Utils;
 
 /**
  * CnnSentenceDataSetIterator extension to Deeplearning4j implementation. This class extends its
@@ -48,9 +49,9 @@ import weka.core.stopwords.AbstractStopwords;
  * Since {@link org.deeplearning4j.iterator.CnnSentenceDataSetIterator} only has private access to
  * its fields and most of its methods, it is necessary to make use of
  * <p>
- * - {@link weka.classifiers.functions.dl4j.Utils#getFieldValue(Object, String)}, - {@link
- * weka.classifiers.functions.dl4j.Utils#setFieldValue(Object, String, Object)} - {@link
- * weka.classifiers.functions.dl4j.Utils#invokeMethod(Object, String, Object...)}
+ * - {@link Utils#getFieldValue(Object, String)}, - {@link
+ * Utils#setFieldValue(Object, String, Object)} - {@link
+ * Utils#invokeMethod(Object, String, Object...)}
  * <p>
  * until field/method visibility is changed upstream.
  *

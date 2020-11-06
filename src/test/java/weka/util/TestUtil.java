@@ -27,9 +27,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.classifiers.Classifier;
@@ -225,6 +229,24 @@ public class TestUtil {
 //    uiServer.attach(statsStorage);
 //  }
 
+  public static Map<String, Long> getAttributesPerLayer() {
+    Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
+    attributesPerLayer.put("layer1", 256L);
+    attributesPerLayer.put("layer2", 64L);
+    return attributesPerLayer;
+  }
+
+  public static INDArray get2DArray() {
+    double[] row1 = new double[] {-1, -1, -2, 0 };
+    double[] row2 = new double[] {2, 2, 4, 5};
+    return Nd4j.create(new double[][] {row1, row2});
+  }
+
+  public static INDArray get4dActivations() {
+    // bs, channels, w, h
+    int[] shape = new int[] {16, 512, 64, 64};
+    return Nd4j.zeros(shape).add(5);
+  }
   /**
    * Creates a test dataset
    */

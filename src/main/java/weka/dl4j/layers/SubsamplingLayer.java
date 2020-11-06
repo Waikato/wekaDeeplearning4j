@@ -23,8 +23,8 @@ import java.util.Enumeration;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.ConvolutionMode;
+import weka.dl4j.enums.PoolingType;
 import weka.gui.ProgrammaticProperty;
 
 /**

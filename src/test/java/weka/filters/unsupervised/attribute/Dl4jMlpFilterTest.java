@@ -24,11 +24,13 @@ import static weka.util.TestUtil.saveClf;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import lombok.extern.log4j.Log4j2;
 import org.junit.Test;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 import weka.dl4j.iterators.instance.AbstractInstanceIterator;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
@@ -51,7 +53,8 @@ import weka.util.TestUtil;
  *
  * @author Steven Lang, Rhys Compton
  */
-public class Dl4JMlpFilterTest {
+@Log4j2
+public class Dl4jMlpFilterTest {
 
   @Test
   public void testProcessMnistResNet() throws Exception {
@@ -104,7 +107,7 @@ public class Dl4JMlpFilterTest {
     Files.delete(Paths.get(clfPath));
   }
 
-  @Test //TODO figure out why test failing on Travis CI, but not locally
+  @Test
   public void testProcessMnist() throws Exception {
     // Init data
     Instances dataMnist = DatasetLoader.loadMiniMnistMeta();

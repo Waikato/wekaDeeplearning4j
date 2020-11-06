@@ -12,13 +12,13 @@
  * You should have received a copy of the GNU General Public License
  * along with WekaDeeplearning4j.  If not, see <https://www.gnu.org/licenses/>.
  *
- * AlgoMode.java
+ * ConvolutionMode.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.dl4j;
+package weka.dl4j.enums;
 
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
+import weka.dl4j.ApiWrapper;
 
 /**
  * Proxy Enum for {@link org.deeplearning4j.nn.conf.ConvolutionMode}. This is necessary as Weka's
@@ -27,27 +27,27 @@ import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
  *
  * @author Steven Lang
  */
-public enum AlgoMode implements ApiWrapper<ConvolutionLayer.AlgoMode> {
-  NO_WORKSPACE, PREFER_FASTEST, USER_SPECIFIED;
+public enum ConvolutionMode implements ApiWrapper<org.deeplearning4j.nn.conf.ConvolutionMode> {
+  Strict, Truncate, Same;
 
   /**
-   * Parse backend algo mode and return weka enum implementation.
+   * Parse backend convolution mode and return weka enum implementation.
    *
-   * @param algoMode Convolution mode
+   * @param convolutionMode Convolution mode
    * @return Weka convolution mode enum implementation
    */
-  public static AlgoMode fromBackend(
-      ConvolutionLayer.AlgoMode algoMode) {
-    return valueOf(algoMode.name());
+  public static ConvolutionMode fromBackend(
+      org.deeplearning4j.nn.conf.ConvolutionMode convolutionMode) {
+    return valueOf(convolutionMode.name());
   }
 
   @Override
-  public ConvolutionLayer.AlgoMode getBackend() {
-    return ConvolutionLayer.AlgoMode.valueOf(this.name());
+  public org.deeplearning4j.nn.conf.ConvolutionMode getBackend() {
+    return org.deeplearning4j.nn.conf.ConvolutionMode.valueOf(this.name());
   }
 
   @Override
-  public void setBackend(ConvolutionLayer.AlgoMode newBackend) {
+  public void setBackend(org.deeplearning4j.nn.conf.ConvolutionMode newBackend) {
     // Do nothing as this enum does not have a state
 
   }

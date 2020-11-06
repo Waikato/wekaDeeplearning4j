@@ -1,5 +1,6 @@
 package weka.core.converters;
 
+import lombok.extern.log4j.Log4j2;
 import weka.core.*;
 import weka.gui.ProgrammaticProperty;
 
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * <!-- globalinfo-start -->
  * <!-- globalinfo-end -->
  */
+@Log4j2
 public class ImageDirectoryLoader extends AbstractLoader implements
         BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
@@ -93,7 +95,7 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         for (int i = 0; i < imageNames.length; i++) {
             String imgName = imageNames[i];
             if (!isImage(imgName)) {
-                System.err.println(String.format("Found non image file: %s, ignoring...", imgName));
+                log.error(String.format("Found non image file: %s, ignoring...", imgName));
                 imageNames[i] = null;
                 continue;
             }
@@ -152,8 +154,8 @@ public class ImageDirectoryLoader extends AbstractLoader implements
                 // Save the dataset
                 ConverterUtils.DataSink.write(outputFileName, dataset);
 
-                System.out.println("------- SUCCESS -------");
-                System.out.println("Output arff file written to: " + outputFileName);
+                log.info("------- SUCCESS -------");
+                log.info("Output arff file written to: " + outputFileName);
             } catch (Exception e) {
                 e.printStackTrace();
                 printInfo();

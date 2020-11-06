@@ -1,9 +1,9 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.core.OptionMetadata;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.VGG;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.Xception;
 
 public class KerasXception extends AbstractZooModel {
@@ -28,6 +28,11 @@ public class KerasXception extends AbstractZooModel {
     )
     public Xception.VARIATION getVariation() {
         return variation;
+    }
+
+    @Override
+    public ImagePreProcessingScaler getImagePreprocessingScaler() {
+        return new ImagePreProcessingScaler(-1, 1);
     }
 
     public void setVariation(Xception.VARIATION var) {

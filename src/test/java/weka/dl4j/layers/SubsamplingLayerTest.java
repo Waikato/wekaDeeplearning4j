@@ -22,8 +22,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import weka.dl4j.ConvolutionMode;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.ConvolutionMode;
+import weka.dl4j.enums.PoolingType;
 
 /**
  * A subsampling layer test.

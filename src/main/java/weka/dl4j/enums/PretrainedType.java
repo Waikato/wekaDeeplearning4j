@@ -16,7 +16,9 @@
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.dl4j;
+package weka.dl4j.enums;
+
+import weka.dl4j.ApiWrapper;
 
 /**
  * Proxy Enum for {@link org.deeplearning4j.zoo.PretrainedType}. This is necessary as Weka's
@@ -26,7 +28,7 @@ package weka.dl4j;
  * @author Rhys Compton
  */
 public enum PretrainedType implements ApiWrapper<org.deeplearning4j.zoo.PretrainedType> {
-  IMAGENET, IMAGENETLARGE, MNIST, CIFAR10, VGGFACE, SEGMENT, NONE;
+  IMAGENET, MNIST, VGGFACE, NONE;
 
   /**
    * Parse backend pooling type and return weka enum implementation.

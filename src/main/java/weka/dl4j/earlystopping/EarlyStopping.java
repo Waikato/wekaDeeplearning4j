@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import weka.classifiers.functions.dl4j.Utils;
+import weka.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;

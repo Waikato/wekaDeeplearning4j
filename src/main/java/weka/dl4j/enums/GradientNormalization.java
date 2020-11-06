@@ -16,7 +16,9 @@
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
-package weka.dl4j;
+package weka.dl4j.enums;
+
+import weka.dl4j.ApiWrapper;
 
 /**
  * Proxy Enum for {@link org.deeplearning4j.nn.conf.GradientNormalization}. This is necessary as
@@ -26,7 +28,7 @@ package weka.dl4j;
  * @author Steven Lang
  */
 public enum GradientNormalization implements
-    ApiWrapper<org.deeplearning4j.nn.conf.GradientNormalization> {
+        ApiWrapper<org.deeplearning4j.nn.conf.GradientNormalization> {
   None,
   RenormalizeL2PerLayer,
   RenormalizeL2PerParamType,

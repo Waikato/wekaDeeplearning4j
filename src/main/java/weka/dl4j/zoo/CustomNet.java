@@ -19,7 +19,7 @@
 package weka.dl4j.zoo;
 
 import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.zoo.PretrainedType;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 
 /**
  * A dummy ZooModel which is empty.
@@ -41,4 +41,21 @@ public class CustomNet extends AbstractZooModel {
   public int[][] getShape() {
     return new int[0][0];
   }
+
+  /**
+   * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+   *
+   * @return Variation
+   */
+  @Override
+  public Enum getVariation() {
+    return null;
+  }
+
+  @Override
+  public ImagePreProcessingScaler getImagePreprocessingScaler() {
+    return null;
+  }
+
+
 }

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import weka.dl4j.PoolingType;
+import weka.dl4j.enums.PoolingType;
 
 /**
  * A global pooling layer test.

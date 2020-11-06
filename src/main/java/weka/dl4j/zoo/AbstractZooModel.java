@@ -1,8 +1,6 @@
 package weka.dl4j.zoo;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang.NotImplementedException;
-import org.deeplearning4j.nn.api.Layer;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
 import org.deeplearning4j.nn.conf.layers.GlobalPoolingLayer;
@@ -12,18 +10,14 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.transferlearning.FineTuneConfiguration;
 import org.deeplearning4j.nn.transferlearning.TransferLearning;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.functions.Dl4jMlpClassifier;
-import weka.core.Option;
-import weka.core.OptionHandler;
-import weka.core.OptionMetadata;
-import weka.core.WekaException;
-import weka.dl4j.PretrainedType;
-import weka.dl4j.zoo.keras.EfficientNet;
+import weka.core.*;
+import weka.dl4j.enums.PretrainedType;
 import weka.gui.ProgrammaticProperty;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
@@ -41,7 +35,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     /**
      * Dataset that the pretrained weights are trained on
      */
-    protected weka.dl4j.PretrainedType m_pretrainedType = PretrainedType.NONE;
+    protected PretrainedType m_pretrainedType = PretrainedType.NONE;
     /**
      * Output layer of the model to be taken off (and replace by our custom output layer)
      */
@@ -98,15 +92,49 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             throws UnsupportedOperationException;
 
     /**
+     * Convenience method to returns a default pretrained graph for this zoo model
+     * @return
+     */
+    public ComputationGraph getDefaultGraph() {
+        return this.init(2, 1, this.getShape()[0], true);
+    }
+
+    /**
      * Get the input shape of this zoomodel
      *
      * @return Input shape of this zoomodel
      */
     public abstract int[][] getShape();
 
-    public Enum getVariation() {
-        return null;
+    public String getPrettyName() {
+        Enum variation = getVariation();
+        if (variation == null) {
+            return this.getClass().getSimpleName();
+        } else {
+            return this.getClass().getSimpleName() + " (" + variation + ")";
+        }
     }
+
+    /**
+     * Get the current variation of the zoo model (e.g., Resnet50 or Resnet101)
+     *
+     * @return Variation
+     */
+    public abstract Enum getVariation();
+
+    /**
+     * Does the model require input images to be preprocessed?
+     * @return true if the model input should be rescaled
+     */
+    public boolean requiresPreProcessing() {
+        return getImagePreprocessingScaler() != null;
+    }
+
+    /**
+     * Get the preprocessor to process this model's data with
+     * @return DataSetPreprocessor
+     */
+    public abstract ImagePreProcessingScaler getImagePreprocessingScaler();
 
     @OptionMetadata(
             displayName = "Image channels last",
@@ -251,7 +279,6 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
         try {
-            log.info(String.format("Downloading %s weights", m_pretrainedType));
             Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
             if (pretrained == null) {
                 throw new Exception("Error while initialising model");
@@ -371,9 +398,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @return an enumeration of all the available options.
      */
-    @Override
     public Enumeration<Option> listOptions() {
-        return Option.listOptionsForClass(this.getClass()).elements();
+        return Option.listOptionsForClassHierarchy(this.getClass(), AbstractZooModel.class).elements();
     }
 
     /**
@@ -381,9 +407,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @return an array of strings suitable for passing to setOptions
      */
-    @Override
     public String[] getOptions() {
-        return Option.getOptions(this, this.getClass());
+        return Option.getOptionsForHierarchy(this, AbstractZooModel.class);
     }
 
     /**
@@ -393,6 +418,8 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @throws Exception if an option is not supported
      */
     public void setOptions(String[] options) throws Exception {
-        Option.setOptions(options, this, this.getClass());
+        Option.setOptionsForHierarchy(options, this, AbstractZooModel.class);
+
+        Utils.checkForRemainingOptions(options);
     }
 }

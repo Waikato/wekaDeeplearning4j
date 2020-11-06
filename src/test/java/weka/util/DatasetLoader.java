@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -96,6 +98,19 @@ public class DatasetLoader {
    */
   public static final int NUM_ATTRIBUTES_IMAGE_META = 2;
 
+  /**
+   * Load the car predictions binary file into an INDArray
+   *
+   * @return Loaded [1, 1000] INDArray
+   */
+  public static INDArray loadCarPredictions() {
+    try {
+      return Nd4j.readBinary(new File("src/test/resources/predictions/carPredictions.bin"));
+    } catch (IOException ex) {
+      System.err.println("Couldn't load car predictions file, please check the file path");
+      return null;
+    }
+  }
 
   /**
    * Load the mnist minimal dataset with an ImageInstanceIterator
