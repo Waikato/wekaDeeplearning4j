@@ -25,6 +25,11 @@ import java.util.Enumeration;
 public class Dl4jCNNExplorer implements Serializable, OptionHandler, CommandlineRunnable {
 
     /**
+     * Set to true to use the serialized model file, false otherwise
+     */
+    protected boolean useSerializedModelFile = false;
+
+    /**
      * The classifier model this filter is based on.
      */
     protected File serializedModelFile = new File(Utils.defaultFileLocation());
@@ -127,11 +132,33 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         return currentPredictions;
     }
 
+    /* Getters and setters */
+    
+    @OptionMetadata(
+            commandLineParamIsFlag = true,
+            commandLineParamName = "use-model-file",
+            commandLineParamSynopsis = "-use-model-file",
+            displayName = "Use serialized model file",
+            description = "Use the supplied serialized model file, instead of the zoo model." +
+                    " Optional flag if running from the command line.",
+            displayOrder = 0
+    )
+    public boolean getUseSerializedModelFile() {
+        return useSerializedModelFile;
+    }
+
+    public void setUseSerializedModelFile(boolean useSerializedModelFile) {
+        this.useSerializedModelFile = useSerializedModelFile;
+        if (!useSerializedModelFile) {
+            setSerializedModelFile(new File(Utils.defaultFileLocation()));
+        }
+    }
+
     @OptionMetadata(
             displayName = "Serialized model file",
             description = "Pointer to file of saved Dl4jMlpClassifier",
-            commandLineParamName = "modelFile",
-            commandLineParamSynopsis = "-modelFile <file path>",
+            commandLineParamName = "model-file",
+            commandLineParamSynopsis = "-model-file <file path>",
             displayOrder = 1
     )
     public File getSerializedModelFile() {
