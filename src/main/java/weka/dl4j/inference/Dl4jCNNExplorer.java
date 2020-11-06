@@ -277,7 +277,8 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         // Run the explorer
         explorer.init();
         explorer.processImage(new File(inputImagePath));
-        explorer.generateAndSaveOutputMap();
+        if (explorer.generateSaliencyMap)
+            explorer.generateAndSaveOutputMap();
         // Output the results to the command line
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
     }
