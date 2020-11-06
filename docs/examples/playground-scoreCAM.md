@@ -234,3 +234,28 @@ the target class for a tabby cat.
 
 As we can see, the model is correctly looking at either animal to make its prediction, depending
 on whether we're targeting the dog or cat!
+
+### Command Line
+
+To generate a saliency map from the command line, you must specify an output image location.
+Note that we can also use `-1` to specify the target class. The saliency map generator
+will simply use the max probability class as the target class; this is useful when you don't 
+know what the class ID may be.
+
+```shell script
+$ java weka.Run .Dl4jCNNExplorer \
+    -i "src/test/resources/images/catAndDog.jpg" \
+    -generate-map \
+    -saliency-map ".WekaScoreCAM -bs 8 -normalize -output output_image.png -target-classes -1" \
+    -zooModel ".KerasResNet -variation RESNET101"
+```
+
+#### Multiple Classes
+
+```shell script
+$ java weka.Run .Dl4jCNNExplorer \
+    -i "src/test/resources/images/catAndDog.jpg" \
+    -generate-map \
+    -saliency-map ".WekaScoreCAM -bs 8 -normalize -output output_image.png -target-classes -1,281" \
+    -zooModel ".KerasResNet -variation RESNET101"
+```
