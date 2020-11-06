@@ -145,6 +145,12 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         return classMapPath;
     }
 
+    public static String[] parseClassmapFromArff(String filepath) throws IOException {
+        var instances = new Instances(new FileReader(filepath));
+        instances.setClassIndex(instances.numAttributes() - 1);
+        return Collections.list(instances.classAttribute().enumerateValues()).toArray(String[]::new);
+    }
+
     /**
      * Parses the classmap file into a String[]
      * @return String[], one item for each class
@@ -154,6 +160,10 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         // TODO add support for arff files
         List<String> classes = new ArrayList<>();
         try {
+            var classMapPath = getClassMapPath();
+            if (FilenameUtils.isExtension(classMapPath, "arff")) {
+                return parseClassmapFromArff(classMapPath);
+            }
             try (FileReader fr = new FileReader(getClassMapPath())) {
                 try (BufferedReader br = new BufferedReader(fr)) {
                     // Create a class for each line in the file
