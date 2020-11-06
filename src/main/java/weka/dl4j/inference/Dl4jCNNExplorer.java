@@ -133,7 +133,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     /* Getters and setters */
-    
+
     @OptionMetadata(
             commandLineParamIsFlag = true,
             commandLineParamName = "use-model-file",
@@ -176,7 +176,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             commandLineParamSynopsis = "-zooModel <options>",
             displayOrder = 2
     )
-    public AbstractZooModel getZooModelType() { // TODO figure out why not applying any non-default models
+    public AbstractZooModel getZooModelType() {
         return zooModelType;
     }
 

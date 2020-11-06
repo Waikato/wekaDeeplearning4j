@@ -19,8 +19,6 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected ComputationGraph computationGraph = null;
 
-//    protected int[] targetClassIDs = new int[] {-1};
-
     protected int batchSize = 1;
 
     protected ImagePreProcessingScaler imagePreProcessingScaler = null;
@@ -29,21 +27,9 @@ public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected InputType.InputTypeConvolutional modelInputShape;
 
-//    protected BufferedImage originalImage;
-//
-//    protected BufferedImage heatmap;
-//
-//    protected BufferedImage heatmapOnImage;
-//
-//    protected BufferedImage compositeImage;
-//
-//    protected ArrayList<BufferedImage> allImages = new ArrayList<>();
-
     protected String modelName;
 
     protected String inputFilename;
-
-//    protected boolean normalizeHeatmap = true;
 
     protected int outsideMargin = 25;
 

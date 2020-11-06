@@ -153,7 +153,6 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
      * @throws Exception
      */
     public String[] getClasses() {
-        // TODO add support for arff files
         List<String> classes = new ArrayList<>();
         try {
             var classMapPath = getClassMapPath();
