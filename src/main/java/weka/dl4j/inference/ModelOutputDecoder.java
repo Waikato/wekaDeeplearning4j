@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import weka.dl4j.ResourceResolver;
 import weka.dl4j.Utils;
 import weka.core.*;
 
@@ -91,17 +92,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
      */
     private String getClassMapFolder() throws Exception {
         // Try the current directory
-        String classMapFolder = Paths.get("src", "main", "resources", "class-maps").toString();
-        if (Utils.pathExists(classMapFolder))
-            return classMapFolder;
-
-        // Otherwise try the package home directory
-        String packageHomeDir = Utils.defaultFileLocation();
-        classMapFolder = Paths.get(packageHomeDir, "wekaDeeplearning4j", classMapFolder).toString();
-        if (Utils.pathExists(classMapFolder))
-            return classMapFolder;
-
-        throw new WekaException("Cannot find Class map folder");
+        return new ResourceResolver().GetResolvedPath("class-maps");
     }
 
     /**

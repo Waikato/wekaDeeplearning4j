@@ -3,7 +3,9 @@ package weka.gui.explorer;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
+import weka.core.WekaException;
 import weka.core.progress.ProgressManager;
+import weka.dl4j.ResourceResolver;
 import weka.dl4j.inference.Dl4jCNNExplorer;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
 import weka.gui.ExtensionFileFilter;
@@ -46,7 +48,8 @@ public class SaliencyMapWindow extends JPanel {
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
     JScrollPane scrollPane;
-    private static final String DEFAULT_SALIENCY_IMAGE_PATH = "src/main/resources/placeholderSaliencyMap.png";
+
+    private String DEFAULT_SALIENCY_IMAGE_PATH;
 
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
 
@@ -60,6 +63,12 @@ public class SaliencyMapWindow extends JPanel {
     int imageRow = 20;
 
     public SaliencyMapWindow() {
+        try {
+            DEFAULT_SALIENCY_IMAGE_PATH = new ResourceResolver().GetResolvedPath("placeholderSaliencyMap.png");
+        } catch (WekaException ex) {
+            ex.printStackTrace();
+        }
+
         oneTimeSetup();
     }
 
