@@ -15,6 +15,7 @@ nav:
         - 'Progress Manager': 'user-guide/progress-manager.md'
     - Examples:
         - 'Image Feature Extraction': 'examples/featurize-mnist.md'
+        - 'Dl4j Inference': 'examples/dl4j-inference.md'
         - 'Classifying a Custom Dataset': 'examples/classifying-your-own.md'
         - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
         - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
