@@ -1,19 +1,15 @@
 package weka.dl4j.inference;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FilenameUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
 import weka.dl4j.Utils;
 import weka.core.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 /**
  * Decodes model outputs into a human-readable and more workable format.
@@ -210,10 +206,6 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
 
     public void setClassMapFile(File f) {
         this.classMapFile = f;
-
-        if (Utils.notDefaultFileLocation(f))
-            // We're using a custom file, not a built-in type
-            this.builtInClassMap = ClassmapType.CUSTOM;
     }
 
     /**
