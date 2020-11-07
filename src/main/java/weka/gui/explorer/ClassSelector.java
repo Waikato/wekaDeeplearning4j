@@ -165,7 +165,7 @@ public class ClassSelector {
         }
         if (classID > classMap.length - 1)
             return;
-        
+
         String newClassName = classMap[classID];
         classNameInput.setText(newClassName);
     }

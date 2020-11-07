@@ -3,6 +3,8 @@
 VGGFace is a dataset containing images of different actor/musicians/etc.
 `Dl4jVGG` with `VGGFACE` pretrained weights is the only pretrained model that can meaningfully use this class list.
 
+[Back to Inference Tutorial](../../examples/dl4j-inference.md#class-map-lookup-tables)
+
 | Class ID | Class Name                        |
 |----------|-----------------------------------|
 | 0        | A.J. Buckley                      |
