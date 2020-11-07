@@ -1,9 +1,9 @@
 # Dl4j Model Inference Panel
 
 WekaDeeplearning4j includes a new `Dl4j Inference` panel, which allows you to easily
-run inference on images using either the built-in [Model Zoo](../user-guide/model-zoo.md).
-This panel doesn't require you to load an entire `.arff` dataset, so it's great for quick
-experimentation and prototyping.
+run inference on images using either the built-in [Model Zoo](../user-guide/model-zoo.md)
+or a custom trained `Dl4jMlpClassifier` model. This panel doesn't require you to load 
+an entire `.arff` dataset, so it's great for quick experimentation and prototyping.
 
 For more in-depth experimentation, WekaDeeplearning4j allows you to generate a **saliency map**
 when running inference on an image. The map can show *what part of the image the model is 'looking'
@@ -120,9 +120,10 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 
 ## Example 3: Simple Inference with Custom Trained Model
 
-Although very diverse datasets are used to train many of the built-in zoo models, meaning they can perform accurate
-prediction in a wide range of domains, you may instead have a custom-trained `Dl4jMlpClassifier` which
-you'd like to experiment with; the process is largely the same as above, with a few minor changes.
+Although a very diverse dataset (IMAGENET) was used to train many of the built-in zoo models 
+(meaning they can perform accurate prediction in a wide range of domains), 
+you may instead have a custom-trained `Dl4jMlpClassifier` which you'd like to experiment with; 
+the process is largely the same as above, with a few minor changes.
 
 ### GUI
 
