@@ -228,12 +228,20 @@ each other.
 - We now want to target the cat separately, so click `Pattern` and enter `.*tabby.*` to find 
 the target class for a tabby cat.
     - If you know the class ID directly you can also enter that in the `Target Class ID` field.
+    (or check the [class map lookup tables](#class-map-lookup-tables))
 - Click `Generate` to create saliency maps for both classes:
 
 ![ScoreCAM result](../img/inference/inference-scoreCAM-twoClass.png)
 
 As we can see, the model is correctly looking at either animal to make its prediction, depending
 on whether we're targeting the dog or cat!
+
+##### Class Map Lookup Tables
+
+- [IMAGENET](../user-guide/class-maps/IMAGENET.md)
+- [IMAGENET - Darknet 19](../user-guide/class-maps/DARKNET_IMAGENET.md) - Darknet19 was pretrained 
+on an altered version of IMAGENET, hence the different class map.
+- [VGGFACE](../user-guide/class-maps/VGGFACE.md)
 
 ### Command Line
 
