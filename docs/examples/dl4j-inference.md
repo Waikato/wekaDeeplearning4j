@@ -188,7 +188,8 @@ to create a weighted combination. The idea being that masked images showing *imp
 image will produce a strong signal for the target class and therefore be weighted more heavily.
 
 Because the model must perform inference on hundreds of images, the process can take much longer
-than simple prediction (2-3 minutes).
+than simple prediction (2-3 minutes). This can be sped up with the use of a modern GPU 
+([setup instructions](../install.md#add-gpu-support))
 
 For the purpose of this tutorial, we'll use **ResNet 101** to perform prediction and 
 generate the saliency map.
