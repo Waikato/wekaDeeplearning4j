@@ -15,7 +15,7 @@ public class ClassSelector {
 
     String m_PatternRegEx = "";
 
-    private SaliencyMapWindow parentPanel;
+    private JPanel parentPanel;
 
     JLabel targetClassIDLabel = new JLabel("Target Class ID:");
     JTextField targetClassIDInput = new JTextField();
@@ -23,11 +23,11 @@ public class ClassSelector {
     JTextField classNameInput = new JTextField();
     JButton patternButton = new JButton("Pattern");
 
-    public ClassSelector(SaliencyMapWindow parentPanel, int rowNum) {
+    public ClassSelector(JPanel parentPanel, String[] classMap, int defaultClassID, int rowNum) {
         this.parentPanel = parentPanel;
-        this.classMap = parentPanel.getCurrentClassMap();
+        this.classMap = classMap;
         setup(rowNum);
-        setTargetClass(parentPanel.getDefaultClassID());
+        setTargetClass(defaultClassID);
     }
 
     private void setup(int rowNum) {
@@ -163,6 +163,9 @@ public class ClassSelector {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+        if (classID > classMap.length - 1)
+            return;
+        
         String newClassName = classMap[classID];
         classNameInput.setText(newClassName);
     }

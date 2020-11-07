@@ -48,6 +48,9 @@ public class SaliencyMapWindow extends JPanel {
     JButton generateButton = new JButton("Generate");
     JButton saveHeatmapButton = new JButton("Save...");
     JScrollPane scrollPane;
+    JPanel buttonPanel;
+    JPanel controlPanel;
+    JSplitPane splitPane;
 
     private String DEFAULT_SALIENCY_IMAGE_PATH;
 
@@ -77,7 +80,7 @@ public class SaliencyMapWindow extends JPanel {
             // Limit the size to 10
             return;
         }
-        var classSelector = new ClassSelector(this, targetClassRow + classSelectors.size());
+        var classSelector = new ClassSelector(controlPanel, getCurrentClassMap(), getDefaultClassID(), targetClassRow + classSelectors.size());
         classSelectors.add(classSelector);
         packWindow();
     }
@@ -102,6 +105,7 @@ public class SaliencyMapWindow extends JPanel {
     private void packWindow() {
 //        var originalDimension = thisWindow.getSize();
         thisWindow.pack();
+        splitPane.setDividerLocation(splitPane.getMinimumDividerLocation());
 //        thisWindow.setSize(originalDimension);
     }
 
@@ -122,13 +126,13 @@ public class SaliencyMapWindow extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridwidth = 5;
-        var buttonPanel = new JPanel(new GridLayout(1, 5, 30, 5));
+        buttonPanel = new JPanel(new GridLayout(1, 5, 30, 5));
         buttonPanel.add(addClassButton);
         buttonPanel.add(removeClassButton);
         buttonPanel.add(normalizeHeatmapCheckbox);
         buttonPanel.add(generateButton);
         buttonPanel.add(saveHeatmapButton);
-        add(buttonPanel, gbc);
+        controlPanel.add(buttonPanel, gbc);
     }
 
     private void addScrollableImage() {
@@ -143,20 +147,26 @@ public class SaliencyMapWindow extends JPanel {
         scrollPane = new JScrollPane(saliencyImageLabel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         scrollPane.getHorizontalScrollBar().setUnitIncrement(20);
-        add(scrollPane, gbc);
     }
 
     private void oneTimeSetup() {
         setupButtonListeners();
 
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Saliency Map Viewer"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
+        controlPanel = new JPanel(new GridBagLayout());
+
         addControlButtons();
 
         addScrollableImage();
+
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlPanel, scrollPane);
+        splitPane.setOneTouchExpandable(true);
+
+        add(splitPane, BorderLayout.CENTER);
     }
 
     public String[] getCurrentClassMap() {
