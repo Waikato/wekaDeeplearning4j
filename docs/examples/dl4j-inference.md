@@ -39,11 +39,11 @@ As we can see the model (`Dl4jResNet50`) has successfully predicted the image as
 
 ### Command Line
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer -i src/test/resources/images/pufferfish.jpg
 ```
 
-```shell script
+```bash
 ==================================================================
 pufferfish.jpg - Dl4jResNet50
 
@@ -91,14 +91,14 @@ see the results in the output panel, again correctly predicting the target class
 
 ### Command Line
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -decoder ".ModelOutputDecoder -builtIn VGGFACE" \
     -zooModel ".Dl4jVGG -variation VGG16 -pretrained VGGFACE" \
     -i src/test/resources/images/ben_stiller.jpg
 ```
 
-```shell script
+```bash
 ==========================================
 ben_stiller.jpg - Dl4jVGG (VGG16)
 
@@ -162,7 +162,7 @@ to classify between different dog breeds isn't going to give accurate answers wh
 
 ### Command Line
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -decoder ".ModelOutputDecoder -builtIn CUSTOM -classMapFile /path/to/classmap.txt" \
     -model-file /path/to/saved/model/Dl4jMlpClassifier.model \
@@ -242,7 +242,7 @@ Note that we can also use `-1` to specify the target class. The saliency map gen
 will simply use the max probability class as the target class; this is useful when you don't 
 know what the class ID may be.
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -i "src/test/resources/images/catAndDog.jpg" \
     -generate-map \
@@ -252,7 +252,7 @@ $ java weka.Run .Dl4jCNNExplorer \
 
 #### Multiple Classes
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -i "src/test/resources/images/catAndDog.jpg" \
     -generate-map \
