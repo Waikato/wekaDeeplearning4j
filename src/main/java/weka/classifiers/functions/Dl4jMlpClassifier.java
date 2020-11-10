@@ -848,13 +848,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * Checks if the layer is a valid output layer
    * @param filterMode true if the model is being used for a filter
    * @param layer output layer of the model
-   * @return true if the model doesn't have a valid output layer (we need to add one on)
+   * @return true if the supplied layer is a valid output layer
    */
-  public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
-    return (!(filterMode) && !(layer instanceof BaseOutputLayer
-            //|| layer instanceof LossLayer || layer instanceof ActivationLayer
-            // The above two layers still throw errors from DL4j if they're the output
-            ));
+  public static boolean isValidOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
+    return (filterMode || layer instanceof BaseOutputLayer);
   }
 
   /**
@@ -903,7 +900,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final Layer lastLayer = layers[layers.length - 1];
     org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
         lastLayer.getBackend();
-    if (noOutputLayer(isFilterMode(), lastLayerBackend)) {
+    if (!isValidOutputLayer(isFilterMode(), lastLayerBackend)) {
       throw new MissingOutputLayerException(
           "Last layer in network must be an output layer but was: "
               + lastLayerBackend.getClass().getSimpleName());
