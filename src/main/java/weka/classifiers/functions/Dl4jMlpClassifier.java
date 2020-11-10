@@ -31,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.lucene.util.ThreadInterruptedException;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
@@ -2078,6 +2079,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     DataSetIterator iter = getDataSetIterator(input);
     INDArray result = null;
     Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
+    Instances newInstances = null;
 
     log.info("Getting features from layers: " + Arrays.toString(layerNames));
 
@@ -2086,28 +2088,32 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     progressManager = new ProgressManager(numIterations, "Performing feature extraction...");
     progressManager.start();
 
-    for (String layerName : layerNames) {
-      if (attributesPerLayer.containsKey(layerName)) {
-        log.warn("Concatenating two identical layers not supported");
-        continue;
+    try {
+      for (String layerName : layerNames) {
+        if (attributesPerLayer.containsKey(layerName)) {
+          log.warn("Concatenating two identical layers not supported");
+          continue;
+        }
+
+        INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+
+        attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
+        if (result == null) {
+          result = activationsAtLayer;
+        } else {
+          // Concatenate the activations of this layer with the other feature extraction layers
+          result = Nd4j.concat(1, result, activationsAtLayer);
+        }
       }
 
-      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+      result = Utils.appendClasses(result, input);
+      newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
 
-      attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
-      if (result == null) {
-        result = activationsAtLayer;
-      } else {
-        // Concatenate the activations of this layer with the other feature extraction layers
-        result = Nd4j.concat(1, result, activationsAtLayer);
-      }
+    } catch (ThreadDeath ex) {
+      log.warn("Filtering forcefully stopped");
+    } finally {
+      progressManager.finish();
     }
-
-    result = Utils.appendClasses(result, input);
-    Instances newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
-
-    progressManager.finish();
-
     return newInstances;
   }
 }
