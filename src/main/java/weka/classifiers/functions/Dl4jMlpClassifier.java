@@ -1253,59 +1253,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return data;
   }
 
-  /**
-   * Enforces the input image size if using a zoo model
-   * @param iii ImageInstanceIterator we're using
-   * @return iterator with image size fixed
-   */
-  private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
-    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
-    AbstractZooModel tmpZooModel = getZooModel();
-    if (tmpZooModel.isPretrained()) {
-      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
-        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
-        iii.setNumChannels(1);
-        iii.setHeight(28);
-        iii.setWidth(28);
-      } else {
-        int[] pretrainedShape = tmpZooModel.getShape()[0];
-        iii.setNumChannels(pretrainedShape[0]);
-        iii.setHeight(pretrainedShape[1]);
-        iii.setWidth(pretrainedShape[2]);
-      }
-      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
-              iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
-    }
-    return iii;
-  }
 
-  /**
-   * The only one-channel zoo model currently implemented is Dl4JLeNet.
-   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
-   * @param instanceIterator iterator we're wanting to use with the zoo model
-   */
-  private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
-    if (instanceIterator.getNumChannels() != 1) {
-      return;
-    }
-    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
-    Set<Class> oneChannelModels = new HashSet<>();
-    oneChannelModels.add(Dl4jLeNet.class);
-
-    AbstractZooModel tmpZooModel = getZooModel();
-    Class currModelClass = tmpZooModel.getClass();
-
-    // If we have a one channel model, continue;
-    if (oneChannelModels.contains(currModelClass)) {
-      return;
-    }
-
-    throw new WrongIteratorException(
-            "You've used an instance iterator for instances of only one channel, however, " +
-                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
-                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
-    );
-  }
 
   /**
    * Build the Zoomodel instance
@@ -1331,13 +1279,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int newWidth, newHeight, channels;
 
     if (isImageIterator) {
-      iii = enforceZooModelSize((ImageInstanceIterator) it);
+      iii = ((ImageInstanceIterator) it);
+      iii.enforceZooModelSize(getZooModel());
       newWidth = iii.getWidth();
       newHeight = iii.getHeight();
       channels = iii.getNumChannels();
     } else {
       cii = (ConvolutionInstanceIterator) it;
-      enforceConvolutionIteratorZooModel(cii);
+      cii.enforceValidForZooModel(getZooModel());
       newWidth = cii.getWidth();
       newHeight = cii.getHeight();
       channels = cii.getNumChannels();
