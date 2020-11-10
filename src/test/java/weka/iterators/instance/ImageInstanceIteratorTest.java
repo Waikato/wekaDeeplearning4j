@@ -37,6 +37,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.InvalidInputDataException;
 import weka.dl4j.iterators.instance.ImageInstanceIterator;
+import weka.dl4j.zoo.Dl4jLeNet;
+import weka.dl4j.zoo.Dl4jResNet50;
 import weka.util.DatasetLoader;
 
 /**
@@ -176,6 +178,24 @@ public class ImageInstanceIteratorTest {
       final int expected = data.numInstances() / batchSize;
       Assert.assertEquals(expected, actual);
     }
+  }
+
+  @Test
+  public void Test_EnforceZooModelSize_Resnet50() {
+    idi.enforceZooModelSize(new Dl4jResNet50());
+
+    Assert.assertEquals(3, idi.getNumChannels());
+    Assert.assertEquals(224, idi.getHeight());
+    Assert.assertEquals(224, idi.getWidth());
+  }
+
+  @Test
+  public void Test_EnforceZooModelSize_LeNet() {
+    idi.enforceZooModelSize(new Dl4jLeNet());
+
+    Assert.assertEquals(1, idi.getNumChannels());
+    Assert.assertEquals(28, idi.getHeight());
+    Assert.assertEquals(28, idi.getWidth());
   }
 
   /**

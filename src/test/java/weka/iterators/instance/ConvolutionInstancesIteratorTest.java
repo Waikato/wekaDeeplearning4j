@@ -30,10 +30,13 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import weka.core.WrongIteratorException;
 import weka.dl4j.Utils;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.dl4j.iterators.instance.ConvolutionInstanceIterator;
+import weka.dl4j.zoo.Dl4jLeNet;
+import weka.dl4j.zoo.Dl4jResNet50;
 import weka.util.DatasetLoader;
 
 /**
@@ -106,5 +109,21 @@ public class ConvolutionInstancesIteratorTest {
     Assert.assertEquals(10, labels.size());
     Assert.assertTrue(labels.containsAll(collect));
     Assert.assertTrue(collect.containsAll(labels));
+  }
+
+  @Test
+  public void Test_EnforceValidForZooModel_1CValidForLeNet() throws WrongIteratorException {
+    this.cii.enforceValidForZooModel(new Dl4jLeNet());
+  }
+
+  @Test(expected = WrongIteratorException.class)
+  public void Test_EnforceValidForZooModel_1CInvalidForResNet50() throws WrongIteratorException {
+    this.cii.enforceValidForZooModel(new Dl4jResNet50());
+  }
+
+  @Test
+  public void Test_EnforceValidForZooModel_3CValidForResNet50() throws WrongIteratorException {
+    this.cii.setNumChannels(3);
+    this.cii.enforceValidForZooModel(new Dl4jResNet50());
   }
 }

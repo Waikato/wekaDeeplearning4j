@@ -34,10 +34,7 @@ import java.util.List;
 import java.util.Random;
 import org.deeplearning4j.models.embeddings.wordvectors.WordVectors;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -720,4 +717,76 @@ public class Dl4jMlpTest {
     Files.delete(Paths.get(clfPath));
   }
 
+  @Test
+  public void TestFixDuplicateLayerNames() {
+    var layerName = "TestLayer";
+    DenseLayer dl = new DenseLayer();
+    dl.setLayerName(layerName);
+    dl.setNOut(10);
+
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setLayerName(layerName);
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
+
+    OutputLayer ol = new OutputLayer();
+    ol.setLayerName(layerName);
+    clf.setLayers(cl, dl, ol);
+
+    for (int i = 0; i < clf.layers.length; i++) {
+      Assert.assertEquals(layerName + " " + (i + 1), clf.layers[i].getLayerName());
+    }
+  }
+
+  @Test
+  public void Test_isValidOutputLayer_TrueForFilter() {
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
+
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
+
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(cl, dl, ol);
+
+    Assert.assertTrue(Dl4jMlpClassifier.isValidOutputLayer(true, clf.layers[2].getBackend()));
+  }
+
+  @Test
+  public void Test_isValidOutputLayer_TrueForOutputLayer() {
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
+
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
+
+    OutputLayer ol = new OutputLayer();
+    clf.setLayers(cl, dl, ol);
+
+    Assert.assertTrue(Dl4jMlpClassifier.isValidOutputLayer(false, clf.layers[2].getBackend()));
+  }
+
+
+  @Test
+  public void Test_isValidOutputLayer_FalseForDenseLayer() {
+    DenseLayer dl = new DenseLayer();
+    dl.setNOut(10);
+
+    DenseLayer dl2 = new DenseLayer();
+    dl.setNOut(10);
+
+    ConvolutionLayer cl = new ConvolutionLayer();
+    cl.setNOut(3);
+    cl.setKernelSize(new int[]{1, 1});
+    cl.setStride(new int[]{1, 1});
+
+    clf.setLayers(cl, dl, dl2);
+
+    Assert.assertFalse(Dl4jMlpClassifier.isValidOutputLayer(false, clf.layers[2].getBackend()));
+  }
 }
