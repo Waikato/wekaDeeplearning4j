@@ -10,7 +10,7 @@ when running inference on an image. The map can show *what part of the image the
 at to make its prediction*.
 
 This tutorial walks through a few common usage scenarios with the panel, including simple 
-inference and more advance **saliency map** generation.
+inference and more advanced **saliency map** generation.
 
 Where the examples below use an image, this can be found at:
 
@@ -19,7 +19,9 @@ Where the examples below use an image, this can be found at:
 ## Example 1: Simple Inference with Default Parameters
 
 The package has set reasonable default values for simple inference on images of everyday objects
-(animals, food, vehicles, etc.) This example uses the built-in `Dl4jResNet50` model (pretrained
+(animals, food, vehicles, etc.). 
+
+This example uses the built-in `Dl4jResNet50` model (pretrained
  on IMAGENET) to perform prediction on your image.
 
 ### GUI
@@ -39,8 +41,11 @@ As we can see the model (`Dl4jResNet50`) has successfully predicted the image as
 
 ### Command Line
 
+The model explorer can also be run from a command-line interface:
+
 ```bash
-$ java weka.Run .Dl4jCNNExplorer -i src/test/resources/images/pufferfish.jpg
+$ java weka.Run .Dl4jCNNExplorer \
+    -i $WEKA_HOME/packages/wekaDeeplearning4j/src/test/resources/images/pufferfish.jpg
 ```
 
 ```bash
@@ -55,12 +60,6 @@ pufferfish.jpg - Dl4jResNet50
        328 |                              sea urchin |      0.024
        448 |                               birdhouse |      0.021
 ==================================================================
-```
-
-### Java
-
-```java
-
 ```
 
 ## Example 2: Simple Inference with Custom Parameters
@@ -112,17 +111,12 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 ==========================================
 ```
 
-### Java
-
-```java
-
-```
-
 ## Example 3: Simple Inference with Custom Trained Model
 
 Although very diverse datasets are used to train many of the built-in zoo models, meaning they can perform accurate
 prediction in a wide range of domains, you may instead have a custom-trained `Dl4jMlpClassifier` which
-you'd like to experiment with; the process is largely the same as above, with a few minor changes.
+you'd like to experiment with (e.g., using [this tutorial](classifying-mnist.md)); 
+the process is largely the same as above, with a few minor changes.
 
 ### GUI
 
@@ -168,12 +162,6 @@ $ java weka.Run .Dl4jCNNExplorer \
     -model-file /path/to/saved/model/Dl4jMlpClassifier.model \
     -use-model-file
     -i /path/to/input/image.png
-```
-
-### Java
-
-```java
-
 ```
 
 ## Example 4: Saliency Map Generation
