@@ -22,7 +22,7 @@ Further configurations can be found in the [Getting Started](user-guide/getting-
 ![Weka workbench GUI](img/gui.png)
 
 ## New Features
-The new release of WekaDeeplearning4j contains some few exciting features that will make it easier than ever
+The new **1.7.0** release of WekaDeeplearning4j contains some few exciting features that will make it easier than ever
 to run experiments on your data.
 
 ### Pretrained Models

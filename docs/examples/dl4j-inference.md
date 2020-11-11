@@ -1,9 +1,9 @@
 # Dl4j Model Inference Panel
 
 WekaDeeplearning4j includes a new `Dl4j Inference` panel, which allows you to easily
-run inference on images using either the built-in [Model Zoo](../user-guide/model-zoo.md).
-This panel doesn't require you to load an entire `.arff` dataset, so it's great for quick
-experimentation and prototyping.
+run inference on images using either the built-in [Model Zoo](../user-guide/model-zoo.md)
+or a custom trained `Dl4jMlpClassifier` model. This panel doesn't require you to load 
+an entire `.arff` dataset, so it's great for quick experimentation and prototyping.
 
 For more in-depth experimentation, WekaDeeplearning4j allows you to generate a **saliency map**
 when running inference on an image. The map can show *what part of the image the model is 'looking'
@@ -113,6 +113,10 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 
 ## Example 3: Simple Inference with Custom Trained Model
 
+Although a very diverse dataset (IMAGENET) was used to train many of the built-in zoo models 
+(meaning they can perform accurate prediction in a wide range of domains), 
+you may instead have a custom-trained `Dl4jMlpClassifier` which you'd like to experiment with; 
+the process is largely the same as above, with a few minor changes.
 Although very diverse datasets are used to train many of the built-in zoo models, meaning they can perform accurate
 prediction in a wide range of domains, you may instead have a custom-trained `Dl4jMlpClassifier` which
 you'd like to experiment with (e.g., using [this tutorial](classifying-mnist.md)); 
@@ -176,7 +180,8 @@ to create a weighted combination. The idea being that masked images showing *imp
 image will produce a strong signal for the target class and therefore be weighted more heavily.
 
 Because the model must perform inference on hundreds of images, the process can take much longer
-than simple prediction (2-3 minutes).
+than simple prediction (2-3 minutes). This can be sped up with the use of a modern GPU 
+([setup instructions](../install.md#add-gpu-support))
 
 For the purpose of this tutorial, we'll use **ResNet 101** to perform prediction and 
 generate the saliency map.
@@ -216,12 +221,20 @@ each other.
 - We now want to target the cat separately, so click `Pattern` and enter `.*tabby.*` to find 
 the target class for a tabby cat.
     - If you know the class ID directly you can also enter that in the `Target Class ID` field.
+    (or check the [class map lookup tables](#class-map-lookup-tables))
 - Click `Generate` to create saliency maps for both classes:
 
 ![ScoreCAM result](../img/inference/inference-scoreCAM-twoClass.png)
 
 As we can see, the model is correctly looking at either animal to make its prediction, depending
 on whether we're targeting the dog or cat!
+
+##### Class Map Lookup Tables
+
+- [IMAGENET](../user-guide/class-maps/IMAGENET.md)
+- [IMAGENET - Darknet 19](../user-guide/class-maps/DARKNET_IMAGENET.md) - Darknet19 was pretrained 
+on an altered version of IMAGENET, hence the different class map.
+- [VGGFACE](../user-guide/class-maps/VGGFACE.md)
 
 ### Command Line
 

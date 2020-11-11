@@ -6,7 +6,6 @@ nav:
     - Home: index.md
     - Installation: install.md
 
-
     - User Guide:
         - 'Getting Started': 'user-guide/getting-started.md'
         - 'Loading Data': 'user-guide/data.md'

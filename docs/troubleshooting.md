@@ -47,3 +47,16 @@ This extracts the library to `./usr/lib/x86_64-linux-gnu/libgomp.so.1`. Afterwar
 **Issue:** Either your operating system is 32 bit or your installed Java version is 32 bit. WekaDeeplearning4j requires a 64 bit OS and Java installation.
 
 **Solution:** Install a 64 bit Java version. If your operating system is 32 bit, there is no solution besides installing a 64 bit OS.
+
+## Layer Specification Not Updating in GUI
+
+Loading the layer specification can take a long time for the larger zoo models, so this
+is done in a separate thread to avoid freezing the GUI. The downside is that the `GenericObjectEditor`
+doesn't update the layer specification after it's finished loading.
+
+If you would like to view/edit the layer specification, follow these steps:
+- Set `Preview zoo model layer specification in GUI` to `True`
+- Select a `Zoo Model`, this will trigger the layer specification to be loaded (you should see
+an on-screen loading message)
+- Edit any of the other `Dl4jMlpClassifier` options (e.g., `number of epochs`). This will trigger
+the GUI to redraw, which will grab the layer specification loaded previously.

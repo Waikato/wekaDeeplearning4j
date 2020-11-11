@@ -2,6 +2,8 @@
 
 This is used by most pretrained models included in **WekaDeeplearning4j**.
 
+[Back to Inference Tutorial](../../examples/dl4j-inference.md#class-map-lookup-tables)
+
 | Class ID | Class Name                                                                                                                |
 |----------|---------------------------------------------------------------------------------------------------------------------------|
 | 0        | tench, Tinca tinca                                                                                                        |

@@ -3,6 +3,8 @@
 Dl4j's pretrained version of DarkNet19 was trained on a slightly altered IMAGENET dataset so the class mapping
 is different.
 
+[Back to Inference Tutorial](../../examples/dl4j-inference.md#class-map-lookup-tables)
+
 | Class ID | Class Name                     |
 |----------|--------------------------------|
 | 0        | kit fox                        |
