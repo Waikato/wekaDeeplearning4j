@@ -51,7 +51,7 @@ public class KerasResNet extends AbstractZooModel {
         ResNet resNet = new ResNet();
         resNet.setVariation(variation);
 
-        return attemptToLoadWeights(resNet, null, seed, numLabels, filterMode);
+        return initZooModel(resNet, null, seed, numLabels, filterMode);
     }
 
     @Override

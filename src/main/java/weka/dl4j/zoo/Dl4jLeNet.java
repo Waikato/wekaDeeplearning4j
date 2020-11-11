@@ -54,7 +54,7 @@ public class Dl4jLeNet extends AbstractZooModel {
 
     ComputationGraph defaultNet = ((MultiLayerNetwork) net.init()).toComputationGraph();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return initZooModel(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

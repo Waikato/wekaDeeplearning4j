@@ -44,7 +44,7 @@ public class KerasXception extends AbstractZooModel {
         Xception xception = new Xception();
         xception.setVariation(variation);
 
-        return attemptToLoadWeights(xception, null, seed, numLabels, filterMode);
+        return initZooModel(xception, null, seed, numLabels, filterMode);
     }
 
     @Override

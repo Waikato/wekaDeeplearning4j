@@ -171,11 +171,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @param filterMode True if using this zoo model for a filter - output layers don't need to be setup
      * @return ComputationGraph - if all succeeds then will be initialized with pretrained weights
      */
-    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
-                                                 ComputationGraph defaultNet,
-                                                 long seed,
-                                                 int numLabels,
-                                                 boolean filterMode) {
+    public ComputationGraph initZooModel(org.deeplearning4j.zoo.ZooModel zooModel,
+                                         ComputationGraph defaultNet,
+                                         long seed,
+                                         int numLabels,
+                                         boolean filterMode) {
 
         this.seed = seed;
         this.numLabels = numLabels;
