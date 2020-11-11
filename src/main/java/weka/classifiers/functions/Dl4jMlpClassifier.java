@@ -2108,12 +2108,12 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
       result = Utils.appendClasses(result, input);
       newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
-
+      progressManager.finish();
+      return newInstances;
     } catch (ThreadDeath ex) {
       log.warn("Filtering forcefully stopped");
-    } finally {
       progressManager.finish();
+      throw new ThreadDeath();
     }
-    return newInstances;
   }
 }
