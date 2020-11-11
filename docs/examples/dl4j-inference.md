@@ -124,6 +124,7 @@ which you'd like to experiment with; the process is largely the same as above, w
 ### GUI
 
 On the `Dl4j Inference` panel, open the `Dl4jCNNExplorer` settings:
+
 - Set `Use serialized model file` to `True`
 - Select your previously saved `.model` file as the `Serialized model file`
 - Open the `ModelOutputDecoder` settings:
