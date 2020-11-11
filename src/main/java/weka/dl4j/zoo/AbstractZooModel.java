@@ -1,5 +1,6 @@
 package weka.dl4j.zoo;
 
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
@@ -15,11 +16,15 @@ import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.enums.PretrainedType;
+import weka.dl4j.layers.Layer;
 import weka.gui.ProgrammaticProperty;
 
+import javax.swing.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class contains the logic necessary to load the pretrained weights for a given zoo model
@@ -171,11 +176,11 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @param filterMode True if using this zoo model for a filter - output layers don't need to be setup
      * @return ComputationGraph - if all succeeds then will be initialized with pretrained weights
      */
-    public ComputationGraph attemptToLoadWeights(org.deeplearning4j.zoo.ZooModel zooModel,
-                                                 ComputationGraph defaultNet,
-                                                 long seed,
-                                                 int numLabels,
-                                                 boolean filterMode) {
+    public ComputationGraph initZooModel(org.deeplearning4j.zoo.ZooModel zooModel,
+                                         ComputationGraph defaultNet,
+                                         long seed,
+                                         int numLabels,
+                                         boolean filterMode) {
 
         this.seed = seed;
         this.numLabels = numLabels;
@@ -190,8 +195,20 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
             return null;
         }
 
+        ComputationGraph pretrainedModel = null;
+        // Attempt to download the model weights
+        var progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)...");
+        progressManager.start();
+        try {
+            pretrainedModel = downloadWeights(zooModel);
+        } catch (ThreadDeath threadDeath) {
+            log.error("Downloading weights stopped prematurely...");
+            progressManager.finish();
+            throw new ThreadDeath();
+        }
+
+        progressManager.finish();
         // If downloading the weights fails, return the standard model
-        ComputationGraph pretrainedModel = downloadWeights(zooModel);
         if (pretrainedModel == null)
             return finish(defaultNet);
 
@@ -216,7 +233,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      */
     protected ComputationGraph addFinalOutputLayer(ComputationGraph computationGraph) {
         org.deeplearning4j.nn.conf.layers.Layer lastLayer = computationGraph.getLayers()[computationGraph.getNumLayers() - 1].conf().getLayer();
-        if (!Dl4jMlpClassifier.noOutputLayer(filterMode, lastLayer)) {
+        if (Dl4jMlpClassifier.isValidOutputLayer(filterMode, lastLayer)) {
             log.debug("No need to add output layer, ignoring");
             return computationGraph;
         }
@@ -272,26 +289,34 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .build();
     }
 
+    private ComputationGraph attemptToDownloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) throws Exception {
+        Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
+        if (pretrained == null) {
+            throw new Exception("Error while initialising model");
+        }
+        if (pretrained instanceof MultiLayerNetwork) {
+            return ((MultiLayerNetwork) pretrained).toComputationGraph();
+        } else {
+            return (ComputationGraph) pretrained;
+        }
+    }
+
     /**
      * Attempts to download weights for the given zoo model
      * @param zooModel Model to try download weights for
      * @return new ComputationGraph initialized with the given PretrainedType
      */
     protected ComputationGraph downloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) {
-        try {
-            Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
-            if (pretrained == null) {
-                throw new Exception("Error while initialising model");
+        int numTries = 3;
+        for (int i = 0; i < numTries; i++) {
+            try {
+                log.info(String.format("Attempt %d to download weights", (i + 1)));
+                return attemptToDownloadWeights(zooModel);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            if (pretrained instanceof MultiLayerNetwork) {
-                return ((MultiLayerNetwork) pretrained).toComputationGraph();
-            } else {
-                return (ComputationGraph) pretrained;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     /**

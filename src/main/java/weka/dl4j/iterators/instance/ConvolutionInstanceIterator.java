@@ -18,15 +18,22 @@
 
 package weka.dl4j.iterators.instance;
 
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import weka.core.WrongIteratorException;
 import weka.dl4j.Utils;
 import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.iterators.dataset.DefaultDataSetIterator;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
+import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.zoo.Dl4jLeNet;
 
 /**
  * Converts the given Instances object into a DataSet and then constructs and returns a
@@ -106,6 +113,33 @@ public class ConvolutionInstanceIterator extends DefaultInstanceIterator impleme
     this.numChannels = numChannels;
   }
 
+
+  /**
+   * The only one-channel zoo model currently implemented is Dl4JLeNet.
+   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
+   * @param tmpZooModel zoo model we need to check against
+   */
+  public void enforceValidForZooModel(AbstractZooModel tmpZooModel) throws WrongIteratorException {
+    if (getNumChannels() != 1) {
+      return;
+    }
+    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
+    Set<Class> oneChannelModels = new HashSet<>();
+    oneChannelModels.add(Dl4jLeNet.class);
+
+    Class currModelClass = tmpZooModel.getClass();
+
+    // If we have a one channel model, continue;
+    if (oneChannelModels.contains(currModelClass)) {
+      return;
+    }
+
+    throw new WrongIteratorException(
+            "You've used an instance iterator for instances of only one channel, however, " +
+                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
+                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
+    );
+  }
 
   /**
    * Returns the actual iterator.

@@ -44,7 +44,7 @@ public class KerasVGG extends AbstractZooModel {
         VGG vgg = new VGG();
         vgg.setVariation(variation);
 
-        return attemptToLoadWeights(vgg, null, seed, numLabels, filterMode);
+        return initZooModel(vgg, null, seed, numLabels, filterMode);
     }
 
     @Override

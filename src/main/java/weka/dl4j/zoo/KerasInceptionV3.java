@@ -44,7 +44,7 @@ public class KerasInceptionV3 extends AbstractZooModel {
         InceptionV3 inceptionV3 = new InceptionV3();
         inceptionV3.setVariation(variation);
 
-        return attemptToLoadWeights(inceptionV3, null, seed, numLabels, filterMode);
+        return initZooModel(inceptionV3, null, seed, numLabels, filterMode);
     }
 
     @Override

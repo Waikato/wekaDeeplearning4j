@@ -48,7 +48,7 @@ public class Dl4jAlexNet extends AbstractZooModel {
             .build();
     ComputationGraph defaultNet = net.init().toComputationGraph();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return initZooModel(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

@@ -12,7 +12,7 @@
 ![Mnist Example 9](../img/mnist/img_10239_9.jpg)
 
 Instead of training a full neural network on your dataset, you may like to try using a pretrained model 
-as a feature extractor and fitting a more simple model to those features.
+as a feature extractor and fitting a simpler model to those features.
 
 You can use any model you've trained within WEKA, or any pretrained model in the model zoo for this task;
 try a few and see which works best for your task!
@@ -34,21 +34,29 @@ There are 4 pooling methods currently supported:
 These pool the 2nd and 3rd dimension into a single value, i.e., activations of 
 [512, 26, 26] (512 26x26 feature maps) are pooled into shape [512]. You can also specify `PoolingType.NONE`
 which simply flattens the extra dimensions (aforementioned example would become shape [346112]). 
+
+### Default Feature Extraction Layer
+
+During feature extraction, the output activations from the designated **feature extraction layer** are used to create the '*featurized*' instances. 
+All zoo models have a **default** feature extraction layer, which is typically the second-to-last layer in the model (e.g., [Dl4jResNet50](../user-guide/model-zoo/dl4j/DL4JResNet50.md)'s 
+`default feature layer` is set to `flatten_1`). The second-to-last layer tends to give the most meaningful
+activations, hence why it's set to the default (although you can use any intermediary layer).
+
 `PoolingType` does not need to be specified when using the default activation layer - the outputs are already the
  correct dimensionality.
 
 ## Example 1: Default MNIST Minimal
-The following example walks through using a pretrained ResNet50 (from the Deeplearning4j model Zoo)
-as a feature extractor on the MNIST dataset and fitting Weka's SMO algorithm to the dataset.
+The following example walks through using a pretrained ResNet50 (from the Deeplearning4j model zoo)
+as a feature extractor on the MNIST dataset and fitting a model using Weka's SMO algorithm to the dataset.
 This only takes 1-2 minutes on a modern CPU &mdash; much faster than training a neural network from scratch.
 
 The steps shown below split this into two steps; storing the featurized dataset, and fitting a Weka classifier to the dataset.
-It can be combined into a single command with a filtered classifier, however, the method shown below
+They can be combined into a single command with a filtered classifier, however, the method shown below
 is more efficient as the dataset featurizing (which is the most expensive part of this operation) 
-is only done once (would be done 10 times using 10-fold CV with a `FilteredClassifier`). Saving the featurized
+is only done once (it would be done 10 times using 10-fold CV with a `FilteredClassifier`). Saving the featurized
 dataset separately then makes it much faster to try out different Weka classifiers.
 
-Note that the first time this is run it may need to download the pretrained weights, in which case actual runtime
+Note that the first time this example is run it may need to download the pretrained weights, in which case actual runtime
 will be longer. These weights are cached locally so subsequent runs are much faster.
 
 ### GUI
@@ -62,8 +70,10 @@ Click in the properties box to open the filter settings.
 
 ![Classifier](../img/gui/featurize-std-filter.png)
 
-To correctly load the images it is further necessary to select the `Image-Instance-Iterator` as `instance iterator` 
-and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`). 
+To correctly load the images it is further necessary to select the `ImageInstanceIterator` as `instance iterator` 
+and point it to the MNIST directory that contains the actual image files (`$WEKA_HOME/packages/wekaDeeplearning4j/datasets/nominal/mnist-minimal/`).
+The `width`, `height`, and `channels` are automatically set based on the zoo model's input shape 
+([further explanation](../user-guide/model-zoo.md#image-instance-iterator)). 
 
 If running on CPU then set mini-batch size to your machine's thread count. 
 If you run into memory issues then use a smaller mini-batch size. Click `OK` to exit the `ImageInstanceIterator` settings.
@@ -81,8 +91,13 @@ Click `Ok` and `Apply` to begin processing your dataset. After completion, you s
 Simply switch to the `Classify` tab to start applying different WEKA classifiers to your newly transformed dataset. 
 
 ### Commandline
-This example assumes that `weka.jar` is in the classpath and the current working directory is the root of the WekaDeeplearning4j folder
-(`$WEKA_HOME/packages/wekaDeeplearning4j`).
+This example assumes that `weka.jar` is in the classpath and the current working directory 
+is the root of the WekaDeeplearning4j folder (`$WEKA_HOME/packages/wekaDeeplearning4j`).
+
+
+It should be noted that because we're using the default extraction layer (for this model) of `flatten_1`, we can simply specify the `-default-feature-layer`
+flag. This is especially useful if trying a range of different zoo models and one wants to avoid specifying layer names for each one.
+ 
 ```bash
 $ java -Xmx8g weka.Run \
     .Dl4jMlpFilter \
@@ -94,9 +109,6 @@ $ java -Xmx8g weka.Run \
         -zooModel ".Dl4jResNet50"
         -default-feature-layer
 ```
-It should be noted that because we're using the default extraction layer (for this model) of `flatten_1`, we can simply specify the `-default-feature-layer`
-flag. This is especially useful if trying a range of different zoo models and one wants to avoid specifying layer names for each one.
- 
  We now have a standard `.arff` file that can be fit to like any numerical dataset
 ```bash
 $ java weka.Run .SMO -t mnist-rn50.arff
@@ -105,7 +117,7 @@ $ java weka.Run .SMO -t mnist-rn50.arff
 
 ### Java
 This uses reflection to load the filter so all the DL4J dependencies don't need to be on the CLASSPATH - 
-as long as WekaDeeplearning4j is installed from the Package Manager, weka.core.WekaPackageManager.loadPackages` will load
+as long as WekaDeeplearning4j is installed from the Package Manager, `weka.core.WekaPackageManager.loadPackages` will load
 the necessary libraries at runtime.
 ```java
 // Load all packages so that Dl4jMlpFilter class can be found using forName("weka.filters.unsupervised.attribute.Dl4jMlpFilter")

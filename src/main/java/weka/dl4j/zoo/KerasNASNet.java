@@ -53,7 +53,7 @@ public class KerasNASNet extends AbstractZooModel {
         NASNet nasNet = new NASNet();
         nasNet.setVariation(variation);
 
-        return attemptToLoadWeights(nasNet, null, seed, numLabels, filterMode);
+        return initZooModel(nasNet, null, seed, numLabels, filterMode);
     }
 
     @Override

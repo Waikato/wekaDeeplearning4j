@@ -49,7 +49,7 @@ public class Dl4jInceptionResNetV1 extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return initZooModel(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

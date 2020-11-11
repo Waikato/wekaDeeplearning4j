@@ -54,7 +54,7 @@ public class Dl4jXception extends AbstractZooModel {
 
     setRequiresPooling(true);
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return initZooModel(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

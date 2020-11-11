@@ -10,7 +10,7 @@ when running inference on an image. The map can show *what part of the image the
 at to make its prediction*.
 
 This tutorial walks through a few common usage scenarios with the panel, including simple 
-inference and more advance **saliency map** generation.
+inference and more advanced **saliency map** generation.
 
 Where the examples below use an image, this can be found at:
 
@@ -19,7 +19,9 @@ Where the examples below use an image, this can be found at:
 ## Example 1: Simple Inference with Default Parameters
 
 The package has set reasonable default values for simple inference on images of everyday objects
-(animals, food, vehicles, etc.) This example uses the built-in `Dl4jResNet50` model (pretrained
+(animals, food, vehicles, etc.). 
+
+This example uses the built-in `Dl4jResNet50` model (pretrained
  on IMAGENET) to perform prediction on your image.
 
 ### GUI
@@ -39,11 +41,14 @@ As we can see the model (`Dl4jResNet50`) has successfully predicted the image as
 
 ### Command Line
 
-```shell script
-$ java weka.Run .Dl4jCNNExplorer -i src/test/resources/images/pufferfish.jpg
+The model explorer can also be run from a command-line interface:
+
+```bash
+$ java weka.Run .Dl4jCNNExplorer \
+    -i $WEKA_HOME/packages/wekaDeeplearning4j/src/test/resources/images/pufferfish.jpg
 ```
 
-```shell script
+```bash
 ==================================================================
 pufferfish.jpg - Dl4jResNet50
 
@@ -55,12 +60,6 @@ pufferfish.jpg - Dl4jResNet50
        328 |                              sea urchin |      0.024
        448 |                               birdhouse |      0.021
 ==================================================================
-```
-
-### Java
-
-```java
-
 ```
 
 ## Example 2: Simple Inference with Custom Parameters
@@ -91,14 +90,14 @@ see the results in the output panel, again correctly predicting the target class
 
 ### Command Line
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -decoder ".ModelOutputDecoder -builtIn VGGFACE" \
     -zooModel ".Dl4jVGG -variation VGG16 -pretrained VGGFACE" \
     -i src/test/resources/images/ben_stiller.jpg
 ```
 
-```shell script
+```bash
 ==========================================
 ben_stiller.jpg - Dl4jVGG (VGG16)
 
@@ -112,17 +111,15 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 ==========================================
 ```
 
-### Java
-
-```java
-
-```
-
 ## Example 3: Simple Inference with Custom Trained Model
 
 Although a very diverse dataset (IMAGENET) was used to train many of the built-in zoo models 
 (meaning they can perform accurate prediction in a wide range of domains), 
 you may instead have a custom-trained `Dl4jMlpClassifier` which you'd like to experiment with; 
+the process is largely the same as above, with a few minor changes.
+Although very diverse datasets are used to train many of the built-in zoo models, meaning they can perform accurate
+prediction in a wide range of domains, you may instead have a custom-trained `Dl4jMlpClassifier` which
+you'd like to experiment with (e.g., using [this tutorial](classifying-mnist.md)); 
 the process is largely the same as above, with a few minor changes.
 
 ### GUI
@@ -163,18 +160,12 @@ to classify between different dog breeds isn't going to give accurate answers wh
 
 ### Command Line
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -decoder ".ModelOutputDecoder -builtIn CUSTOM -classMapFile /path/to/classmap.txt" \
     -model-file /path/to/saved/model/Dl4jMlpClassifier.model \
     -use-model-file
     -i /path/to/input/image.png
-```
-
-### Java
-
-```java
-
 ```
 
 ## Example 4: Saliency Map Generation
@@ -252,7 +243,7 @@ Note that we can also use `-1` to specify the target class. The saliency map gen
 will simply use the max probability class as the target class; this is useful when you don't 
 know what the class ID may be.
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -i "src/test/resources/images/catAndDog.jpg" \
     -generate-map \
@@ -262,7 +253,7 @@ $ java weka.Run .Dl4jCNNExplorer \
 
 #### Multiple Classes
 
-```shell script
+```bash
 $ java weka.Run .Dl4jCNNExplorer \
     -i "src/test/resources/images/catAndDog.jpg" \
     -generate-map \

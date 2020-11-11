@@ -50,7 +50,7 @@ public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
 
     ComputationGraph defaultNet = net.init();
 
-    return attemptToLoadWeights(net, defaultNet, seed, numLabels, filterMode);
+    return initZooModel(net, defaultNet, seed, numLabels, filterMode);
   }
 
   @Override

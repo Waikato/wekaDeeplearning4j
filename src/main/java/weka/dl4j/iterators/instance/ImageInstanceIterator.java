@@ -20,6 +20,8 @@ package weka.dl4j.iterators.instance;
 
 import java.io.File;
 import java.util.Enumeration;
+
+import lombok.extern.log4j.Log4j2;
 import org.datavec.api.split.CollectionInputSplit;
 import org.datavec.image.recordreader.ImageRecordReader;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
@@ -32,7 +34,10 @@ import weka.core.InvalidInputDataException;
 import weka.core.Option;
 import weka.core.OptionMetadata;
 import weka.dl4j.ArffMetaDataLabelGenerator;
+import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
+import weka.dl4j.zoo.AbstractZooModel;
+import weka.dl4j.zoo.Dl4jLeNet;
 import weka.gui.FilePropertyMetadata;
 import weka.gui.knowledgeflow.KFGUIConsts;
 
@@ -43,6 +48,7 @@ import weka.gui.knowledgeflow.KFGUIConsts;
  * @author Eibe Frank
  * @author Steven Lang
  */
+@Log4j2
 public class ImageInstanceIterator extends AbstractInstanceIterator implements
     ConvolutionalIterator {
 
@@ -151,6 +157,29 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
 
   public void setChannelsLast(boolean channelsLast) {
     this.channelsLast = channelsLast;
+  }
+
+  /**
+   * Enforces the input image size if using a zoo model
+   * @param tmpZooModel Zoo model to constrain input size to
+   */
+  public void enforceZooModelSize(AbstractZooModel tmpZooModel) {
+    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
+    if (tmpZooModel.isPretrained()) {
+      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
+        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
+        setNumChannels(1);
+        setHeight(28);
+        setWidth(28);
+      } else {
+        int[] pretrainedShape = tmpZooModel.getShape()[0];
+        setNumChannels(pretrainedShape[0]);
+        setHeight(pretrainedShape[1]);
+        setWidth(pretrainedShape[2]);
+      }
+      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
+              getNumChannels(), getWidth(), getHeight()));
+    }
   }
 
   /**

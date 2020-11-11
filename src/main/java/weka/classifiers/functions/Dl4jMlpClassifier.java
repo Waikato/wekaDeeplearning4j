@@ -31,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.lucene.util.ThreadInterruptedException;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
@@ -848,13 +849,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    * Checks if the layer is a valid output layer
    * @param filterMode true if the model is being used for a filter
    * @param layer output layer of the model
-   * @return true if the model doesn't have a valid output layer (we need to add one on)
+   * @return true if the supplied layer is a valid output layer
    */
-  public static boolean noOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
-    return (!(filterMode) && !(layer instanceof BaseOutputLayer
-            //|| layer instanceof LossLayer || layer instanceof ActivationLayer
-            // The above two layers still throw errors from DL4j if they're the output
-            ));
+  public static boolean isValidOutputLayer(boolean filterMode, org.deeplearning4j.nn.conf.layers.Layer layer) {
+    return (filterMode || layer instanceof BaseOutputLayer);
   }
 
   /**
@@ -903,7 +901,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     final Layer lastLayer = layers[layers.length - 1];
     org.deeplearning4j.nn.conf.layers.Layer lastLayerBackend =
         lastLayer.getBackend();
-    if (noOutputLayer(isFilterMode(), lastLayerBackend)) {
+    if (!isValidOutputLayer(isFilterMode(), lastLayerBackend)) {
       throw new MissingOutputLayerException(
           "Last layer in network must be an output layer but was: "
               + lastLayerBackend.getClass().getSimpleName());
@@ -1256,59 +1254,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return data;
   }
 
-  /**
-   * Enforces the input image size if using a zoo model
-   * @param iii ImageInstanceIterator we're using
-   * @return iterator with image size fixed
-   */
-  private ImageInstanceIterator enforceZooModelSize(ImageInstanceIterator iii) {
-    // https://deeplearning4j.konduit.ai/model-zoo/overview#changing-inputs
-    AbstractZooModel tmpZooModel = getZooModel();
-    if (tmpZooModel.isPretrained()) {
-      if (tmpZooModel instanceof Dl4jLeNet && tmpZooModel.getPretrainedType() == PretrainedType.MNIST) {
-        log.warn("Using LeNet with MNIST weights, setting shape to 1, 28, 28");
-        iii.setNumChannels(1);
-        iii.setHeight(28);
-        iii.setWidth(28);
-      } else {
-        int[] pretrainedShape = tmpZooModel.getShape()[0];
-        iii.setNumChannels(pretrainedShape[0]);
-        iii.setHeight(pretrainedShape[1]);
-        iii.setWidth(pretrainedShape[2]);
-      }
-      log.warn(String.format("Using pretrained model weights, setting shape to: %d, %d, %d",
-              iii.getNumChannels(), iii.getWidth(), iii.getHeight()));
-    }
-    return iii;
-  }
 
-  /**
-   * The only one-channel zoo model currently implemented is Dl4JLeNet.
-   * If the user tries using any other zoo models with a 1D ConvolutionInstanceIterator, throw an exception
-   * @param instanceIterator iterator we're wanting to use with the zoo model
-   */
-  private void enforceConvolutionIteratorZooModel(ConvolutionInstanceIterator instanceIterator) throws WrongIteratorException {
-    if (instanceIterator.getNumChannels() != 1) {
-      return;
-    }
-    // Dl4jLeNet is the only one-channel model currently supported - all else need 3 input channels (e.g. RGB)
-    Set<Class> oneChannelModels = new HashSet<>();
-    oneChannelModels.add(Dl4jLeNet.class);
-
-    AbstractZooModel tmpZooModel = getZooModel();
-    Class currModelClass = tmpZooModel.getClass();
-
-    // If we have a one channel model, continue;
-    if (oneChannelModels.contains(currModelClass)) {
-      return;
-    }
-
-    throw new WrongIteratorException(
-            "You've used an instance iterator for instances of only one channel, however, " +
-                    "the Zoo model you've selected needs 3 input channels. To use a zoo model " +
-                    "with 1-channel instances, please use one of: " + Arrays.toString(oneChannelModels.toArray())
-    );
-  }
 
   /**
    * Build the Zoomodel instance
@@ -1334,13 +1280,14 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     int newWidth, newHeight, channels;
 
     if (isImageIterator) {
-      iii = enforceZooModelSize((ImageInstanceIterator) it);
+      iii = ((ImageInstanceIterator) it);
+      iii.enforceZooModelSize(getZooModel());
       newWidth = iii.getWidth();
       newHeight = iii.getHeight();
       channels = iii.getNumChannels();
     } else {
       cii = (ConvolutionInstanceIterator) it;
-      enforceConvolutionIteratorZooModel(cii);
+      cii.enforceValidForZooModel(getZooModel());
       newWidth = cii.getWidth();
       newHeight = cii.getHeight();
       channels = cii.getNumChannels();
@@ -1719,7 +1666,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     if (getLoadLayerSpecification()) {
 
-      progressManager = new ProgressManager("Initializing pretrained model and parsing layers (may require downloading weights)");
+      progressManager = new ProgressManager("Parsing model layers...");
       progressManager.start();
 
       layerSwingWorker = new SwingWorker<>() {
@@ -2132,6 +2079,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     DataSetIterator iter = getDataSetIterator(input);
     INDArray result = null;
     Map<String, Long> attributesPerLayer = new LinkedHashMap<>();
+    Instances newInstances = null;
 
     log.info("Getting features from layers: " + Arrays.toString(layerNames));
 
@@ -2140,28 +2088,32 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     progressManager = new ProgressManager(numIterations, "Performing feature extraction...");
     progressManager.start();
 
-    for (String layerName : layerNames) {
-      if (attributesPerLayer.containsKey(layerName)) {
-        log.warn("Concatenating two identical layers not supported");
-        continue;
+    try {
+      for (String layerName : layerNames) {
+        if (attributesPerLayer.containsKey(layerName)) {
+          log.warn("Concatenating two identical layers not supported");
+          continue;
+        }
+
+        INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
+
+        attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
+        if (result == null) {
+          result = activationsAtLayer;
+        } else {
+          // Concatenate the activations of this layer with the other feature extraction layers
+          result = Nd4j.concat(1, result, activationsAtLayer);
+        }
       }
 
-      INDArray activationsAtLayer = featurizeForLayer(layerName, iter, poolingType);
-
-      attributesPerLayer.put(layerName, activationsAtLayer.shape()[1]);
-      if (result == null) {
-        result = activationsAtLayer;
-      } else {
-        // Concatenate the activations of this layer with the other feature extraction layers
-        result = Nd4j.concat(1, result, activationsAtLayer);
-      }
+      result = Utils.appendClasses(result, input);
+      newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
+      progressManager.finish();
+      return newInstances;
+    } catch (ThreadDeath ex) {
+      log.warn("Filtering forcefully stopped");
+      progressManager.finish();
+      throw new ThreadDeath();
     }
-
-    result = Utils.appendClasses(result, input);
-    Instances newInstances = Utils.convertToInstances(result, input, attributesPerLayer);
-
-    progressManager.finish();
-
-    return newInstances;
   }
 }

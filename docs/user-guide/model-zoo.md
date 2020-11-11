@@ -52,6 +52,12 @@ kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
 View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/classifying-your-own.md)
 for usage examples with the model zoo.
 
+### Image Instance Iterator
+
+Pretrained zoo models have their input shape pre-specified. To avoid errors when the user-specified image
+dimensions don't match this input shape, the `ImageInstanceIterator` enforces image dimensions
+based on the selected zoo model's input shape. 
+
 ## Model Summaries
 
 The following summaries are generated from the pretrained zoo models included in WekaDeeplearning4j. 

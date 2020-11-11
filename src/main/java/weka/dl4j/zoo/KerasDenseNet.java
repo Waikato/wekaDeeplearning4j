@@ -53,7 +53,7 @@ public class KerasDenseNet extends AbstractZooModel {
         denseNet.setVariation(variation);
         ComputationGraph defaultNet = denseNet.init();
 
-        return attemptToLoadWeights(denseNet, defaultNet, seed, numLabels, filterMode);
+        return initZooModel(denseNet, defaultNet, seed, numLabels, filterMode);
     }
 
     @Override
