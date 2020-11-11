@@ -239,8 +239,8 @@ on an altered version of IMAGENET, hence the different class map.
 ### Command Line
 
 To generate a saliency map from the command line, you must specify an output image location.
-Note that we can also use `-1` to specify the target class. The saliency map generator
-will simply use the max probability class as the target class; this is useful when you don't 
+When specifying a target class, we can specify it as `-1`; the saliency map generator
+will simply use the max probability class as the target class in this case. This is useful when you don't 
 know what the class ID may be.
 
 ```bash
