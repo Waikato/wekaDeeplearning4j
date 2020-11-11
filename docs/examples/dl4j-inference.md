@@ -115,18 +115,17 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 
 Although a very diverse dataset (IMAGENET) was used to train many of the built-in zoo models 
 (meaning they can perform accurate prediction in a wide range of domains), 
-you may instead have a custom-trained `Dl4jMlpClassifier` which you'd like to experiment with; 
-the process is largely the same as above, with a few minor changes.
-Although very diverse datasets are used to train many of the built-in zoo models, meaning they can perform accurate
-prediction in a wide range of domains, you may instead have a custom-trained `Dl4jMlpClassifier` which
-you'd like to experiment with (e.g., using [this tutorial](classifying-mnist.md)); 
-the process is largely the same as above, with a few minor changes.
+you may instead have a custom-trained `Dl4jMlpClassifier` 
+(e.g., using [this tutorial](classifying-mnist.md), refer to image below on model saving)
+which you'd like to experiment with; the process is largely the same as above, with a few minor changes.
+
+![Saving a Dl4jMlpClassifier](../img/inference/Explorer_saveModel.png)
 
 ### GUI
 
 On the `Dl4j Inference` panel, open the `Dl4jCNNExplorer` settings:
 - Set `Use serialized model file` to `True`
-- Select your `.model` file as the `Serialized model file`
+- Select your previously saved `.model` file as the `Serialized model file`
 - Open the `ModelOutputDecoder` settings:
     - Set `Built in class map` to `CUSTOM`
     - Select the `Class map file` on your machine. This can be in two forms:
