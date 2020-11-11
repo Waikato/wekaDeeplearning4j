@@ -1666,7 +1666,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
     if (getLoadLayerSpecification()) {
 
-      progressManager = new ProgressManager("Initializing pretrained model and parsing layers (may require downloading weights)");
+      progressManager = new ProgressManager("Parsing model layers...");
       progressManager.start();
 
       layerSwingWorker = new SwingWorker<>() {

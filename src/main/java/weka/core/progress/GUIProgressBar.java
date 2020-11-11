@@ -98,6 +98,7 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
     public void finish() {
         if (currentFrame != null) {
             currentFrame.dispose();
+            currentFrame = null;
         }
     }
 
