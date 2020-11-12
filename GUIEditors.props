@@ -50,6 +50,8 @@ weka.dl4j.inference.Dl4jCNNExplorer=weka.gui.GenericObjectEditor
 
 weka.dl4j.inference.ModelOutputDecoder=weka.gui.GenericObjectEditor
 
+weka.dl4j.inference.CustomModelSetup=weka.gui.GenericObjectEditor
+
 weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper=weka.gui.GenericObjectEditor
 
 
