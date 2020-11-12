@@ -121,7 +121,7 @@ public class TestUtil {
     final DataSetIterator testIter = aii.getDataSetIterator(test, 42);
     final ComputationGraph model = clf.getModel();
     logger.info("DL4J Evaluation: ");
-    org.deeplearning4j.eval.Evaluation evaluation = model.evaluate(testIter);
+    org.nd4j.evaluation.classification.Evaluation evaluation = model.evaluate(testIter);
     logger.info(evaluation.stats());
   }
 
