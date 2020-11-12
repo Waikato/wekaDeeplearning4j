@@ -57,7 +57,8 @@ public class TopNPredictions {
         double[] predDouble = predictions.toDoubleVector();
 
         if (predDouble.length != classes.length) {
-            throw new WekaException(String.format("Number of prediction classes (%d) don't match size of class map (%d)!", predDouble.length, classes.length));
+            throw new WekaException(String.format("Number of prediction classes from model (%d) " +
+                    "don't match size of class map (%d)! Have you set the correct class map?", predDouble.length, classes.length));
         }
 
         // Get the Top N prediction indices

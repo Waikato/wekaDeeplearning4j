@@ -535,10 +535,10 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             }
         } catch (RuntimeException ex) {
             m_Logger.statusMessage("Terminated");
-            // End the current progress
-            explorer.getSaliencyMapWrapper().getProgressManager().finish();
+            m_Logger.logMessage(ex.getMessage());
         } catch (Exception ex) {
             m_Logger.statusMessage("Error occured");
+            m_Logger.logMessage(ex.getMessage());
             ex.printStackTrace();
         } finally {
             Thread.currentThread().setContextClassLoader(origLoader);

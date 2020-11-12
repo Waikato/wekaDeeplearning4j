@@ -70,6 +70,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      */
     public void init() throws Exception {
         model = Dl4jMlpClassifier.loadInferenceModel(serializedModelFile, zooModelType);
+    public void checkArgs() throws WekaException {
+        // If the user has set use-custom-model to True but not selected their model file
+        if (useCustomModel && !Utils.notDefaultFileLocation(customModelSetup.getSerializedModelFile()))
+            throw new WekaException("If using a custom model setup, you must select the model file location");
     }
 
     public void processImage(File imageFile) throws Exception {
