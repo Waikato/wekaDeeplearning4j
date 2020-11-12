@@ -79,7 +79,8 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     public void processImage(File imageFile) throws Exception {
         // Load the image
-        NativeImageLoader loader = new NativeImageLoader(224, 224, 3); // TODO take shape from loaded model
+        var inputShape = model.getInputShape(getCustomModelSetup());
+        NativeImageLoader loader = new NativeImageLoader(inputShape.getHeight(), inputShape.getWidth(), inputShape.getChannels());
         INDArray image = loader.asMatrix(imageFile);
 
         // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)

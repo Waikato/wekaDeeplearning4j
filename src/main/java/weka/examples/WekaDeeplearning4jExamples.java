@@ -133,7 +133,7 @@ public class WekaDeeplearning4jExamples {
     public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        Dl4jResNet50 zooModel = new Dl4jResNet50();
+        var zooModel = new Dl4jResNet50();
 //        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
         explorer.setZooModelType(zooModel);
 
