@@ -188,6 +188,8 @@ public class SaliencyMapWindow extends JPanel {
         packWindow();
         thisWindow.setLocationRelativeTo(null);
         thisWindow.setVisible(true);
+
+        generateSaliencyMap();
     }
 
     public int getDefaultClassID() {
