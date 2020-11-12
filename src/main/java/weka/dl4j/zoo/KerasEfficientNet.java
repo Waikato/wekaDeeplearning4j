@@ -76,9 +76,7 @@ public class KerasEfficientNet extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
-        int[][] shape = new int[1][];
-        shape[0] = EfficientNet.inputShape;
-        return shape;
+    public int[] getInputShape() {
+        return EfficientNet.inputShape;
     }
 }

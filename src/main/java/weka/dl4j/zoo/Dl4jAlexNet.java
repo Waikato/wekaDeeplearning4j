@@ -52,8 +52,8 @@ public class Dl4jAlexNet extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.AlexNet.builder().build().metaData().getInputShape();
+  public int[] getInputShape() {
+    return org.deeplearning4j.zoo.model.AlexNet.builder().build().metaData().getInputShape()[0];
   }
 
   /**

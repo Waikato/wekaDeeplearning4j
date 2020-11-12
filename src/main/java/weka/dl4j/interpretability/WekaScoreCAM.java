@@ -21,7 +21,7 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         scoreCAM.setBatchSize(batchSize);
 
         scoreCAM.setImageChannelsLast(zooModel.getChannelsLast()); // TODO get working with Custom trained model
-        scoreCAM.setModelInputShape(Utils.decodeCNNShape(zooModel.getShape()[0]));
+        scoreCAM.setModelInputShape(Utils.decodeCNNShape(zooModel.getInputShape()));
         scoreCAM.setImagePreProcessingScaler(zooModel.getImagePreprocessingScaler());
         scoreCAM.setModelName(zooModel.getPrettyName());
 

@@ -48,9 +48,7 @@ public class KerasXception extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
-        int[][] shape = new int[1][];
-        shape[0] = Xception.inputShape;
-        return shape;
+    public int[] getInputShape() {
+        return Xception.inputShape;
     }
 }

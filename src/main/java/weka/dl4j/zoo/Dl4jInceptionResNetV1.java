@@ -53,9 +53,9 @@ public class Dl4jInceptionResNetV1 extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
+  public int[] getInputShape() {
     return org.deeplearning4j.zoo.model.InceptionResNetV1.builder().build().metaData()
-        .getInputShape();
+        .getInputShape()[0];
   }
 
   /**

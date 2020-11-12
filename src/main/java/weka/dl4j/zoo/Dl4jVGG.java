@@ -105,10 +105,10 @@ public class Dl4jVGG extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
+    public int[] getInputShape() {
         if (m_variation == VGG.VARIATION.VGG16)
-            return org.deeplearning4j.zoo.model.VGG16.builder().build().metaData().getInputShape();
+            return org.deeplearning4j.zoo.model.VGG16.builder().build().metaData().getInputShape()[0];
         else
-            return org.deeplearning4j.zoo.model.VGG19.builder().build().metaData().getInputShape();
+            return org.deeplearning4j.zoo.model.VGG19.builder().build().metaData().getInputShape()[0];
     }
 }

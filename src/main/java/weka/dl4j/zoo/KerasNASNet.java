@@ -57,9 +57,7 @@ public class KerasNASNet extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
-        int[][] shape = new int[1][];
-        shape[0] = NASNet.inputShape;
-        return shape;
+    public int[] getInputShape() {
+        return NASNet.inputShape;
     }
 }
