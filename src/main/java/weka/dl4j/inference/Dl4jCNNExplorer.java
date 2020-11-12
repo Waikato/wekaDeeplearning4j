@@ -136,6 +136,18 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         return currentPredictions;
     }
 
+    public void finishProgress() {
+        var wrapper = getSaliencyMapWrapper();
+        if (wrapper == null)
+            return;
+
+        var progressManager = wrapper.getProgressManager();
+        if (progressManager == null)
+            return;
+
+        progressManager.finish();
+    }
+
     /* Getters and setters */
 
     @OptionMetadata(

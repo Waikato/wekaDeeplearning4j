@@ -541,6 +541,8 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             m_Logger.logMessage(ex.getMessage());
             ex.printStackTrace();
         } finally {
+            explorer.finishProgress();
+
             Thread.currentThread().setContextClassLoader(origLoader);
 
             synchronized (this) {
