@@ -94,7 +94,7 @@ see the results in the output panel, again correctly predicting the target class
 $ java weka.Run .Dl4jCNNExplorer \
     -decoder ".ModelOutputDecoder -builtIn VGGFACE" \
     -zooModel ".Dl4jVGG -variation VGG16 -pretrained VGGFACE" \
-    -i src/test/resources/images/ben_stiller.jpg
+    -i $WEKA_HOME/packages/wekaDeeplearning4j/src/test/resources/images/ben_stiller.jpg
 ```
 
 ```bash
@@ -245,7 +245,7 @@ know what the class ID may be.
 
 ```bash
 $ java weka.Run .Dl4jCNNExplorer \
-    -i "src/test/resources/images/catAndDog.jpg" \
+    -i "$WEKA_HOME/packages/wekaDeeplearning4j/src/test/resources/images/catAndDog.jpg" \
     -generate-map \
     -saliency-map ".WekaScoreCAM -bs 8 -normalize -output output_image.png -target-classes -1" \
     -zooModel ".KerasResNet -variation RESNET101"
@@ -255,7 +255,7 @@ $ java weka.Run .Dl4jCNNExplorer \
 
 ```bash
 $ java weka.Run .Dl4jCNNExplorer \
-    -i "src/test/resources/images/catAndDog.jpg" \
+    -i "$WEKA_HOME/packages/wekaDeeplearning4j/src/test/resources/images/catAndDog.jpg" \
     -generate-map \
     -saliency-map ".WekaScoreCAM -bs 8 -normalize -output output_image.png -target-classes -1,281" \
     -zooModel ".KerasResNet -variation RESNET101"
