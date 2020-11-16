@@ -1747,6 +1747,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
+        model.setCustomNet();
       } catch (Exception e) {
         throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
       }
