@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import lombok.extern.log4j.Log4j2;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.*;
+import weka.dl4j.zoo.keras.DenseNet;
+import weka.dl4j.zoo.keras.EfficientNet;
 import weka.dl4j.zoo.keras.VGG;
 import weka.zoo.ZooModelTest;
 
@@ -21,6 +23,14 @@ public class Dl4jCNNExplorerTest extends TestCase {
     private final static int GERMAN_SHEPPARD_ID = 235;
 
     private final static String GERMAN_SHEPPARD_PATH = "src/test/resources/images/dog.jpg";
+
+    private final static int FOUR_ID = 4;
+
+    private final static String FOUR_PATH = "datasets/nominal/mnist-minimal/img_3574_4.jpg";
+
+    private final static String MNIST1x28x28_MODEL_PATH = "src/test/resources/models/lenet_1x28x28_mnist_5e.model";
+
+    private final static String MNIST3x56x56_MODEL_PATH = "src/test/resources/models/lenet_3x56x56_mnist_5e.model";
 
     /**
      * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller
@@ -41,13 +51,6 @@ public class Dl4jCNNExplorerTest extends TestCase {
         checkPredictionInTopN(explorer, BEN_STILLER_PATH, BEN_STILLER_ID);
     }
 
-    /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a trombone
-     * @throws Exception If an exception occurs during testing
-     */
-    public void testDogResNet() throws Exception {
-        checkImageNetModel(new KerasResNet(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
-    }
 
     /**
      * Test the explorer with a pretrained Darknet19 model - it uses a different class mapping
@@ -103,6 +106,71 @@ public class Dl4jCNNExplorerTest extends TestCase {
     }
 
     /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDl4jResNet50_SimpleInference() throws Exception {
+        checkImageNetModel(new Dl4jResNet50(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained LeNet on MNIST. This won't give accurate predictions but is merely
+     * to check it doesn't throw any exceptions.
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDl4jLeNet_SimpleInference() throws Exception {
+        checkMnistModel(new Dl4jLeNet(), FOUR_PATH, FOUR_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testKerasResNet50_SimpleInference() throws Exception {
+        checkImageNetModel(new KerasResNet(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDenseNet169_SimpleInference() throws Exception {
+        var model = new KerasDenseNet();
+        model.setVariation(DenseNet.VARIATION.DENSENET169);
+        checkImageNetModel(model, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testEfficientNet_SimpleInference() throws Exception {
+        var model = new KerasEfficientNet();
+        model.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        checkImageNetModel(model, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    public void test1x28x28_SimpleInference() throws Exception {
+        var modelSetup = new CustomModelSetup();
+        modelSetup.setSerializedModelFile(new File(MNIST1x28x28_MODEL_PATH));
+        modelSetup.setInputChannels(1);
+        modelSetup.setInputWidth(28);
+        modelSetup.setInputHeight(28);
+
+        checkMnistModel(modelSetup, FOUR_PATH, FOUR_ID);
+    }
+
+    public void test3x56x56_SimpleInference() throws Exception {
+        var modelSetup = new CustomModelSetup();
+        modelSetup.setSerializedModelFile(new File(MNIST3x56x56_MODEL_PATH));
+        modelSetup.setInputChannels(3);
+        modelSetup.setInputWidth(56);
+        modelSetup.setInputHeight(56);
+
+        checkMnistModel(modelSetup, FOUR_PATH, FOUR_ID);
+    }
+
+    /**
      * Test a set of zoo models against the german sheppard image
      * @param zooModels models to test
      * @throws Exception If an exception occurs during testing
@@ -139,6 +207,31 @@ public class Dl4jCNNExplorerTest extends TestCase {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
         explorer.setZooModelType(zooModel);
+        checkPredictionInTopN(explorer, imagePath, expectedClassID);
+    }
+
+    private void checkMnistModel(AbstractZooModel zooModel, String imagePath, int expectedClassID) throws Exception {
+        Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
+        explorer.setZooModelType(zooModel);
+
+        var decoder = new ModelOutputDecoder();
+        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
+        decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
+        explorer.setModelOutputDecoder(decoder);
+
+        checkPredictionInTopN(explorer, imagePath, expectedClassID);
+    }
+
+    private void checkMnistModel(CustomModelSetup modelSetup, String imagePath, int expectedClassID) throws Exception {
+        Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
+        explorer.setUseCustomModel(true);
+        explorer.setCustomModelSetup(modelSetup);
+
+        var decoder = new ModelOutputDecoder();
+        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
+        decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
+        explorer.setModelOutputDecoder(decoder);
+
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
