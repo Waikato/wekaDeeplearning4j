@@ -335,11 +335,10 @@ task travisTest(type: Test) {
     }
 
     filter {
-        // Excluded from travis due to taking too long / using too much memory
+        // Excluded from travis due to taking too long / using too much memory and throwing OOM exception.
         excludeTestsMatching 'ZooModelTest'
         excludeTestsMatching 'Dl4jCNNExplorerTest'
         excludeTestsMatching 'Dl4jMlpFilterTest'
-        excludeTestsMatching 'ScoreCAMTest'
     }
 }
 
