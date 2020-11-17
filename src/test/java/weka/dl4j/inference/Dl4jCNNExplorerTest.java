@@ -110,7 +110,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testDl4jResNet50_SimpleInference() throws Exception {
-        checkImageNetModel(new Dl4jResNet50(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+        checkImageNetModel(new Dl4jResNet50(), false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     /**
@@ -119,7 +119,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testDl4jLeNet_SimpleInference() throws Exception {
-        checkMnistModel(new Dl4jLeNet(), FOUR_PATH, FOUR_ID);
+        checkMnistModel(new Dl4jLeNet(), false, FOUR_PATH, FOUR_ID);
     }
 
     /**
@@ -127,27 +127,27 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testKerasResNet50_SimpleInference() throws Exception {
-        checkImageNetModel(new KerasResNet(), GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+        checkImageNetModel(new KerasResNet(), false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard
      * @throws Exception If an exception occurs during testing
      */
     public void testDenseNet169_SimpleInference() throws Exception {
         var model = new KerasDenseNet();
         model.setVariation(DenseNet.VARIATION.DENSENET169);
-        checkImageNetModel(model, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+        checkImageNetModel(model,false,  GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard
      * @throws Exception If an exception occurs during testing
      */
     public void testEfficientNet_SimpleInference() throws Exception {
         var model = new KerasEfficientNet();
         model.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
-        checkImageNetModel(model, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+        checkImageNetModel(model, false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     public void test1x28x28_SimpleInference() throws Exception {
@@ -157,7 +157,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
         modelSetup.setInputWidth(28);
         modelSetup.setInputHeight(28);
 
-        checkMnistModel(modelSetup, FOUR_PATH, FOUR_ID);
+        checkMnistModel(modelSetup, false, FOUR_PATH, FOUR_ID);
     }
 
     public void test3x56x56_SimpleInference() throws Exception {
@@ -167,7 +167,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
         modelSetup.setInputWidth(56);
         modelSetup.setInputHeight(56);
 
-        checkMnistModel(modelSetup, FOUR_PATH, FOUR_ID);
+        checkMnistModel(modelSetup, false, FOUR_PATH, FOUR_ID);
     }
 
     /**
@@ -180,7 +180,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
         for (AbstractZooModel zooModel : zooModels) {
             try {
-                checkImageNetModel(zooModel, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+                checkImageNetModel(zooModel, false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
             } catch (AssertionError ex) {
                 failedModels.add(zooModel);
             }
@@ -203,16 +203,18 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * Simply tests a pretrained (on IMAGENET) zoo model
      * @param zooModel Model to test
      */
-    private void checkImageNetModel(AbstractZooModel zooModel, String imagePath, int expectedClassID) throws Exception {
+    private void checkImageNetModel(AbstractZooModel zooModel, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
         explorer.setZooModelType(zooModel);
+        explorer.setGenerateSaliencyMap(generateSaliencyMap);
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
-    private void checkMnistModel(AbstractZooModel zooModel, String imagePath, int expectedClassID) throws Exception {
+    private void checkMnistModel(AbstractZooModel zooModel, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
         explorer.setZooModelType(zooModel);
+        explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
         var decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
@@ -222,10 +224,11 @@ public class Dl4jCNNExplorerTest extends TestCase {
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
-    private void checkMnistModel(CustomModelSetup modelSetup, String imagePath, int expectedClassID) throws Exception {
+    private void checkMnistModel(CustomModelSetup modelSetup, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
         explorer.setUseCustomModel(true);
         explorer.setCustomModelSetup(modelSetup);
+        explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
         var decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
