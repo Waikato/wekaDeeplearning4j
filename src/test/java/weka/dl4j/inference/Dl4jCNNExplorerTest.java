@@ -28,9 +28,9 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
     private final static String FOUR_PATH = "datasets/nominal/mnist-minimal/img_3574_4.jpg";
 
-    private final static String MNIST1x28x28_MODEL_PATH = "src/test/resources/models/lenet_1x28x28_mnist_5e.model";
+    private final static String MNIST1x28x28_MODEL_PATH = "src/test/resources/models/custom_1x28x28_mnist_30e.model";
 
-    private final static String MNIST3x56x56_MODEL_PATH = "src/test/resources/models/lenet_3x56x56_mnist_5e.model";
+    private final static String MNIST3x56x56_MODEL_PATH = "src/test/resources/models/custom_3x56x56_mnist_30e.model";
 
     /**
      * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller
