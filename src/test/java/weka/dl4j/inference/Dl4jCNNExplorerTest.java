@@ -216,6 +216,26 @@ public class Dl4jCNNExplorerTest extends TestCase {
         checkImageNetModel(model, true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
+    public void test1x28x28_SaliencyMap() throws Exception {
+        var modelSetup = new CustomModelSetup();
+        modelSetup.setSerializedModelFile(new File(MNIST1x28x28_MODEL_PATH));
+        modelSetup.setInputChannels(1);
+        modelSetup.setInputWidth(28);
+        modelSetup.setInputHeight(28);
+
+        checkMnistModel(modelSetup, true, FOUR_PATH, FOUR_ID);
+    }
+
+    public void test3x56x56_SaliencyMap() throws Exception {
+        var modelSetup = new CustomModelSetup();
+        modelSetup.setSerializedModelFile(new File(MNIST3x56x56_MODEL_PATH));
+        modelSetup.setInputChannels(3);
+        modelSetup.setInputWidth(56);
+        modelSetup.setInputHeight(56);
+
+        checkMnistModel(modelSetup, true, FOUR_PATH, FOUR_ID);
+    }
+
     /**
      * Test a set of zoo models against the german sheppard image
      * @param zooModels models to test
