@@ -119,7 +119,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
      * @param targetClass Class to predict for
      * @return
      */
-    private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) { // TODO return Prediction
+    private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) {
         // Run the model on the image, then return the prediction for the target class
         INDArray output = modelOutputSingle(imageArr);
         if (targetClass == -1) {
@@ -562,53 +562,60 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
      * @param array INDArray containing an image in order [N, C, H, W] or [C, H, W]
      * @return BufferedImage
      */
-    public static BufferedImage imageFromINDArray(INDArray array) {
-        long[] shape = array.shape();
-
+    public BufferedImage imageFromINDArray(INDArray array) {
+        // Assume 3d array -> [channels, width, height]
         boolean is4d = false;
+        boolean is1ChannelImage = false;
+        int channelIndex = 0;
         String dimString = "3D";
 
-        if (shape.length == 4) {
-            is4d = true;
-            dimString = "4D";
-        }
-
-        log.debug(String.format("Converting %s INDArray to image...", dimString));
-
+        // Check the image array shape whether it's 3- or 4-d
+        long[] shape = array.shape();
         long height = shape[1];
         long width = shape[2];
 
-        if (is4d) {
+        if (shape.length == 4) {
+            // 4d array -> [batch_size, channels, width, height]
+            is4d = true;
+            dimString = "4D";
+            channelIndex = 1;
             height = shape[2];
             width = shape[3];
         }
+
+        if (shape[channelIndex] == 1)
+            is1ChannelImage = true;
+
+        log.debug(String.format("Converting %s INDArray to image...", dimString));
 
         BufferedImage image = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int red, green, blue;
 
-                if (is4d) {
-                    red = array.getInt(0, 2, y, x);
-                    green = array.getInt(0, 1, y, x);
-                    blue = array.getInt(0, 0, y, x);
-                } else {
-                    red = array.getInt(2, y, x);
-                    green = array.getInt(1, y, x);
-                    blue = array.getInt(0, y, x);
-                }
+                red = getPixelValue(array, 2, x, y, is4d, is1ChannelImage);
+                green = getPixelValue(array, 1, x, y, is4d, is1ChannelImage);
+                blue = getPixelValue(array, 0, x, y, is4d, is1ChannelImage);
 
-                //handle out of bounds pixel values
-                red = Math.min(red, 255);
-                green = Math.min(green, 255);
-                blue = Math.min(blue, 255);
-
-                red = Math.max(red, 0);
-                green = Math.max(green, 0);
-                blue = Math.max(blue, 0);
                 image.setRGB(x, y, new Color(red, green, blue).getRGB());
             }
         }
         return image;
+    }
+
+    private int getPixelValue(INDArray array, int pixelChannel, int x, int y, boolean is4d, boolean is1Channel) {
+        if (is1Channel) {
+            pixelChannel = 0;
+        }
+        int pixelVal;
+        if (is4d) {
+            pixelVal = array.getInt(0, pixelChannel, y, x);
+        } else {
+            pixelVal = array.getInt(pixelChannel, y, x);
+        }
+
+        // Clamp the pixel value to between 0 and 255
+        int min = 0, max = 255;
+        return Math.max(min, Math.min(max, pixelVal));
     }
 }
