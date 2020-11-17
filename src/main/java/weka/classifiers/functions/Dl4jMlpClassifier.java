@@ -1997,7 +1997,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    *
    * @return True if zoomodel is not CustomNet
    */
-  protected boolean useZooModel() {
+  public boolean useZooModel() {
     return !(zooModel instanceof CustomNet);
   }
 
