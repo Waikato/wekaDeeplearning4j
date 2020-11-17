@@ -1,7 +1,6 @@
 package weka.dl4j.interpretability;
 
 import lombok.extern.log4j.Log4j2;
-import weka.dl4j.Utils;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.PredictionClass;
 
@@ -17,13 +16,16 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     @Override
     public void processImage(File imageFile) {
         scoreCAM = new ScoreCAM();
-        scoreCAM.setComputationGraph(getComputationGraph());
         scoreCAM.setBatchSize(batchSize);
+        var classifier = getDl4jMlpClassifier();
+        scoreCAM.setComputationGraph(classifier.getModel());
+        scoreCAM.setModelInputShape(classifier.getInputShape(getCustomModelSetup()));
+        scoreCAM.setModelName(classifier.getModelName());
 
-        scoreCAM.setImageChannelsLast(zooModel.getChannelsLast()); // TODO get working with Custom trained model
-        scoreCAM.setModelInputShape(Utils.decodeCNNShape(zooModel.getInputShape()));
-        scoreCAM.setImagePreProcessingScaler(zooModel.getImagePreprocessingScaler());
-        scoreCAM.setModelName(zooModel.getPrettyName());
+        if (classifier.useZooModel()) {
+            scoreCAM.setImageChannelsLast(classifier.getZooModel().getChannelsLast());
+            scoreCAM.setImagePreProcessingScaler(classifier.getZooModel().getImagePreprocessingScaler());
+        }
 
         scoreCAM.addIterationsStartedListener(this::onIterationsStarted);
         scoreCAM.addIterationIncrementListener(this::onIterationIncremented);
