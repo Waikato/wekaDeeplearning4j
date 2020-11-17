@@ -170,6 +170,52 @@ public class Dl4jCNNExplorerTest extends TestCase {
         checkMnistModel(modelSetup, false, FOUR_PATH, FOUR_ID);
     }
 
+    /* Saliency Map Tests */
+    /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDl4jResNet50_SaliencyMap() throws Exception {
+        checkImageNetModel(new Dl4jResNet50(), true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained LeNet on MNIST. This won't give accurate predictions but is merely
+     * to check it doesn't throw any exceptions.
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDl4jLeNet_SaliencyMap() throws Exception {
+        checkMnistModel(new Dl4jLeNet(), true, FOUR_PATH, FOUR_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testKerasResNet50_SaliencyMap() throws Exception {
+        checkImageNetModel(new KerasResNet(), true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testDenseNet169_SaliencyMap() throws Exception {
+        var model = new KerasDenseNet();
+        model.setVariation(DenseNet.VARIATION.DENSENET169);
+        checkImageNetModel(model,true,  GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
+    /**
+     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard
+     * @throws Exception If an exception occurs during testing
+     */
+    public void testEfficientNet_SaliencyMap() throws Exception {
+        var model = new KerasEfficientNet();
+        model.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
+        checkImageNetModel(model, true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
+    }
+
     /**
      * Test a set of zoo models against the german sheppard image
      * @param zooModels models to test
