@@ -127,11 +127,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @return Model name
      */
     public String getModelName() {
-        if (Utils.notDefaultFileLocation(customModelSetup.getSerializedModelFile())) {
-            return "Custom trained Dl4jMlpClassifier";
-        } else {
-            return zooModelType.getPrettyName();
-        }
+        return model.getModelName();
     }
 
     public TopNPredictions getCurrentPredictions() {

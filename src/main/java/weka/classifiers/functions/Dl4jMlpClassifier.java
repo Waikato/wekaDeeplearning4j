@@ -810,6 +810,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
+   * Get the name of the loaded model
+   * @return Model name
+   */
+  public String getModelName() {
+    if (useZooModel()) {
+      return getZooModel().getPrettyName();
+    } else {
+      return "Custom trained Dl4jMlpClassifier";
+    }
+  }
+
+  /**
    * The method used to train the classifier.
    *
    * @param data set of instances serving as training data
