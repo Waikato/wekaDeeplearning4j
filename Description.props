@@ -27,7 +27,7 @@ License=GPL 3.0
 
 Description=Provides access to classifiers and filters using the Deeplearning4j library. Deep neural networks can be built using a multitude of different layers, activations, lossfunctions and more. See https://deeplearning.cms.waikato.ac.nz/install#add-gpu-support to add CUDA support.
 
-Changes=Update Deeplearning4j API to dl4j 1.0.0-beta
+Changes=Add new Dl4jCNNExplorer class and `Dl4j Inference` panel to use it. Also implemented ScoreCAM and integrated it into the Dl4jCNNExplorer.
 
 # Package URL for obtaining the package archive (required)
 PackageURL=https://github.com/Waikato/wekaDeeplearning4j/releases/download/v{VERSION}/{ZIP_NAME}
