@@ -136,7 +136,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         Instances instances = new Instances(new FileReader(filepath));
         instances.setClassIndex(instances.numAttributes() - 1);
         ArrayList<Object> list = Collections.list(instances.classAttribute().enumerateValues());
-        return (String[]) list.toArray();
+        return list.toArray(new String[0]);
     }
 
     /**
