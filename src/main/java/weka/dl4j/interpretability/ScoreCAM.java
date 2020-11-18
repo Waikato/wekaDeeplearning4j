@@ -29,7 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// TODO document
+
+/**
+ *
+ */
 @Log4j2
 public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 

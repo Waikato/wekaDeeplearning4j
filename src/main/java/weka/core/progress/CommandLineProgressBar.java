@@ -8,8 +8,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @Log4j2
-/**
- * Command line implementation of a progress bar
+/*
+  Command line implementation of a progress bar
  */
 public class CommandLineProgressBar extends AbstractProgressBar {
 

@@ -14,7 +14,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO document
+/**
+ * Generic class for a saliency map generator.
+ * Only implemented by ScoreCAM currently so some fields may need to be refactored when implementing a new
+ * generator method.
+ */
 public abstract class AbstractCNNSaliencyMapGenerator {
 
     protected ComputationGraph computationGraph = null;

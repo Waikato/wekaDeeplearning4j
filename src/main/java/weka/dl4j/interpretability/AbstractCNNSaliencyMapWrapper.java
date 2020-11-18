@@ -20,8 +20,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Enumeration;
 
-// TODO Document
-
+/**
+ * WEKA Wrapper for a Saliency Map Generator (e.g., ScoreCAM).
+ * Provides the WEKA handles and getters/setters to control the
+ * generator from the command line/GUI.
+ *
+ */
 @Log4j2
 public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, OptionHandler {
 
@@ -64,6 +68,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         }
     }
 
+    @ProgrammaticProperty
     public String[] getClassMap() {
         return classMap;
     }
@@ -72,6 +77,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         this.classMap = classMap;
     }
 
+    @ProgrammaticProperty
     public Dl4jMlpClassifier getDl4jMlpClassifier() {
         return dl4jMlpClassifier;
     }
@@ -80,6 +86,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         this.dl4jMlpClassifier = dl4jMlpClassifier;
     }
 
+    @ProgrammaticProperty
     public CustomModelSetup getCustomModelSetup() {
         return customModelSetup;
     }

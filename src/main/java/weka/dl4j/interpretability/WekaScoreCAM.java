@@ -8,7 +8,28 @@ import weka.dl4j.inference.PredictionClass;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-// TODO Document
+/**
+ * WEKA Wrapper for the Deeplearning4j ScoreCAM implementation.
+ * <!-- options-start -->
+ * Valid options are: <p>
+ *
+ * <pre> -bs &lt;int&gt;
+ *  The mini batch size to use for map generation</pre>
+ *
+ * <pre> -target-classes &lt;int,int,...&gt;
+ *  Output class to generate saliency maps for; default is -1 (use the highest probability class). This only needs to be set if wanting to use a non-default class from the *command line*; if using the *GUI*, the 'View Saliency Map' window contains the interface for setting this.</pre>
+ *
+ * <pre> -output &lt;file location&gt;
+ *  File for the saliency map to be saved in</pre>
+ *
+ * <pre> -normalize
+ *  When generating the heatmap, should the values be normalized to be in [0, 1]</pre>
+ *
+ * <!-- options-end -->
+ *
+ * <!-- globalinfo-start -->
+ * <!-- globalinfo-end -->
+ */
 @Log4j2
 public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
