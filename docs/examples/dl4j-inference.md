@@ -125,8 +125,11 @@ which you'd like to experiment with; the process is largely the same as above, w
 
 On the `Dl4j Inference` panel, open the `Dl4jCNNExplorer` settings:
 
-- Set `Use serialized model file` to `True`
-- Select your previously saved `.model` file as the `Serialized model file`
+- Set `Use custom-trained model file` to `True`
+- Open the `CustomModelSetup` settings
+    - Select your previously saved `.model` file as the `Serialized model file`
+    - Set the input `channels`, `width`, and `height` with the values used to train the model. 
+    These values will be identical to those set on the `ImageInstanceIterator`. 
 - Open the `ModelOutputDecoder` settings:
     - Set `Built in class map` to `CUSTOM`
     - Select the `Class map file` on your machine. This can be in two forms:
@@ -160,12 +163,16 @@ to classify between different dog breeds isn't going to give accurate answers wh
 
 ### Command Line
 
+This example uses a custom-trained model which used an `ImageInstanceIterator` using 
+`channels`, `width`, and `height` of `3`, `56`, `56`, respectively. These values are explicitly
+defined in the `CustomModelSetup`.
+ 
 ```bash
 $ java weka.Run .Dl4jCNNExplorer \
-    -decoder ".ModelOutputDecoder -builtIn CUSTOM -classMapFile /path/to/classmap.txt" \
-    -model-file /path/to/saved/model/Dl4jMlpClassifier.model \
-    -use-model-file
-    -i /path/to/input/image.png
+    -i path/to/image.jpg \
+    -custom-model ".CustomModelSetup -channels 3 -height 56 -width 56 -model-file path/to/customModel.model" \
+    -decoder ".ModelOutputDecoder -builtIn CUSTOM -classMapFile path/to/training.arff" \
+    -useCustomModel
 ```
 
 ## Example 4: Saliency Map Generation
