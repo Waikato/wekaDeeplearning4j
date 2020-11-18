@@ -172,7 +172,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
         setHeight(28);
         setWidth(28);
       } else {
-        int[] pretrainedShape = tmpZooModel.getShape()[0];
+        int[] pretrainedShape = tmpZooModel.getInputShape();
         setNumChannels(pretrainedShape[0]);
         setHeight(pretrainedShape[1]);
         setWidth(pretrainedShape[2]);

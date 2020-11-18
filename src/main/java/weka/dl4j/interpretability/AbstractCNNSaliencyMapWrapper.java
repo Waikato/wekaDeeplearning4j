@@ -3,12 +3,13 @@ package weka.dl4j.interpretability;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.deeplearning4j.nn.graph.ComputationGraph;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.dl4j.Utils;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.OptionMetadata;
 import weka.core.progress.ProgressManager;
+import weka.dl4j.inference.CustomModelSetup;
 import weka.dl4j.zoo.AbstractZooModel;
 import weka.gui.ProgrammaticProperty;
 
@@ -19,8 +20,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Enumeration;
 
-// TODO Document
-
+/**
+ * WEKA Wrapper for a Saliency Map Generator (e.g., ScoreCAM).
+ * Provides the WEKA handles and getters/setters to control the
+ * generator from the command line/GUI.
+ *
+ */
 @Log4j2
 public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, OptionHandler {
 
@@ -39,9 +44,12 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
 
     protected String[] classMap;
 
-    protected ComputationGraph computationGraph;
+    /**
+     * Model used for feature extraction
+     */
+    protected Dl4jMlpClassifier dl4jMlpClassifier;
 
-    protected AbstractZooModel zooModel;
+    protected CustomModelSetup customModelSetup = new CustomModelSetup();
 
     public abstract void processImage(File imageFile);
 
@@ -60,6 +68,7 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         }
     }
 
+    @ProgrammaticProperty
     public String[] getClassMap() {
         return classMap;
     }
@@ -68,20 +77,22 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
         this.classMap = classMap;
     }
 
-    public ComputationGraph getComputationGraph() {
-        return computationGraph;
+    @ProgrammaticProperty
+    public Dl4jMlpClassifier getDl4jMlpClassifier() {
+        return dl4jMlpClassifier;
     }
 
-    public void setComputationGraph(ComputationGraph computationGraph) {
-        this.computationGraph = computationGraph;
+    public void setDl4jMlpClassifier(Dl4jMlpClassifier dl4jMlpClassifier) {
+        this.dl4jMlpClassifier = dl4jMlpClassifier;
     }
 
-    public AbstractZooModel getZooModel() {
-        return zooModel;
+    @ProgrammaticProperty
+    public CustomModelSetup getCustomModelSetup() {
+        return customModelSetup;
     }
 
-    public void setZooModel(AbstractZooModel zooModel) {
-        this.zooModel = zooModel;
+    public void setCustomModelSetup(CustomModelSetup customModelSetup) {
+        this.customModelSetup = customModelSetup;
     }
 
     @OptionMetadata(

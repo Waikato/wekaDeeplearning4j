@@ -48,9 +48,7 @@ public class KerasInceptionV3 extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
-        int[][] shape = new int[1][];
-        shape[0] = InceptionV3.inputShape;
-        return shape;
+    public int[] getInputShape() {
+        return InceptionV3.inputShape;
     }
 }

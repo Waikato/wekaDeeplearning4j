@@ -43,7 +43,8 @@ All zoo models have a **default** feature extraction layer, which is typically t
 activations, hence why it's set to the default (although you can use any intermediary layer).
 
 `PoolingType` does not need to be specified when using the default activation layer - the outputs are already the
- correct dimensionality.
+ correct dimensionality (`[batch size, num activations]`). If using an intermediary layer the outputs will
+ typically be of size `[batch size, width, height, num channels]`.
 
 ## Example 1: Default MNIST Minimal
 The following example walks through using a pretrained ResNet50 (from the Deeplearning4j model zoo)

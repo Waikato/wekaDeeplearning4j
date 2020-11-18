@@ -56,8 +56,8 @@ public class Dl4jResNet50 extends AbstractZooModel {
     }
 
     @Override
-    public int[][] getShape() {
-        return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape();
+    public int[] getInputShape() {
+        return org.deeplearning4j.zoo.model.ResNet50.builder().build().metaData().getInputShape()[0];
     }
 
     /**

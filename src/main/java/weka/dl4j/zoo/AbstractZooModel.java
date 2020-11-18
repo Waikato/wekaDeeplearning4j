@@ -1,6 +1,5 @@
 package weka.dl4j.zoo;
 
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
@@ -18,13 +17,10 @@ import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.enums.PretrainedType;
-import weka.dl4j.layers.Layer;
 import weka.gui.ProgrammaticProperty;
 
-import javax.swing.*;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This class contains the logic necessary to load the pretrained weights for a given zoo model
@@ -101,7 +97,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      * @return
      */
     public ComputationGraph getDefaultGraph() {
-        return this.init(2, 1, this.getShape()[0], true);
+        return this.init(2, 1, this.getInputShape(), true);
     }
 
     /**
@@ -109,7 +105,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
      *
      * @return Input shape of this zoomodel
      */
-    public abstract int[][] getShape();
+    public abstract int[] getInputShape();
 
     public String getPrettyName() {
         Enum variation = getVariation();
@@ -197,7 +193,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
         ComputationGraph pretrainedModel = null;
         // Attempt to download the model weights
-        var progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)...");
+        ProgressManager progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)...");
         progressManager.start();
         try {
             pretrainedModel = downloadWeights(zooModel);

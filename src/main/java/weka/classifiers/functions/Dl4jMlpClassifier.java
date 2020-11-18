@@ -31,7 +31,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.output.CountingOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.lucene.util.ThreadInterruptedException;
 import org.deeplearning4j.datasets.iterator.AsyncDataSetIterator;
 import org.deeplearning4j.exception.DL4JException;
 import org.deeplearning4j.exception.DL4JInvalidConfigException;
@@ -65,7 +64,7 @@ import weka.dl4j.earlystopping.EarlyStopping;
 import weka.dl4j.enums.CacheMode;
 import weka.dl4j.enums.ConvolutionMode;
 import weka.dl4j.enums.PoolingType;
-import weka.dl4j.enums.PretrainedType;
+import weka.dl4j.inference.CustomModelSetup;
 import weka.dl4j.iterators.instance.*;
 import weka.dl4j.iterators.instance.api.ConvolutionalIterator;
 import weka.dl4j.iterators.instance.sequence.text.cnn.CnnTextEmbeddingInstanceIterator;
@@ -279,7 +278,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected ProgressManager progressManager;
 
-  private SwingWorker<Layer[], Layer> layerSwingWorker;
+  private SwingWorker<Layer[], Void> layerSwingWorker;
 
   public Dl4jMlpClassifier() {
     if (!s_cudaMultiGPUSet) {
@@ -811,6 +810,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
+   * Get the name of the loaded model
+   * @return Model name
+   */
+  public String getModelName() {
+    if (useZooModel()) {
+      return getZooModel().getPrettyName();
+    } else {
+      return "Custom trained Dl4jMlpClassifier";
+    }
+  }
+
+  /**
    * The method used to train the classifier.
    *
    * @param data set of instances serving as training data
@@ -1254,7 +1265,18 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     return data;
   }
 
-
+  public InputType.InputTypeConvolutional getInputShape(CustomModelSetup customModelSetup) {
+    if (useZooModel()) {
+      int[] inputShape = getZooModel().getInputShape();
+      log.debug("Zoo Model shape for image inference is: " + Arrays.toString(inputShape));
+      return new InputType.InputTypeConvolutional(inputShape[1], inputShape[2], inputShape[0]);
+    }
+    
+    return new InputType.InputTypeConvolutional(
+            customModelSetup.getInputHeight(),
+            customModelSetup.getInputWidth(),
+            customModelSetup.getInputChannels());
+  }
 
   /**
    * Build the Zoomodel instance
@@ -1669,7 +1691,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       progressManager = new ProgressManager("Parsing model layers...");
       progressManager.start();
 
-      layerSwingWorker = new SwingWorker<>() {
+      layerSwingWorker = new SwingWorker<Layer[], Void>() {
         @Override
         protected Layer[] doInBackground() throws Exception {
           return parseLayers();
@@ -1705,7 +1727,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       Thread.currentThread().setContextClassLoader(
               this.getClass().getClassLoader());
       ComputationGraph tmpCg =
-              zooModel.init(dummyNumLabels, getSeed(), zooModel.getShape()[0], isFilterMode());
+              zooModel.init(dummyNumLabels, getSeed(), zooModel.getInputShape(), isFilterMode());
       tmpCg.init();
        tmpLayers =
               Arrays.stream(tmpCg.getLayers())
@@ -1737,6 +1759,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       // First try load from the WEKA binary model file
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializedModelFile))) {
         model = (Dl4jMlpClassifier) ois.readObject();
+        model.setCustomNet();
       } catch (Exception e) {
         throw new WekaException("Couldn't load Dl4jMlpClassifier from model file");
       }
@@ -1786,7 +1809,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     Dl4jMlpClassifier model = tryLoadFromFile(serializedModelFile, zooModelType);
 
     if (!Utils.notDefaultFileLocation(serializedModelFile))
-      model.loadZooModelNoData(2, 1, zooModelType.getShape()[0]);
+      model.loadZooModelNoData(2, 1, zooModelType.getInputShape());
 
     return model;
   }
@@ -1986,7 +2009,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    *
    * @return True if zoomodel is not CustomNet
    */
-  protected boolean useZooModel() {
+  public boolean useZooModel() {
     return !(zooModel instanceof CustomNet);
   }
 

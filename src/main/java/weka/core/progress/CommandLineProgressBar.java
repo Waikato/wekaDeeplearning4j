@@ -1,13 +1,15 @@
 package weka.core.progress;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.CharUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 @Log4j2
-/**
- * Command line implementation of a progress bar
+/*
+  Command line implementation of a progress bar
  */
 public class CommandLineProgressBar extends AbstractProgressBar {
 
@@ -67,9 +69,9 @@ public class CommandLineProgressBar extends AbstractProgressBar {
 
         System.err.printf("\r%s: [%s%s%s] %s",
                 getProgressMessage(),
-                progressRemainingChar.repeat(leftSpace),
-                progressChar.repeat(currNumDots),
-                progressRemainingChar.repeat(rightSpace),
+                StringUtils.repeat(progressRemainingChar, leftSpace),
+                StringUtils.repeat(progressChar, currNumDots),
+                StringUtils.repeat(progressRemainingChar, rightSpace),
                 getETAString());
     }
 

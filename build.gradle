@@ -14,8 +14,8 @@ def is_cuda_version_valid = cuda_version in valid_cuda_versions
 
 // Set JDK compatibility
 allprojects {
-    sourceCompatibility = 1.11
-    targetCompatibility = 1.11
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
 
 /*
@@ -335,11 +335,10 @@ task travisTest(type: Test) {
     }
 
     filter {
-        // Excluded from travis due to taking too long / using too much memory
+        // Excluded from travis due to taking too long / using too much memory and throwing OOM exception.
         excludeTestsMatching 'ZooModelTest'
         excludeTestsMatching 'Dl4jCNNExplorerTest'
         excludeTestsMatching 'Dl4jMlpFilterTest'
-        excludeTestsMatching 'ScoreCAMTest'
     }
 }
 

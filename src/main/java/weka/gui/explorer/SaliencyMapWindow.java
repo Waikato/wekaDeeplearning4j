@@ -80,7 +80,7 @@ public class SaliencyMapWindow extends JPanel {
             // Limit the size to 10
             return;
         }
-        var classSelector = new ClassSelector(controlPanel, getCurrentClassMap(), getDefaultClassID(), targetClassRow + classSelectors.size());
+        ClassSelector classSelector = new ClassSelector(controlPanel, getCurrentClassMap(), getDefaultClassID(), targetClassRow + classSelectors.size());
         classSelectors.add(classSelector);
         packWindow();
     }
@@ -121,7 +121,7 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void addControlButtons() {
-        var gbc = new SaliencyMapGBC();
+        GridBagConstraints gbc = new SaliencyMapGBC();
         gbc.gridy = buttonsRow;
 
         gbc.gridx = 0;
@@ -136,7 +136,7 @@ public class SaliencyMapWindow extends JPanel {
     }
 
     private void addScrollableImage() {
-        var gbc = new SaliencyMapGBC();
+        GridBagConstraints gbc = new SaliencyMapGBC();
         gbc.gridx = 0;
         gbc.gridy = imageRow;
         gbc.weighty = 1;
@@ -188,6 +188,8 @@ public class SaliencyMapWindow extends JPanel {
         packWindow();
         thisWindow.setLocationRelativeTo(null);
         thisWindow.setVisible(true);
+
+        generateSaliencyMap();
     }
 
     public int getDefaultClassID() {

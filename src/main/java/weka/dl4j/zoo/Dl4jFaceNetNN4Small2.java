@@ -54,9 +54,9 @@ public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
+  public int[] getInputShape() {
     return org.deeplearning4j.zoo.model.FaceNetNN4Small2.builder().build().metaData()
-        .getInputShape();
+        .getInputShape()[0];
   }
 
   /**

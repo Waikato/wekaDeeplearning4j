@@ -421,6 +421,7 @@ public abstract class Dl4jStringToWordEmbeddings extends SimpleBatchFilter {
       commandLineParamSynopsis = "-preprocessor <String>",
       displayOrder = 5
   )
+
   /**
    * Gets the action for the selected preprocessor.
    *

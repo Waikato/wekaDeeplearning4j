@@ -1,5 +1,6 @@
 package weka.dl4j.inference;
 
+import org.apache.commons.lang.StringUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.core.WekaException;
 
@@ -57,7 +58,8 @@ public class TopNPredictions {
         double[] predDouble = predictions.toDoubleVector();
 
         if (predDouble.length != classes.length) {
-            throw new WekaException(String.format("Number of prediction classes (%d) don't match size of class map (%d)!", predDouble.length, classes.length));
+            throw new WekaException(String.format("Number of prediction classes from model (%d) " +
+                    "don't match size of class map (%d)! Have you set the correct class map?", predDouble.length, classes.length));
         }
 
         // Get the Top N prediction indices
@@ -98,7 +100,7 @@ public class TopNPredictions {
      * @return String of the given length
      */
     private String getTableBreak(String breakChar, int len) {
-        return breakChar.repeat(len) + "\n";
+        return StringUtils.repeat(breakChar, len) + "\n";
     }
 
     /**

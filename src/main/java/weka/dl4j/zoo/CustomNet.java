@@ -38,8 +38,8 @@ public class CustomNet extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
-    return new int[0][0];
+  public int[] getInputShape() {
+    return new int[0];
   }
 
   /**

@@ -2,9 +2,11 @@ package weka.dl4j.inference;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.Utils;
 import weka.core.*;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
@@ -27,12 +29,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     /**
      * Set to true to use the serialized model file, false otherwise
      */
-    protected boolean useSerializedModelFile = false;
+    protected boolean useCustomModel = false;
 
-    /**
-     * The classifier model this filter is based on.
-     */
-    protected File serializedModelFile = new File(Utils.defaultFileLocation());
+
+    protected CustomModelSetup customModelSetup = new CustomModelSetup();
 
     /**
      * The zoo model to use, if we're not loading from the serialized model file (default)
@@ -69,12 +69,20 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @throws Exception Exceptions from loading the ComputationGraph
      */
     public void init() throws Exception {
-        model = Dl4jMlpClassifier.loadInferenceModel(serializedModelFile, zooModelType);
+        checkArgs();
+        model = Dl4jMlpClassifier.loadInferenceModel(customModelSetup.getSerializedModelFile(), zooModelType);
+    }
+
+    public void checkArgs() throws WekaException {
+        // If the user has set use-custom-model to True but not selected their model file
+        if (useCustomModel && !Utils.notDefaultFileLocation(customModelSetup.getSerializedModelFile()))
+            throw new WekaException("If using a custom model setup, you must select the model file location");
     }
 
     public void processImage(File imageFile) throws Exception {
         // Load the image
-        NativeImageLoader loader = new NativeImageLoader(224, 224, 3); // TODO take shape from loaded model
+        InputType.InputTypeConvolutional inputShape = model.getInputShape(getCustomModelSetup());
+        NativeImageLoader loader = new NativeImageLoader(inputShape.getHeight(), inputShape.getWidth(), inputShape.getChannels());
         INDArray image = loader.asMatrix(imageFile);
 
         // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
@@ -101,8 +109,8 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         }
 
         log.info("Generating saliency map...");
-        saliencyMapWrapper.setComputationGraph(model.getModel());
-        saliencyMapWrapper.setZooModel(zooModelType);
+        saliencyMapWrapper.setDl4jMlpClassifier(model);
+        saliencyMapWrapper.setCustomModelSetup(getCustomModelSetup());
         saliencyMapWrapper.setClassMap(modelOutputDecoder.getClasses());
         saliencyMapWrapper.processImage(imageFile);
     }
@@ -112,7 +120,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     public void generateAndSaveOutputMap() {
-        var output = generateOutputMap();
+        BufferedImage output = generateOutputMap();
         saliencyMapWrapper.saveResult(output);
     }
 
@@ -121,52 +129,57 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
      * @return Model name
      */
     public String getModelName() {
-        if (Utils.notDefaultFileLocation(serializedModelFile)) {
-            return "Custom trained Dl4jMlpClassifier";
-        } else {
-            return zooModelType.getPrettyName();
-        }
+        return model.getModelName();
     }
 
     public TopNPredictions getCurrentPredictions() {
         return currentPredictions;
     }
 
+    public void finishProgress() {
+        AbstractCNNSaliencyMapWrapper wrapper = getSaliencyMapWrapper();
+        if (wrapper == null)
+            return;
+
+        ProgressManager progressManager = wrapper.getProgressManager();
+        if (progressManager == null)
+            return;
+
+        progressManager.finish();
+    }
+
     /* Getters and setters */
 
     @OptionMetadata(
             commandLineParamIsFlag = true,
-            commandLineParamName = "use-model-file",
-            commandLineParamSynopsis = "-use-model-file",
-            displayName = "Use serialized model file",
-            description = "Use the supplied serialized model file, instead of the zoo model." +
-                    " Optional flag if running from the command line.",
+            commandLineParamName = "useCustomModel",
+            commandLineParamSynopsis = "-useCustomModel",
+            displayName = "Use custom-trained model file",
+            description = "Use the a custom-trained Dl4jMlpClassifier serialized model file, instead of the zoo model.",
             displayOrder = 0
     )
-    public boolean getUseSerializedModelFile() {
-        return useSerializedModelFile;
+    public boolean getUseCustomModel() {
+        return useCustomModel;
     }
 
-    public void setUseSerializedModelFile(boolean useSerializedModelFile) {
-        this.useSerializedModelFile = useSerializedModelFile;
-        if (!useSerializedModelFile) {
-            setSerializedModelFile(new File(Utils.defaultFileLocation()));
-        }
+    public void setUseCustomModel(boolean useCustomModel) {
+        this.useCustomModel = useCustomModel;
+        getCustomModelSetup().setUseCustomSetup(useCustomModel);
     }
 
     @OptionMetadata(
-            displayName = "Serialized model file",
-            description = "Pointer to file of saved Dl4jMlpClassifier",
-            commandLineParamName = "model-file",
-            commandLineParamSynopsis = "-model-file <file path>",
+            displayName = "Custom model setup",
+            description = "Options to set if using a custom-trained model",
+            commandLineParamName = "custom-model",
+            commandLineParamSynopsis = "-customModel <options>",
             displayOrder = 1
     )
-    public File getSerializedModelFile() {
-        return serializedModelFile;
+    public CustomModelSetup getCustomModelSetup() {
+        return customModelSetup;
     }
 
-    public void setSerializedModelFile(File serializedModelFile) {
-        this.serializedModelFile = serializedModelFile;
+    public void setCustomModelSetup(CustomModelSetup customModelSetup) {
+        this.customModelSetup = customModelSetup;
     }
 
     @OptionMetadata(
@@ -227,7 +240,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     public void setSaliencyMapWrapper(AbstractCNNSaliencyMapWrapper saliencyMapWrapper) {
-        this.saliencyMapWrapper = (WekaScoreCAM) saliencyMapWrapper;
+        this.saliencyMapWrapper = saliencyMapWrapper;
     }
 
 

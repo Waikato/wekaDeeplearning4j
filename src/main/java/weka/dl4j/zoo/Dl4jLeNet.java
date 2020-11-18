@@ -58,8 +58,11 @@ public class Dl4jLeNet extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
-    return org.deeplearning4j.zoo.model.LeNet.builder().build().metaData().getInputShape();
+  public int[] getInputShape() {
+    if (isPretrained())
+      return new int[] {1, 28, 28};
+
+    return org.deeplearning4j.zoo.model.LeNet.builder().build().metaData().getInputShape()[0];
   }
 
   /**

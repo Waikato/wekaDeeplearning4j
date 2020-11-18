@@ -29,7 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// TODO document
+
+/**
+ *
+ */
 @Log4j2
 public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
@@ -79,10 +82,10 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     @Override
     public BufferedImage generateHeatmapToImage(int[] targetClasses, String[] classMap, boolean normalize) {
-        var allImages = new ArrayList<BufferedImage>();
-        var classPredictions = new ArrayList<Prediction>();
-        for (var targetClass : targetClasses) {
-            var predictionForClass = predictForClass(preprocessedImageArr, targetClass, classMap);
+        ArrayList<BufferedImage> allImages = new ArrayList<BufferedImage>();
+        ArrayList<Prediction> classPredictions = new ArrayList<Prediction>();
+        for (int targetClass : targetClasses) {
+            Prediction predictionForClass = predictForClass(preprocessedImageArr, targetClass, classMap);
 
             INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, predictionForClass.getClassID());
 
@@ -119,14 +122,14 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
      * @param targetClass Class to predict for
      * @return
      */
-    private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) { // TODO return Prediction
+    private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) {
         // Run the model on the image, then return the prediction for the target class
         INDArray output = modelOutputSingle(imageArr);
         if (targetClass == -1) {
             targetClass = output.argMax(1).getNumber(0).intValue();
         }
-        var classProbability = output.getDouble(0, targetClass);
-        var className = classMap[targetClass];
+        double classProbability = output.getDouble(0, targetClass);
+        String className = classMap[targetClass];
         return new Prediction(targetClass, className, classProbability);
     }
 
@@ -194,7 +197,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private BufferedImage createHeatmap(INDArray postprocessedActivations) {
         Color[] gradientColors = Gradient.GRADIENT_PLASMA;
-        var heatmap = new BufferedImage(
+        BufferedImage heatmap = new BufferedImage(
                 (int) modelInputShape.getWidth(),
                 (int) modelInputShape.getHeight(),
                 BufferedImage.TYPE_INT_ARGB);
@@ -253,7 +256,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
                 getInputFilename(), getModelName()), textX, textY);
 
         for (int i = 0; i < numImages; i++) {
-            var prediction = predictions.get(i);
+            Prediction prediction = predictions.get(i);
             g.drawString(String.format("Class ID: %d       Probability: %.2f       Name: %s",
                     prediction.getClassID(), prediction.getClassProbability(),prediction.getClassName()),
                     textX, ((i + 1) * calculateCompositeHeight()) - fontSpacing);
@@ -265,9 +268,9 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     private BufferedImage createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
-        var originalImage = createOriginalImage(imageArr);
-        var heatmap = createHeatmap(postprocessedActivations);
-        var heatmapOnImage = createHeatmapOnImage(originalImage, heatmap);
+        BufferedImage originalImage = createOriginalImage(imageArr);
+        BufferedImage heatmap = createHeatmap(postprocessedActivations);
+        BufferedImage heatmapOnImage = createHeatmapOnImage(originalImage, heatmap);
         return createCompositeImage(originalImage, heatmap, heatmapOnImage);
     }
 
@@ -285,7 +288,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         int width = calculateCompositeWidth();
         int height = calculateCompositeHeight();
 
-        var compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = compositeImage.createGraphics();
 
         g.setColor(Color.WHITE);
@@ -320,7 +323,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private BufferedImage createHeatmapOnImage(BufferedImage originalImage, BufferedImage heatmap) {
         // From https://www.reddit.com/r/javahelp/comments/2ufc0m/how_do_i_overlay_2_bufferedimages_and_set_the/co7yrv9?utm_source=share&utm_medium=web2x&context=3
-        var heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = heatmapOnImage.createGraphics();
 
         // Clear the image (optional)
@@ -562,53 +565,60 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
      * @param array INDArray containing an image in order [N, C, H, W] or [C, H, W]
      * @return BufferedImage
      */
-    public static BufferedImage imageFromINDArray(INDArray array) {
-        long[] shape = array.shape();
-
+    public BufferedImage imageFromINDArray(INDArray array) {
+        // Assume 3d array -> [channels, width, height]
         boolean is4d = false;
+        boolean is1ChannelImage = false;
+        int channelIndex = 0;
         String dimString = "3D";
 
-        if (shape.length == 4) {
-            is4d = true;
-            dimString = "4D";
-        }
-
-        log.debug(String.format("Converting %s INDArray to image...", dimString));
-
+        // Check the image array shape whether it's 3- or 4-d
+        long[] shape = array.shape();
         long height = shape[1];
         long width = shape[2];
 
-        if (is4d) {
+        if (shape.length == 4) {
+            // 4d array -> [batch_size, channels, width, height]
+            is4d = true;
+            dimString = "4D";
+            channelIndex = 1;
             height = shape[2];
             width = shape[3];
         }
+
+        if (shape[channelIndex] == 1)
+            is1ChannelImage = true;
+
+        log.debug(String.format("Converting %s INDArray to image...", dimString));
 
         BufferedImage image = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int red, green, blue;
 
-                if (is4d) {
-                    red = array.getInt(0, 2, y, x);
-                    green = array.getInt(0, 1, y, x);
-                    blue = array.getInt(0, 0, y, x);
-                } else {
-                    red = array.getInt(2, y, x);
-                    green = array.getInt(1, y, x);
-                    blue = array.getInt(0, y, x);
-                }
+                red = getPixelValue(array, 2, x, y, is4d, is1ChannelImage);
+                green = getPixelValue(array, 1, x, y, is4d, is1ChannelImage);
+                blue = getPixelValue(array, 0, x, y, is4d, is1ChannelImage);
 
-                //handle out of bounds pixel values
-                red = Math.min(red, 255);
-                green = Math.min(green, 255);
-                blue = Math.min(blue, 255);
-
-                red = Math.max(red, 0);
-                green = Math.max(green, 0);
-                blue = Math.max(blue, 0);
                 image.setRGB(x, y, new Color(red, green, blue).getRGB());
             }
         }
         return image;
+    }
+
+    private int getPixelValue(INDArray array, int pixelChannel, int x, int y, boolean is4d, boolean is1Channel) {
+        if (is1Channel) {
+            pixelChannel = 0;
+        }
+        int pixelVal;
+        if (is4d) {
+            pixelVal = array.getInt(0, pixelChannel, y, x);
+        } else {
+            pixelVal = array.getInt(pixelChannel, y, x);
+        }
+
+        // Clamp the pixel value to between 0 and 255
+        int min = 0, max = 255;
+        return Math.max(min, Math.min(max, pixelVal));
     }
 }

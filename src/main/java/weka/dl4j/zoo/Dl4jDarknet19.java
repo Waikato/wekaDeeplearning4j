@@ -82,15 +82,14 @@ public class Dl4jDarknet19 extends AbstractZooModel {
   }
 
   @Override
-  public int[][] getShape() {
+  public int[] getInputShape() {
     int imgSize = -1;
     if (m_variation == VARIATION.INPUT224) {
       imgSize = 224;
     } else if (m_variation == VARIATION.INPUT448) {
       imgSize = 448;
     }
-    int[][] shape = new int[1][];
-    shape[0] = new int[] {3, imgSize, imgSize};
+    int[] shape = new int[] {3, imgSize, imgSize};
     return shape;
   }
 }

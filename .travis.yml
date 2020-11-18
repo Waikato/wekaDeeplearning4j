@@ -1,13 +1,13 @@
 language: java
 install: true
 
-# before_install commands required as of https://www.deps.co/guides/travis-ci-latest-java/
 matrix:
   include:
-    - jdk: openjdk11
+    - jdk:
+      - openjdk8
+      - openjdk11
       before_install:
-        - sudo rm "${JAVA_HOME}/lib/security/cacerts"
-        - sudo ln -s /etc/ssl/certs/java/cacerts "${JAVA_HOME}/lib/security/cacerts"
+        - sudo ./fix-java-verts.sh
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
