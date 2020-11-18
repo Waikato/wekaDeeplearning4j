@@ -1,5 +1,6 @@
 package weka.dl4j.inference;
 
+import org.apache.commons.lang.StringUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.core.WekaException;
 
@@ -99,7 +100,7 @@ public class TopNPredictions {
      * @return String of the given length
      */
     private String getTableBreak(String breakChar, int len) {
-        return breakChar.repeat(len) + "\n";
+        return StringUtils.repeat(breakChar, len) + "\n";
     }
 
     /**

@@ -19,6 +19,7 @@
 package weka.dl4j;
 
 import org.deeplearning4j.nn.conf.CNN2DFormat;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -34,6 +35,7 @@ import weka.util.TestUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 public class UtilsTest {
 
@@ -65,31 +67,31 @@ public class UtilsTest {
   @Test
   public void copyNominalAttribute_CopiesCorrectly() {
     // Arrange
-    var attributeName = "Test Attribute";
-    var attributeValues = new ArrayList<String>();
+    String attributeName = "Test Attribute";
+    ArrayList<String> attributeValues = new ArrayList<String>();
     attributeValues.add("Attribute val 1");
     attributeValues.add("Attribute val 2");
     attributeValues.add("Attribute val 3");
-    var originalAttribute = new Attribute(attributeName, attributeValues);
+    Attribute originalAttribute = new Attribute(attributeName, attributeValues);
 
     // Act
-    var duplicateAttribute = Utils.copyNominalAttribute(originalAttribute);
+    Attribute duplicateAttribute = Utils.copyNominalAttribute(originalAttribute);
 
     // Assert
     Assert.assertEquals(originalAttribute.numValues(), duplicateAttribute.numValues());
 
-    var duplicateValues = Collections.list(duplicateAttribute.enumerateValues());
+    ArrayList duplicateValues = Collections.list(duplicateAttribute.enumerateValues());
     Assert.assertArrayEquals(attributeValues.toArray(), duplicateValues.toArray());
   }
 
   @Test
   public void getAttributeName_Index0_IsLayer1() {
     // Arrange
-    var attributesPerLayer = TestUtil.getAttributesPerLayer();
-    var i = 0;
+    Map<String, Long> attributesPerLayer = TestUtil.getAttributesPerLayer();
+    int i = 0;
 
     // Act
-    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+    String layerName = Utils.getAttributeName(attributesPerLayer, i);
 
     Assert.assertEquals("layer1-0", layerName);
   }
@@ -97,11 +99,11 @@ public class UtilsTest {
   @Test
   public void getAttributeName_Index255_IsLayer1() {
     // Arrange
-    var attributesPerLayer = TestUtil.getAttributesPerLayer();
-    var i = 255;
+    Map<String, Long> attributesPerLayer = TestUtil.getAttributesPerLayer();
+    int i = 255;
 
     // Act
-    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+    String layerName = Utils.getAttributeName(attributesPerLayer, i);
 
     Assert.assertEquals("layer1-255", layerName);
   }
@@ -109,11 +111,11 @@ public class UtilsTest {
   @Test
   public void getAttributeName_Index256_IsLayer2() {
     // Arrange
-    var attributesPerLayer = TestUtil.getAttributesPerLayer();
-    var i = 256;
+    Map<String, Long> attributesPerLayer = TestUtil.getAttributesPerLayer();
+    int i = 256;
 
     // Act
-    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+    String layerName = Utils.getAttributeName(attributesPerLayer, i);
 
     Assert.assertEquals("layer2-0", layerName);
   }
@@ -121,11 +123,11 @@ public class UtilsTest {
   @Test
   public void getAttributeName_Index319_IsLayer2() {
     // Arrange
-    var attributesPerLayer = TestUtil.getAttributesPerLayer();
-    var i = 319;
+    Map<String, Long> attributesPerLayer = TestUtil.getAttributesPerLayer();
+    int i = 319;
 
     // Act
-    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+    String layerName = Utils.getAttributeName(attributesPerLayer, i);
 
     Assert.assertEquals("layer2-63", layerName);
   }
@@ -133,11 +135,11 @@ public class UtilsTest {
   @Test
   public void getAttributeName_OutofIndex_IsNull() {
     // Arrange
-    var attributesPerLayer = TestUtil.getAttributesPerLayer();
-    var i = 320;
+    Map<String, Long> attributesPerLayer = TestUtil.getAttributesPerLayer();
+    int i = 320;
 
     // Act
-    var layerName = Utils.getAttributeName(attributesPerLayer, i);
+    String layerName = Utils.getAttributeName(attributesPerLayer, i);
 
     Assert.assertNull(layerName);
   }
@@ -145,10 +147,10 @@ public class UtilsTest {
   @Test
   public void getAttributeName_NoLayerMap_transformedAttribute() {
     // Arrange
-    var i = 256;
+    int i = 256;
 
     // Act
-    var layerName = Utils.getAttributeName(null, i);
+    String layerName = Utils.getAttributeName(null, i);
 
     Assert.assertEquals("transformedAttribute256", layerName);
   }
@@ -156,7 +158,7 @@ public class UtilsTest {
   @Test
   public void needsReshaping_2d_isFalse() {
     // Arrange
-    var activations = Nd4j.rand(8, 64);
+    INDArray activations = Nd4j.rand(8, 64);
 
     // Assert
     Assert.assertFalse(Utils.needsReshaping(activations));
@@ -165,7 +167,7 @@ public class UtilsTest {
   @Test
   public void needsReshaping_3d_isTrue() {
     // Arrange
-    var activations = Nd4j.rand(8, 64, 7);
+    INDArray activations = Nd4j.rand(8, 64, 7);
 
     // Assert
     Assert.assertTrue(Utils.needsReshaping(activations));
@@ -174,7 +176,7 @@ public class UtilsTest {
   @Test
   public void needsReshaping_4d_isTrue() {
     // Arrange
-    var activations = Nd4j.rand(8, 64, 7, 7);
+    INDArray activations = Nd4j.rand(8, 64, 7, 7);
 
     // Assert
     Assert.assertTrue(Utils.needsReshaping(activations));
@@ -183,7 +185,7 @@ public class UtilsTest {
   @Test
   public void poolNDArray_Max_IsMax() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(5, (int) Utils.poolNDArray(ndArray, PoolingType.MAX));
@@ -192,7 +194,7 @@ public class UtilsTest {
   @Test
   public void poolNDArray_Avg_IsAvg() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(1.125, Utils.poolNDArray(ndArray, PoolingType.AVG), 0.01);
@@ -201,7 +203,7 @@ public class UtilsTest {
   @Test
   public void poolNDArray_Sum_IsSum() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(9, (int) Utils.poolNDArray(ndArray, PoolingType.SUM));
@@ -210,7 +212,7 @@ public class UtilsTest {
   @Test
   public void poolNDArray_Min_IsMin() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.MIN));
@@ -219,7 +221,7 @@ public class UtilsTest {
   @Test(expected = IllegalArgumentException.class)
   public void poolNDArray_PNorm_throwsException() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.PNORM));
@@ -228,7 +230,7 @@ public class UtilsTest {
   @Test(expected = IllegalArgumentException.class)
   public void poolNDArray_None_throwsException() {
     // Arrange
-    var ndArray = TestUtil.get2DArray();
+    INDArray ndArray = TestUtil.get2DArray();
 
     // Assert
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.NONE));
@@ -237,7 +239,7 @@ public class UtilsTest {
   @Test()
   public void isChannelsLast_TrueForChannelsLast() {
     // Arrange
-    var ndArray = Nd4j.zeros(1, 56, 56, 128);
+    INDArray ndArray = Nd4j.zeros(1, 56, 56, 128);
 
     // Assert
     Assert.assertTrue(Utils.isChannelsLast(ndArray));
@@ -246,7 +248,7 @@ public class UtilsTest {
   @Test()
   public void isChannelsLast_FalseForChannelsFirst() {
     // Arrange
-    var ndArray = Nd4j.zeros(1, 128, 56, 56);
+    INDArray ndArray = Nd4j.zeros(1, 128, 56, 56);
 
     // Assert
     Assert.assertFalse(Utils.isChannelsLast(ndArray));
@@ -255,10 +257,10 @@ public class UtilsTest {
   @Test()
   public void reshapeActivations_NoPooling_IsReshaped() {
     // Arrange
-    var ndArray = TestUtil.get4dActivations();
+    INDArray ndArray = TestUtil.get4dActivations();
 
     // Act
-    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.NONE);
+    INDArray reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.NONE);
 
     // Assert
     // Flattened the extra dimensions together
@@ -271,10 +273,10 @@ public class UtilsTest {
   @Test()
   public void reshapeActivations_Max_IsPooled() {
     // Arrange
-    var ndArray = TestUtil.get4dActivations();
+    INDArray ndArray = TestUtil.get4dActivations();
 
     // Act
-    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MAX);
+    INDArray reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MAX);
 
     // Assert
     // Pooled extra dimensions the extra dimensions together
@@ -287,10 +289,10 @@ public class UtilsTest {
   @Test()
   public void reshapeActivations_Avg_IsPooled() {
     // Arrange
-    var ndArray = TestUtil.get4dActivations();
+    INDArray ndArray = TestUtil.get4dActivations();
 
     // Act
-    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.AVG);
+    INDArray reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.AVG);
 
     // Assert
     // Pooled extra dimensions the extra dimensions together
@@ -302,10 +304,10 @@ public class UtilsTest {
   @Test()
   public void reshapeActivations_Sum_IsPooled() {
     // Arrange
-    var ndArray = TestUtil.get4dActivations();
+    INDArray ndArray = TestUtil.get4dActivations();
 
     // Act
-    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.SUM);
+    INDArray reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.SUM);
 
     // Assert
     // Pooled extra dimensions the extra dimensions together
@@ -317,10 +319,10 @@ public class UtilsTest {
   @Test()
   public void reshapeActivations_Min_IsPooled() {
     // Arrange
-    var ndArray = TestUtil.get4dActivations();
+    INDArray ndArray = TestUtil.get4dActivations();
 
     // Act
-    var reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MIN);
+    INDArray reshapedActivations = Utils.reshapeActivations(ndArray, PoolingType.MIN);
 
     // Assert
     // Pooled extra dimensions the extra dimensions together
@@ -332,10 +334,10 @@ public class UtilsTest {
   @Test()
   public void appendClasses_AttachesCorrectClasses() throws Exception {
     // Arrange
-    var numInstances = 10;
-    var numAttributes = 100;
+    int numInstances = 10;
+    int numAttributes = 100;
 
-    var dataset = TestUtil.makeTestDataset(
+    Instances dataset = TestUtil.makeTestDataset(
             0,
             numInstances,
             0,
@@ -349,12 +351,12 @@ public class UtilsTest {
             false
     );
 
-    var activations = Nd4j.ones(numInstances, numAttributes);
+    INDArray activations = Nd4j.ones(numInstances, numAttributes);
 
     // Act
-    var classesAppended = Utils.appendClasses(activations, dataset);
+    INDArray classesAppended = Utils.appendClasses(activations, dataset);
 
-    var shape = classesAppended.shape();
+    long[] shape = classesAppended.shape();
 
     // Assert
     Assert.assertEquals(numInstances, shape[0]);
@@ -362,7 +364,7 @@ public class UtilsTest {
     Assert.assertEquals(numAttributes + 1, shape[1]);
 
     for (int i = 0; i < numInstances; i++) {
-      var thisInstance = classesAppended.getRow(i);
+      INDArray thisInstance = classesAppended.getRow(i);
 
       // Assert the class value has been transferred to the activation correctly
       Assert.assertEquals(dataset.instance(i).classValue(), thisInstance.getDouble(numAttributes), 0);
@@ -372,7 +374,7 @@ public class UtilsTest {
   @Test
   public void notDefaultFileLocation_True_ForNewFile() {
     // Arrange
-    var selectedFile = new File("tmp.png");
+    File selectedFile = new File("tmp.png");
 
     // Assert
     Assert.assertTrue(Utils.notDefaultFileLocation(selectedFile));
@@ -381,7 +383,7 @@ public class UtilsTest {
   @Test
   public void notDefaultFileLocation_False_ForDefaultFile() {
     // Arrange
-    var selectedFile = new File(WekaPackageManager.getPackageHome().getPath());
+    File selectedFile = new File(WekaPackageManager.getPackageHome().getPath());
 
     // Assert
     Assert.assertFalse(Utils.notDefaultFileLocation(selectedFile));
@@ -392,10 +394,10 @@ public class UtilsTest {
     // Arrange
     int numChannels = 512;
     int featureMapSize = 7;
-    var cnnShape = new int[] {numChannels, featureMapSize, featureMapSize};
+    int[] cnnShape = new int[] {numChannels, featureMapSize, featureMapSize};
 
     // Act
-    var decodedShape = Utils.decodeCNNShape(cnnShape);
+    InputType.InputTypeConvolutional decodedShape = Utils.decodeCNNShape(cnnShape);
 
     // Assert
     Assert.assertEquals(numChannels, decodedShape.getChannels());
@@ -409,10 +411,10 @@ public class UtilsTest {
     // Arrange
     int numChannels = 512;
     int featureMapSize = 7;
-    var cnnShape = new int[] {featureMapSize, featureMapSize, numChannels};
+    int[] cnnShape = new int[] {featureMapSize, featureMapSize, numChannels};
 
     // Act
-    var decodedShape = Utils.decodeCNNShape(cnnShape);
+    InputType.InputTypeConvolutional decodedShape = Utils.decodeCNNShape(cnnShape);
 
     // Assert
     Assert.assertEquals(numChannels, decodedShape.getChannels());
@@ -427,7 +429,7 @@ public class UtilsTest {
     int batchSize = 16;
     int numChannels = 512;
     int featureMapSize = 7;
-    var cnnShape = new int[] {batchSize, numChannels, featureMapSize, featureMapSize};
+    int[] cnnShape = new int[] {batchSize, numChannels, featureMapSize, featureMapSize};
 
     // Act
     Utils.decodeCNNShape(cnnShape);
@@ -438,7 +440,7 @@ public class UtilsTest {
     // Arrange
     int numChannels = 512;
     int featureMapSize = 7;
-    var cnnShape = new int[] {featureMapSize, numChannels, featureMapSize};
+    int[] cnnShape = new int[] {featureMapSize, numChannels, featureMapSize};
 
     // Act
     Utils.decodeCNNShape(cnnShape);
@@ -448,7 +450,7 @@ public class UtilsTest {
   public void decodeCNNShape_with2dshape_ThrowsIndexOutOfBoundsException() {
     // Arrange
     int featureMapSize = 7;
-    var cnnShape = new int[] {featureMapSize, featureMapSize};
+    int[] cnnShape = new int[] {featureMapSize, featureMapSize};
 
     // Act
     Utils.decodeCNNShape(cnnShape);

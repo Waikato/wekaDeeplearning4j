@@ -1,6 +1,7 @@
 package weka.dl4j.interpretability;
 
 import lombok.extern.log4j.Log4j2;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.progress.ProgressManager;
 import weka.dl4j.inference.PredictionClass;
 
@@ -17,7 +18,7 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     public void processImage(File imageFile) {
         scoreCAM = new ScoreCAM();
         scoreCAM.setBatchSize(batchSize);
-        var classifier = getDl4jMlpClassifier();
+        Dl4jMlpClassifier classifier = getDl4jMlpClassifier();
         scoreCAM.setComputationGraph(classifier.getModel());
         scoreCAM.setModelInputShape(classifier.getInputShape(getCustomModelSetup()));
         scoreCAM.setModelName(classifier.getModelName());
@@ -37,12 +38,12 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
     @Override
     public BufferedImage generateHeatmapToImage() {
         int[] targetClassIDs = getTargetClassIDsAsInt();
-        var normalize = getNormalizeHeatmap();
+        boolean normalize = getNormalizeHeatmap();
         return scoreCAM.generateHeatmapToImage(targetClassIDs, getClassMap(), normalize);
     }
 
     private PredictionClass[] getTestPredictionClasses(int[] targetClassIDs) {
-        var result = new PredictionClass[targetClassIDs.length];
+        PredictionClass[] result = new PredictionClass[targetClassIDs.length];
 
         for (int i = 0; i < targetClassIDs.length; i++)
         {

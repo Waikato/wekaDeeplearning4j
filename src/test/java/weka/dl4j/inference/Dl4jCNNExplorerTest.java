@@ -135,7 +135,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testDenseNet169_SimpleInference() throws Exception {
-        var model = new KerasDenseNet();
+        KerasDenseNet model = new KerasDenseNet();
         model.setVariation(DenseNet.VARIATION.DENSENET169);
         checkImageNetModel(model,false,  GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
@@ -145,13 +145,13 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testEfficientNet_SimpleInference() throws Exception {
-        var model = new KerasEfficientNet();
+        KerasEfficientNet model = new KerasEfficientNet();
         model.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
         checkImageNetModel(model, false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     public void test1x28x28_SimpleInference() throws Exception {
-        var modelSetup = new CustomModelSetup();
+        CustomModelSetup modelSetup = new CustomModelSetup();
         modelSetup.setSerializedModelFile(new File(MNIST1x28x28_MODEL_PATH));
         modelSetup.setInputChannels(1);
         modelSetup.setInputWidth(28);
@@ -161,7 +161,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
     }
 
     public void test3x56x56_SimpleInference() throws Exception {
-        var modelSetup = new CustomModelSetup();
+        CustomModelSetup modelSetup = new CustomModelSetup();
         modelSetup.setSerializedModelFile(new File(MNIST3x56x56_MODEL_PATH));
         modelSetup.setInputChannels(3);
         modelSetup.setInputWidth(56);
@@ -201,7 +201,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testDenseNet169_SaliencyMap() throws Exception {
-        var model = new KerasDenseNet();
+        KerasDenseNet model = new KerasDenseNet();
         model.setVariation(DenseNet.VARIATION.DENSENET169);
         checkImageNetModel(model,true,  GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
@@ -211,13 +211,13 @@ public class Dl4jCNNExplorerTest extends TestCase {
      * @throws Exception If an exception occurs during testing
      */
     public void testEfficientNet_SaliencyMap() throws Exception {
-        var model = new KerasEfficientNet();
+        KerasEfficientNet model = new KerasEfficientNet();
         model.setVariation(EfficientNet.VARIATION.EFFICIENTNET_B1);
         checkImageNetModel(model, true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
     public void test1x28x28_SaliencyMap() throws Exception {
-        var modelSetup = new CustomModelSetup();
+        CustomModelSetup modelSetup = new CustomModelSetup();
         modelSetup.setSerializedModelFile(new File(MNIST1x28x28_MODEL_PATH));
         modelSetup.setInputChannels(1);
         modelSetup.setInputWidth(28);
@@ -227,7 +227,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
     }
 
     public void test3x56x56_SaliencyMap() throws Exception {
-        var modelSetup = new CustomModelSetup();
+        CustomModelSetup modelSetup = new CustomModelSetup();
         modelSetup.setSerializedModelFile(new File(MNIST3x56x56_MODEL_PATH));
         modelSetup.setInputChannels(3);
         modelSetup.setInputWidth(56);
@@ -282,7 +282,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
         explorer.setZooModelType(zooModel);
         explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
-        var decoder = new ModelOutputDecoder();
+        ModelOutputDecoder decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
         decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
         explorer.setModelOutputDecoder(decoder);
@@ -296,7 +296,7 @@ public class Dl4jCNNExplorerTest extends TestCase {
         explorer.setCustomModelSetup(modelSetup);
         explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
-        var decoder = new ModelOutputDecoder();
+        ModelOutputDecoder decoder = new ModelOutputDecoder();
         decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
         decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
         explorer.setModelOutputDecoder(decoder);
@@ -319,14 +319,15 @@ public class Dl4jCNNExplorerTest extends TestCase {
 
             TopNPredictions topNPredictions = explorer.getCurrentPredictions();
 
+            log.info(topNPredictions.toSummaryString());
+
             for (Prediction p : topNPredictions.getTopPredictions()) {
                 if (p.getClassID() == expectedClassID) {
                     assertTrue(true);
                     return;
                 }
             }
-            log.error("Couldn't find correct prediction id in predictions:");
-            log.error(topNPredictions.toSummaryString());
+            log.error("Couldn't find correct prediction id in predictions...");
             fail();
         } catch (OutOfMemoryError error) {
             log.warn("OutOfMemoryError encountered - please run this test individually to ensure there are no other errors");

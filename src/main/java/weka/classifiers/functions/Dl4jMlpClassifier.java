@@ -278,7 +278,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected ProgressManager progressManager;
 
-  private SwingWorker<Layer[], Layer> layerSwingWorker;
+  private SwingWorker<Layer[], Void> layerSwingWorker;
 
   public Dl4jMlpClassifier() {
     if (!s_cudaMultiGPUSet) {
@@ -1267,7 +1267,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
 
   public InputType.InputTypeConvolutional getInputShape(CustomModelSetup customModelSetup) {
     if (useZooModel()) {
-      var inputShape = getZooModel().getInputShape();
+      int[] inputShape = getZooModel().getInputShape();
       log.debug("Zoo Model shape for image inference is: " + Arrays.toString(inputShape));
       return new InputType.InputTypeConvolutional(inputShape[1], inputShape[2], inputShape[0]);
     }
@@ -1691,7 +1691,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
       progressManager = new ProgressManager("Parsing model layers...");
       progressManager.start();
 
-      layerSwingWorker = new SwingWorker<>() {
+      layerSwingWorker = new SwingWorker<Layer[], Void>() {
         @Override
         protected Layer[] doInBackground() throws Exception {
           return parseLayers();

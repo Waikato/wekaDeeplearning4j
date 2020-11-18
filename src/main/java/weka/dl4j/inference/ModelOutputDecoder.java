@@ -133,9 +133,10 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
     }
 
     public static String[] parseClassmapFromArff(String filepath) throws IOException {
-        var instances = new Instances(new FileReader(filepath));
+        Instances instances = new Instances(new FileReader(filepath));
         instances.setClassIndex(instances.numAttributes() - 1);
-        return Collections.list(instances.classAttribute().enumerateValues()).toArray(String[]::new);
+        ArrayList<Object> list = Collections.list(instances.classAttribute().enumerateValues());
+        return (String[]) list.toArray();
     }
 
     /**
@@ -144,9 +145,9 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
      * @throws Exception
      */
     public String[] getClasses() {
-        List<String> classes = new ArrayList<>();
+        List<String> classes = new ArrayList<String>();
         try {
-            var classMapPath = getClassMapPath();
+            String classMapPath = getClassMapPath();
             if (FilenameUtils.isExtension(classMapPath, "arff")) {
                 return parseClassmapFromArff(classMapPath);
             }
@@ -166,7 +167,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return classes.toArray(String[]::new);
+        return classes.toArray(new String[0]);
     }
 
     @OptionMetadata(

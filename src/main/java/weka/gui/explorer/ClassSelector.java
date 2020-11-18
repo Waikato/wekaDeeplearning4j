@@ -56,7 +56,7 @@ public class ClassSelector {
         targetClassIDInput.setToolTipText("-1 to use max probability class");
         classNameInput.setEditable(false);
 
-        var gbc = new SaliencyMapWindow.SaliencyMapGBC();
+        GridBagConstraints gbc = new SaliencyMapWindow.SaliencyMapGBC();
 
         gbc.gridy = rowNum;
 

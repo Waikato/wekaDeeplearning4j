@@ -2,9 +2,11 @@ package weka.dl4j.inference;
 
 import lombok.extern.log4j.Log4j2;
 import org.datavec.image.loader.NativeImageLoader;
+import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import weka.classifiers.functions.Dl4jMlpClassifier;
+import weka.core.progress.ProgressManager;
 import weka.dl4j.Utils;
 import weka.core.*;
 import weka.dl4j.interpretability.AbstractCNNSaliencyMapWrapper;
@@ -79,7 +81,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
 
     public void processImage(File imageFile) throws Exception {
         // Load the image
-        var inputShape = model.getInputShape(getCustomModelSetup());
+        InputType.InputTypeConvolutional inputShape = model.getInputShape(getCustomModelSetup());
         NativeImageLoader loader = new NativeImageLoader(inputShape.getHeight(), inputShape.getWidth(), inputShape.getChannels());
         INDArray image = loader.asMatrix(imageFile);
 
@@ -118,7 +120,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     public void generateAndSaveOutputMap() {
-        var output = generateOutputMap();
+        BufferedImage output = generateOutputMap();
         saliencyMapWrapper.saveResult(output);
     }
 
@@ -135,11 +137,11 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     public void finishProgress() {
-        var wrapper = getSaliencyMapWrapper();
+        AbstractCNNSaliencyMapWrapper wrapper = getSaliencyMapWrapper();
         if (wrapper == null)
             return;
 
-        var progressManager = wrapper.getProgressManager();
+        ProgressManager progressManager = wrapper.getProgressManager();
         if (progressManager == null)
             return;
 

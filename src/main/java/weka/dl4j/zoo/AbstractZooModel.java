@@ -193,7 +193,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
         ComputationGraph pretrainedModel = null;
         // Attempt to download the model weights
-        var progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)...");
+        ProgressManager progressManager = new ProgressManager("Initializing pretrained model (may require downloading weights)...");
         progressManager.start();
         try {
             pretrainedModel = downloadWeights(zooModel);

@@ -79,10 +79,10 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     @Override
     public BufferedImage generateHeatmapToImage(int[] targetClasses, String[] classMap, boolean normalize) {
-        var allImages = new ArrayList<BufferedImage>();
-        var classPredictions = new ArrayList<Prediction>();
-        for (var targetClass : targetClasses) {
-            var predictionForClass = predictForClass(preprocessedImageArr, targetClass, classMap);
+        ArrayList<BufferedImage> allImages = new ArrayList<BufferedImage>();
+        ArrayList<Prediction> classPredictions = new ArrayList<Prediction>();
+        for (int targetClass : targetClasses) {
+            Prediction predictionForClass = predictForClass(preprocessedImageArr, targetClass, classMap);
 
             INDArray targetClassWeights = calculateTargetClassWeights(softmaxOnMaskedImages, predictionForClass.getClassID());
 
@@ -125,8 +125,8 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         if (targetClass == -1) {
             targetClass = output.argMax(1).getNumber(0).intValue();
         }
-        var classProbability = output.getDouble(0, targetClass);
-        var className = classMap[targetClass];
+        double classProbability = output.getDouble(0, targetClass);
+        String className = classMap[targetClass];
         return new Prediction(targetClass, className, classProbability);
     }
 
@@ -194,7 +194,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private BufferedImage createHeatmap(INDArray postprocessedActivations) {
         Color[] gradientColors = Gradient.GRADIENT_PLASMA;
-        var heatmap = new BufferedImage(
+        BufferedImage heatmap = new BufferedImage(
                 (int) modelInputShape.getWidth(),
                 (int) modelInputShape.getHeight(),
                 BufferedImage.TYPE_INT_ARGB);
@@ -253,7 +253,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
                 getInputFilename(), getModelName()), textX, textY);
 
         for (int i = 0; i < numImages; i++) {
-            var prediction = predictions.get(i);
+            Prediction prediction = predictions.get(i);
             g.drawString(String.format("Class ID: %d       Probability: %.2f       Name: %s",
                     prediction.getClassID(), prediction.getClassProbability(),prediction.getClassName()),
                     textX, ((i + 1) * calculateCompositeHeight()) - fontSpacing);
@@ -265,9 +265,9 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     private BufferedImage createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
-        var originalImage = createOriginalImage(imageArr);
-        var heatmap = createHeatmap(postprocessedActivations);
-        var heatmapOnImage = createHeatmapOnImage(originalImage, heatmap);
+        BufferedImage originalImage = createOriginalImage(imageArr);
+        BufferedImage heatmap = createHeatmap(postprocessedActivations);
+        BufferedImage heatmapOnImage = createHeatmapOnImage(originalImage, heatmap);
         return createCompositeImage(originalImage, heatmap, heatmapOnImage);
     }
 
@@ -285,7 +285,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         int width = calculateCompositeWidth();
         int height = calculateCompositeHeight();
 
-        var compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage compositeImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = compositeImage.createGraphics();
 
         g.setColor(Color.WHITE);
@@ -320,7 +320,7 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     private BufferedImage createHeatmapOnImage(BufferedImage originalImage, BufferedImage heatmap) {
         // From https://www.reddit.com/r/javahelp/comments/2ufc0m/how_do_i_overlay_2_bufferedimages_and_set_the/co7yrv9?utm_source=share&utm_medium=web2x&context=3
-        var heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = heatmapOnImage.createGraphics();
 
         // Clear the image (optional)

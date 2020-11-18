@@ -719,7 +719,7 @@ public class Dl4jMlpTest {
 
   @Test
   public void TestFixDuplicateLayerNames() {
-    var layerName = "TestLayer";
+    String layerName = "TestLayer";
     DenseLayer dl = new DenseLayer();
     dl.setLayerName(layerName);
     dl.setNOut(10);

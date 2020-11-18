@@ -133,11 +133,11 @@ public class WekaDeeplearning4jExamples {
     public static void inference() throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
 
-        var zooModel = new Dl4jResNet50();
+        AbstractZooModel zooModel = new Dl4jResNet50();
 //        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
 //        explorer.setZooModelType(zooModel);
 
-        var modelSetup = new CustomModelSetup();
+        CustomModelSetup modelSetup = new CustomModelSetup();
         modelSetup.setSerializedModelFile(new File("src/test/resources/models/custom_1x28x28_mnist_30e.model"));
         modelSetup.setInputChannels(1);
         modelSetup.setInputWidth(28);
