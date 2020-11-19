@@ -158,14 +158,15 @@ public class ClassSelector {
         try {
             classID = Integer.parseInt(targetClassIDText);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null,
-                    "Error: Please enter a valid integer value", "Error Message",
-                    JOptionPane.ERROR_MESSAGE);
+	    // Don't update the class name if the target class isn't a number
             return;
         }
-        if (classID > classMap.length - 1)
+	
+	// Don't update the class name if the class ID is outside the bounds of the class map
+        if (classID > classMap.length - 1 || classID < 0)
             return;
 
+	// Update the class name in the GUI
         String newClassName = classMap[classID];
         classNameInput.setText(newClassName);
     }
