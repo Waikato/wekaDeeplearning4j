@@ -303,6 +303,9 @@ dependencies {
         if (is_cuda_version_valid) {
             implementation "org.nd4j:nd4j-cuda-$cuda_version-platform:$versions.nd4j"
             implementation "org.deeplearning4j:deeplearning4j-cuda-$cuda_version:$versions.dl4j"
+            if (cuda_version == "10.2") {
+                implementation "org.bytedeco:cuda-platform-redist:10.2-7.6-1.5.3"
+            }
         } else {
             throw new GradleException("Invalid CUDA Version: $cuda_version - Must be one of $valid_cuda_versions")
         }
