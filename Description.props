@@ -37,7 +37,7 @@ URL=https://deeplearning.cms.waikato.ac.nz/
 
 # Dependencies
 #{PACKAGE_DEPENDENCIES}
-Depends=weka (>=3.8.1)
+Depends=weka (>=3.8.4)
 
 # Package(s) that can't be installed alongside this one
 # - old wekaDeeplearning4j
