@@ -135,20 +135,20 @@ public class WekaDeeplearning4jExamples {
 
         AbstractZooModel zooModel = new Dl4jResNet50();
 //        zooModel.setVariation(ResNet.VARIATION.RESNET101V2);
-//        explorer.setZooModelType(zooModel);
+        explorer.setZooModelType(zooModel);
 
-        CustomModelSetup modelSetup = new CustomModelSetup();
-        modelSetup.setSerializedModelFile(new File("src/test/resources/models/custom_1x28x28_mnist_30e.model"));
-        modelSetup.setInputChannels(1);
-        modelSetup.setInputWidth(28);
-        modelSetup.setInputHeight(28);
-        explorer.setCustomModelSetup(modelSetup);
-        explorer.setUseCustomModel(true);
+//        CustomModelSetup modelSetup = new CustomModelSetup();
+//        modelSetup.setSerializedModelFile(new File("src/test/resources/models/custom_1x28x28_mnist_30e.model"));
+//        modelSetup.setInputChannels(1);
+//        modelSetup.setInputWidth(28);
+//        modelSetup.setInputHeight(28);
+//        explorer.setCustomModelSetup(modelSetup);
+//        explorer.setUseCustomModel(true);
 
-        ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
-        decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
-        explorer.setModelOutputDecoder(decoder);
+//        ModelOutputDecoder decoder = new ModelOutputDecoder();
+//        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
+//        decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
+//        explorer.setModelOutputDecoder(decoder);
 
         // Dog ID = 222
         // Cat ID = 281
@@ -160,7 +160,7 @@ public class WekaDeeplearning4jExamples {
         // Predict for dog
         explorer.init();
 //        explorer.makePrediction(new File("C:\\Users\\comptonr\\Desktop\\catAndDog.jpg"));
-        explorer.processImage(new File("datasets/nominal/mnist-minimal/img_3574_4.jpg"));
+        explorer.processImage(new File("src/test/resources/images/dog.jpg"));
         System.out.println(explorer.getCurrentPredictions().toSummaryString());
 
         wrapper.setTargetClassIDs("-1");
