@@ -17,5 +17,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - ./gradlew build -x test
   - ./gradlew travisTest -i --fail-fast
