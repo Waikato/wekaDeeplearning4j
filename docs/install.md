@@ -1,5 +1,5 @@
 # Prerequisites
-- Weka 3.8.1 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
+- Weka 3.8.4 or above ([here](https://sourceforge.net/projects/weka/files/latest/download))
 - WekaDeeplearning4j package latest version ([here](https://github.com/Waikato/wekaDeeplearning4j/releases/latest))
 - Java 8 or above
 
