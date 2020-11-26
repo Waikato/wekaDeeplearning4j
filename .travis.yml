@@ -1,13 +1,12 @@
 language: java
 install: true
 
-matrix:
-  include:
-    - jdk:
-      - openjdk8
-      - openjdk11
-      before_install:
-        - sudo ./fix-java-verts.sh
+before_install:
+  - sudo ./fix-java-verts.sh
+
+jdk:
+  - openjdk8
+  - openjdk11
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -18,5 +17,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - ./gradlew build -x test
   - ./gradlew travisTest -i --fail-fast

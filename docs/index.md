@@ -21,37 +21,48 @@ The following Neural Network Layers are available to build sophisticated archite
 Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)
 
-## New Features
-The new **1.7.0** release of WekaDeeplearning4j contains some few exciting features that will make it easier than ever
-to run experiments on your data.
+## New Release (1.7.0)
 
-### Pretrained Models
-A wide range of pretrained models are now available, sourced from both the DL4J model zoo *and* the Keras Applications module.
-These can easily be instantiated and used as a base for further finetuning or simply as a feature extractor, after which 
-you can then apply any standard Weka classifier. The weights are cached locally after being initially downloaded, so it's quick to instantiate in the future. 
-Check out the [Model Zoo](user-guide/model-zoo.md) for more information.
+![Dl4jCNNExplorer and Saliency map generation](img/releases/1.7.0/GUI.jpg)
 
-### Updated Dl4jMlpFilter
-The Dl4jMlpFilter takes activations from a layer in the given neural network and uses those as the output for the instance, commonly referred to as *feature extraction* or *embedding creation*.
+### Dl4j Inference Panel & Dl4jCNNExplorer
+One major addition in **WekaDeeplearning4j** v1.7.0 is the new **Dl4jCNNExplorer** and the 
+associated GUI **Dl4j Inference Panel**. This brings real-time inference to the WEKA universe, 
+allowing you to quickly run an image classification CNN model on an image without having to 
+load an entire `.arff` file.
 
-The DL4jMlpFilter can now accept multiple layer names to use activations from, concatenating the activations together.
+The **Dl4jCNNExplorer** supports both a custom-trained `Dl4jMlpClassifier` and a model from 
+the Model Zoo, so it can be used to verify your model's prediction capabilities 
+or simply play around with pretrained models and explore what state-of-the-art 
+architectures may work best for your domain.
 
-Pooling functions can be applied to the activations if using activations from an intermediary layer which outputs 3D
- activations (e.g. a convolution layer which outputs a set of feature maps).
+Check out the [usage example](https://deeplearning.cms.waikato.ac.nz/examples/dl4j-inference/) 
+to see how easy it is to get started.
 
-Check out the [filter tutorial](./examples/featurize-mnist.md) for usage examples.
+### Saliency Map Generation with ScoreCAM
+Another exciting new feature is the implementation of **ScoreCAM**, a saliency map generation technique. 
+This can be accessed through the `Dl4jCNNExplorer`, allowing you to not only perform prediction on an image, 
+but look at *what* in the image your model was using for prediction.
 
-### Image Dataset Conversion Script
-Often, image classification datasets come in a folder-organized fashion i.e., instance classes are inferred
-from the subfolder they're in as opposed to having a seperate file explicitly defining this. Now included is `ImageDirectoryLoader`, a tool to create an `.arff` file from this folder structure so it can be loaded into WEKA. 
+This can be invoked from the command-line, although the best user experience is to be had from the GUI using the 
+**Saliency Map Viewer**, which allows you to quickly customize the ScoreCAM target classes.
 
-Check out [Classify Your Own Dataset](examples/classifying-your-own.md) for usage examples
+Check out the [usage example](https://deeplearning.cms.waikato.ac.nz/examples/dl4j-inference/#example-4-saliency-map-generation) 
+to see what new insights can be brought to your workflow.
 
-### CUDA 10.2 Support
-The new release of Deeplearning4j (`1.0.0-beta7`) now supports CUDA 10.2, so WekaDeeplearning4j has
- new installation packages for users with this CUDA version. 
- 
-The new release of DL4J has dropped support for CUDA 9.2, so this is also no longer supported in WekaDeeplearning4j.
+### Progress Manager
+
+![Progress Manager](./img/releases/1.7.0/ProgressManager.png)
+
+We've created a simple---but effective---progress bar and added this to the long-running tasks 
+(model training, feature extraction, etc.). This provides a graphical indicator of progress and remaining 
+ETA for the current job so will make WEKA more usable for large jobs.
+
+### Model Summaries
+
+We've also added [model summaries](https://deeplearning.cms.waikato.ac.nz/user-guide/model-zoo/#model-summaries) 
+to the documentation, which specify the different models and their layers. This can be useful for designing 
+your own architectures or with the `Dl4jMlpFilter`, when using intermediary layers for feature extraction.
 
 ## Citation
 
