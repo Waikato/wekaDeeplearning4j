@@ -181,7 +181,7 @@ task makeMain(dependsOn: makeMainZip) {
  * @return Platforms that are not the specified platform
  */
 static def getExcludePlatform(platform) {
-    def platforms = ['linux', 'windows']
+    def platforms = ['linux', 'windows', 'macosx']
     platforms.remove(platform)
     return new Tuple(platforms[0], platforms[1])
 }
