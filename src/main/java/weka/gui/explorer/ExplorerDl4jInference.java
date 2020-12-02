@@ -58,7 +58,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /** The filename extension that should be used for PMML xml files. */
     public static String PMML_FILE_EXTENSION = ".xml";
 
-    public static String[] IMAGE_FILE_EXTENSIONS = new String[] {".jpg", ".jpeg", ".png"};
+    public static String[] IMAGE_FILE_EXTENSIONS = new String[] {".jpg", ".jpeg", ".png", ".tif", ".tiff"};
 
     /** The output area for classification results. */
     protected JTextArea m_OutText = new JTextArea(10, 40);
