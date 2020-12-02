@@ -1702,9 +1702,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
         protected void done() {
           super.done();
           try {
-            log.debug("Done reached");
             layers = get();
-            log.debug("Layers updated");
           } catch (ExecutionException ex) {
             log.error("Error while getting layer results!");
             ex.printStackTrace();
