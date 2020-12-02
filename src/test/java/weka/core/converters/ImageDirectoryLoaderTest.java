@@ -46,39 +46,84 @@ public class ImageDirectoryLoaderTest {
     return inst;
   }
 
+  public static Instances loadTiffDataset() {
+    ImageDirectoryLoader loader = new ImageDirectoryLoader();
+    loader.setInputDirectory(new File(DatasetLoader.FILE_PATH_TIFF_DATASET));
+    Instances inst = loader.getDataSet();
+    inst.setClassIndex(1);
+    return inst;
+  }
+
   /**
    * Check that the IDL loads all classes from the plant-seedlings dataset
    */
   @Test
-  public void testIDLNumClasses() {
+  public void testPlantSeedlings_IDLNumClasses() {
     Instances plantLoaded = loadPlantSeedlings();
-    assertEquals(plantLoaded.numClasses(), DatasetLoader.NUM_CLASSES_PLANT_SEEDLINGS);
+    assertEquals(DatasetLoader.NUM_CLASSES_PLANT_SEEDLINGS, plantLoaded.numClasses());
   }
 
   /**
    * Check that the IDL loads all instances
    */
   @Test
-  public void testIDLNumInstances() {
+  public void testPlantSeedlings_IDLNumInstances() {
     Instances plantLoaded = loadPlantSeedlings();
-    assertEquals(plantLoaded.numInstances(), DatasetLoader.NUM_INSTANCES_PLANT_SEEDLINGS);
+    assertEquals(DatasetLoader.NUM_INSTANCES_PLANT_SEEDLINGS, plantLoaded.numInstances());
   }
 
   /**
    * Check that the loaded instances have the correct number of attributes (2)
    */
   @Test
-  public void testIDLNumAttributes() {
+  public void testPlantSeedlings_IDLNumAttributes() {
     Instances plantLoaded = loadPlantSeedlings();
-    assertEquals(plantLoaded.numAttributes(), DatasetLoader.NUM_ATTRIBUTES_IMAGE_META);
+    assertEquals(DatasetLoader.NUM_ATTRIBUTES_IMAGE_META, plantLoaded.numAttributes());
   }
 
   /**
    * Check that the first attribute is a string (filepath) and the second is nominal (image classification)
    */
   @Test
-  public void testIDLAttributes() {
+  public void testPlantSeedlings_IDLAttributes() {
     Instances plantLoaded = loadPlantSeedlings();
+    assertTrue(plantLoaded.attribute(0).isString());
+    assertTrue(plantLoaded.classAttribute().isNominal());
+  }
+
+  /**
+   * Check that the IDL loads all classes from the plant-seedlings dataset
+   */
+  @Test
+  public void testTiffDataset_IDLNumClasses() {
+    Instances plantLoaded = loadTiffDataset();
+    assertEquals(DatasetLoader.NUM_CLASSES_TIFF_DATASET, plantLoaded.numClasses());
+  }
+
+  /**
+   * Check that the IDL loads all instances
+   */
+  @Test
+  public void testTiffDataset_IDLNumInstances() {
+    Instances plantLoaded = loadTiffDataset();
+    assertEquals(DatasetLoader.NUM_INSTANCES_TIFF_DATASET, plantLoaded.numInstances());
+  }
+
+  /**
+   * Check that the loaded instances have the correct number of attributes (2)
+   */
+  @Test
+  public void testTiffDataset_IDLNumAttributes() {
+    Instances plantLoaded = loadTiffDataset();
+    assertEquals(DatasetLoader.NUM_ATTRIBUTES_IMAGE_META, plantLoaded.numAttributes());
+  }
+
+  /**
+   * Check that the first attribute is a string (filepath) and the second is nominal (image classification)
+   */
+  @Test
+  public void testTiffDataset_IDLAttributes() {
+    Instances plantLoaded = loadTiffDataset();
     assertTrue(plantLoaded.attribute(0).isString());
     assertTrue(plantLoaded.classAttribute().isNominal());
   }
