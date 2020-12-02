@@ -86,14 +86,14 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         INDArray image = loader.asMatrix(imageFile);
 
         // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
-        if (zooModelType.getChannelsLast()) {
+        if (model.getZooModel().getChannelsLast()) {
             log.info("Permuting channel order of input image...");
             image = image.permute(0,2,3,1);
         }
 
-        if (zooModelType.requiresPreProcessing()) {
+        if (model.getZooModel().requiresPreProcessing()) {
             log.info("Applying image preprocessing...");
-            ImagePreProcessingScaler preprocessor = zooModelType.getImagePreprocessingScaler();
+            ImagePreProcessingScaler preprocessor = model.getZooModel().getImagePreprocessingScaler();
             preprocessor.transform(image);
         }
 
