@@ -79,6 +79,20 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
             throw new WekaException("If using a custom model setup, you must select the model file location");
     }
 
+    private boolean correctDarknetClassmap() {
+        boolean isDarknet = model.getZooModel() instanceof Dl4jDarknet19;
+        // Don't need to check if we're not using darknet
+        if (!isDarknet)
+            return true;
+
+        boolean isPretrained = model.getZooModel().isPretrained();
+        // Don't need to check if we're not using a pretrained Darknet
+        if (!isPretrained)
+            return true;
+
+        return modelOutputDecoder.getBuiltInClassMap() == ModelOutputDecoder.ClassmapType.DARKNET_IMAGENET;
+    }
+
     public void processImage(File imageFile) throws Exception {
         // Load the image
         InputType.InputTypeConvolutional inputShape = model.getInputShape(getCustomModelSetup());
@@ -86,15 +100,21 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         INDArray image = loader.asMatrix(imageFile);
 
         // We may need to change the channel order if using a channelsLast model (e.g., EfficientNet)
-        if (zooModelType.getChannelsLast()) {
+        if (model.getZooModel().getChannelsLast()) {
             log.info("Permuting channel order of input image...");
             image = image.permute(0,2,3,1);
         }
 
-        if (zooModelType.requiresPreProcessing()) {
+        if (model.getZooModel().requiresPreProcessing()) {
             log.info("Applying image preprocessing...");
-            ImagePreProcessingScaler preprocessor = zooModelType.getImagePreprocessingScaler();
+            ImagePreProcessingScaler preprocessor = model.getZooModel().getImagePreprocessingScaler();
             preprocessor.transform(image);
+        }
+
+        if (!correctDarknetClassmap()) {
+            throw new IllegalArgumentException("You have selected the Darknet19 model but aren't using the DARKNET_IMAGENET classmap. " +
+                    "Please be aware that the class mapping is different for the pretrained Darknet model, so " +
+                    "you may get erroneous class predictions (class names seem incorrect).");
         }
 
         // Run prediction

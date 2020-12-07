@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.indexing.NDArrayIndex;
+import weka.core.converters.CSVLoader;
 import weka.dl4j.ResourceResolver;
 import weka.dl4j.Utils;
 import weka.core.*;
@@ -134,6 +135,17 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
 
     public static String[] parseClassmapFromArff(String filepath) throws IOException {
         Instances instances = new Instances(new FileReader(filepath));
+        return parseClassmap(instances);
+    }
+
+    public static String[] parseClassmapFromCsv(String filepath) throws IOException {
+        CSVLoader loader = new CSVLoader();
+        loader.setSource(new File(filepath));
+        Instances instances = loader.getDataSet();
+        return parseClassmap(instances);
+    }
+
+    public static String[] parseClassmap(Instances instances) {
         instances.setClassIndex(instances.numAttributes() - 1);
         ArrayList<Object> list = Collections.list(instances.classAttribute().enumerateValues());
         return list.toArray(new String[0]);
@@ -150,6 +162,9 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
             String classMapPath = getClassMapPath();
             if (FilenameUtils.isExtension(classMapPath, "arff")) {
                 return parseClassmapFromArff(classMapPath);
+            }
+            if (FilenameUtils.isExtension(classMapPath, "csv")) {
+                return parseClassmapFromCsv(classMapPath);
             }
             try (FileReader fr = new FileReader(getClassMapPath())) {
                 try (BufferedReader br = new BufferedReader(fr)) {

@@ -4,8 +4,10 @@ import lombok.extern.log4j.Log4j2;
 import weka.core.*;
 import weka.gui.ProgrammaticProperty;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,11 +75,14 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         this.outputFileName = outputFileName;
     }
 
-    public boolean isImage(String imgName) {
-        String lowerName = imgName.toLowerCase();
-        return  lowerName.endsWith(".jpg") ||
-                lowerName.endsWith(".jpeg") ||
-                lowerName.endsWith(".png");
+    public boolean isImage(String fullImgPath) {
+        try {
+            String mimetype = Files.probeContentType(new File(fullImgPath).toPath());
+            //mimetype should be something like "image/png"
+            return mimetype != null && mimetype.split("/")[0].equals("image");
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     private String[] removeNullImages(String[] images) {
@@ -94,7 +99,8 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         String imgClass = folder.getName();
         for (int i = 0; i < imageNames.length; i++) {
             String imgName = imageNames[i];
-            if (!isImage(imgName)) {
+            String fullImagePath = Paths.get(folder.getAbsolutePath(), imgName).toString();
+            if (!isImage(fullImagePath)) {
                 log.error(String.format("Found non image file: %s, ignoring...", imgName));
                 imageNames[i] = null;
                 continue;

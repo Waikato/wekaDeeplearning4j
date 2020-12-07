@@ -69,6 +69,11 @@ public class DatasetLoader {
   public static final int NUM_CLASSES_PLANT_SEEDLINGS = 5;
 
   /**
+   * Number of classes in the tiff dataset
+   */
+  public static final int NUM_CLASSES_TIFF_DATASET = 2;
+
+  /**
    * Number of instances in the iris dataset
    */
   public static final int NUM_INSTANCES_IRIS = 150;
@@ -89,9 +94,19 @@ public class DatasetLoader {
   public static final int NUM_INSTANCES_PLANT_SEEDLINGS = 25;
 
   /**
+   * Number of instances in the small tiff dataset
+   */
+  public static final int NUM_INSTANCES_TIFF_DATASET = 8;
+
+  /**
    * Filepath to the plant-seedlings dataset
    */
   public static final String FILE_PATH_PLANT_SEEDLINGS = "src/test/resources/nominal/plant-seedlings-small";
+
+  /**
+   * Filepath to the tiff-dataset dataset
+   */
+  public static final String FILE_PATH_TIFF_DATASET = "src/test/resources/nominal/tiff-dataset";
 
   /**
    * Number of attributes for a 'meta' arff - path to the image file, and class of the image

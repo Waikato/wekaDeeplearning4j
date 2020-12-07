@@ -5,24 +5,24 @@ The table below outlines the different models included, whether pretrained weigh
 and the model variations (if any). WekaDeeplearning4j merges the model zoo of Deeplearning4j *and* Keras.
 Values in **bold** are the defaults.
 
-| Framework | Model             | Pretrained Implemented | Weights Available                  | Varieties                            |
-|-----------|-------------------|------------------------|------------------------------------|--------------------------------------|
-| DL4J      | AlexNet           | No                     | -                                  | -                                    |
-| DL4J      | Darknet19         | Yes                    | **ImageNet**                       | **224x224** or 448x448 input size    |
-| DL4J      | FaceNetNN4Small2  | No                     | -                                  | -                                    |
-| DL4J      | InceptionResNetV1 | No                     | -                                  | -                                    |
-| DL4J      | LeNet             | Yes                    | **MNIST**                          | -                                    |
-| DL4J      | ResNet50          | Yes                    | **ImageNet**                       | -                                    |
-| DL4J      | SqueezeNet        | Yes                    | **ImageNet**                       | -                                    |
-| DL4J      | VGG               | Yes                    | **ImageNet**, VGGFace (VGG16 only) | **16**, 19                           |
-| DL4J      | XCeption          | Yes                    | **ImageNet**                       | -                                    |
-| Keras     | DenseNet          | Yes                    | **ImageNet**                       | **121**, 169, 201                    |
-| Keras     | EfficientNet      | Yes                    | **ImageNet**                       | **B0**-B7                            |
-| Keras     | InceptionV3       | Yes                    | **ImageNet**                       | -                                    |
-| Keras     | NASNet            | Yes                    | **ImageNet**                       | **Mobile**, Large                    |
-| Keras     | ResNet            | Yes                    | **ImageNet**                       | **50**, 50V2, 101, 101V2, 152, 152V2 |
-| Keras     | VGG               | Yes                    | **ImageNet**                       | **16**, 19                           |
-| Keras     | Xception          | Yes                    | **ImageNet**                       | -                                    |
+| Framework | Model             | Input Shape                                 | Pretrained Implemented | Weights Available                  | Varieties                            |
+|-----------|-------------------|---------------------------------------------|------------------------|------------------------------------|--------------------------------------|
+| DL4J      | AlexNet           | 3, 224, 224                                 | No                     | -                                  | -                                    |
+| DL4J      | Darknet19         | 3, 224, 224                                 | Yes                    | **ImageNet**                       | **224x224** or 448x448 input size    |
+| DL4J      | FaceNetNN4Small2  | 3, 96, 96                                   | No                     | -                                  | -                                    |
+| DL4J      | InceptionResNetV1 | 3, 160, 160                                 | No                     | -                                  | -                                    |
+| DL4J      | LeNet             | 1, 28, 28                                   | Yes                    | **MNIST**                          | -                                    |
+| DL4J      | ResNet50          | 3, 224, 224                                 | Yes                    | **ImageNet**                       | -                                    |
+| DL4J      | SqueezeNet        | 3, 227, 227                                 | Yes                    | **ImageNet**                       | -                                    |
+| DL4J      | VGG               | 3, 224, 224                                 | Yes                    | **ImageNet**, VGGFace (VGG16 only) | **16**, 19                           |
+| DL4J      | XCeption          | 3, 299, 299                                 | Yes                    | **ImageNet**                       | -                                    |
+| Keras     | DenseNet          | 3, 224, 224                                 | Yes                    | **ImageNet**                       | **121**, 169, 201                    |
+| Keras     | EfficientNet      | 3, 224, 224                                 | Yes                    | **ImageNet**                       | **B0** - B7                          |
+| Keras     | InceptionV3       | 3, 299, 299                                 | Yes                    | **ImageNet**                       | -                                    |
+| Keras     | NASNet            | 3, 224, 224 (Mobile) or 3, 331, 331 (Large) | Yes                    | **ImageNet**                       | **Mobile**, Large                    |
+| Keras     | ResNet            | 3, 224, 224                                 | Yes                    | **ImageNet**                       | **50**, 50V2, 101, 101V2, 152, 152V2 |
+| Keras     | VGG               | 3, 224, 224                                 | Yes                    | **ImageNet**                       | **16**, 19                           |
+| Keras     | Xception          | 3, 299, 299                                 | Yes                    | **ImageNet**                       | -                                    |
 
 Finetuning some of these models can result in `NaN` errors (returns `NaN` for all classes when performing prediction on an instance).
 Currently, the only fix for this is to retune the network: [DL4J Help](https://deeplearning4j.konduit.ai/tuning-and-training/troubleshooting-training#nan-not-a-number-errors)

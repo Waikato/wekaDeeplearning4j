@@ -11,7 +11,7 @@
     <Logger level="OFF" name="org.reflections"/>
 
     <!--Root level-->
-    <Root level="info">
+    <Root level="debug">
       <AppenderRef ref="Console"/>
     </Root>
   </Loggers>

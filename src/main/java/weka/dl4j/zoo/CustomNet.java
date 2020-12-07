@@ -52,9 +52,14 @@ public class CustomNet extends AbstractZooModel {
     return null;
   }
 
+  /**
+   * By default, training a model uses the below scaler for the Dl4jMlpClassifier.
+   * We also define it here for use in the Inference panel
+   * @return Preprocessing scaler used during training.
+   */
   @Override
   public ImagePreProcessingScaler getImagePreprocessingScaler() {
-    return null;
+    return new ImagePreProcessingScaler(0, 1);
   }
 
 

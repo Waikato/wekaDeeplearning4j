@@ -19,6 +19,7 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Log4j2
 public class SaliencyMapWindow extends JPanel {
@@ -203,15 +204,25 @@ public class SaliencyMapWindow extends JPanel {
         return classSelectors.stream().mapToInt(ClassSelector::getTargetClass).toArray();
     }
 
+    private void validateClassID() {
+        Integer[] targetClasses = classSelectors.stream().map(ClassSelector::getTargetClass).toArray(Integer[]::new);
+        log.info("Generating for classes = " + Arrays.toString(targetClasses));
+
+        for (Integer targetClass : targetClasses) {
+            if (targetClass < 0 || targetClass >= getCurrentClassMap().length) {
+                throw new IllegalArgumentException("Invalid class ID(s) supplied: " + Arrays.toString(targetClasses));
+            }
+        }
+    }
+
     private void generateSaliencyMap() {
+        validateClassID();
         SwingWorker<Image, Void> worker = new SwingWorker<Image, Void>() {
             @Override
             protected Image doInBackground() {
                 ProgressManager manager = new ProgressManager(-1, "Generating saliency map...");
                 manager.start();
-                int targetClassID = classSelectors.get(0).getTargetClass();
                 boolean normalize = normalizeHeatmapCheckbox.isSelected();
-                log.info("Generating for class = " + targetClassID);
 
                 AbstractCNNSaliencyMapWrapper wrapper = processedExplorer.getSaliencyMapWrapper();
                 wrapper.setTargetClassIDsAsInt(getTargetClassIDs());
@@ -219,7 +230,6 @@ public class SaliencyMapWindow extends JPanel {
 
                 processedExplorer.setSaliencyMapWrapper(wrapper);
                 Image outputMap = processedExplorer.generateOutputMap();
-
                 manager.finish();
 
                 return outputMap;
