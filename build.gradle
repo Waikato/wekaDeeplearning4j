@@ -244,7 +244,7 @@ def createCudaZipTask(cuda_version, platform) {
  */
 if (is_cuda_version_valid) {
     def make_cuda_deps = [copyDependencies]
-    def platforms = ["linux", "windows"]
+    def platforms = ["linux", "windows", "macosx"]
     (platforms).each { pf ->
         make_cuda_deps = make_cuda_deps + "makeCuda-$cuda_version-$pf-zip"
         createCudaDirTask(cuda_version, pf)
@@ -317,7 +317,7 @@ dependencies {
 }
 
 test {
-    maxHeapSize = "4g"
+    maxHeapSize = "6g"
 
     testLogging {
         events "passed", "skipped", "failed"
