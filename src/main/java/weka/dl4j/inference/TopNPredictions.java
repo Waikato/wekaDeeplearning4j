@@ -204,8 +204,8 @@ public class TopNPredictions {
         this.n = n;
     }
 
-    public Prediction getPrediction(int n) {
-        return topNPredictions[n];
+    public Prediction getPrediction(int i) {
+        return topNPredictions[i];
     }
 
     public Prediction getTopPrediction() {
