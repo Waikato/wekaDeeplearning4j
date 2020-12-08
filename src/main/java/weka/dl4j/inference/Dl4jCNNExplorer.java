@@ -90,7 +90,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         if (!isPretrained)
             return true;
 
-        return modelOutputDecoder.getBuiltInClassMap() == ModelOutputDecoder.ClassmapType.DARKNET_IMAGENET;
+        return modelOutputDecoder.getBuiltInClassMap() == ClassmapType.DARKNET_IMAGENET;
     }
 
     public void processImage(File imageFile) throws Exception {

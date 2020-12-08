@@ -21,11 +21,6 @@ import java.util.*;
 @Log4j2
 public class ModelOutputDecoder implements Serializable, OptionHandler {
     /**
-     * Built-in class maps for WDL4J
-    */
-    public enum ClassmapType { IMAGENET, DARKNET_IMAGENET, VGGFACE, CUSTOM }
-
-    /**
      * Class Map to use to decode the model output
      */
     protected ClassmapType builtInClassMap = ClassmapType.IMAGENET;

@@ -48,7 +48,7 @@ public class Dl4jCNNExplorerTest {
         explorer.setZooModelType(zooModel);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
+        decoder.setBuiltInClassMap(ClassmapType.VGGFACE);
         explorer.setModelOutputDecoder(decoder);
 
         checkPredictionInTopN(explorer, BEN_STILLER_PATH, BEN_STILLER_ID);
@@ -71,7 +71,7 @@ public class Dl4jCNNExplorerTest {
         explorer.setZooModelType(zooModel);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.DARKNET_IMAGENET);
+        decoder.setBuiltInClassMap(ClassmapType.DARKNET_IMAGENET);
         explorer.setModelOutputDecoder(decoder);
 
         checkPredictionInTopN(explorer, GERMAN_SHEPPARD_PATH, DARKNET_GERMAN_SHEPPARD_ID);
@@ -320,7 +320,7 @@ public class Dl4jCNNExplorerTest {
         explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
+        decoder.setBuiltInClassMap(ClassmapType.CUSTOM);
         decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
         explorer.setModelOutputDecoder(decoder);
 
@@ -334,7 +334,7 @@ public class Dl4jCNNExplorerTest {
         explorer.setGenerateSaliencyMap(generateSaliencyMap);
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.CUSTOM);
+        decoder.setBuiltInClassMap(ClassmapType.CUSTOM);
         decoder.setClassMapFile(new File("datasets/nominal/mnist.meta.minimal.arff"));
         explorer.setModelOutputDecoder(decoder);
 

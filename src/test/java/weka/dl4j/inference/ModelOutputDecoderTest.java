@@ -15,7 +15,7 @@ public class ModelOutputDecoderTest extends TestCase {
         INDArray modelPredictions = DatasetLoader.loadCarPredictions();
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.IMAGENET);
+        decoder.setBuiltInClassMap(ClassmapType.IMAGENET);
 
         TopNPredictions carPrediction = decoder.decodePredictions(modelPredictions);
 
@@ -37,7 +37,7 @@ public class ModelOutputDecoderTest extends TestCase {
         INDArray modelPredictions = DatasetLoader.loadCarPredictions();
 
         ModelOutputDecoder decoder = new ModelOutputDecoder();
-        decoder.setBuiltInClassMap(ModelOutputDecoder.ClassmapType.VGGFACE);
+        decoder.setBuiltInClassMap(ClassmapType.VGGFACE);
 
         try {
             decoder.decodePredictions(modelPredictions);
