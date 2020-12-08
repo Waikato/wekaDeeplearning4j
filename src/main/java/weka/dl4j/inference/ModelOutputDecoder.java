@@ -136,6 +136,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
     public static String[] parseClassmapFromCsv(String filepath) throws IOException {
         CSVLoader loader = new CSVLoader();
         loader.setSource(new File(filepath));
+        loader.setNominalAttributes("last");
         Instances instances = loader.getDataSet();
         return parseClassmap(instances);
     }
