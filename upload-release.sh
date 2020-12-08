@@ -2,11 +2,11 @@
 
 if [ -z "$1" ]
   then
-    echo "No release tag supplied - please supply as argument, e.g., ./upload-release v1.7.1"
+    echo "No release tag supplied - please supply as argument, e.g., ./upload-release 1.7.1"
     exit 1
 fi
 
-TAG="$1"
+TAG="v$1"
 # clobber overwrites existing assets of the same name
 BASE_COMMAND="gh release upload ${TAG} --clobber"
 

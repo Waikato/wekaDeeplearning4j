@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ $# -ne 2 ]]; then
+    echo "Illegal number of parameters. Usage: ./version-bump.sh <old tag number> <new tag number>"
+    echo "e.g.: ./version-bump.sh 1.7.0 1.7.1"
+fi
+
 old=$1
 new=$2
 
