@@ -276,7 +276,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   /**
    * Displays progress of the current process (feature extraction, training, etc.)
    */
-  protected ProgressManager progressManager;
+  protected transient ProgressManager progressManager;
 
   private SwingWorker<Layer[], Void> layerSwingWorker;
 
