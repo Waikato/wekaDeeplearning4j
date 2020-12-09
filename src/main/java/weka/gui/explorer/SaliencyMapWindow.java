@@ -81,7 +81,8 @@ public class SaliencyMapWindow extends JPanel {
             // Limit the size to 10
             return;
         }
-        ClassSelector classSelector = new ClassSelector(controlPanel, getCurrentClassMap(), getDefaultClassID(), targetClassRow + classSelectors.size());
+        ClassSelector classSelector = new ClassSelector(controlPanel, getCurrentClassMap());
+        classSelector.initOnGUI(getDefaultClassID(), targetClassRow + classSelectors.size());
         classSelectors.add(classSelector);
         packWindow();
     }

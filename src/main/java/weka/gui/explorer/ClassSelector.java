@@ -23,9 +23,12 @@ public class ClassSelector {
     JTextField classNameInput = new JTextField();
     JButton patternButton = new JButton("Pattern");
 
-    public ClassSelector(JPanel parentPanel, String[] classMap, int defaultClassID, int rowNum) {
+    public ClassSelector(JPanel parentPanel, String[] classMap) {
         this.parentPanel = parentPanel;
         this.classMap = classMap;
+    }
+
+    public void initOnGUI(int defaultClassID, int rowNum) {
         setup(rowNum);
         setTargetClass(defaultClassID);
     }
@@ -135,7 +138,7 @@ public class ClassSelector {
                 matchingClasses.get(0));
     }
 
-    private ArrayList<PredictionClass> getMatchingClasses(String pattern) {
+    public ArrayList<PredictionClass> getMatchingClasses(String pattern) {
         ArrayList<PredictionClass> result = new ArrayList<>();
         for (int i = 0; i < classMap.length; i++) {
             String tmpClass = classMap[i];
