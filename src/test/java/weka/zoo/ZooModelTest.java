@@ -62,6 +62,7 @@ class ModelDownloader implements Runnable {
  * the models work.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 @Log4j2
 public class ZooModelTest {
