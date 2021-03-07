@@ -14,8 +14,8 @@ import java.io.File;
 public class ModelOutputDecoderTest extends TestCase {
 
     /**
-     * Test that the decoder parses the predictions correctly
-     * @throws Exception
+     * Test that the decoder parses the predictions correctly.
+     * @throws Exception File exception
      */
     public void testDecodePredictions() throws Exception {
         INDArray modelPredictions = DatasetLoader.loadCarPredictions();
@@ -35,7 +35,7 @@ public class ModelOutputDecoderTest extends TestCase {
     }
 
     /**
-     * Test that the decoder can parse a class map from ARFF correctly
+     * Test that the decoder can parse a class map from ARFF correctly.
      */
     public void testClassmapFromArff() {
         // Arrange
@@ -50,6 +50,9 @@ public class ModelOutputDecoderTest extends TestCase {
         assertEquals(10, classmap.length);
     }
 
+    /**
+     * Test the class can correctly load a classmap from csv.
+     */
     public void testClassmapFromCsv() {
         // Arrange
         ModelOutputDecoder decoder = new ModelOutputDecoder();
@@ -63,6 +66,9 @@ public class ModelOutputDecoderTest extends TestCase {
         assertEquals(5, classmap.length);
     }
 
+    /**
+     * Test that the model can correctly load the built-in ImageNet classmap.
+     */
     public void testClassmapFromImageNet() {
         // Arrange
         ModelOutputDecoder decoder = new ModelOutputDecoder();
@@ -75,6 +81,9 @@ public class ModelOutputDecoderTest extends TestCase {
         assertEquals(1000, classmap.length);
     }
 
+    /**
+     * Test that the model can correctly load the built-in DarkNet ImageNet classmap.
+     */
     public void testClassmapFromDarknetImageNet() {
         // Arrange
         ModelOutputDecoder decoder = new ModelOutputDecoder();
@@ -87,6 +96,9 @@ public class ModelOutputDecoderTest extends TestCase {
         assertEquals(1000, classmap.length);
     }
 
+    /**
+     * Test that the model can correctly load the classmap from built-in VGGFace dataset.
+     */
     public void testClassmapFromVGGFace() {
         // Arrange
         ModelOutputDecoder decoder = new ModelOutputDecoder();
@@ -102,7 +114,7 @@ public class ModelOutputDecoderTest extends TestCase {
     /**
      * Tests that the method fails properly when an invalid setup is provided.
      * Will complain about number of prediction classes not matching size of class map
-     * @throws Exception
+     * @throws Exception File exception
      */
     public void testIncorrectSetup() throws Exception {
         INDArray modelPredictions = DatasetLoader.loadCarPredictions();

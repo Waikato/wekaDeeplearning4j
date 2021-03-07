@@ -31,9 +31,14 @@ import weka.dl4j.enums.PretrainedType;
  * @author Rhys Compton
  */
 public class Dl4jAlexNet extends AbstractZooModel {
-
+  /**
+   * Unique ID for this version of the model.
+   */
   private static final long serialVersionUID = 1650928023723447528L;
 
+  /**
+   * Instantiate the model.
+   */
   public Dl4jAlexNet() {
     setPretrainedType(PretrainedType.NONE);
   }

@@ -21,51 +21,126 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * JPanel showing the saliency map generated, as well as options for configuring it.
+ */
 @Log4j2
 public class SaliencyMapWindow extends JPanel {
 
+    /**
+     * Wrapper class for GBC which defaults to inset size of 5.
+     */
     public static class SaliencyMapGBC extends GridBagConstraints {
+        /**
+         * Init.
+         */
         public SaliencyMapGBC() {
             this(5);
         }
 
+        /**
+         * Init.
+         * @param insetSize Inset size for objects
+         */
         public SaliencyMapGBC(int insetSize) {
             this.insets = new Insets(insetSize, insetSize, insetSize, insetSize);
         }
     }
 
-    Dl4jCNNExplorer processedExplorer;
     /**
-     * UI Elements
+     * The Dl4jCNNExplorer which has processed the image.
+     */
+    Dl4jCNNExplorer processedExplorer;
+
+    /**
+     * UI Elements.
      */
     JFrame thisWindow = new JFrame("WekaDeeplearning4j - Saliency Map Viewer");
 
+    /**
+     * Displays the saliency image.
+     */
     JLabel saliencyImageLabel;
+
+    /**
+     * Displays the saliency image.
+     */
     ImageIcon icon;
+    /**
+     * Stores the saliency image.
+     */
     Image saliencyImage;
+    /**
+     * Checkbox for the user to normalize the heatmap.
+     */
     JCheckBox normalizeHeatmapCheckbox = new JCheckBox("Normalize heatmap");
+    /**
+     * Add class button.
+     */
     JButton addClassButton = new JButton("Add Class");
+    /**
+     * Remove class button.
+     */
     JButton removeClassButton = new JButton("Remove Class");
+    /**
+     * Generate a heatmap button.
+     */
     JButton generateButton = new JButton("Generate");
+    /**
+     * Save the heatmap as an image button.
+     */
     JButton saveHeatmapButton = new JButton("Save...");
+    /**
+     * Scrollpane for the image, allowing us to generate for many more classes than we can fit on screen.
+     */
     JScrollPane scrollPane;
+    /**
+     * Panel for the buttons above.
+     */
     JPanel buttonPanel;
+    /**
+     * Control panel.
+     */
     JPanel controlPanel;
+    /**
+     * Split pane to allow us to hide the control buttons.
+     */
     JSplitPane splitPane;
 
+    /**
+     * The filepath for the default saliency map image.
+     */
     private String DEFAULT_SALIENCY_IMAGE_PATH;
 
+    /**
+     * Filter for the save dialog.
+     */
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(ExplorerDl4jInference.IMAGE_FILE_EXTENSIONS, "Image files");
 
     /** The file chooser for saving the image. */
     protected WekaFileChooser m_FileChooser = new WekaFileChooser(new File(System.getProperty("user.dir")));
 
+    /**
+     * List of all the ClassSelectors currently open.
+     */
     ArrayList<ClassSelector> classSelectors = new ArrayList<>();
 
+    /**
+     * Which GBC row should the buttons appear on.
+     */
     int buttonsRow = 0;
+    /**
+     * Which GBC row should the target class fields start from.
+     */
     int targetClassRow = 1;
+    /**
+     * Which row should the image label appear on (bottom).
+     */
     int imageRow = 20;
 
+    /**
+     * Initialize the window.
+     */
     public SaliencyMapWindow() {
         try {
             DEFAULT_SALIENCY_IMAGE_PATH = new ResourceResolver().GetResolvedPath("placeholderSaliencyMap.png");
@@ -76,6 +151,9 @@ public class SaliencyMapWindow extends JPanel {
         oneTimeSetup();
     }
 
+    /**
+     * Add a new class selector to the panel.
+     */
     private void addClassSelector() {
         if (classSelectors.size() == 5) {
             // Limit the size to 10
@@ -87,12 +165,18 @@ public class SaliencyMapWindow extends JPanel {
         packWindow();
     }
 
+    /**
+     * Clear all class selectors from the panel.
+     */
     private void clearClassSelectors() {
         while (classSelectors.size() > 0) {
             removeClassSelector();
         }
     }
 
+    /**
+     * Remove the last class selector.
+     */
     private void removeClassSelector() {
         if (classSelectors.size() == 0) {
             // Don't go below one class selector
@@ -104,6 +188,9 @@ public class SaliencyMapWindow extends JPanel {
         packWindow();
     }
 
+    /**
+     * This resets the window size to fit all the components inside it.
+     */
     private void packWindow() {
 //        var originalDimension = thisWindow.getSize();
         thisWindow.pack();
@@ -111,6 +198,9 @@ public class SaliencyMapWindow extends JPanel {
 //        thisWindow.setSize(originalDimension);
     }
 
+    /**
+     * Setup the listeners for the panel buttons.
+     */
     private void setupButtonListeners() {
         generateButton.addActionListener(e -> generateSaliencyMap());
         saveHeatmapButton.addActionListener(e -> saveHeatmap());
@@ -122,6 +212,9 @@ public class SaliencyMapWindow extends JPanel {
         normalizeHeatmapCheckbox.setSelected(true);
     }
 
+    /**
+     * Add the buttons to the control panel.
+     */
     private void addControlButtons() {
         GridBagConstraints gbc = new SaliencyMapGBC();
         gbc.gridy = buttonsRow;
@@ -137,6 +230,9 @@ public class SaliencyMapWindow extends JPanel {
         controlPanel.add(buttonPanel, gbc);
     }
 
+    /**
+     * Add the scrollable image to the main panel.
+     */
     private void addScrollableImage() {
         GridBagConstraints gbc = new SaliencyMapGBC();
         gbc.gridx = 0;
@@ -151,6 +247,9 @@ public class SaliencyMapWindow extends JPanel {
         scrollPane.getHorizontalScrollBar().setUnitIncrement(20);
     }
 
+    /**
+     * Onetime setup for the window - listeners, etc.
+     */
     private void oneTimeSetup() {
         setupButtonListeners();
 
@@ -179,6 +278,10 @@ public class SaliencyMapWindow extends JPanel {
         }
     }
 
+    /**
+     * Show the saliency map.
+     * @param explorer Processed explorer
+     */
     public void open(Dl4jCNNExplorer explorer) {
         this.processedExplorer = explorer;
 
@@ -205,6 +308,9 @@ public class SaliencyMapWindow extends JPanel {
         return classSelectors.stream().mapToInt(ClassSelector::getTargetClass).toArray();
     }
 
+    /**
+     * Check that all supplied class IDs are valid.
+     */
     private void validateClassID() {
         Integer[] targetClasses = classSelectors.stream().map(ClassSelector::getTargetClass).toArray(Integer[]::new);
         log.info("Generating for classes = " + Arrays.toString(targetClasses));
@@ -216,6 +322,9 @@ public class SaliencyMapWindow extends JPanel {
         }
     }
 
+    /**
+     * Generate the saliency map then display it in the window.
+     */
     private void generateSaliencyMap() {
         validateClassID();
         SwingWorker<Image, Void> worker = new SwingWorker<Image, Void>() {
@@ -263,6 +372,9 @@ public class SaliencyMapWindow extends JPanel {
         saliencyImageLabel.invalidate();
     }
 
+    /**
+     * Show the file chooser and save the heatmap to the user specified location.
+     */
     private void saveHeatmap() {
         // Prompt the user for a place to save the image to
         m_FileChooser.setFileFilter(m_ImageFilter);

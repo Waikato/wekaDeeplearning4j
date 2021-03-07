@@ -4,10 +4,14 @@ import junit.framework.TestCase;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import weka.util.DatasetLoader;
 
+/**
+ * Tests for TopNPredictions class, ensuring it parses the top predictions correctly.
+ */
 public class TopNPredictionsTest extends TestCase {
 
     /**
-     * Ensures that the predictions are correctly sorted in descending order
+     * Ensures that the predictions are correctly sorted in descending order.
+     * @throws Exception file exception
      */
     public void testPredictionsInCorrectOrder() throws Exception {
         INDArray modelPredictions = DatasetLoader.loadCarPredictions();

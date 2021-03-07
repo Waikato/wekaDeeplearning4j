@@ -7,33 +7,38 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@Log4j2
-/*
-  Command line implementation of a progress bar
+/**
+ Command line implementation of a progress bar.
  */
+@Log4j2
 public class CommandLineProgressBar extends AbstractProgressBar {
 
+    /**
+     * Instantiate a new progress bar.
+     * @param maxProgress Max progress.
+     * @param progressMessage Message to display.
+     */
     public CommandLineProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
     }
 
-    /** Total number of characters across the progress bar */
+    /** Total number of characters across the progress bar. */
     protected int totalProgressBarSize = 60;
 
-    /** Size of the indeterminate bar which scrolls across */
+    /** Size of the indeterminate bar which scrolls across. */
     private int indeterminateBarSize = 10;
 
-    /** Number of Progress chars to print */
+    /** Number of Progress chars to print. */
     private int currNumDots = 0;
 
-    /** Space to the left and right of the progress bar */
+    /** Space to the left and right of the progress bar. */
     private int leftSpace = 0, rightSpace = 0;
 
-    /** Timer for refreshing the indeterminate progress bar */
+    /** Timer for refreshing the indeterminate progress bar. */
     protected Timer timer;
 
     /**
-     * Update the progress bar with the current value
+     * Update the progress bar with the current value.
      */
     @Override
     protected void onSetProgress() {
@@ -60,7 +65,7 @@ public class CommandLineProgressBar extends AbstractProgressBar {
     }
 
     /**
-     * Update the progress bar display
+     * Update the progress bar display.
      */
     @Override
     public void refreshDisplay() {
@@ -87,7 +92,7 @@ public class CommandLineProgressBar extends AbstractProgressBar {
         }
     }
 
-    /** Start a new timer which repeatedly increments the indeterminate progress bar loader */
+    /** Start a new timer which repeatedly increments the indeterminate progress bar loader. */
     private void startIndeterminateLoader() {
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {

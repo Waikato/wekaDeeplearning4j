@@ -28,7 +28,30 @@ import weka.dl4j.ApiWrapper;
  * @author Steven Lang
  */
 public enum PoolingType implements ApiWrapper<org.deeplearning4j.nn.conf.layers.PoolingType> {
-  MAX, AVG, SUM, PNORM, NONE, MIN;
+  /**
+   * Max pooling.
+   */
+  MAX,
+  /**
+   * Average pooling.
+   */
+  AVG,
+  /**
+   * Additive pooling.
+   */
+  SUM,
+  /**
+   * PNorm pooling.
+   */
+  PNORM,
+  /**
+   * No pooling.
+   */
+  NONE,
+  /**
+   * Min pooling.
+   */
+  MIN;
 
   /**
    * NONE and MIN are not DL4J pooling types, only used for pooling activations

@@ -15,27 +15,54 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tests for Dl4jCNNExplorer.
+ */
 @Log4j2
 public class Dl4jCNNExplorerTest {
 
+    /**
+     * Class ID of Ben stiller in VGGFace.
+     */
     private final static int BEN_STILLER_ID = 201;
 
+    /**
+     * Filepath for ben stiller image.
+     */
     private final static String BEN_STILLER_PATH = "src/test/resources/images/ben_stiller.jpg";
 
+    /**
+     * Class ID of german sheppard in ImageNet.
+     */
     private final static int GERMAN_SHEPPARD_ID = 235;
 
+    /**
+     * Filepath for german sheppard image.
+     */
     private final static String GERMAN_SHEPPARD_PATH = "src/test/resources/images/dog.jpg";
 
+    /**
+     * Class ID of 4 in MNIST.
+     */
     private final static int FOUR_ID = 4;
 
+    /**
+     * Filepath of 4 image.
+     */
     private final static String FOUR_PATH = "datasets/nominal/mnist-minimal/img_3574_4.jpg";
 
+    /**
+     * Filepath of custom-trained MNIST model, with input size shown below.
+     */
     private final static String MNIST1x28x28_MODEL_PATH = "src/test/resources/models/custom_1x28x28_mnist_30e.model";
 
+    /**
+     * Filepath of custom-trained MNIST model, with input size shown below.
+     */
     private final static String MNIST3x56x56_MODEL_PATH = "src/test/resources/models/custom_3x56x56_mnist_30e.model";
 
     /**
-     * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller
+     * Test the explorer with VGG16 pretrained on VGGFACE, and a photo of Ben Stiller.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -57,7 +84,7 @@ public class Dl4jCNNExplorerTest {
 
     /**
      * Test the explorer with a pretrained Darknet19 model - it uses a different class mapping
-     * hence why it's in a separate method
+     * hence why it's in a separate method.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -79,8 +106,8 @@ public class Dl4jCNNExplorerTest {
 
     /**
      * Test that if someone selects Darknet19 (which has a different version of IMAGENET),
-     * that an exception is thrown.
-     * @throws Exception
+     * that an exception is thrown..
+     * @throws Exception File exception.
      */
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidDarknet_throwsIllegalArgumentException() throws Exception {
@@ -95,7 +122,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the Deeplearning4j zoo models with a simple dog picture
+     * Test the Deeplearning4j zoo models with a simple dog picture.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -118,7 +145,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Tests the Keras models with a simple dog picture - checks to see which models output correct predictions
+     * Tests the Keras models with a simple dog picture - checks to see which models output correct predictions.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -129,7 +156,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -148,7 +175,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -157,7 +184,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -168,7 +195,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -178,6 +205,10 @@ public class Dl4jCNNExplorerTest {
         checkImageNetModel(model, false, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
+    /**
+     * Test a custom trained MNIST model for simple inference.
+     * @throws Exception If an exception occurs during testing
+     */
     @Test
     public void test1x28x28_SimpleInference() throws Exception {
         CustomModelSetup modelSetup = new CustomModelSetup();
@@ -189,6 +220,10 @@ public class Dl4jCNNExplorerTest {
         checkMnistModel(modelSetup, false, FOUR_PATH, FOUR_ID);
     }
 
+    /**
+     * Test a custom trained MNIST model for simple inference.
+     * @throws Exception If an exception occurs during testing
+     */
     @Test
     public void test3x56x56_SimpleInference() throws Exception {
         CustomModelSetup modelSetup = new CustomModelSetup();
@@ -202,7 +237,7 @@ public class Dl4jCNNExplorerTest {
 
     /* Saliency Map Tests */
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -221,7 +256,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained ResNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -230,7 +265,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained DenseNet on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -241,7 +276,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard
+     * Test the explorer with a pretrained EfficientNet B1 on ImageNet and a photo of a german sheppard.
      * @throws Exception If an exception occurs during testing
      */
     @Test
@@ -251,6 +286,10 @@ public class Dl4jCNNExplorerTest {
         checkImageNetModel(model, true, GERMAN_SHEPPARD_PATH, GERMAN_SHEPPARD_ID);
     }
 
+    /**
+     * Test a custom trained MNIST model for generation of saliency map.
+     * @throws Exception If an exception occurs during testing
+     */
     @Test
     public void test1x28x28_SaliencyMap() throws Exception {
         CustomModelSetup modelSetup = new CustomModelSetup();
@@ -262,6 +301,10 @@ public class Dl4jCNNExplorerTest {
         checkMnistModel(modelSetup, true, FOUR_PATH, FOUR_ID);
     }
 
+    /**
+     * Test a custom trained MNIST model for generation of saliency map.
+     * @throws Exception If an exception occurs during testing
+     */
     @Test
     public void test3x56x56_SaliencyMap() throws Exception {
         CustomModelSetup modelSetup = new CustomModelSetup();
@@ -274,7 +317,7 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Test a set of zoo models against the german sheppard image
+     * Test a set of zoo models against the german sheppard image.
      * @param zooModels models to test
      * @throws Exception If an exception occurs during testing
      */
@@ -303,8 +346,12 @@ public class Dl4jCNNExplorerTest {
     }
 
     /**
-     * Simply tests a pretrained (on IMAGENET) zoo model
+     * Simply tests a pretrained (on IMAGENET) zoo model.
      * @param zooModel Model to test
+     * @param generateSaliencyMap should we generate a saliency map
+     * @param imagePath Image path
+     * @param expectedClassID Expected Class ID
+     * @throws Exception exception
      */
     private void checkImageNetModel(AbstractZooModel zooModel, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
@@ -314,6 +361,14 @@ public class Dl4jCNNExplorerTest {
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
+    /**
+     * Check MNIST model correctly predicts.
+     * @param zooModel Given model
+     * @param generateSaliencyMap should we generate a saliency map
+     * @param imagePath Image path
+     * @param expectedClassID Expected Class ID
+     * @throws Exception Error occurs during testing
+     */
     private void checkMnistModel(AbstractZooModel zooModel, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
         explorer.setZooModelType(zooModel);
@@ -327,6 +382,14 @@ public class Dl4jCNNExplorerTest {
         checkPredictionInTopN(explorer, imagePath, expectedClassID);
     }
 
+    /**
+     * Check MNIST model correctly predicts.
+     * @param modelSetup Model setup
+     * @param generateSaliencyMap should we generate a saliency map
+     * @param imagePath Image path
+     * @param expectedClassID Expected Class ID
+     * @throws Exception Error occurs during testing
+     */
     private void checkMnistModel(CustomModelSetup modelSetup, boolean generateSaliencyMap, String imagePath, int expectedClassID) throws Exception {
         Dl4jCNNExplorer explorer = new Dl4jCNNExplorer();
         explorer.setUseCustomModel(true);
@@ -343,7 +406,7 @@ public class Dl4jCNNExplorerTest {
 
     /**
      * Checks that the expected class ID is in the top N predictions - the model has (at least somewhat) correctly
-     * predicted the image
+     * predicted the image.
      * @param explorer Explorer to run the prediction with
      * @param imagePath Image to predict on
      * @param expectedClassID Expected class ID of the prediction

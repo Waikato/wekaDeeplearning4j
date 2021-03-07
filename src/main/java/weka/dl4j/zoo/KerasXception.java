@@ -6,12 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.Xception;
 
+/**
+ * Wrapper class for Keras version of Xception.
+ */
 public class KerasXception extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = -6899732453136761839L;
 
+    /**
+     * Desired version of the model.
+     */
     private Xception.VARIATION variation = Xception.VARIATION.STANDARD;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasXception() {
         setVariation(Xception.VARIATION.STANDARD);
         setPretrainedType(PretrainedType.IMAGENET);

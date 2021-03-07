@@ -3,27 +3,35 @@ package weka.core.progress;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Progress bar panel displayed in the GUI.
+ */
 public class GUIProgressBar extends AbstractProgressBar implements Runnable {
 
-    /** The main JFrame */
+    /** The main JFrame. */
     protected JFrame currentFrame;
 
-    /** The main progres bar */
+    /** The main progress bar. */
     protected JProgressBar progressBar;
 
-    /** Displays the user supplied progress message */
+    /** Displays the user supplied progress message. */
     protected JLabel progressMessageLabel;
 
-    /** Displays the calculated ETA */
+    /** Displays the calculated ETA. */
     protected JLabel etaLabel;
 
+    /**
+     * Init the GUI progress bar
+     * @param maxProgress Max progress for the bar
+     * @param progressMessage Message to display
+     */
     public GUIProgressBar(double maxProgress, String progressMessage) {
         super(maxProgress, progressMessage);
         initGUIElements();
     }
 
     /**
-     * Initialize the GUI elements on the frame
+     * Initialize the GUI elements on the frame.
      */
     private void initGUIElements() {
         // Create frame with title Registration Demo
@@ -74,7 +82,7 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
     }
 
     /**
-     * Update the progress bar with the current value
+     * Update the progress bar with the current value.
      */
     @Override
     protected void onSetProgress() {
@@ -103,7 +111,7 @@ public class GUIProgressBar extends AbstractProgressBar implements Runnable {
     }
 
     /**
-     * Update the progress bar display
+     * Update the progress bar display.
      */
     @Override
     public void refreshDisplay() {

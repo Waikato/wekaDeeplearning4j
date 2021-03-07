@@ -32,8 +32,14 @@ import weka.dl4j.enums.PretrainedType;
  */
 public class Dl4jSqueezeNet extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = -9163009640895595245L;
 
+    /**
+     * Instantiate the model.
+     */
     public Dl4jSqueezeNet() {
         setPretrainedType(PretrainedType.IMAGENET);
         setNumFExtractOutputs(1000);

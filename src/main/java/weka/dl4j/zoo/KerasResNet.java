@@ -6,12 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.ResNet;
 
+/**
+ * Wrapper class for Keras version of ResNet.
+ */
 public class KerasResNet extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = 5525252856492208127L;
 
+    /**
+     * Desired version of the model.
+     */
     private ResNet.VARIATION variation = ResNet.VARIATION.RESNET50;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasResNet() {
         setVariation(ResNet.VARIATION.RESNET50);
         setPretrainedType(PretrainedType.IMAGENET);

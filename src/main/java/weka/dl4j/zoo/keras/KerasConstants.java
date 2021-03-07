@@ -5,9 +5,19 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Simple class to hold URLs and checksums of all Keras models in WDL4J.
+ */
 public class KerasConstants {
 
+    /**
+     * URLs of model files.
+     */
     public static Map<String, String> Locations;
+
+    /**
+     * Checksums of model files.
+     */
     public static Map<String, Long> Checksums;
 
     static {

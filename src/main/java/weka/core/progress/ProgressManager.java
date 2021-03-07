@@ -12,14 +12,14 @@ import java.io.Serializable;
 @Log4j2
 public class ProgressManager implements Serializable {
 
-    /** Progress bar to control */
+    /** Progress bar to control. */
     protected AbstractProgressBar progressBar;
 
-    /** Flag indicating if we're running the GUI */
+    /** Flag indicating if we're running the GUI. */
     protected boolean runningInGUI = false;
 
     /**
-     * Init a new progress manager, setting the maximum progress and progress message
+     * Init a new progress manager, setting the maximum progress and progress message.
      * @param maxProgress Maximum progress value (e.g., max number of iterations)
      * @param progressMessage Progress message to display
      */
@@ -28,13 +28,16 @@ public class ProgressManager implements Serializable {
     }
 
     /**
-     * Init a new indeterminate progress manager (no notion of iterating progress)
+     * Init a new indeterminate progress manager (no notion of iterating progress).
      * @param indeterminateProgressMessage Progress message to display
      */
     public ProgressManager(String indeterminateProgressMessage) {
         init(-1, indeterminateProgressMessage);
     }
 
+    /**
+     * Init the progress manager.
+     */
     public ProgressManager() {
         init(-1, "");
     }
@@ -42,6 +45,7 @@ public class ProgressManager implements Serializable {
     /**
      * Checks the stacktrace for a call to anything in the weka.gui package.
      * If that exists, WEKA was started by the GUIChooser
+     * @return True if being run within the GUI.
      */
     public boolean checkIfRunByGUI() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
@@ -57,7 +61,7 @@ public class ProgressManager implements Serializable {
     }
 
     /**
-     * Initializes either a GUI or command line progress bar
+     * Initializes either a GUI or command line progress bar.
      * @param maxProgress Maximum progress value
      * @param progressMessage Progress message to display
      */
@@ -79,14 +83,14 @@ public class ProgressManager implements Serializable {
     /* Progress Bar passthrough methods */
 
     /**
-     * Show the progress bar and start the timer
+     * Show the progress bar and start the timer.
      */
     public void start() {
         progressBar.start();
     }
 
     /**
-     * Increment the progress bar
+     * Increment the progress bar.
      */
     public void increment() {
         progressBar.increment();
@@ -101,7 +105,7 @@ public class ProgressManager implements Serializable {
     }
 
     /**
-     * Close out the progress bar
+     * Close out the progress bar.
      */
     public void finish() {
         progressBar.finish();

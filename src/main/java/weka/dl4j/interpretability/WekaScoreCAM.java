@@ -33,6 +33,9 @@ import java.io.File;
 @Log4j2
 public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
 
+    /**
+     * ScoreCAM backend.
+     */
     protected ScoreCAM scoreCAM;
 
     @Override
@@ -61,28 +64,25 @@ public class WekaScoreCAM extends AbstractCNNSaliencyMapWrapper {
         return scoreCAM.generateHeatmapToImage(targetClassIDs, getClassMap(), normalize);
     }
 
-    private PredictionClass[] getTestPredictionClasses(int[] targetClassIDs) {
-        PredictionClass[] result = new PredictionClass[targetClassIDs.length];
-
-        for (int i = 0; i < targetClassIDs.length; i++)
-        {
-            result[i] = new PredictionClass(
-                    targetClassIDs[i],
-                    String.format("Test class %d", i)
-            );
-        }
-        return result;
-    }
-
+    /**
+     * Function to call when iterations start (start the progress manager).
+     * @param maxIterations Maximum number of iterations
+     */
     private void onIterationsStarted(int maxIterations) {
         progressManager = new ProgressManager(maxIterations, String.format("Calculating Saliency Map with a batch size of %d...", scoreCAM.getBatchSize()));
         progressManager.start();
     }
 
+    /**
+     * Function to call when iterations increment (increment the progress manager).
+     */
     private void onIterationIncremented() {
         progressManager.increment();
     }
 
+    /**
+     * Function to call when iterations finish (close the progress manager).
+     */
     private void onIterationsFinished() {
         progressManager.finish();
     }

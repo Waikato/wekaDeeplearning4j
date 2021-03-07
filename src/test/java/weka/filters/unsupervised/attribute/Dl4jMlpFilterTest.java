@@ -56,11 +56,19 @@ import weka.util.TestUtil;
 @Log4j2
 public class Dl4jMlpFilterTest {
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   @Test
   public void testProcessMnistResNet() throws Exception {
     checkZooModelMNIST(new Dl4jResNet50(), true);
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   @Test
   public void testProcessMnistKerasDenseNet201() throws Exception {
     KerasDenseNet kerasDenseNet = new KerasDenseNet();
@@ -68,12 +76,20 @@ public class Dl4jMlpFilterTest {
     checkZooModelMNIST(kerasDenseNet, true);
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   @Test
   public void testProcessMnistConvolutional() throws Exception {
     Dl4jLeNet leNet = new Dl4jLeNet();
     checkZooModelMNIST(leNet, false);
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   @Test
   public void testProcessIris() throws Exception {
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
@@ -107,6 +123,10 @@ public class Dl4jMlpFilterTest {
     Files.delete(Paths.get(clfPath));
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   @Test
   public void testProcessMnist() throws Exception {
     // Init data
@@ -142,6 +162,10 @@ public class Dl4jMlpFilterTest {
     }
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   protected void checkZooModelMNIST(AbstractZooModel zooModel, boolean isMeta) throws Exception {
     Dl4jMlpFilter myFilter = new Dl4jMlpFilter();
     Dl4jMlpClassifier clf = new Dl4jMlpClassifier();
@@ -183,6 +207,10 @@ public class Dl4jMlpFilterTest {
     }
   }
 
+  /**
+   * Test model works correctly in filter.
+   * @throws Exception Exception occurs during testing.
+   */
   protected void checkLayer(Dl4jMlpClassifier clf, Instances instances, String[] transformationLayerNames,
       String clfPath, boolean useZooModel) throws Exception {
     Instances activationsExpected = clf.getActivationsAtLayers(transformationLayerNames, instances);

@@ -32,8 +32,14 @@ import weka.dl4j.enums.PretrainedType;
  */
 public class Dl4jFaceNetNN4Small2 extends AbstractZooModel {
 
+  /**
+   * Unique ID for this version of the model.
+   */
   private static final long serialVersionUID = -3489424545896301678L;
 
+  /**
+   * Instantiate the model.
+   */
   public Dl4jFaceNetNN4Small2() {
     setPretrainedType(PretrainedType.NONE);
   }

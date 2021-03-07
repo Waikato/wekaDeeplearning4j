@@ -33,12 +33,32 @@ import weka.dl4j.enums.PretrainedType;
  */
 public class Dl4jDarknet19 extends AbstractZooModel {
 
+  /**
+   * Unique ID for this version of the model.
+   */
   private static final long serialVersionUID = 7854379460490744564L;
 
-  public enum VARIATION {INPUT224, INPUT448};
+  /**
+   * Variations of the model.
+   */
+  public enum VARIATION {
+    /**
+     * Model with 3x224x224 input size.
+     */
+    INPUT224,
+    /**
+     * Model with 3x448x448 input size.
+     */
+    INPUT448};
 
+  /**
+   * Desired version of the model.
+   */
   protected VARIATION m_variation = VARIATION.INPUT224;
 
+  /**
+   * Instantiate the model.
+   */
   public Dl4jDarknet19() {
     setPretrainedType(PretrainedType.IMAGENET);
     setNumFExtractOutputs(1000);

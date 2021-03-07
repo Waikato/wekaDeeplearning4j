@@ -26,10 +26,21 @@ import java.util.regex.Pattern;
 @Log4j2
 public class KerasModelConverter {
 
+    /**
+     * File path to model summaries.
+     */
     private static String modelSummariesPath = "";
 
+    /**
+     * Regex for the broadcast layer.
+     */
     private static final String broadcastLayerRegex = "^broadcast_w(\\d+).*";
 
+    /**
+     * Save the supplied model .h5 file into our output folder.
+     * @param modelFile .h5 file
+     * @param outputFolder Folder to save file into.
+     */
     private static void saveH5File(File modelFile, File outputFolder) {
         try {
             INDArray testShape = Nd4j.zeros(1, 3, 224, 224);
@@ -64,6 +75,11 @@ public class KerasModelConverter {
         }
     }
 
+    /**
+     * Main entrypoint.
+     * @param args args
+     * @throws Exception exception
+     */
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {
             System.err.println("Usage: KerasModelConverter <h5 folder path> <model summary folder path>");
@@ -94,6 +110,11 @@ public class KerasModelConverter {
         }
     }
 
+    /**
+     * Checks whether this line in the model summary is a broadcast layer.
+     * @param line Line to check.
+     * @return True if layer is broadcast layer.
+     */
     private static boolean isBroadcastLayer(String line) {
         Pattern p = Pattern.compile(broadcastLayerRegex);
         Matcher m = p.matcher(line);
@@ -101,6 +122,12 @@ public class KerasModelConverter {
         return m.matches();
     }
 
+    /**
+     * Gets the width/height of the supplied broadcast layer.
+     * @param layerName Layer name to check
+     * @return Width of layer.
+     * @throws Exception If we couldn't find the width in the supplied layername.
+     */
     private static int getWidth(String layerName) throws Exception {
         Pattern p = Pattern.compile(broadcastLayerRegex);
         Matcher m = p.matcher(layerName);
@@ -112,6 +139,10 @@ public class KerasModelConverter {
         throw new Exception("Couldn't find width in layerName " + layerName);
     }
 
+    /**
+     * Register lambda layers for the given model summaries.
+     * @throws Exception File exception.
+     */
     private static void loadLambdaLayers() throws Exception {
         File[] modelSummaries = new File(modelSummariesPath).listFiles();
         assert modelSummaries != null;

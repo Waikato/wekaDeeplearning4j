@@ -6,11 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.EfficientNet;
 
+/**
+ * Wrapper class for Keras version of EfficientNet.
+ */
 public class KerasEfficientNet extends AbstractZooModel {
+
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = -7261085237958094389L;
 
+    /**
+     * Desired version of the model.
+     */
     private EfficientNet.VARIATION variation = EfficientNet.VARIATION.EFFICIENTNET_B0;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasEfficientNet() {
         setVariation(EfficientNet.VARIATION.EFFICIENTNET_B0);
         setPretrainedType(PretrainedType.IMAGENET);

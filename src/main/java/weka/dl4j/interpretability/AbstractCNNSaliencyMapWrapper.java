@@ -34,27 +34,60 @@ public abstract class AbstractCNNSaliencyMapWrapper implements Serializable, Opt
      */
     protected ProgressManager progressManager;
 
+    /**
+     * Batch size for generating the saliency map.
+     */
     protected int batchSize = 1;
 
+    /**
+     * IDs of the classes we want to generate heatmaps for.
+     */
     protected int[] targetClassIDs = new int[] {-1};
 
+    /**
+     * File to save heatmap image to.
+     */
     protected File outputFile = new File(Utils.defaultFileLocation());
 
+    /**
+     * Should we normalize the heatmap.
+     */
     protected boolean normalizeHeatmap = true;
 
+    /**
+     * Classmap to match with target classes.
+     */
     protected String[] classMap;
 
     /**
-     * Model used for feature extraction
+     * Model used for feature extraction.
      */
     protected Dl4jMlpClassifier dl4jMlpClassifier;
 
+    /**
+     * Custom model settings, to be used when running on a custom-trained model.
+     */
     protected CustomModelSetup customModelSetup = new CustomModelSetup();
 
+    /**
+     * Main processing entrypoint. Takes an image as input, and performs the necessary
+     * processing on it. Note that this is performed separately to the actual saliency map
+     * generation. This method should only perform the expensive one-time processing on an image.
+     * @param imageFile Image to process heatmap for.
+     */
     public abstract void processImage(File imageFile);
 
+    /**
+     * Generates heatmaps, returning a human-viewable heatmap summary.
+     * @return Human-viewable heatmap summary.
+     */
     public abstract BufferedImage generateHeatmapToImage();
 
+
+    /**
+     * Save the supplied composite image to a file.
+     * @param completeCompositeImage Image to save.
+     */
     public void saveResult(BufferedImage completeCompositeImage) {
         if (Utils.notDefaultFileLocation(getOutputFile())) {
             log.info(String.format("Output file location = %s", getOutputFile()));

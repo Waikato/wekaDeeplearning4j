@@ -37,8 +37,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * Test class for helper functions in Utils.
+ */
 public class UtilsTest {
 
+  /**
+   * Check the Instances get created correctly.
+   * @throws Exception Exception
+   */
   @Test
   public void testInstancesToDataSet() throws Exception {
     final Instances data = TestUtil.makeTestDataset(
@@ -64,6 +71,9 @@ public class UtilsTest {
     }
   }
 
+  /**
+   * Ensure Copy Nominal Attribute copies correctly.
+   */
   @Test
   public void copyNominalAttribute_CopiesCorrectly() {
     // Arrange
@@ -84,6 +94,9 @@ public class UtilsTest {
     Assert.assertArrayEquals(attributeValues.toArray(), duplicateValues.toArray());
   }
 
+  /**
+   * Ensures attribute name matches what's expected.
+   */
   @Test
   public void getAttributeName_Index0_IsLayer1() {
     // Arrange
@@ -96,6 +109,9 @@ public class UtilsTest {
     Assert.assertEquals("layer1-0", layerName);
   }
 
+  /**
+   * Ensures attribute name matches what's expected.
+   */
   @Test
   public void getAttributeName_Index255_IsLayer1() {
     // Arrange
@@ -108,6 +124,9 @@ public class UtilsTest {
     Assert.assertEquals("layer1-255", layerName);
   }
 
+  /**
+   * Ensure layer index rolls over on new layer.
+   */
   @Test
   public void getAttributeName_Index256_IsLayer2() {
     // Arrange
@@ -120,6 +139,9 @@ public class UtilsTest {
     Assert.assertEquals("layer2-0", layerName);
   }
 
+  /**
+   * Ensure correct layer name.
+   */
   @Test
   public void getAttributeName_Index319_IsLayer2() {
     // Arrange
@@ -132,6 +154,9 @@ public class UtilsTest {
     Assert.assertEquals("layer2-63", layerName);
   }
 
+  /**
+   * Ensure invalid layer index returns null.
+   */
   @Test
   public void getAttributeName_OutofIndex_IsNull() {
     // Arrange
@@ -144,6 +169,9 @@ public class UtilsTest {
     Assert.assertNull(layerName);
   }
 
+  /**
+   * Ensures we get the expected default attribute name.
+   */
   @Test
   public void getAttributeName_NoLayerMap_transformedAttribute() {
     // Arrange
@@ -155,6 +183,9 @@ public class UtilsTest {
     Assert.assertEquals("transformedAttribute256", layerName);
   }
 
+  /**
+   * Check that 2d activations don't need reshaping.
+   */
   @Test
   public void needsReshaping_2d_isFalse() {
     // Arrange
@@ -164,6 +195,9 @@ public class UtilsTest {
     Assert.assertFalse(Utils.needsReshaping(activations));
   }
 
+  /**
+   * Check that 3d activations do need reshaping.
+   */
   @Test
   public void needsReshaping_3d_isTrue() {
     // Arrange
@@ -173,6 +207,9 @@ public class UtilsTest {
     Assert.assertTrue(Utils.needsReshaping(activations));
   }
 
+  /**
+   * Check that 4d activations need reshaping.
+   */
   @Test
   public void needsReshaping_4d_isTrue() {
     // Arrange
@@ -182,6 +219,9 @@ public class UtilsTest {
     Assert.assertTrue(Utils.needsReshaping(activations));
   }
 
+  /**
+   * Check that the max pooling works as expected.
+   */
   @Test
   public void poolNDArray_Max_IsMax() {
     // Arrange
@@ -191,6 +231,9 @@ public class UtilsTest {
     Assert.assertEquals(5, (int) Utils.poolNDArray(ndArray, PoolingType.MAX));
   }
 
+  /**
+   * Check that the average pooling works as expected.
+   */
   @Test
   public void poolNDArray_Avg_IsAvg() {
     // Arrange
@@ -200,6 +243,9 @@ public class UtilsTest {
     Assert.assertEquals(1.125, Utils.poolNDArray(ndArray, PoolingType.AVG), 0.01);
   }
 
+  /**
+   * Check that the sum pooling works as expected.
+   */
   @Test
   public void poolNDArray_Sum_IsSum() {
     // Arrange
@@ -209,6 +255,9 @@ public class UtilsTest {
     Assert.assertEquals(9, (int) Utils.poolNDArray(ndArray, PoolingType.SUM));
   }
 
+  /**
+   * Check that the min pooling works as expected.
+   */
   @Test
   public void poolNDArray_Min_IsMin() {
     // Arrange
@@ -218,6 +267,9 @@ public class UtilsTest {
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.MIN));
   }
 
+  /**
+   * Check that the PNorm pooling throws an error.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void poolNDArray_PNorm_throwsException() {
     // Arrange
@@ -227,6 +279,9 @@ public class UtilsTest {
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.PNORM));
   }
 
+  /**
+   * Check that exception is thrown when trying to pool with None type.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void poolNDArray_None_throwsException() {
     // Arrange
@@ -236,6 +291,9 @@ public class UtilsTest {
     Assert.assertEquals(-2, (int) Utils.poolNDArray(ndArray, PoolingType.NONE));
   }
 
+  /**
+   * Check that method correctly detects channels last.
+   */
   @Test()
   public void isChannelsLast_TrueForChannelsLast() {
     // Arrange
@@ -245,6 +303,9 @@ public class UtilsTest {
     Assert.assertTrue(Utils.isChannelsLast(ndArray));
   }
 
+  /**
+   * Check that method correctly detects channels last.
+   */
   @Test()
   public void isChannelsLast_FalseForChannelsFirst() {
     // Arrange
@@ -254,6 +315,9 @@ public class UtilsTest {
     Assert.assertFalse(Utils.isChannelsLast(ndArray));
   }
 
+  /**
+   * Check that NONE pooling works as expected.
+   */
   @Test()
   public void reshapeActivations_NoPooling_IsReshaped() {
     // Arrange
@@ -270,6 +334,9 @@ public class UtilsTest {
     Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
   }
 
+  /**
+   * Check that max pooling works as expected for reshaping.
+   */
   @Test()
   public void reshapeActivations_Max_IsPooled() {
     // Arrange
@@ -286,6 +353,9 @@ public class UtilsTest {
     Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
   }
 
+  /**
+   * Check that average pooling works as expected for reshaping.
+   */
   @Test()
   public void reshapeActivations_Avg_IsPooled() {
     // Arrange
@@ -301,6 +371,9 @@ public class UtilsTest {
     Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
   }
 
+  /**
+   * Check that sum pooling works as expected for reshaping.
+   */
   @Test()
   public void reshapeActivations_Sum_IsPooled() {
     // Arrange
@@ -316,6 +389,9 @@ public class UtilsTest {
     Assert.assertEquals(20480, reshapedActivations.maxNumber().intValue());
   }
 
+  /**
+   * Check that min pooling works as expected for reshaping.
+   */
   @Test()
   public void reshapeActivations_Min_IsPooled() {
     // Arrange
@@ -331,6 +407,10 @@ public class UtilsTest {
     Assert.assertEquals(5, reshapedActivations.maxNumber().intValue());
   }
 
+  /**
+   * Check that correct classes get appended to activations.
+   * @throws Exception File exception
+   */
   @Test()
   public void appendClasses_AttachesCorrectClasses() throws Exception {
     // Arrange
@@ -371,6 +451,9 @@ public class UtilsTest {
     }
   }
 
+  /**
+   * Check notDefaultFileLocation works for  custom file.
+   */
   @Test
   public void notDefaultFileLocation_True_ForNewFile() {
     // Arrange
@@ -380,6 +463,9 @@ public class UtilsTest {
     Assert.assertTrue(Utils.notDefaultFileLocation(selectedFile));
   }
 
+  /**
+   * Check notDefaultFileLocation works for weka package home.
+   */
   @Test
   public void notDefaultFileLocation_False_ForDefaultFile() {
     // Arrange
@@ -389,6 +475,9 @@ public class UtilsTest {
     Assert.assertFalse(Utils.notDefaultFileLocation(selectedFile));
   }
 
+  /**
+   * Check DecodeCNNShape decodes as expected.
+   */
   @Test
   public void decodeCNNShape_channelsFirst() {
     // Arrange
@@ -406,6 +495,9 @@ public class UtilsTest {
     Assert.assertEquals(CNN2DFormat.NCHW, decodedShape.getFormat());
   }
 
+  /**
+   * Check DecodeCNNShape decodes as expected.
+   */
   @Test
   public void decodeCNNShape_channelsLast() {
     // Arrange
@@ -423,6 +515,9 @@ public class UtilsTest {
     Assert.assertEquals(CNN2DFormat.NCHW, decodedShape.getFormat());
   }
 
+  /**
+   * Check DecodeCNNShape decodes as expected.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void decodeCNNShape_withBatchSize_ThrowsIllegalArgumentException() {
     // Arrange
@@ -435,6 +530,9 @@ public class UtilsTest {
     Utils.decodeCNNShape(cnnShape);
   }
 
+  /**
+   * Check DecodeCNNShape decodes as expected.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void decodeCNNShape_withBadOrder_ThrowsIllegalArgumentException() {
     // Arrange
@@ -446,6 +544,9 @@ public class UtilsTest {
     Utils.decodeCNNShape(cnnShape);
   }
 
+  /**
+   * Check DecodeCNNShape decodes as expected.
+   */
   @Test(expected = IndexOutOfBoundsException.class)
   public void decodeCNNShape_with2dshape_ThrowsIndexOutOfBoundsException() {
     // Arrange

@@ -38,6 +38,10 @@ import static org.junit.Assert.assertTrue;
 @Log4j2
 public class ImageDirectoryLoaderTest {
 
+  /**
+   * Load a tiny version of the plant seedlings dataset.
+   * @return Plant seedlings instances.
+   */
   public static Instances loadPlantSeedlings() {
     ImageDirectoryLoader loader = new ImageDirectoryLoader();
     loader.setInputDirectory(new File(DatasetLoader.FILE_PATH_PLANT_SEEDLINGS));
@@ -46,6 +50,10 @@ public class ImageDirectoryLoaderTest {
     return inst;
   }
 
+  /**
+   * Load a small dataset of .tiff images.
+   * @return Tiff dataset of images.
+   */
   public static Instances loadTiffDataset() {
     ImageDirectoryLoader loader = new ImageDirectoryLoader();
     loader.setInputDirectory(new File(DatasetLoader.FILE_PATH_TIFF_DATASET));
@@ -55,7 +63,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the IDL loads all classes from the plant-seedlings dataset
+   * Check that the IDL loads all classes from the plant-seedlings dataset.
    */
   @Test
   public void testPlantSeedlings_IDLNumClasses() {
@@ -64,7 +72,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the IDL loads all instances
+   * Check that the IDL loads all instances.
    */
   @Test
   public void testPlantSeedlings_IDLNumInstances() {
@@ -73,7 +81,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the loaded instances have the correct number of attributes (2)
+   * Check that the loaded instances have the correct number of attributes (2).
    */
   @Test
   public void testPlantSeedlings_IDLNumAttributes() {
@@ -82,7 +90,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the first attribute is a string (filepath) and the second is nominal (image classification)
+   * Check that the first attribute is a string (filepath) and the second is nominal (image classification).
    */
   @Test
   public void testPlantSeedlings_IDLAttributes() {
@@ -92,7 +100,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the IDL loads all classes from the plant-seedlings dataset
+   * Check that the IDL loads all classes from the plant-seedlings dataset.
    */
   @Test
   public void testTiffDataset_IDLNumClasses() {
@@ -101,7 +109,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the IDL loads all instances
+   * Check that the IDL loads all instances.
    */
   @Test
   public void testTiffDataset_IDLNumInstances() {
@@ -110,7 +118,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the loaded instances have the correct number of attributes (2)
+   * Check that the loaded instances have the correct number of attributes (2).
    */
   @Test
   public void testTiffDataset_IDLNumAttributes() {
@@ -119,7 +127,7 @@ public class ImageDirectoryLoaderTest {
   }
 
   /**
-   * Check that the first attribute is a string (filepath) and the second is nominal (image classification)
+   * Check that the first attribute is a string (filepath) and the second is nominal (image classification).
    */
   @Test
   public void testTiffDataset_IDLAttributes() {

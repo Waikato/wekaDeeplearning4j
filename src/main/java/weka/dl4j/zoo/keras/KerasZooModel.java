@@ -37,12 +37,26 @@ import java.util.zip.Checksum;
 @Log4j2
 public abstract class KerasZooModel extends ZooModel implements Serializable {
 
+    /**
+     * Unique version of class.
+     */
     private static final long serialVersionUID = -7117367016579062724L;
 
+    /**
+     * Default input shape.
+     */
     protected int[] inputShape;
 
+    /**
+     * Get the model family.
+     * @return String denoting the model family
+     */
     public abstract String modelFamily();
 
+    /**
+     * Get the pretty name of the model (e.g., ResNet 50)
+     * @return Model name.
+     */
     public abstract String modelPrettyName();
 
     public abstract void setVariation(Enum variation);

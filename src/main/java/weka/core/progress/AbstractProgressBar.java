@@ -4,14 +4,14 @@ import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Handles common tasks between the GUI and Command line progress bar
+ * Handles common tasks between the GUI and Command line progress bar.
  */
 public abstract class AbstractProgressBar implements Serializable {
 
-    /** Is the progress bar set to indeterminate mode? */
+    /** Is the progress bar set to indeterminate mode?. */
     protected boolean m_indeterminate = false;
 
-    /** Progress message, set by the user */
+    /** Progress message, set by the user. */
     protected String m_progressMessage;
 
     /** Actual progress value (e.g., 25) */
@@ -23,21 +23,24 @@ public abstract class AbstractProgressBar implements Serializable {
     /** Normalized progress value (e.g., 0.5) */
     protected double m_normalizedProgress = 0;
 
-    /** Estimated time remaining for the current task */
+    /** Estimated time remaining for the current task. */
     protected String etaHms = "";
 
-    /** Time the progress manager was started on (used for calculating ETA) */
+    /** Time the progress manager was started on (used for calculating ETA). */
     protected long startTime;
 
-    public AbstractProgressBar() { }
-
+    /**
+     * Create a new progress bar.
+     * @param maxProgress Max progress the bar can reach.
+     * @param progressMessage Message to display.
+     */
     public AbstractProgressBar(double maxProgress, String progressMessage) {
         setMaxProgress(maxProgress);
         setProgressMessage(progressMessage);
     }
 
     /**
-     * Initialize all values to 0 and start the progress manager
+     * Initialize all values to 0 and start the progress manager.
      */
     public void start() {
         m_normalizedProgress = 0;
@@ -54,12 +57,12 @@ public abstract class AbstractProgressBar implements Serializable {
     protected abstract void onStart();
 
     /**
-     * Update the progress bar with the current value
+     * Update the progress bar with the current value.
      */
     protected abstract void onSetProgress();
 
     /**
-     * Helper methods so consumers don't need to keep track of iterations
+     * Helper methods so consumers don't need to keep track of iterations.
      */
     public void increment() {
         setProgress(m_actualProgress + 1);
@@ -71,12 +74,12 @@ public abstract class AbstractProgressBar implements Serializable {
     public abstract void finish();
 
     /**
-     * Update the progress bar display
+     * Update the progress bar display.
      */
     public abstract void refreshDisplay();
 
     /**
-     * Calculates the normalized progress and ETA
+     * Calculates the normalized progress and ETA.
      */
     private void calculate() {
         m_normalizedProgress = m_actualProgress / m_maxProgress;

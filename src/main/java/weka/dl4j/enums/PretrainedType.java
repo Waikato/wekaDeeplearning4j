@@ -28,7 +28,22 @@ import weka.dl4j.ApiWrapper;
  * @author Rhys Compton
  */
 public enum PretrainedType implements ApiWrapper<org.deeplearning4j.zoo.PretrainedType> {
-  IMAGENET, MNIST, VGGFACE, NONE;
+  /**
+   * Pretrained on ImageNet
+   */
+  IMAGENET,
+  /**
+   * Pretrained on MNIST.
+   */
+  MNIST,
+  /**
+   * Pretrained on VGGFace.
+   */
+  VGGFACE,
+  /**
+   * Not pretrained.
+   */
+  NONE;
 
   /**
    * Parse backend pooling type and return weka enum implementation.

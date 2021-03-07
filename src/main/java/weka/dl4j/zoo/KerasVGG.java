@@ -6,12 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.VGG;
 
+/**
+ * Wrapper class for Keras version of VGG.
+ */
 public class KerasVGG extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = 4745962510013669482L;
 
+    /**
+     * Desired version of the model.
+     */
     private VGG.VARIATION variation = VGG.VARIATION.VGG16;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasVGG() {
         setVariation(VGG.VARIATION.VGG16);
         setPretrainedType(PretrainedType.IMAGENET);
