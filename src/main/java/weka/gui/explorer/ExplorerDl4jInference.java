@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import weka.core.*;
 
+import weka.dl4j.IsGPUAvailable;
 import weka.dl4j.inference.Dl4jCNNExplorer;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
@@ -80,6 +81,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
 
     /** Click to view Saliency Map. */
     protected JButton m_saliencyMapButton = new JButton("View Saliency Map...");
+
+    /** Click to see if GPU is available. */
+    protected JButton m_gpuAvailableButton = new JButton("Check GPU Available...");
 
     /** A thread that classification runs in. */
     protected Thread m_RunThread;
@@ -212,6 +216,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_OpenImageButton.setToolTipText("Open an image for prediction");
         m_startButton.setToolTipText("Run prediction on the image");
         m_saliencyMapButton.setToolTipText("View the saliency map for this image and model");
+        m_gpuAvailableButton.setToolTipText("Check whether WDL4J can recognize your machine's GPU");
     }
 
     /**
@@ -229,6 +234,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_startButton.addActionListener(e -> startPrediction());
         m_stopButton.addActionListener(e -> stopPrediction());
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
+        m_gpuAvailableButton.addActionListener(e -> openGPUAvailableWindow());
 
         _refreshButtonsEnabled();
     }
@@ -278,6 +284,16 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbC.insets = new Insets(0, 10, 10, 10);
         gbL.setConstraints(m_saliencyMapButton, gbC);
         optionsPanel.add(m_saliencyMapButton);
+
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.fill = GridBagConstraints.HORIZONTAL;
+        gbC.gridy = 3;
+        gbC.gridx = 0;
+        gbC.weightx = 100;
+        gbC.insets = new Insets(0, 10, 10, 10);
+        gbL.setConstraints(m_gpuAvailableButton, gbC);
+        optionsPanel.add(m_gpuAvailableButton);
 
         return optionsPanel;
     }
@@ -421,6 +437,16 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
      */
     private void openSaliencyMapWindow() {
         saliencyMapWindow.open(processedExplorer);
+    }
+
+    /**
+     * Check for GPU availability
+     */
+    private void openGPUAvailableWindow() {
+        JOptionPane.showMessageDialog(this,
+                new IsGPUAvailable().check(),
+                "Is GPU Available",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
