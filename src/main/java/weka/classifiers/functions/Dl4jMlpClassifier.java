@@ -960,11 +960,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected void initParallelWrapperIfApplicable() {
 
-    Nd4jBackend b = Nd4j.getBackend();
-    if (b != null) {
-      gpuBackendAvailable = b.getClass().getCanonicalName()
-          .toLowerCase().contains("jcublas");
-    }
+    gpuBackendAvailable = new IsGPUAvailable().check();
 
     // only configure if the gpu backend is available and the user has requested
     // more than one gpus
