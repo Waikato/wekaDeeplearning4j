@@ -2,15 +2,46 @@ package weka.dl4j;
 
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
-import weka.core.CommandlineRunnable;
-import weka.core.Option;
-import weka.core.OptionHandler;
+import weka.core.*;
 import weka.core.Utils;
 import weka.core.converters.AbstractFileLoader;
+import weka.gui.GUIChooser;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Enumeration;
+import java.util.Set;
 
-public class IsGPUAvailable implements CommandlineRunnable, OptionHandler {
+public class IsGPUAvailable extends JPanel implements CommandlineRunnable, OptionHandler, GUIChooser.GUIChooserMenuPlugin {
+
+    JLabel outputLabel = new JLabel(".....");
+    JButton checkButton = new JButton("Check...");
+
+    public IsGPUAvailable() {
+        Font f = new Font(outputLabel.getName(), Font.PLAIN, 32);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10,10,10,10);
+
+        outputLabel.setFont(f);
+        add(outputLabel, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10,10,10,10);
+        gbc.gridy = 1;
+        checkButton.addActionListener(e -> checkGUI());
+        add(checkButton, gbc);
+
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
+    private void checkGUI() {
+        boolean result = check();
+
+        String decider = result ? "" : "not";
+
+        outputLabel.setText(String.format("%b: GPU %s available", result, decider));
+    }
 
     /**
      * Main Entrypoint: Check whether WekaDeeplearning4j can detect a GPU backend.
@@ -96,5 +127,25 @@ public class IsGPUAvailable implements CommandlineRunnable, OptionHandler {
     @Override
     public String[] getOptions() {
         return Option.getOptions(this, IsGPUAvailable.class);
+    }
+
+    @Override
+    public String getApplicationName() {
+        return "WekaDeeplearning4j: Is GPU Available?";
+    }
+
+    @Override
+    public Menu getMenuToDisplayIn() {
+        return Menu.TOOLS;
+    }
+
+    @Override
+    public String getMenuEntryText() {
+        return "Is GPU Available";
+    }
+
+    @Override
+    public JMenuBar getMenuBar() {
+        return null;
     }
 }
