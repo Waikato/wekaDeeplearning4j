@@ -2,6 +2,7 @@ package weka.dl4j;
 
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.factory.Nd4jBackend;
+import weka.classifiers.functions.Dl4jMlpClassifier;
 import weka.core.*;
 import weka.core.Utils;
 import weka.core.converters.AbstractFileLoader;
@@ -9,6 +10,8 @@ import weka.gui.GUIChooser;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Set;
 
@@ -50,11 +53,22 @@ public class IsGPUAvailable extends JPanel implements CommandlineRunnable, Optio
     public boolean check() {
         boolean result = false;
 
-        Nd4jBackend b = Nd4j.getBackend();
-        if (b != null) {
-            String backend = b.getClass().getCanonicalName().toLowerCase();
-            System.out.printf("Backend is: %s \n", backend);
-            result = backend.contains("jcublas");
+        // Must use classloader, otherwise Nd4j backend doesn't get loaded properly
+
+        ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(
+                    this.getClass().getClassLoader());
+
+            Nd4jBackend b = Nd4j.getBackend();
+            if (b != null) {
+                String backend = b.getClass().getCanonicalName().toLowerCase();
+                System.out.printf("Backend is: %s \n", backend);
+                result = backend.contains("jcublas");
+            }
+
+        } finally {
+            Thread.currentThread().setContextClassLoader(origLoader);
         }
 
         return result;
