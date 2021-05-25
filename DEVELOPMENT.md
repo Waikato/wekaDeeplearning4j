@@ -7,6 +7,28 @@ This document provides information that are specific to the development of Wekad
 - `Utils.getNext(DataSetIterator, int)` - If using a `DataSetIterator`, make sure you use this wrapper method in `Utils`
 instead of simply calling `DataSetIterator.next()`.
 - `Utils.defaultFileLocation()` - If making a class with a `File` parameter, use this as the default filepath value.
+
+## Classloader
+
+One error you may encounter is a `BackendNotFoundException`, when making a call to some `Dl4j`/`Nd4j` code, e.g.:
+```java
+Nd4jBackend b = Nd4jBackend();
+```
+
+If you encounter this error, you may need to explicitly set the `Classloader`; don't forget to reset it after the code block e.g.:
+
+```java
+// Must use classloader, otherwise Nd4j backend doesn't get loaded properly
+ClassLoader origLoader = Thread.currentThread().getContextClassLoader();
+try {
+    Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+
+    Nd4jBackend b = Nd4j.getBackend();
+} finally {
+    Thread.currentThread().setContextClassLoader(origLoader);
+}
+```
+
 ## Publish a new Release
 
 See the [RELEASE.md](./RELEASE.md) documentation.
