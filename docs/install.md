@@ -94,7 +94,7 @@ in your CLASSPATH, however, means that the IDE cannot type-check the arguments.
 
 ##### Java examples with reflection
 * [Classifying a Custom Dataset](examples/train_cnn.md)
-* [Image Feature Extraction](examples/featurize-mnist.md)
+* [Image Feature Extraction](examples/feature_extraction.md)
 
 
 # Using WekaDeeplearning4j in a Maven Project

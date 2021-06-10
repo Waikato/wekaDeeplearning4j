@@ -16,6 +16,6 @@ nav:
         - 'Introduction': 'examples/introduction.md'
         - 'Training a CNN': 'examples/train_cnn.md'
         - 'Training an RNN': 'examples/train_rnn.md'
-        - 'Image Feature Extraction': 'examples/featurize-mnist.md'
+        - 'Image Feature Extraction': 'examples/feature_extraction.md'
         - 'Dl4j Inference': 'examples/dl4j-inference.md'
     - Troubleshooting: troubleshooting.md
