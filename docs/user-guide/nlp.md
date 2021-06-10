@@ -12,7 +12,7 @@ A few important things to keep in mind when building a CNN on text data:
 - `ConvolutionMode` of each `ConvolutionLayer` must be set to `SAME`
 - The list of `ConvolutionLayer` must be followed by a `GlobalPoolingLayer`
 
-See also: [Java Examples](../examples/classifying-imdb.md#java-cnn)
+See also: [Java Examples](../examples/train_rnn.md#java-cnn)
 
 Use the `CnnTextEmbeddingInstanceIterator` or `CnnTextFilesEmbeddingInstanceIterator` accordingly.
 

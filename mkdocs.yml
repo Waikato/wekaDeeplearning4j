@@ -14,10 +14,10 @@ nav:
         - 'Progress Manager': 'user-guide/progress-manager.md'
     - Examples:
         - 'Introduction': 'examples/introduction.md'
+        - 'Training an RNN': 'examples/train_rnn.md'
         - 'Image Feature Extraction': 'examples/featurize-mnist.md'
         - 'Dl4j Inference': 'examples/dl4j-inference.md'
         - 'Classifying a Custom Dataset': 'examples/classifying-your-own.md'
         - 'Classifying the MNIST Dataset': 'examples/classifying-mnist.md'
         - 'Classifying the Iris Dataset': 'examples/classifying-iris.md'
-        - 'Classifying the IMDB Dataset': 'examples/classifying-imdb.md'
     - Troubleshooting: troubleshooting.md

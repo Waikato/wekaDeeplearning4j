@@ -1,9 +1,8 @@
-# The IMDB Dataset
+# Training an RNN - The IMDB Dataset
 
 As of [ai.stanford.edu](http://ai.stanford.edu/~amaas/data/sentiment/):
 
 > This is a dataset for binary sentiment classification containing substantially more data than previous benchmark datasets. We provide a set of 25,000 highly polar movie reviews for training, and 25,000 for testing. There is additional unlabeled data for use as well. Raw text and already processed bag of words formats are provided. See the README file contained in the release for more details.
-
 
 The full IMDB dataset in the ARFF format can be found [here](https://sourceforge.net/projects/weka/files/datasets/text-datasets/imdb-sentiment-2011.arff.gz/download).
 
@@ -62,7 +61,7 @@ clf.buildClassifier(data);
 ```
 
 ## Java CNN
-Below is an example building a CNN with two `ConvolutionLayer` that are automatically merged as described [here](../user-guide/nlp.md#using-convolutional-neural-networks) afterwards. 
+Below is an example building a CNN with two `ConvolutionLayer` that are automatically merged as described [here](../user-guide/nlp.md#using-convolutional-neural-networks) afterwards.
 ```java
 
 // Embedding vector size
