@@ -36,7 +36,7 @@ the Model Zoo, so it can be used to verify your model's prediction capabilities
 or simply play around with pretrained models and explore what state-of-the-art 
 architectures may work best for your domain.
 
-Check out the [usage example](examples/dl4j-inference.md) 
+Check out the [usage example](examples/inference.md) 
 to see how easy it is to get started.
 
 ### Saliency Map Generation with ScoreCAM
@@ -47,7 +47,7 @@ but look at *what* in the image your model was using for prediction.
 This can be invoked from the command-line, although the best user experience is to be had from the GUI using the 
 **Saliency Map Viewer**, which allows you to quickly customize the ScoreCAM target classes.
 
-Check out the [usage example](examples/dl4j-inference.md#example-4-saliency-map-generation) 
+Check out the [usage example](examples/inference.md#saliency-map-generation) 
 to see what new insights can be brought to your workflow.
 
 ### Progress Manager
