@@ -13,6 +13,7 @@ nav:
         - 'Natural Language Processing': 'user-guide/nlp.md'
         - 'Progress Manager': 'user-guide/progress-manager.md'
     - Examples:
+        - 'Introduction': 'examples/introduction.md'
         - 'Image Feature Extraction': 'examples/featurize-mnist.md'
         - 'Dl4j Inference': 'examples/dl4j-inference.md'
         - 'Classifying a Custom Dataset': 'examples/classifying-your-own.md'
