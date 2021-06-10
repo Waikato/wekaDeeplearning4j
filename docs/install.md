@@ -93,7 +93,7 @@ loads this library at runtime. This has the benefit of not needing to include th
 in your CLASSPATH, however, means that the IDE cannot type-check the arguments. 
 
 ##### Java examples with reflection
-* [Classifying a Custom Dataset](examples/classifying-your-own.md)
+* [Classifying a Custom Dataset](examples/train_cnn.md)
 * [Image Feature Extraction](examples/featurize-mnist.md)
 
 

@@ -49,7 +49,7 @@ KerasResNet kerasResNet = new KerasResNet();
 kerasResNet.setVariation(ResNet.VARIATION.RESNET152V2);
 ```
 
-View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/classifying-your-own.md)
+View the [featurizing tutorial](../examples/featurize-mnist.md) and the [finetuning tutorial](../examples/train_cnn.md)
 for usage examples with the model zoo.
 
 ### Image Instance Iterator

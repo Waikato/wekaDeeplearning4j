@@ -116,7 +116,7 @@ ben_stiller.jpg - Dl4jVGG (VGG16)
 Although a very diverse dataset (IMAGENET) was used to train many of the built-in zoo models 
 (meaning they can perform accurate prediction in a wide range of domains), 
 you may instead have a custom-trained `Dl4jMlpClassifier` 
-(e.g., using [this tutorial](classifying-mnist.md), refer to image below on model saving)
+(e.g., using [this tutorial](train_cnn.md), refer to image below on model saving)
 which you'd like to experiment with; the process is largely the same as above, with a few minor changes.
 
 ![Saving a Dl4jMlpClassifier](../img/inference/Explorer_saveModel.png)
