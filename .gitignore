@@ -187,3 +187,5 @@ dl4j_format
 .vscode
 
 *.h5
+
+*.DS_STORE
