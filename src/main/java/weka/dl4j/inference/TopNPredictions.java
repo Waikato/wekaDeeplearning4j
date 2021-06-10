@@ -7,50 +7,58 @@ import weka.core.WekaException;
 import java.util.Arrays;
 
 /**
- * Holds an arbitrary number of predictions, ordered by class probability
+ * Holds an arbitrary number of predictions, ordered by class probability.
  * @author - Rhys Compton
  */
 public class TopNPredictions {
 
     /**
-     * Number of predictions to hold
+     * Number of predictions to hold.
      */
     protected int n = 5;
 
     /**
-     * Predictions, ordered by class probability
+     * Predictions, ordered by class probability.
      */
     protected Prediction[] topNPredictions;
 
     /**
-     * Name of the image used for prediction
+     * Name of the image used for prediction.
      */
     protected String imageName = "";
 
     /**
-     * Name of the model used for prediction
+     * Name of the model used for prediction.
      */
     protected String modelName = "";
 
+    /**
+     * Initialize.
+     */
     public TopNPredictions() { }
 
+    /**
+     * Initialize the top N predictions.
+     * @param imageName Name of image
+     * @param modelName Name of model
+     */
     public TopNPredictions(String imageName, String modelName) {
         this.imageName = imageName;
         this.modelName = modelName;
     }
 
     /**
-     * Initialize the prediction array
+     * Initialize the prediction array.
      */
     protected void initPredArray() {
         this.topNPredictions = new Prediction[n];
     }
 
     /**
-     * Main entrypoint, decodes predictions into a TopNPredictions object
+     * Main entrypoint, decodes predictions into a TopNPredictions object.
      * @param predictions Raw model predictions
      * @param classes Class map
-     * @throws Exception
+     * @throws Exception image exception
      */
     public void process(INDArray predictions, String[] classes) throws Exception {
         initPredArray();
@@ -94,7 +102,7 @@ public class TopNPredictions {
     }
 
     /**
-     * Gets a string representing a <br> with the given breakChar
+     * Gets a string representing a <br> with the given breakChar.
      * @param breakChar Character to repeat
      * @param len Length of the line break
      * @return String of the given length
@@ -104,7 +112,7 @@ public class TopNPredictions {
     }
 
     /**
-     * Return a summary string of the stored predictions
+     * Return a summary string of the stored predictions.
      * @return Results in table format
      */
     public String toSummaryString() {
@@ -112,7 +120,7 @@ public class TopNPredictions {
     }
 
     /**
-     * Return a summary string of the stored predictions, headed with the given image and model name
+     * Return a summary string of the stored predictions, headed with the given image and model name.
      * @param imageName Image used for prediction
      * @param zooModelName Model used for prediction
      * @return Results in table format
@@ -162,7 +170,7 @@ public class TopNPredictions {
     }
 
     /**
-     * Get the indices of the top n highest values from the input array
+     * Get the indices of the top n highest values from the input array.
      * @param array Array to find highest values from
      * @return indices of highest values
      */
@@ -185,13 +193,24 @@ public class TopNPredictions {
     }
 
     /**
-     * Helper class for finding highest indices
+     * Helper class for finding highest indices.
      * @author - Rhys Compton
      */
     private static class IndexValuePair {
+        /**
+         * Index of the value.
+         */
         private final int index;
+        /**
+         * Value.
+         */
         private final double value;
 
+        /**
+         * Initialize the index value pair.
+         * @param index Index
+         * @param value Value
+         */
         public IndexValuePair(int index, double value) {
             this.index = index;
             this.value = value;
@@ -204,8 +223,13 @@ public class TopNPredictions {
         this.n = n;
     }
 
-    public Prediction getPrediction(int n) {
-        return topNPredictions[n];
+    /**
+     * Get the prediction at index i.
+     * @param i Index of prediction to get.
+     * @return Prediction.
+     */
+    public Prediction getPrediction(int i) {
+        return topNPredictions[i];
     }
 
     public Prediction getTopPrediction() {

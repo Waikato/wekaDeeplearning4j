@@ -27,45 +27,49 @@ import java.util.Enumeration;
 public class Dl4jCNNExplorer implements Serializable, OptionHandler, CommandlineRunnable {
 
     /**
-     * Set to true to use the serialized model file, false otherwise
+     * Set to true to use the serialized model file, false otherwise.
      */
     protected boolean useCustomModel = false;
 
 
+    /**
+     * Custom model setup, used if the model is supplying a custom-trained model.
+     */
     protected CustomModelSetup customModelSetup = new CustomModelSetup();
 
     /**
-     * The zoo model to use, if we're not loading from the serialized model file (default)
+     * The zoo model to use, if we're not loading from the serialized model file (default).
      */
     protected AbstractZooModel zooModelType = new Dl4jResNet50();
 
     /**
      * Decodes the prediction IDs to human-readable format
-     * Defaults to a decoder for IMAGENET classes
+     * Defaults to a decoder for IMAGENET classes.
      */
     protected ModelOutputDecoder modelOutputDecoder = new ModelOutputDecoder();
 
     /**
-     * Flag for ScoreCAM saliency map generation
+     * Flag for ScoreCAM saliency map generation.
      */
     protected boolean generateSaliencyMap = false;
 
     /**
-     * Class to generate a saliency map
+     * Class to generate a saliency map.
      */
+
     protected AbstractCNNSaliencyMapWrapper saliencyMapWrapper = new WekaScoreCAM();
     /**
-     * Model used for feature extraction
+     * Model used for feature extraction.
      */
     protected Dl4jMlpClassifier model;
 
     /**
-     * Predictions for the current image
+     * Predictions for the current image.
      */
     protected TopNPredictions currentPredictions;
 
     /**
-     * Initialize the ComputationGraph
+     * Initialize the ComputationGraph.
      * @throws Exception Exceptions from loading the ComputationGraph
      */
     public void init() throws Exception {
@@ -73,12 +77,21 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         model = Dl4jMlpClassifier.loadInferenceModel(customModelSetup.getSerializedModelFile(), zooModelType);
     }
 
+    /**
+     * Check the arguments for the explorer.
+     * @throws WekaException If the user hasn't selected a model file
+     */
     public void checkArgs() throws WekaException {
         // If the user has set use-custom-model to True but not selected their model file
         if (useCustomModel && !Utils.notDefaultFileLocation(customModelSetup.getSerializedModelFile()))
             throw new WekaException("If using a custom model setup, you must select the model file location");
     }
 
+    /**
+     * Checks whether the user has selected the correct ImageNet classmap for Darknet, otherwise will return incorrect
+     * class names.
+     * @return True if the classmap is correctly set.
+     */
     private boolean correctDarknetClassmap() {
         boolean isDarknet = model.getZooModel() instanceof Dl4jDarknet19;
         // Don't need to check if we're not using darknet
@@ -90,9 +103,14 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         if (!isPretrained)
             return true;
 
-        return modelOutputDecoder.getBuiltInClassMap() == ModelOutputDecoder.ClassmapType.DARKNET_IMAGENET;
+        return modelOutputDecoder.getBuiltInClassMap() == ClassmapType.DARKNET_IMAGENET;
     }
 
+    /**
+     * Performs prediction and (optionally) computes a saliency map.
+     * @param imageFile Image to compute.
+     * @throws Exception Exception during prediction.
+     */
     public void processImage(File imageFile) throws Exception {
         // Load the image
         InputType.InputTypeConvolutional inputShape = model.getInputShape(getCustomModelSetup());
@@ -135,10 +153,17 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         saliencyMapWrapper.processImage(imageFile);
     }
 
+    /**
+     * Generate and return the heatmap.
+     * @return Generated heatmap.
+     */
     public BufferedImage generateOutputMap() {
         return saliencyMapWrapper.generateHeatmapToImage();
     }
 
+    /**
+     * Generate the output heatmap, and save to file.
+     */
     public void generateAndSaveOutputMap() {
         BufferedImage output = generateOutputMap();
         saliencyMapWrapper.saveResult(output);
@@ -156,6 +181,9 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
         return currentPredictions;
     }
 
+    /**
+     * Close up all progress managers when we finish processing.
+     */
     public void finishProgress() {
         AbstractCNNSaliencyMapWrapper wrapper = getSaliencyMapWrapper();
         if (wrapper == null)
@@ -275,10 +303,10 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     /**
-     * Run this tool from the command line
+     * Run this tool from the command line.
      * @param toRun Object to run
      * @param options Command line options
-     * @throws Exception
+     * @throws Exception invalid arguments.
      */
     private void commandLineRun(Object toRun, String[] options) throws Exception {
         if (!(toRun instanceof Dl4jCNNExplorer)) {
@@ -338,7 +366,7 @@ public class Dl4jCNNExplorer implements Serializable, OptionHandler, Commandline
     }
 
     /**
-     * Print the usage options to standard err
+     * Print the usage options to standard err.
      */
     private void printInfo() {
         System.err.println("\nUsage:\n" + "\tDl4jCNNExplorer [options]\n"

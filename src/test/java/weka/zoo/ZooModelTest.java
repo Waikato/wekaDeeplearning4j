@@ -44,10 +44,20 @@ import weka.util.DatasetLoader;
 
 import static org.junit.Assert.fail;
 
+/**
+ * Simple helper class to download a model's pretrained weights.
+ */
 class ModelDownloader implements Runnable {
 
+    /**
+     * Zoo model to download for.
+     */
     AbstractZooModel zooModel;
 
+    /**
+     * Initialize class.
+     * @param zooModel Model to download for
+     */
     public ModelDownloader(AbstractZooModel zooModel) {
         this.zooModel = zooModel;
     }
@@ -62,6 +72,7 @@ class ModelDownloader implements Runnable {
  * the models work.
  *
  * @author Steven Lang
+ * @author Rhys Compton
  */
 @Log4j2
 public class ZooModelTest {

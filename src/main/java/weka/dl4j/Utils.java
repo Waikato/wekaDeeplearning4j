@@ -46,9 +46,10 @@ import weka.dl4j.enums.PoolingType;
 import javax.imageio.ImageIO;
 
 /**
- * Utility routines for the Dl4jMlpClassifier
+ * Utility routines for the Dl4jMlpClassifier.
  *
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
+ * @author Rhys Compton
  */
 @Log4j2
 public class Utils {
@@ -99,7 +100,7 @@ public class Utils {
 
   /**
    * Converts a set of training instances to a DataSet prepared for the convolution operation using
-   * the height, width and number of channels
+   * the height, width and number of channels.
    *
    * @param height image height
    * @param width image width
@@ -158,7 +159,7 @@ public class Utils {
   }
 
   /**
-   * Copies the attribute name and values of a given nominal attribute
+   * Copies the attribute name and values of a given nominal attribute.
    * @param oldAttribute attribute to copy
    * @return duplicated nominal attribute
    */
@@ -176,10 +177,10 @@ public class Utils {
    * The attributes are named after the layer they originated from, so this function
    * counts throught the attributes per layer, comparing it with the given index
    * to determine a) which layer the activation came from and b) which number activation
-   * this is
-   * @param attributesPerLayer
-   * @param i
-   * @return
+   * this is.
+   * @param attributesPerLayer Hashmap defining how many attributes there are per layer
+   * @param i Index of layer we're currently looking at.
+   * @return Attribute name for transformed attribute.
    */
   public static String getAttributeName(Map<String, Long> attributesPerLayer, int i) {
     if (attributesPerLayer == null) {
@@ -200,7 +201,7 @@ public class Utils {
   }
 
   /**
-   * Convert an arbitrary NDArray to Weka instances
+   * Convert an arbitrary NDArray to Weka instances.
    *
    * @param ndArray Input array
    * @param inputFormat Format to use for the instances
@@ -339,7 +340,7 @@ public class Utils {
   }
 
   /**
-   * Determines if the activations need reshaping
+   * Determines if the activations need reshaping.
    * @param activationAtLayer Activations in question
    * @return true if the activations need reshaping (too high dimensionality)
    */
@@ -348,7 +349,7 @@ public class Utils {
   }
 
   /**
-   * Applies the pooling function to the given feature map
+   * Applies the pooling function to the given feature map.
    * @param array feature map to pool
    * @param poolingType pooling function to apply
    * @return pooled value
@@ -370,7 +371,7 @@ public class Utils {
 
   /**
    * Shape will either be something like [1, 56, 56, 128] or [1, 128, 56, 56]
-   * If it's the former then return true
+   * If it's the former then return true.
    * @param activations
    * @return true if the activations are in channels-last format
    */
@@ -381,7 +382,7 @@ public class Utils {
   }
 
   /**
-   * Reshape the activations, either by pooling or simply multiplying the extra dimensions together
+   * Reshape the activations, either by pooling or simply multiplying the extra dimensions together.
    * @param activationAtLayer 4d activations e.g., [batch_size, 512, 64, 64]
    * @param poolingType Pooling type to use to lower the dimensionality
    * @return 2D activations
@@ -415,7 +416,7 @@ public class Utils {
   }
 
   /**
-   * Appends the input Instances classes to the INDArray
+   * Appends the input Instances classes to the INDArray.
    * @param result activations
    * @param input original Instances
    * @return activations with class value appended
@@ -430,12 +431,12 @@ public class Utils {
   }
 
   /**
-   * Converts the newly transformed instances to an Instances object
+   * Converts the newly transformed instances to an Instances object.
    * @param result activations generated from feature layers
    * @param input original input Instances
    * @param attributesPerLayer Hashmap stating the feature layers and how many attributes each has
-   * @return
-   * @throws Exception
+   * @return Instances
+   * @throws Exception File exception
    */
   public static Instances convertToInstances(INDArray result, Instances input, Map<String, Long> attributesPerLayer) throws Exception {
     if (result == null) {
@@ -471,7 +472,7 @@ public class Utils {
   }
 
   /**
-   * Checks whether the path exists - a little tidier than the code it wraps
+   * Checks whether the path exists - a little tidier than the code it wraps.
    * @param path Path to check
    * @return True if the path exists, false otherwise
    */
@@ -480,6 +481,7 @@ public class Utils {
   }
 
   /**
+   * Checks if the given file isn't the default file location (i.e., the user has selected a file).
    * @param file File to check
    * @return true if the user has selected a file to load the model from
    */
@@ -489,17 +491,27 @@ public class Utils {
   }
 
   /**
-   * The default location for a file parameter
+   * The default location for a file parameter.
    * @return Default file path
    */
   public static String defaultFileLocation() {
     return WekaPackageManager.getPackageHome().getPath();
   }
 
+  /**
+   * Decode a CNN Input shape.
+   * @param shape Shape to decode
+   * @return Parsed input shape
+   */
   public static InputType.InputTypeConvolutional decodeCNNShape (int[] shape) {
     return decodeCNNShape(Arrays.stream(shape).asLongStream().toArray());
   }
 
+  /**
+   * Decode a CNN Input shape.
+   * @param shape Shape to decode
+   * @return Parsed input shape
+   */
   public static InputType.InputTypeConvolutional decodeCNNShape (long[] shape) {
     long val0 = shape[0];
     long val1 = shape[1];

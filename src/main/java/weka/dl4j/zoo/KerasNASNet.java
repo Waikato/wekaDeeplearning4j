@@ -6,12 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.NASNet;
 
+/**
+ * Wrapper class for Keras version of NASNet.
+ */
 public class KerasNASNet extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = -6046846303686819108L;
 
+    /**
+     * Desired version of the model.
+     */
     private NASNet.VARIATION variation = NASNet.VARIATION.MOBILE;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasNASNet() {
         setVariation(NASNet.VARIATION.MOBILE);
         setPretrainedType(PretrainedType.IMAGENET);

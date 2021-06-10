@@ -77,8 +77,9 @@ import weka.filters.SimpleBatchFilter;
 @Log4j2
 public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, CapabilitiesHandler {
 
-
-
+  /**
+   * Unique ID for version of this class.
+   */
   private static final long serialVersionUID = 1317698787337080580L;
   /**
    * The classifier model this filter is based on.
@@ -86,18 +87,18 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   protected File serializedModelFile = new File(Utils.defaultFileLocation());
 
   /**
-   * The zoo model to use, if we're not loading from the serialized model file
+   * The zoo model to use, if we're not loading from the serialized model file.
    */
   protected AbstractZooModel zooModelType = new Dl4jResNet50();
 
   /**
-   * The image instance iterator to use
+   * The image instance iterator to use.
    */
   protected AbstractInstanceIterator instanceIterator = new DefaultInstanceIterator();
 
   /**
    * The pooling function to use if taking activations from an intermediary convolution layer
-   * (instead of the already-pooled output layer)
+   * (instead of the already-pooled output layer).
    */
   protected PoolingType poolingType = PoolingType.MAX;
 
@@ -107,12 +108,12 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   protected DenseLayer[] transformationLayers = new DenseLayer[] { };
 
   /**
-   * Model used for feature extraction
+   * Model used for feature extraction.
    */
   protected Dl4jMlpClassifier model;
 
   /**
-   * Flag for the GUI to set whether or not default feature extraction layer should be loaded
+   * Flag for the GUI to set whether or not default feature extraction layer should be loaded.
    */
   protected boolean useDefaultFeatureLayer = true;
 
@@ -228,7 +229,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   }
 
   /**
-   * Adds a new transformation layer for the filter to use
+   * Adds a new transformation layer for the filter to use.
    * @param transformationLayerName name of the layer in the model to take activations from
    */
   public void addTransformationLayerName(String transformationLayerName) {
@@ -243,7 +244,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   }
 
   /**
-   * Clear the transformation layers to be used by the filter
+   * Clear the transformation layers to be used by the filter.
    */
   public void clearTransformationLayers() {
     this.transformationLayers = new DenseLayer[] {};
@@ -267,7 +268,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   }
 
   /**
-   * FILTER CODE
+   * FILTER CODE.
    */
 
   public Dl4jMlpFilter() {
@@ -281,6 +282,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   }
 
   /**
+   * Load the model on the data.
    * @param data Sets up the filter by loading the model (either from file or from model zoo)
    * @throws Exception From errors occurring during loading the model file, or from intializing from the data
    */
@@ -289,6 +291,7 @@ public class Dl4jMlpFilter extends SimpleBatchFilter implements OptionHandler, C
   }
 
   /**
+   * Return transformation layer names.
    * @return String[] containing the names of transformation layers this filter is using
    */
   public String[] transformationLayersToNames() {

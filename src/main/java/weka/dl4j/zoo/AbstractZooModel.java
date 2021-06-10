@@ -25,52 +25,55 @@ import java.util.*;
 /**
  * This class contains the logic necessary to load the pretrained weights for a given zoo model
  *
- * It also handles the addition/removal of output layers to enable training the model in DL4J
+ * It also handles the addition/removal of output layers to enable training the model in DL4J.
  * @author Rhys Compton
  */
 @Log4j2
 public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
+    /**
+     * Unique ID for version of class.
+     */
     private static final long serialVersionUID = -4598529061609767660L;
 
     /**
-     * Dataset that the pretrained weights are trained on
+     * Dataset that the pretrained weights are trained on.
      */
     protected PretrainedType m_pretrainedType = PretrainedType.NONE;
     /**
-     * Output layer of the model to be taken off (and replace by our custom output layer)
+     * Output layer of the model to be taken off (and replace by our custom output layer).
      */
     protected String m_outputLayer;
     /**
-     * Feature extraction layer of the model (which we'll attach our output layer to) and use for feature extraction
+     * Feature extraction layer of the model (which we'll attach our output layer to) and use for feature extraction.
      */
     protected String m_featureExtractionLayer;
     /**
-     * Name of the output layer we attach to the end of the model
+     * Name of the output layer we attach to the end of the model.
      */
     protected String m_predictionLayerName = "weka_predictions";
     /**
-     * Names of extraneous layers to completely remove (doesn't keep the weights of them)
+     * Names of extraneous layers to completely remove (doesn't keep the weights of them).
      */
     protected String[] m_extraLayersToRemove = new String[0];
     /**
-     * Number of dimensions of the feature extraction layer
+     * Number of dimensions of the feature extraction layer.
      */
     protected int m_numFExtractOutputs;
     /**
-     * Random seed
+     * Random seed.
      */
     private long seed;
     /**
-     * Number of output labels we want to classify on
+     * Number of output labels we want to classify on.
      */
     private long numLabels;
     /**
-     * Are we loading this model for use as feature extractor (no need to add output layer)
+     * Are we loading this model for use as feature extractor (no need to add output layer).
      */
     protected boolean filterMode;
     /**
-     * Do the activations from featureLayer require pooling (too high dimensionality)
+     * Do the activations from featureLayer require pooling (too high dimensionality).
      */
     protected boolean requiresPooling = false;
     /**
@@ -80,7 +83,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     protected boolean channelsLast = false;
 
     /**
-     * Initialize the ZooModel as MLP
+     * Initialize the ZooModel as MLP.
      *
      * @param numLabels Number of labels to adjust the output
      * @param seed Seed
@@ -124,7 +127,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     public abstract Enum getVariation();
 
     /**
-     * Does the model require input images to be preprocessed?
+     * Does the model require input images to be preprocessed?.
      * @return true if the model input should be rescaled
      */
     public boolean requiresPreProcessing() {
@@ -164,7 +167,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
 
 
     /**
-     *
+     * Initialize the zoo model with the supplied params.
      * @param zooModel Zoo model family to use
      * @param defaultNet Default ComputationGraph to use if loading weights fails
      * @param seed Random seed to initialize with
@@ -213,7 +216,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Final endpoint for ComputationGraph before returning
+     * Final endpoint for ComputationGraph before returning.
      * @param computationGraph Input ComputationGraph
      * @return Finalized ComputationGraph
      */
@@ -223,7 +226,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Checks if we need to add a final output layer - also applies pooling beforehand if necessary
+     * Checks if we need to add a final output layer - also applies pooling beforehand if necessary.
      * @param computationGraph Input ComputationGraph
      * @return Finalized ComputationGraph
      */
@@ -285,6 +288,12 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
                 .build();
     }
 
+    /**
+     * Attempt to download weights for the given model with our pretrained type.
+     * @param zooModel Zoo model to download weights for.
+     * @return Model with initialized weights.
+     * @throws Exception If error occurs during download of weights.
+     */
     private ComputationGraph attemptToDownloadWeights(org.deeplearning4j.zoo.ZooModel zooModel) throws Exception {
         Object pretrained = zooModel.initPretrained(m_pretrainedType.getBackend());
         if (pretrained == null) {
@@ -298,7 +307,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Attempts to download weights for the given zoo model
+     * Attempts to download weights for the given zoo model, repeating numTries times.
      * @param zooModel Model to try download weights for
      * @return new ComputationGraph initialized with the given PretrainedType
      */
@@ -316,7 +325,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * We need a layer with the correct number of outputs
+     * We need a layer with the correct number of outputs.
      * @return Default output layer
      */
     protected OutputLayer createOutputLayer() {
@@ -327,7 +336,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Checks if the zoo model has the specific pretrained type available
+     * Checks if the zoo model has the specific pretrained type available.
      * @param dl4jModelType ZooModel to check
      * @return True if model supports `m_pretrainedType` weights
      */
@@ -347,7 +356,7 @@ public abstract class AbstractZooModel implements OptionHandler, Serializable {
     }
 
     /**
-     * Get all Pretrained types this ZooModel supports
+     * Get all Pretrained types this ZooModel supports.
      * @param zooModel ZooModel to check
      * @return Set of pretrained types the model supports
      */

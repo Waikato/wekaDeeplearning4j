@@ -31,30 +31,30 @@ import java.util.Arrays;
 
 
 /**
- *
+ * Implementation of the ScoreCAM saliency map generation method.
  */
 @Log4j2
 public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
 
     /**
-     * Used for displaying the original image
+     * Used for displaying the original image.
      */
     private INDArray originalImageArr;
 
     /**
      * The image after having preprocessing applied
-     * (passed into the model)
+     * (passed into the model).
      */
     private INDArray preprocessedImageArr;
 
     /**
-     *
+     * Activations after normalization.
      */
     private INDArray normalisedActivations;
 
     /**
      * The final result after running the model on all masked images
-     * Shape = [numActivationMaps, numClasses]
+     * Shape = [numActivationMaps, numClasses].
      */
     private INDArray softmaxOnMaskedImages;
 
@@ -101,6 +101,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return createCompleteCompositeImage(allImages, classPredictions);
     }
 
+    /**
+     * Preprocess the image using the model's scaler.
+     * @param imageArr Apply the model's preprocessing scaler to the input NDArray.
+     * @return Image array with preprocessing applied
+     */
     private INDArray preprocessImage(INDArray imageArr) {
         ImagePreProcessingScaler scaler = getImagePreProcessingScaler();
 
@@ -117,10 +122,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     /**
-     * Run prediction on the class, returning the class probability for the given class ID
+     * Run prediction on the class, returning the class probability for the given class ID.
      * @param imageArr Preprocessed image
      * @param targetClass Class to predict for
-     * @return
+     * @param classMap Class map for the prediction.
+     * @return Prediction.
      */
     private Prediction predictForClass(INDArray imageArr, int targetClass, String[] classMap) {
         // Run the model on the image, then return the prediction for the target class
@@ -133,10 +139,21 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return new Prediction(targetClass, className, classProbability);
     }
 
+    /**
+     * Get the softmax weighting for the given class ID.
+     * @param softmaxOutput The NDArray of model predictions
+     * @param targetClassID Class we want to find the softmax weight for.
+     * @return Target class weights.
+     */
     private INDArray calculateTargetClassWeights(INDArray softmaxOutput, int targetClassID) {
         return softmaxOutput.getColumn(targetClassID).dup();
     }
 
+    /**
+     * Checks if the supplied INDArray is stored in channels last format.
+     * @param in INDArray to check
+     * @return True if of shape like [bs, w, h, c]
+     */
     private boolean isNDArrayChannelsLast(INDArray in) {
         long[] shape = in.shape();
         long minibatch = shape[0];
@@ -148,6 +165,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return val1 == val2 && val2 != val3;
     }
 
+    /**
+     * Handles all permutation logic to ensure the INDArray shape matches the model input shape.
+     * @param in INDarray to permute
+     * @param shouldBeChannelsLast True if arr should be channels last.
+     * @return Correctly permuted array.
+     */
     private INDArray permuteToSuit(INDArray in, boolean shouldBeChannelsLast) {
         // Check if the array we're being passed is is channels last
         boolean inChannelsLast = isNDArrayChannelsLast(in);
@@ -165,15 +188,30 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return permuted.dup();
     }
 
+    /**
+     * Should be called before passing INDArray to model, to ensure channel order is correct.
+     * @param in Image array to pass to model
+     * @return Permuted image array
+     */
     private INDArray preModelCheck(INDArray in) {
         boolean modelExpectsChannelsLast = isImageChannelsLast();
         return permuteToSuit(in, modelExpectsChannelsLast);
     }
 
+    /**
+     * Ensure image array is channels first.
+     * @param in Image array to return
+     * @return Permuted image array
+     */
     private INDArray postModelCheck(INDArray in) {
         return permuteToSuit(in, false);
     }
 
+    /**
+     * Basically a wrapper for model.outputSingle, but includes the premodel check.
+     * @param in Image array
+     * @return Model predictions.
+     */
     private INDArray modelOutputSingle(INDArray in) {
         // Transform it before we pass to the model if necessary
         // Default should be [NCHW] but may need to permute to [NHWC]
@@ -195,6 +233,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return layerName;
     }
 
+    /**
+     * Create a heatmap from the postprocessed activations.
+     * @param postprocessedActivations Model activations
+     * @return Human-viewable heatmap image
+     */
     private BufferedImage createHeatmap(INDArray postprocessedActivations) {
         Color[] gradientColors = Gradient.GRADIENT_PLASMA;
         BufferedImage heatmap = new BufferedImage(
@@ -223,10 +266,21 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return heatmap;
     }
 
+    /**
+     * Create a buffered image matching the original image.
+     * @param imageArr Image array
+     * @return Original image.
+     */
     private BufferedImage createOriginalImage(INDArray imageArr) {
         return imageFromINDArray(imageArr);
     }
 
+    /**
+     * Creates the complete composite, including all different target classes, heatmaps, and original images.
+     * @param allImages Images
+     * @param predictions Predictions
+     * @return Large image composed of all the individual heatmap generations
+     */
     private BufferedImage createCompleteCompositeImage(ArrayList<BufferedImage> allImages, ArrayList<Prediction> predictions) {
         // Stitch each buffered image together in allImages
         if (allImages.size() == 0) {
@@ -267,6 +321,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return completeCompositeImage;
     }
 
+    /**
+     * Create a composite image for a single target class.
+     * @param imageArr Input image array
+     * @param postprocessedActivations Model activations
+     * @return Composite bufferedimage
+     */
     private BufferedImage createFinalImages(INDArray imageArr, INDArray postprocessedActivations) {
         BufferedImage originalImage = createOriginalImage(imageArr);
         BufferedImage heatmap = createHeatmap(postprocessedActivations);
@@ -274,16 +334,31 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return createCompositeImage(originalImage, heatmap, heatmapOnImage);
     }
 
+    /**
+     * Calculate the width of the composite image.
+     * @return Composite image width
+     */
     private int calculateCompositeWidth() {
         // Outside margins plus images plus padding
         return outsideMargin * 2 + (insidePadding * 2) + ((int) modelInputShape.getWidth() * 3);
     }
 
+    /**
+     * Calculate the height of the composite image.
+     * @return Composite image height.
+     */
     private int calculateCompositeHeight() {
         // Outside margins plus image height plus space for text
         return outsideMargin * 2 + (int) modelInputShape.getHeight() + (fontSpacing);
     }
 
+    /**
+     * Stitches together the three images supplied.
+     * @param originalImage Original Image
+     * @param heatmap Heatmap
+     * @param heatmapOnImage Heatmap superimposed on image.
+     * @return Composite image
+     */
     private BufferedImage createCompositeImage(BufferedImage originalImage, BufferedImage heatmap, BufferedImage heatmapOnImage) {
         int width = calculateCompositeWidth();
         int height = calculateCompositeHeight();
@@ -321,6 +396,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return compositeImage;
     }
 
+    /**
+     * Superimpose the given heatmap onto the original image.
+     * @param originalImage Original image
+     * @param heatmap Heatmap
+     * @return Heatmap on image
+     */
     private BufferedImage createHeatmapOnImage(BufferedImage originalImage, BufferedImage heatmap) {
         // From https://www.reddit.com/r/javahelp/comments/2ufc0m/how_do_i_overlay_2_bufferedimages_and_set_the/co7yrv9?utm_source=share&utm_medium=web2x&context=3
         BufferedImage heatmapOnImage = new BufferedImage(224, 224, BufferedImage.TYPE_INT_ARGB);
@@ -343,6 +424,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return heatmapOnImage;
     }
 
+    /**
+     * Sum the activation maps into a single activation map, perform pixel-wise relu, and normalise.
+     * @param weightedActivationMaps Activations with weighting applied
+     * @param normalize True if normalize
+     * @return Postprocessed activations
+     */
     private INDArray postprocessActivations(INDArray weightedActivationMaps, boolean normalize) {
         // Sum all maps to get one 224x224 map - [numActivationMaps, 224, 224] -> [224, 224]
         INDArray summed = weightedActivationMaps.sum(0);
@@ -355,6 +442,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return reluActivations;
     }
 
+    /**
+     * Normalize each activation map between 0 and 1.
+     * @param upsampledActivations Activations to normalise
+     * @return Normalized activation maps.
+     */
     private INDArray normalizeActivationMaps(INDArray upsampledActivations) {
         // Normalize each of the 512 activation maps
         int numActivationMaps = getNumActivationMaps(upsampledActivations);
@@ -377,6 +469,10 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return upsampledActivations;
     }
 
+    /**
+     * Normalizes 2d array in place.
+     * @param array Array to normalise
+     */
     private void normalize2x2ArrayI(INDArray array) {
         double currMax = array.maxNumber().doubleValue();
         double currMin = array.minNumber().doubleValue();
@@ -385,6 +481,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         array.divi(currMax - currMin);
     }
 
+    /**
+     * Apply the weights to each activation map, scaling them.
+     * @param normalisedActivations Activation maps
+     * @param weights Weights to apply to each activation map
+     * @return Activation maps with weights applied
+     */
     private INDArray applyActivationMapWeights(INDArray normalisedActivations, INDArray weights) {
         int numActivationMaps = getNumActivationMaps(normalisedActivations);
         // Add dimensions to the weights for the multiplication
@@ -393,6 +495,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return normalisedActivations.mul(weights);
     }
 
+    /**
+     * Get the total number of iterations.
+     * @param numActivationMaps Number of activation maps to iterate over
+     * @return Total number of iterations
+     */
     private int getNumIterations(int numActivationMaps) {
         if (numActivationMaps % batchSize == 0) {
             return numActivationMaps / batchSize;
@@ -401,6 +508,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         }
     }
 
+    /**
+     * This is the to index for our batch size. Ensures we don't get index out of bounds.
+     * @param fromIndex starting index
+     * @param numActivationMaps Total number of activation maps
+     * @return To index which won't go over the number of activation maps.
+     */
     private int getSafeToIndex(int fromIndex, int numActivationMaps) {
         int toIndex = fromIndex + batchSize;
         if (toIndex >= numActivationMaps) {
@@ -409,24 +522,40 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return toIndex;
     }
 
+    /**
+     * Broadcast the iterations starting, including the total iterations as an arg.
+     * @param totalIterations Total number of iterations.
+     */
     private void broadcastIterationsStarted(int totalIterations) {
         for (IterationsStartedListener listener : iterationsStartedListeners) {
             listener.iterationsStarted(totalIterations);
         }
     }
 
+    /**
+     * Broadcast the iterations have incremented.
+     */
     private void broadcastIterationIncremented() {
         for (IterationIncrementListener listener : iterationIncrementListeners) {
             listener.iterationIncremented();
         }
     }
 
+    /**
+     * Broadcast the iterations have finished.
+     */
     private void broadcastIterationsFinished() {
         for (IterationsFinishedListener listener : iterationsFinishedListeners) {
             listener.iterationsFinished();
         }
     }
 
+    /**
+     * After using the model's original activation maps to mask the images, we pass each image through the model
+     * to get its predicted score for our target class.
+     * @param maskedImages Tensor containing all masked images.
+     * @return Softmax scores for each masked image.
+     */
     private INDArray predictOnMaskedImages(INDArray maskedImages) {
         int numActivationMaps = getNumActivationMaps(maskedImages);
         log.info(String.format("Running prediction on %d masked images with a batch size of %d", numActivationMaps, batchSize));
@@ -466,6 +595,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return softmaxOnMaskedImages;
     }
 
+    /**
+     * Apply the normalized activation maps as masks to the original image.
+     * @param normalisedActivations Set of activation maps from model
+     * @param imageArr Original image
+     * @return Tensor of masked images.
+     */
     private INDArray createMaskedImages(INDArray normalisedActivations, INDArray imageArr) {
         int numActivationMaps = getNumActivationMaps(normalisedActivations);
 
@@ -491,6 +626,12 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return allMaskedImages;
     }
 
+    /**
+     * The activations usually won't be in the same size as the original image. We upscale them to match the image size
+     * so they can easily be used to mask the image.
+     * @param rawActivations Raw activation maps
+     * @return Upscaled activation maps
+     */
     private INDArray upsampleActivations(INDArray rawActivations) {
         // Create the new size array
         INDArray newSize = Nd4j.create(new int[] {(int) modelInputShape.getHeight(), (int) modelInputShape.getWidth()}, new long[] {2}, DataType.INT32);
@@ -507,6 +648,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return upsampledActivations.permute(2, 0, 1);
     }
 
+    /**
+     * Take the original model and extract the activation maps from the final convolution layer when we pass the image through.
+     * @param imageArr Original image
+     * @return Activations for image, at final convolution layer.
+     */
     private INDArray getActivationsForImage(INDArray imageArr) {
         // Set up the model and image
         String activationMapLayer = getActivationMapLayer();
@@ -527,6 +673,11 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return rawActivations.permute(0, 2, 3, 1);
     }
 
+    /**
+     * Load the image into an NDArray.
+     * @param imageFile Image to load
+     * @return Image as NDArray, matching the model's input size
+     */
     private INDArray loadImage(File imageFile) {
         setInputFilename(imageFile.getName());
         // Load the image
@@ -548,9 +699,9 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
     }
 
     /**
-     * Assuming arr is in order [channels, height, width]
-     * @param activationMaps
-     * @return
+     * Assuming arr is in order [channels, height, width].
+     * @param activationMaps Activation map NDArray
+     * @return number of activation maps.
      */
     private int getNumActivationMaps(INDArray activationMaps) {
         return (int) activationMaps.shape()[0];
@@ -606,6 +757,16 @@ public class ScoreCAM extends AbstractCNNSaliencyMapGenerator {
         return image;
     }
 
+    /**
+     * Get the pixel value for the given channel at (y,x).
+     * @param array Image array
+     * @param pixelChannel pixel channel
+     * @param x x pos
+     * @param y y pos
+     * @param is4d is the array 4d?
+     * @param is1Channel is the array 1 channel?
+     * @return pixel value at (y,x)
+     */
     private int getPixelValue(INDArray array, int pixelChannel, int x, int y, boolean is4d, boolean is1Channel) {
         if (is1Channel) {
             pixelChannel = 0;

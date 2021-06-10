@@ -32,8 +32,14 @@ import weka.dl4j.enums.PretrainedType;
  */
 public class Dl4jXception extends AbstractZooModel {
 
+  /**
+   * Unique ID for this version of the model.
+   */
   private static final long serialVersionUID = -4927205727389940364L;
 
+  /**
+   * Instantiate the model.
+   */
   public Dl4jXception() {
     setPretrainedType(PretrainedType.IMAGENET);
     setNumFExtractOutputs(2048);

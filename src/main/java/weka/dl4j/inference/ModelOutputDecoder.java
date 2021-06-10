@@ -21,31 +21,32 @@ import java.util.*;
 @Log4j2
 public class ModelOutputDecoder implements Serializable, OptionHandler {
     /**
-     * Built-in class maps for WDL4J
-    */
-    public enum ClassmapType { IMAGENET, DARKNET_IMAGENET, VGGFACE, CUSTOM }
-
-    /**
-     * Class Map to use to decode the model output
+     * Class Map to use to decode the model output.
      */
     protected ClassmapType builtInClassMap = ClassmapType.IMAGENET;
 
     /**
-     * Path to custom class map file
+     * Path to custom class map file.
      */
     protected File classMapFile = new File(Utils.defaultFileLocation());
 
+    /**
+     * Decode predictions, without any image or model name.
+     * @param predictions Predictions to decode
+     * @return Parsed predictions.
+     * @throws Exception Exception.
+     */
     public TopNPredictions decodePredictions(INDArray predictions) throws Exception {
         return decodePredictions(predictions, "", "");
     }
 
     /**
-     * Main entrypoint - decode the model predictions, saving the image and model name alongside it
+     * Main entrypoint - decode the model predictions, saving the image and model name alongside it.
      * @param predictions Predictions to decode
      * @param imageName Name of the image used for prediction
      * @param modelName Name of the model used for prediction
      * @return TopNPredictions object, parsed from the predictions
-     * @throws Exception
+     * @throws Exception exception
      */
     public TopNPredictions decodePredictions(INDArray predictions, String imageName, String modelName) throws Exception {
         // Get number of instances to predict for
@@ -77,7 +78,7 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
     }
 
     /**
-     * Reshape the single instance INDArray to a batch of size 1
+     * Reshape the single instance INDArray to a batch of size 1.
      * @param array Array to reshape
      * @return Reshaped activation
      */
@@ -133,18 +134,36 @@ public class ModelOutputDecoder implements Serializable, OptionHandler {
         return classMapPath;
     }
 
+    /**
+     * Parse a classmap from a valid .arff file.
+     * @param filepath Filepath to arff file
+     * @return Parsed classmap.
+     * @throws IOException file exception.
+     */
     public static String[] parseClassmapFromArff(String filepath) throws IOException {
         Instances instances = new Instances(new FileReader(filepath));
         return parseClassmap(instances);
     }
 
+    /**
+     * Parse a classmap from a valid .csv dataset.
+     * @param filepath Filepath to a valid .csv dataset
+     * @return Parsed classmap.
+     * @throws IOException file exception.
+     */
     public static String[] parseClassmapFromCsv(String filepath) throws IOException {
         CSVLoader loader = new CSVLoader();
         loader.setSource(new File(filepath));
+        loader.setNominalAttributes("last");
         Instances instances = loader.getDataSet();
         return parseClassmap(instances);
     }
 
+    /**
+     * Get a classmap from a set of instances.
+     * @param instances Instances to parse classes from
+     * @return Parsed classmap.
+     */
     public static String[] parseClassmap(Instances instances) {
         instances.setClassIndex(instances.numAttributes() - 1);
         ArrayList<Object> list = Collections.list(instances.classAttribute().enumerateValues());

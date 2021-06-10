@@ -6,12 +6,24 @@ import weka.core.OptionMetadata;
 import weka.dl4j.enums.PretrainedType;
 import weka.dl4j.zoo.keras.DenseNet;
 
+/**
+ * Wrapper class for Keras version of DenseNet.
+ */
 public class KerasDenseNet extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = 4978029404997176050L;
 
+    /**
+     * Desired version of the model.
+     */
     private DenseNet.VARIATION variation = DenseNet.VARIATION.DENSENET121;
 
+    /**
+     * Instantiate the model.
+     */
     public KerasDenseNet() {
         setVariation(DenseNet.VARIATION.DENSENET121);
         setPretrainedType(PretrainedType.IMAGENET);

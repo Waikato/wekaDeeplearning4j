@@ -1,14 +1,43 @@
 package weka.dl4j.zoo.keras;
 
+/**
+ * Wrapper class for the different versions of VGG. Has the same interface as Dl4j zoo models, so we can
+ * simply call initPretrained().
+ */
 public class VGG extends KerasZooModel {
+
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = 3908733587819287902L;
 
-    public enum VARIATION {VGG16, VGG19};
+    /**
+     * Different variations of the model.
+     */
+    public enum VARIATION {
+        /**
+         * VGG16 variation.
+         */
+        VGG16,
+        /**
+         * VGG19 variation.
+         */
+        VGG19
+    };
 
+    /**
+     * Default input shape of the model.
+     */
     public static int[] inputShape = new int[] {3, 224, 224};
 
+    /**
+     * Default variation of the model.
+     */
     protected VARIATION m_variation = VARIATION.VGG16;
 
+    /**
+     * Instantiate the model.
+     */
     public VGG() {
         setVariation(VARIATION.VGG16);
     }

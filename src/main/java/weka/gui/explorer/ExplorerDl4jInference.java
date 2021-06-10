@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import weka.core.*;
 
+import weka.dl4j.IsGPUAvailable;
 import weka.dl4j.inference.Dl4jCNNExplorer;
 import weka.gui.*;
 import weka.gui.explorer.Explorer.ExplorerPanel;
@@ -26,21 +27,21 @@ import java.util.Date;
 @Log4j2
 public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogHandler {
 
-    /** the parent frame */
+    /** the parent frame. */
     protected Explorer m_Explorer = null;
 
     /**
-     * The loaded instances
+     * The loaded instances.
      */
     protected Instances m_Instances = null;
 
     /**
-     * The system logger
+     * The system logger.
      */
     protected Logger m_Logger = new SysErrLog();
 
     /**
-     * File path of the currently displayed image
+     * File path of the currently displayed image.
      */
     protected String m_currentlyDisplayedImage = "";
 
@@ -58,6 +59,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /** The filename extension that should be used for PMML xml files. */
     public static String PMML_FILE_EXTENSION = ".xml";
 
+    /**
+     * Allowable image file extensions.
+     */
     public static String[] IMAGE_FILE_EXTENSIONS = new String[] {".jpg", ".jpeg", ".png", ".tif", ".tiff"};
 
     /** The output area for classification results. */
@@ -75,19 +79,18 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     /** Click to stop running the classifier. */
     protected JButton m_stopButton = new JButton("Stop");
 
-    /** Click to view Saliency Map */
+    /** Click to view Saliency Map. */
     protected JButton m_saliencyMapButton = new JButton("View Saliency Map...");
+
+    /** Click to see if GPU is available. */
+    protected JButton m_gpuAvailableButton = new JButton("Check GPU Available...");
 
     /** A thread that classification runs in. */
     protected Thread m_RunThread;
 
-    /** Filter to ensure only model files are selected. */
-    protected FileFilter m_ModelFilter = new ExtensionFileFilter(
-            MODEL_FILE_EXTENSION, "Model object files");
-
-    protected FileFilter m_PMMLModelFilter = new ExtensionFileFilter(
-            PMML_FILE_EXTENSION, "PMML model files");
-
+    /**
+     * Filter for image files.
+     */
     protected FileFilter m_ImageFilter = new ExtensionFileFilter(
             IMAGE_FILE_EXTENSIONS, "Image files");
 
@@ -96,12 +99,12 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
             System.getProperty("user.dir")));
 
     /**
-     * Label used to display the image
+     * Label used to display the image.
      */
     JLabel imageLabel;
 
     /**
-     * Panel the imageLabel is displayed on
+     * Panel the imageLabel is displayed on.
      */
     JPanel imagePanel;
 
@@ -110,18 +113,30 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         GenericObjectEditor.registerEditors();
     }
 
+    /**
+     * Dl4jCNNExplorer object after processing an image.
+     */
     protected Dl4jCNNExplorer processedExplorer;
 
+    /**
+     * Popup window to display saliency maps.
+     */
     protected SaliencyMapWindow saliencyMapWindow;
     //endregion
 
 
+    /**
+     * Create the panel.
+     */
     public ExplorerDl4jInference() {
         super();
 
         initGUI();
     }
 
+    /**
+     * Init the GUI elements.
+     */
     protected void initGUI() {
         setupCNNExplorerEditor();
 
@@ -148,7 +163,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup the top bar in the window - the explorer editor
+     * Setup the top bar in the window - the explorer editor.
      */
     private void setupCNNExplorerEditor() {
         m_CNNExplorerEditor.setClassType(Dl4jCNNExplorer.class);
@@ -156,7 +171,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup the output text panel
+     * Setup the output text panel.
      */
     private void setupOutputText() {
         // Connect / configure the components
@@ -174,7 +189,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup the Historical results panel
+     * Setup the Historical results panel.
      * @return Loaded results panel
      */
     private JPanel setupHistoryPanel() {
@@ -195,36 +210,38 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup all tooltip texts
+     * Setup all tooltip texts.
      */
     private void setupToolTipText() {
         m_OpenImageButton.setToolTipText("Open an image for prediction");
         m_startButton.setToolTipText("Run prediction on the image");
         m_saliencyMapButton.setToolTipText("View the saliency map for this image and model");
+        m_gpuAvailableButton.setToolTipText("Check whether WDL4J can recognize your machine's GPU");
     }
 
     /**
-     * Setup the file chooser object
+     * Setup the file chooser object.
      */
     private void setupFileChooser() {
         m_FileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     }
 
     /**
-     * Setup listeners for the two buttons
+     * Setup listeners for the two buttons.
      */
     private void setupButtonListeners() {
         m_OpenImageButton.addActionListener(actionEvent -> openNewImage());
         m_startButton.addActionListener(e -> startPrediction());
         m_stopButton.addActionListener(e -> stopPrediction());
         m_saliencyMapButton.addActionListener(e -> openSaliencyMapWindow());
+        m_gpuAvailableButton.addActionListener(e -> openGPUAvailableWindow());
 
         _refreshButtonsEnabled();
     }
 
     /**
-     * Setup the layout for the two buttons
-     * @return
+     * Setup the layout for the two buttons.
+     * @return Initialized panel.
      */
     private JPanel setupMainButtons() {
         JPanel optionsPanel = new JPanel();
@@ -268,11 +285,21 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         gbL.setConstraints(m_saliencyMapButton, gbC);
         optionsPanel.add(m_saliencyMapButton);
 
+        gbC = new GridBagConstraints();
+        gbC.anchor = GridBagConstraints.CENTER;
+        gbC.fill = GridBagConstraints.HORIZONTAL;
+        gbC.gridy = 3;
+        gbC.gridx = 0;
+        gbC.weightx = 100;
+        gbC.insets = new Insets(0, 10, 10, 10);
+        gbL.setConstraints(m_gpuAvailableButton, gbC);
+        optionsPanel.add(m_gpuAvailableButton);
+
         return optionsPanel;
     }
 
     /**
-     * Set the layout for the text output panel
+     * Set the layout for the text output panel.
      * @return Loaded output panel
      */
     private JPanel setupOutputPanel() {
@@ -299,7 +326,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup the layout of the entire explorer window
+     * Setup the layout of the entire explorer window.
      * @param optionsPanel Options panel
      * @param historyPanel History panel
      * @param outputPanel Text output panel
@@ -375,7 +402,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Setup the objects for the image display panel
+     * Setup the objects for the image display panel.
      * @return Loaded image panel
      */
     private JPanel setupImagePanel() {
@@ -388,7 +415,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Launches the "Open Image" popup, saves the image path, and shows it in the image panel
+     * Launches the "Open Image" popup, saves the image path, and shows it in the image panel.
      */
     protected void openNewImage() {
         m_FileChooser.setFileFilter(m_ImageFilter);
@@ -405,22 +432,41 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         refreshState();
     }
 
+    /**
+     * Open the saliency map window.
+     */
     private void openSaliencyMapWindow() {
         saliencyMapWindow.open(processedExplorer);
     }
 
+    /**
+     * Check for GPU availability
+     */
+    private void openGPUAvailableWindow() {
+        JOptionPane.showMessageDialog(this,
+                new IsGPUAvailable().check(),
+                "Is GPU Available",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Setup the saliency map window.
+     */
     private void setupSaliencyMapWindow() {
         saliencyMapWindow = new SaliencyMapWindow();
     }
 
     /**
-     * Refresh the image panel to show the currently selected image
+     * Refresh the image panel to show the currently selected image.
      */
     protected void refreshState() {
         _refreshImagePanel();
         _refreshButtonsEnabled();
     }
 
+    /**
+     * Helper function to refresh the image panel.
+     */
     private void _refreshImagePanel() {
         if (m_currentlyDisplayedImage == null || m_currentlyDisplayedImage.equals("")) {
             return;
@@ -437,6 +483,9 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         imageLabel.setIcon(scaledIcon);
     }
 
+    /**
+     * Helper function to refresh enabled buttons.
+     */
     private void _refreshButtonsEnabled() {
         boolean startButtonEnabled = !m_currentlyDisplayedImage.equals("") &&m_RunThread == null;
         m_startButton.setEnabled(startButtonEnabled);
@@ -449,7 +498,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Scale the image to the desired width and height, maintaining aspect ratio
+     * Scale the image to the desired width and height, maintaining aspect ratio.
      * @param icon Raw image
      * @param desiredWidth Desired width to resize to
      * @param desiredHeight Desired height to resize to
@@ -476,7 +525,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Save the results in the ResultHistoryPanel
+     * Save the results in the ResultHistoryPanel.
      * @param name Run name
      * @param buffer String buffer containing the output
      */
@@ -485,17 +534,25 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         m_History.addObject(name, savePredictionsForHistory());
     }
 
+    /**
+     * Create the record to save with this session.
+     * @return The current PredictionResult.
+     */
     private PredictionResult savePredictionsForHistory() {
         return new PredictionResult(m_currentlyDisplayedImage, processedExplorer);
     }
 
+    /**
+     * Load the given prediction result into the panel.
+     * @param result Selected prediction result.
+     */
     private void loadPredictionsFromHistory(PredictionResult result) {
         m_currentlyDisplayedImage = result.imagePath;
         processedExplorer = result.processedExplorer;
     }
 
     /**
-     * Main run method - loads the Dl4jCNNExplorer, runs it on the image, and displays the output
+     * Main run method - loads the Dl4jCNNExplorer, runs it on the image, and displays the output.
      */
     @SneakyThrows
     private void runInference() {
@@ -556,7 +613,7 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
     }
 
     /**
-     * Using a separate thread, runs the model prediction
+     * Using a separate thread, runs the model prediction.
      */
     private void startPrediction() {
         if (m_RunThread == null) {
@@ -578,10 +635,24 @@ public class ExplorerDl4jInference extends JPanel implements ExplorerPanel, LogH
         }
     }
 
+    /**
+     * Helper class to store the image path and Dl4jCNNExplorer. Allows us to replay previous predictions and saliency map generations.
+     */
     private class PredictionResult {
+        /**
+         * Filepath of predicted image.
+         */
         private final String imagePath;
+        /**
+         * Explorer after prediction.
+         */
         private final Dl4jCNNExplorer processedExplorer;
 
+        /**
+         * Init the class.
+         * @param imagePath Filepath of predicted image.
+         * @param processedExplorer Explorer after prediction.
+         */
         public PredictionResult(String imagePath, Dl4jCNNExplorer processedExplorer) {
             this.imagePath = imagePath;
             this.processedExplorer = processedExplorer;

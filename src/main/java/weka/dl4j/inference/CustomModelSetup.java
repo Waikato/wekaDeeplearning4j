@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
 
+/**
+ * Config class to hold parameters for a custom model that was trained previously.
+ */
 public class CustomModelSetup implements Serializable, OptionHandler {
 
     /**
@@ -17,10 +20,19 @@ public class CustomModelSetup implements Serializable, OptionHandler {
      */
     protected File serializedModelFile = new File(Utils.defaultFileLocation());
 
+    /**
+     * Input channels for the model.
+     */
     protected int inputChannels = 3;
 
+    /**
+     * Input width for the model.
+     */
     protected int inputWidth = 224;
 
+    /**
+     * Input height for the model.
+     */
     protected int inputHeight = 224;
 
     public void setUseCustomSetup(boolean useCustomSetup) {
@@ -29,6 +41,9 @@ public class CustomModelSetup implements Serializable, OptionHandler {
         }
     }
 
+    /**
+     * Reset the model filepath to the default.
+     */
     public void resetModelFilepath() {
         setSerializedModelFile(new File(Utils.defaultFileLocation()));
     }

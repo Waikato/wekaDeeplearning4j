@@ -53,32 +53,32 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     ConvolutionalIterator {
 
   /**
-   * The version ID used for serializing objects of this class
+   * The version ID used for serializing objects of this class.
    */
   private static final long serialVersionUID = -3701309032945158130L;
 
   /**
-   * The desired output height
+   * The desired output height.
    */
   protected int height = 28;
 
   /**
-   * The desired output width
+   * The desired output width.
    */
   protected int width = 28;
 
   /**
-   * The desired number of channels
+   * The desired number of channels.
    */
   protected int numChannels = 1;
 
   /**
-   * If true, swap the reader to supply image channels last
+   * If true, swap the reader to supply image channels last.
    */
   protected boolean channelsLast = false;
 
   /**
-   * The location of the folder containing the images
+   * The location of the folder containing the images.
    */
   protected File imagesLocation = new File(System.getProperty("user.dir"));
 
@@ -160,7 +160,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   }
 
   /**
-   * Enforces the input image size if using a zoo model
+   * Enforces the input image size if using a zoo model.
    * @param tmpZooModel Zoo model to constrain input size to
    */
   public void enforceZooModelSize(AbstractZooModel tmpZooModel) {
@@ -183,7 +183,7 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
   }
 
   /**
-   * Validates the input dataset
+   * Validates the input dataset.
    *
    * @param data the input dataset
    * @throws InvalidInputDataException if validation is unsuccessful
@@ -271,6 +271,10 @@ public class ImageInstanceIterator extends AbstractInstanceIterator implements
     return tmpIter;
   }
 
+  /**
+   * Return the global info for this class.
+   * @return Global info
+   */
   public String globalInfo() {
     return "Instance iterator that reads images based on the meta-data "
         + "given in the ARFF file.";

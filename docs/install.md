@@ -11,14 +11,14 @@ For the package no further requisites are necessary.
 #### GPU
 The GPU additions needs the CUDA Toolkit 10.0, 10.1, or 10.2 backend with the appropriate cuDNN library to be installed on your system. Nvidia provides some good installation instructions for all platforms:
 
-##### CUDA Toolkit
-- [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
-- [Mac OS X](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html)
-- [Windows](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html)
+- CUDA Toolkit
+    - [Linux](http://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html)
+    - [Mac OS X](http://docs.nvidia.com/cuda/cuda-installation-guide-mac-os-x/index.html)
+    - [Windows](http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/index.html)
 
-##### CUDNN
-- [Linux](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux)
-- [Windows](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-windows)
+- CUDNN
+    - [Linux](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux)
+    - [Windows](https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-windows)
 
 # Installing the Weka Package
 Weka packages can be easily installed either via the user interface as described [here](https://weka.wikispaces.com/How+do+I+use+the+package+manager%3F#toc2), or simply via the commandline:
@@ -42,11 +42,49 @@ Installed	Repository	Loaded	Package
 
 ## Add GPU Support
 
-To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and run the latest `install-cuda-libs.sh` for Linux/Macosx or `install-cuda-libs.ps1` for Windows. Make sure CUDA is installed on your system as explained [here](https://deeplearning.cms.waikato.ac.nz/install/#gpu).
+To add GPU support, [download](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and run the latest `install-cuda-libs.sh` for Linux/Macosx or `install-cuda-libs.ps1` for Windows. Make sure CUDA is installed on your system as explained [here](#gpu).
 
 The install script automatically downloads the libraries and copies them into your wekaDeeplearning4j package installation. If you want to download the library zip yourself, choose the appropriate combination of your platform and CUDA version from the [latest release](https://github.com/Waikato/wekaDeeplearning4j/releases/latest) and point the installation script to the file, e.g.:
 ```bash
 ./install-cuda-libs.sh ~/Downloads/wekaDeeplearning4j-cuda-10.2-1.6.0-linux-x86_64.zip
+```
+
+### Check your GPU is Available
+
+Ensuring your GPU is setup correctly may be difficult so to help out we've provided `IsGPUAvailable`, a simple diagnostic tool to test whether your
+GPU is identified and available to WekaDeeplearning4j.
+
+If the tool returns `true`, your GPU is setup correctly and ready to use!
+
+If the tool returns `false`, your GPU is not available to WekaDeeplearning4j (e.g., caused by incorrect drivers) and will
+not be used.
+
+#### GUI
+
+Once WekaDeeplearning4j is installed, you can find `IsGPUAvailable` in the `Tools` menu in the `GUIChooser`:
+
+![GUIChooser Menu](./img/gui/GUIChooserToolsMenu.png)
+
+Simply click `Check...` and WekaDeeplearning4j will check your GPU's availability.
+
+#### Commandline
+
+Simply invoke the tool from the commandline: 
+```bash
+$ java -cp <WEKA-JAR-PATH> weka.Run .IsGPUAvailable
+```
+
+The output for an incorrectly setup GPU will look like:
+```bash
+...
+...
+false
+```
+And for a correctly setup GPU:
+```bash
+...
+...
+true
 ```
 
 # Using WekaDeeplearning4j via Reflection
@@ -55,8 +93,8 @@ loads this library at runtime. This has the benefit of not needing to include th
 in your CLASSPATH, however, means that the IDE cannot type-check the arguments. 
 
 ##### Java examples with reflection
-* [Classifying a Custom Dataset](examples/classifying-your-own.md)
-* [Image Feature Extraction](examples/featurize-mnist.md)
+* [Classifying a Custom Dataset](examples/train_cnn.md)
+* [Image Feature Extraction](examples/feature_extraction.md)
 
 
 # Using WekaDeeplearning4j in a Maven Project

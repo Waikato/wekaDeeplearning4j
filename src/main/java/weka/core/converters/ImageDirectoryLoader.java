@@ -41,10 +41,19 @@ import java.util.stream.Collectors;
 public class ImageDirectoryLoader extends AbstractLoader implements
         BatchConverter, IncrementalConverter, CommandlineRunnable, OptionHandler {
 
+    /**
+     * Unique ID for this version of the class.
+     */
     private static final long serialVersionUID = 8956780190928290891L;
 
+    /**
+     * Input directory to get images from.
+     */
     protected File inputDirectory = new File(System.getProperty("user.dir"));
 
+    /**
+     * Filename for output .arff file.
+     */
     protected String outputFileName = "";
 
     @ProgrammaticProperty
@@ -75,6 +84,11 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         this.outputFileName = outputFileName;
     }
 
+    /**
+     * Check whether the supplied path is a valid image.
+     * @param fullImgPath Image path.
+     * @return True if file is an image, false otherwise.
+     */
     public boolean isImage(String fullImgPath) {
         try {
             String mimetype = Files.probeContentType(new File(fullImgPath).toPath());
@@ -85,13 +99,18 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         }
     }
 
+    /**
+     * Remove null items from our list of images.
+     * @param images List of image paths (potentially including null).
+     * @return List of valid images.
+     */
     private String[] removeNullImages(String[] images) {
         return Arrays.stream(images).filter(x -> !(x == null)).toArray(String[]::new);
     }
 
     /**
-     * Appends the folder that the image is in, to the image path
-     * @param folder
+     * Appends the folder that the image is in, to the image path.
+     * @param folder Folder to search.
      * @return Image names (including the folder they're in)
      */
     public String[] fileListForFolder(File folder) {
@@ -110,6 +129,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         return removeNullImages(imageNames);
     }
 
+    /**
+     * Main entrypoint.
+     * @return List of instances from directory.
+     */
     public Instances createDataset() {
         File[] classArr = inputDirectory.listFiles();
         assert classArr != null;
@@ -171,6 +194,9 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         }
     }
 
+    /**
+     * Print the usage info.
+     */
     private void printInfo() {
         System.err.println("\nUsage:\n" + "\tImageDirectoryLoader [options]\n"
                 + "\n" + "Options:\n");
@@ -251,6 +277,10 @@ public class ImageDirectoryLoader extends AbstractLoader implements
         Utils.checkForRemainingOptions(options);
     }
 
+    /**
+     * Main entrypoint if invoking class independently
+     * @param args Args
+     */
     public static void main(String[] args) {
         ImageDirectoryLoader loader = new ImageDirectoryLoader();
         loader.run(loader, args);

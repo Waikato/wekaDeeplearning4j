@@ -1,14 +1,59 @@
 package weka.dl4j.zoo.keras;
 
+/**
+ * Wrapper class for the different versions of ResNet. Has the same interface as Dl4j zoo models, so we can
+ * simply call initPretrained().
+ */
 public class ResNet extends KerasZooModel {
+
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = 5315928260273073018L;
 
-    public enum VARIATION {RESNET50, RESNET50V2, RESNET101, RESNET101V2, RESNET152, RESNET152V2};
+    /**
+     * Different variations of the model.
+     */
+    public enum VARIATION {
+        /**
+         * ResNet50 version.
+         */
+        RESNET50,
+        /**
+         * ResNet50v2 version.
+         */
+        RESNET50V2,
+        /**
+         * ResNet101 version.
+         */
+        RESNET101,
+        /**
+         * ResNet101v2 version.
+         */
+        RESNET101V2,
+        /**
+         * ResNet152 version.
+         */
+        RESNET152,
+        /**
+         * ResNet152v2 version.
+         */
+        RESNET152V2
+    };
 
+    /**
+     * Default input shape of the model.
+     */
     public static int[] inputShape = new int[] {3, 224, 224};
 
+    /**
+     * Default variation of the model.
+     */
     protected VARIATION m_variation = VARIATION.RESNET50;
 
+    /**
+     * Instantiate the model.
+     */
     public ResNet() {
         setVariation(VARIATION.RESNET50);
     }

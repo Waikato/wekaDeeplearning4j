@@ -38,10 +38,19 @@ import weka.dl4j.zoo.keras.VGG;
  */
 public class Dl4jVGG extends AbstractZooModel {
 
+    /**
+     * Unique ID for this version of the model.
+     */
     private static final long serialVersionUID = -4741420712433849216L;
 
+    /**
+     * Desired version of the model.
+     */
     protected VGG.VARIATION m_variation = VGG.VARIATION.VGG16;
 
+    /**
+     * Instantiate the model.
+     */
     public Dl4jVGG() {
         this.setPretrainedType(PretrainedType.IMAGENET);
     }

@@ -27,7 +27,9 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
  * @author Steven Lang
  */
 public class CustomNet extends AbstractZooModel {
-
+  /**
+   * Unique ID for this version of the model.
+   */
   private static final long serialVersionUID = -1211860593883280761L;
 
   @Override

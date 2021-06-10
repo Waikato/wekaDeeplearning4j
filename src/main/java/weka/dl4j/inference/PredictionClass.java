@@ -1,16 +1,24 @@
 package weka.dl4j.inference;
 
+/**
+ * Wrapper class to hold a class ID and classname.
+ */
 public class PredictionClass {
     /**
-     * ID of the class prediction
+     * ID of the class prediction.
      */
     private final int classID;
 
     /**
-     * Human readable class name
+     * Human readable class name.
      */
     private final String className;
 
+    /**
+     * Create a new PredictionClass.
+     * @param classID Class ID
+     * @param className Class Name
+     */
     public PredictionClass(int classID, String className) {
         this.classID = classID;
         this.className = className;

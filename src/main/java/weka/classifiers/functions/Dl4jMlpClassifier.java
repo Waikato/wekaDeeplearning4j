@@ -100,19 +100,19 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     BatchPredictor, CapabilitiesHandler, IterativeClassifier {
 
   /**
-   * filter: Normalize training data
+   * filter: Normalize training data.
    */
   public static final int FILTER_NORMALIZE = 0;
   /**
-   * filter: Standardize training data
+   * filter: Standardize training data.
    */
   public static final int FILTER_STANDARDIZE = 1;
   /**
-   * filter: No normalization/standardization
+   * filter: No normalization/standardization.
    */
   public static final int FILTER_NONE = 2;
   /**
-   * The filter to apply to the training data
+   * The filter to apply to the training data.
    */
   public static final Tag[] TAGS_FILTER = {
       new Tag(FILTER_NORMALIZE, "Normalize training data"),
@@ -147,7 +147,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected transient ComputationGraph model;
   /**
-   * Used to leverage multiple GPUs (if available)
+   * Used to leverage multiple GPUs (if available).
    */
   protected transient ParallelWrapper parallelWrapper;
   /**
@@ -155,7 +155,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected AbstractZooModel zooModel = new CustomNet();
   /**
-   * True if using the model for feature extraction
+   * True if using the model for feature extraction.
    */
   protected boolean filterMode = false;
   /**
@@ -179,7 +179,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected int numEpochs = 10;
   /**
-   * The current upper bound for the number of epochs
+   * The current upper bound for the number of epochs.
    */
   protected int maxEpochs = 0;
   /**
@@ -187,7 +187,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected int numEpochsPerformed;
   /**
-   * The number of epochs performed in this session of iterating
+   * The number of epochs performed in this session of iterating.
    */
   protected int numEpochsPerformedThisSession;
   /**
@@ -204,27 +204,27 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected AbstractInstanceIterator instanceIterator =
       new DefaultInstanceIterator();
   /**
-   * Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used)
+   * Queue size for AsyncDataSetIterator (if < 1, AsyncDataSetIterator is not used).
    */
   protected int queueSize = 0;
   /**
-   * Whether to normalize/standardize/neither
+   * Whether to normalize/standardize/neither.
    */
   protected int filterType = FILTER_STANDARDIZE;
   /**
-   * Coefficient x0 used for normalizing the class
+   * Coefficient x0 used for normalizing the class.
    */
   protected double x0 = 0.0;
   /**
-   * Coefficient x1 used for normalizing the class
+   * Coefficient x1 used for normalizing the class.
    */
   protected double x1 = 1.0;
   /**
-   * Caching mode to use for loading data
+   * Caching mode to use for loading data.
    */
   protected CacheMode cacheMode = CacheMode.MEMORY;
   /**
-   * Training listener list
+   * Training listener list.
    */
   protected TrainingListener iterationListener = new EpochListener();
   /**
@@ -245,7 +245,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   protected boolean resume;
   /**
    * Whether to leave the filesystem data cache intact (if using FILESYSTEM caching) when starting
-   * or resuming learning
+   * or resuming learning.
    */
   protected boolean doNotClearFilesystemCache;
   /**
@@ -270,16 +270,22 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected int averagingFrequency = 10;
   /**
-   * True if the Cuda/GPU backend is available
+   * True if the Cuda/GPU backend is available.
    */
   protected boolean gpuBackendAvailable;
   /**
    * Displays progress of the current process (feature extraction, training, etc.)
    */
-  protected ProgressManager progressManager;
+  protected transient ProgressManager progressManager;
 
+  /**
+   * Worker for parsing layer names.
+   */
   private SwingWorker<Layer[], Void> layerSwingWorker;
 
+  /**
+   * Instantiate the model.
+   */
   public Dl4jMlpClassifier() {
     if (!s_cudaMultiGPUSet) {
       try {
@@ -326,7 +332,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
   }
 
   /**
-   * Split the dataset into p% train an (100-p)% test set
+   * Split the dataset into p% train an (100-p)% test set.
    *
    * @param data Input data
    * @param p train percentage
@@ -379,6 +385,10 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
     this.logConfig = logConfig;
   }
 
+  /**
+   * .
+   * @return Global info to return.
+   */
   public String globalInfo() {
     return "Classification and regression with multilayer perceptrons using DeepLearning4J.\n"
         + "Iterator usage\n"
@@ -950,11 +960,7 @@ public class Dl4jMlpClassifier extends RandomizableClassifier implements
    */
   protected void initParallelWrapperIfApplicable() {
 
-    Nd4jBackend b = Nd4j.getBackend();
-    if (b != null) {
-      gpuBackendAvailable = b.getClass().getCanonicalName()
-          .toLowerCase().contains("jcublas");
-    }
+    gpuBackendAvailable = new IsGPUAvailable().check();
 
     // only configure if the gpu backend is available and the user has requested
     // more than one gpus
