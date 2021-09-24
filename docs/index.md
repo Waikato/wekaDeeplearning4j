@@ -21,6 +21,12 @@ The following Neural Network Layers are available to build sophisticated archite
 Further configurations can be found in the [Getting Started](user-guide/getting-started.md) and the [Examples](examples) sections.
 ![Weka workbench GUI](img/gui.png)
 
+## New Release (1.7.2)
+
+This release adds the `IsGPUAvailable` tool, similar to Keras,TF,etc., which provides a simple way to check whether the 
+GPU drivers are loaded correctly. Check out the [Usage Instructions](install.md#check-your-gpu-is-available) alongside
+the GPU setup instructions.
+
 ## New Release (1.7.0)
 
 ![Dl4jCNNExplorer and Saliency map generation](img/releases/1.7.0/GUI.jpg)
