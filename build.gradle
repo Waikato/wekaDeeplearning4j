@@ -26,7 +26,7 @@ ext.versions = [
         'dl4j'         : '1.0.0-beta7',
         'weka'         : '3.8.4',
         'junit'        : '4.12',
-        'log4j'        : '2.11.2',
+        'log4j'        : '2.17.1',
         'ark_tweet_nlp': '0.3.2',
         'commons_lang' : '2.6',
         'openblas'     : '0.2.19-1.3',
